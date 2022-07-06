@@ -1,0 +1,59 @@
+/* Input Field */
+.fieldContainer {
+    width: 100%;
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid white;
+    backface-visibility: hidden;
+}
+.fieldContainer .fieldName {
+    top: 50%;
+    left: 0.5rem;
+    color: white;
+    position: absolute;
+    pointer-events: none;
+    transition: 0.25s ease;
+    text-transform: capitalize;
+    transform: translateY(-50%);
+}
+.fieldContainer .fieldName {
+    font-size: 0.8rem;
+}
+.fieldContainer .field {
+    width: 100%;
+    height: 3rem;
+    border: none;
+    outline: none;
+    color: white;
+    flex-grow: 0.85;
+    padding: 0 0.5rem;
+    background-color: transparent;
+}
+.fieldContainer .field:valid + .fieldName,
+.fieldContainer .field:focus + .fieldName,
+.fieldContainer .field.filled + .fieldName
+{
+    top: 0;
+    left: 0;
+    font-size: 0.6rem;
+}
+
+/* Visibility Toggler */
+.visibilityToggler {
+    height: 3rem;
+    border: none;
+    outline: none;
+    flex-grow: 0.15;
+    min-width: 1rem;
+    background: transparent;
+}
+.visibilityToggler svg {
+    width: 80%;
+    height: 100%;
+}
+.visibilityToggler svg path {
+    fill: white;
+    fill-rule: evenodd;
+}

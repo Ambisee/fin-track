@@ -1,0 +1,224 @@
+/* Hero - Right */
+.heroRight {
+    height: 100%;
+    width: inherit;
+    color: white;
+    display: flex;
+    /* position: relative; */
+    align-items: center;
+    perspective: 62.5rem;
+    justify-content: center;
+    perspective-origin: center;
+}
+.heroRight * {
+    perspective: 200rem;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+.heroRight .formDiv {
+    gap: 1rem;
+    width: 65%;
+    height: 92.5%;
+    display: flex;
+    min-width: 20rem;
+    min-height: 30rem;
+    position: absolute;
+    max-width: 22.5rem;
+    max-height: 32.5rem;
+    border-radius: 1rem;
+    padding: 1.5rem 1rem;
+    flex-direction: column;
+    border: 1px solid white;
+    backface-visibility: hidden;
+    transition: transform 0.75s ease;
+}
+.heroRight > div span {
+    font-size: 0.6rem;
+}
+.heroRight .submitButton {
+    width: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    min-width: 5rem;
+    border-radius: 0.7rem;
+    transition: 0.25s ease;
+    padding: 0.75rem 0;
+    transform-origin: center;
+    border: 1px solid white;
+    backface-visibility: hidden;
+    transform: translateZ(1.5rem);
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 7.5px rgba(0, 0, 0, 0.25);
+}
+.heroRight .submitButton:hover {
+    transform: translateZ(2rem);
+}
+.heroRight .formLink {
+    border: none;
+    cursor: pointer;
+    color: #05eefe;
+    font-size: 0.6rem;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+    background-color: transparent;
+}
+.heroRight .formLink::after {
+    content: '';
+    left: 0;
+    bottom: 0;
+    height: 0.5px;
+    width: 100%;
+    position: absolute;
+    transform-origin: left;
+    transform: translateX(-100%);
+    background-color: #05eefe;
+    transition: transform 0.25s ease;
+}
+.heroRight .formLink:hover::after {
+    transform: translateX(0%);
+}
+.heroRight span .formLink {
+    margin-left: 0.1rem;
+}
+.heroRight h4 {
+    width: 100%;
+    font-weight: 400;
+    text-align: center;
+    transform: translateZ(0.75rem);
+}
+
+/* Login Form */
+.heroRight form {
+    gap: 1rem;
+    width: 75%;
+    display: flex;
+    margin-bottom: 0;
+    margin: 1rem auto;
+    align-items: center;
+    flex-direction: column;
+    perspective: 50rem;
+}
+
+/* Login Form - Email */
+.heroRight .login form {
+    margin-bottom: 0;
+    margin: 1rem auto;
+}
+.heroRight .login form .forgotPasswordButton {
+    height: 100%;
+    align-self: flex-end;
+    transform: translateY(-0.75rem);
+}
+.heroRight .login .emailLogin .submitButton {
+    margin-top: -0.5rem;
+}
+
+/* Login Form - Divider */
+.heroRight .login .divider {
+    display: grid;
+    width: 100%;
+    height: max-content;
+    gap: 0.5rem;
+    position: relative;
+    grid-template-columns: 1fr 0.25fr 1fr;
+}
+.heroRight .login .divider hr {
+    height: 1px;
+    border: none;
+    display: block;
+    align-self: center;
+    background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+.heroRight .login .divider hr:first-of-type {
+    background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+.heroRight .login .divider p {
+    text-align: center;
+    align-self: center;
+}
+
+/* Login Form - Provider Login */
+.heroRight .providerLogin {
+    gap: 1rem;
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-direction: column;
+    perspective: 50rem;
+}
+
+/* Registration Form */
+.heroRight .register {
+    transform: rotateY(180deg);
+}
+.heroRight .register .registrationForm {
+    gap: 1.5rem;
+    grid-gap: 1.5rem;
+}
+.heroRight .register .registrationForm .submitButton {
+    margin-top: 1.25rem;
+}
+.heroRight .register > span {
+    align-self: center;
+}
+
+/* Forgot Password */
+.heroRight .forgotPassword {
+    gap: 2rem;
+    position: absolute;
+    align-items: center;
+    transform: rotateY(-180deg);
+}
+.heroRight .forgotPassword p {
+    text-align: center;
+    font-size: 0.75rem;
+    width: 80%;
+}
+.heroRight .forgotPassword form {
+    gap: 2rem;
+}
+.heroRight .forgotPassword .formLink {
+    margin-left: 1.5rem;
+    align-self: flex-start;
+}
+
+/* Shadow */
+.heroRight .shadow {
+    z-index: -1;
+    backdrop-filter: blur(10px);
+    backface-visibility: visible;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+@media screen and (min-width: 800px) {
+    .heroRight .formDiv {
+        width: 80%;
+        height: 90%;
+        max-width: 25rem;
+    }
+    .heroRight .submitButton {
+        padding: 0.75rem 0;
+    }
+}
+
+/* Event Triggered Animation */
+.login.flipRight {
+    transform: rotateY(180deg);
+}
+.login.flipLeft {
+    transform: rotateY(-180deg);
+}
+.forgotPassword.flipped {
+    transform: rotateY(-360deg);
+}
+.register.flipped {
+    transform: rotateY(360deg);
+}
+.shadow.flipRight {
+    transform: rotateY(180deg)
+}
+.shadow.flipLeft {
+    transform: rotateY(-180deg)
+}

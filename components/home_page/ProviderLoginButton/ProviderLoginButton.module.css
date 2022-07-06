@@ -1,0 +1,44 @@
+/* Provider Login - Provider Login Button */
+.providerLoginButton {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    width: 70%;
+    min-width: 5rem;
+    position: relative;
+    min-height: 2.75rem;
+    transition: 0.25s ease;
+    align-items: center;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 5px 7.5px rgba(0, 0, 0, 0.25);
+    transform: translateZ(1rem);
+}
+.providerLoginButton:hover {
+    transform: translateZ(1.5rem);
+}
+.providerLoginButton div {
+    height: 100%;
+    display: grid;
+    padding: 0 0.75rem;
+    position: relative;
+    width: fit-content;
+    align-items: center;
+    border-radius: inherit;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.providerLoginButton p {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    font-weight: 400;
+    font-size: min(0.825rem, 3.5vw);
+    align-items: center;
+    justify-content: center;
+    border-left: none;
+    border-radius: inherit;
+    border: 1px solid white;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

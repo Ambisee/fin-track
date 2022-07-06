@@ -1,0 +1,64 @@
+/* Loading Wrapper */
+.pageContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+.loadingWrapper {
+    width: 20rem;
+    height: 20rem;
+    margin: auto;
+    position: relative;
+
+    --animation-delay-interval: 0.3s;
+}
+.loadingWrapper div {
+    left: 50%;
+    top: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: circleAnimation 3s ease infinite forwards;
+    animation-delay: calc(var(--data-order) * var(--animation-delay-interval));
+}
+
+/* Loading Wrapper - Circles */
+.loadingWrapper .first {
+    width: 9rem;
+    height: 9rem;
+    left: 42.5%;
+    top: 35%;
+}
+.loadingWrapper .second {
+    width: 6rem;
+    height: 6rem;
+    left: 62.5%;
+    top: 53%;
+}
+.loadingWrapper .third {
+    width: 4.5rem;
+    height: 4.5rem;
+    left: 47.5%;
+    top: 70%;
+}
+
+/* Loading Wrapper - Circle Animation */
+@keyframes circleAnimation {
+    0% {
+        transform: translate(-50%, calc(-50% + 50%));
+        opacity: 0;
+    }
+    35% {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+    65% {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% - 50%));
+    }
+}

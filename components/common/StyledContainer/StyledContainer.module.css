@@ -1,0 +1,88 @@
+/* Wrappers */
+.homeContainer {
+    margin: auto;
+    position: relative;
+    width: min(100%, 120rem);
+    height: min(100%, 67.5rem);
+}
+.circleContainer {
+    position: absolute;
+    width: 50rem;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Background Decoration */
+.decorCircle {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+}
+.XsmallCircle {
+    width: 2rem;
+    height: 2rem;
+}
+.smallCircle {
+    width: 4.75rem;
+    height: 4.75rem;
+}
+.mediumCircle {
+    width: 11rem;
+    height: 11rem;
+}
+.largeCircle {
+    width: 15rem;
+    height: 15rem;
+}
+.XlargeCircle {
+    width: 20rem;
+    height: 20rem;
+}
+.pinkCircle {
+    background: radial-gradient(74.2% 86.99% at 49.32% 13.01%, #FF71F0 10%, #FF00E5 100%);
+}
+.pinkCircle.first {
+    top: -15%;
+    left: 6%;
+}
+.purpleCircle {
+    background: radial-gradient(74.2% 86.99% at 49.32% 13.01%, #C57BFF 0%, #8F00FF 100%);
+}
+.purpleCircle.first {
+    bottom: 10%;
+    left: 3%;
+}
+.purpleCircle.second {
+    left: 52.5%;
+    top: 40%;
+}
+.purpleCircle.third {
+    left: 82.5%;
+    bottom: 2.5%;
+}
+.cyanCircle {
+    background: radial-gradient(74.2% 86.99% at 49.32% 13.01%, #85F8FF 0%, #00F0FF 100%);
+}
+.cyanCircle.first {
+    bottom: -47.5%;
+    left: 32.5%;
+    transform: translate(-35%);
+}
+.cyanCircle.second {
+    top: 1.5%;
+    left: 58%;
+    transform: translate(-35%);
+}
+
+@media screen and (min-width: 50rem) {
+    .circleContainer {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: inherit;
+        width: inherit;
+    }
+    .cyanCircle.first {
+        bottom: -30%;
+    }
+}
