@@ -7,10 +7,10 @@ import 'swiper/css'
 function MyApp({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => page)
   
-  return getLayout(
+  return (
     <FirebaseAuthProvider>
       <StyledContainer>
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </StyledContainer>
     </FirebaseAuthProvider>
   )

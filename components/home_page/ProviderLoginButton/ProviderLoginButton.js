@@ -10,6 +10,7 @@ export default function ProviderLoginButton({providerName, imgSrc=defaultImage, 
                 <Image
                     src={imgSrc}
                     alt="Provider Logo.jpg"
+                    loading="eager"
                     layout="fixed"
                     width="25"
                     height="25"

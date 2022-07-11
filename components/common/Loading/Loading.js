@@ -16,7 +16,7 @@ export default function Loading() {
                     <div
                         className={`
                             ${circleStyles.decorCircle}
-                            ${circleStyles.cyanCircle}
+                            ${circleStyles.blueCircle}
                             ${styles.first}
                         `}
                         style={{'--data-order': 1}}

@@ -1,0 +1,46 @@
+/* Dashboard Navigation Bar */
+.dashboardNav {
+    gap: 1rem;
+    width: 15rem;
+    height: 100%;
+    display: grid;
+    position: fixed;
+    border-right: 1px solid white;
+    transition: transform 0.5s linear;
+    background: rgba(143, 0, 255, 0.8);
+    grid-template-rows: 6.25rem auto;
+}
+
+/* Dashboard Navigation Bar - Header */
+.dashboardNav h3 {
+    color: white;
+    justify-self: center;
+    align-self: center;
+}
+
+/* Dashboard Navigation Bar - Links */
+.links {
+    list-style: none;
+    position: relative;
+}
+.link {
+    z-index: 10;
+    display: flex;
+    padding: 0 1.5rem;
+    color: white;
+    align-items: center;
+    text-decoration: none;
+    filter: grayscale(1);
+    height: var(--link-height);
+    transition: color 0.5s ease;
+    mix-blend-mode: difference;
+}
+.linkHighlight {
+    top: 0;
+    z-index: -1;
+    width: 100%;
+    position: absolute;
+    height: var(--link-height);
+    user-select: none;
+    background: rgba(255, 255, 255);
+}

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 
-import backgroundImage from '../../../public/background.png'
+import backgroundImage from '../../../public/background(1).png'
 import styles from './ThemedContainer.module.css'
 
 export default function ThemedContainer({ children }) {
@@ -12,7 +12,6 @@ export default function ThemedContainer({ children }) {
                     className={styles.bgImage}
                     src={backgroundImage}
                     alt="Background.jpg"
-                    placeholder='blur'
                     objectFit="cover"
                     loading="eager"
                     priority={true}

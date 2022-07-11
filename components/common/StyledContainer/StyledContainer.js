@@ -9,49 +9,49 @@ export default function HomeContainer({ props, children }) {
                     <div
                         className={`
                             ${styles.decorCircle}
-                            ${styles.pinkCircle} 
-                            ${styles.mediumCircle} 
-                            ${styles.first}
-                        `}
-                    />
-                    <div
-                        className={`
-                            ${styles.decorCircle} 
-                            ${styles.purpleCircle} 
-                            ${styles.smallCircle}
-                            ${styles.first}
-                        `}
-                    />
-                    <div
-                        className={`
-                            ${styles.decorCircle} 
-                            ${styles.cyanCircle} 
-                            ${styles.XlargeCircle}
-                            ${styles.first}
-                        `}
-                    />
-                    <div
-                        className={`
-                            ${styles.decorCircle}
-                            ${styles.cyanCircle}
-                            ${styles.largeCircle}
-                            ${styles.second}
-                        `}
-                    />
-                    <div
-                        className={`
-                            ${styles.decorCircle}
-                            ${styles.purpleCircle} 
+                            ${styles.blueCircle} 
                             ${styles.XsmallCircle} 
-                            ${styles.second}
+                            ${styles.id1}
                         `}
                     />
                     <div
                         className={`
                             ${styles.decorCircle} 
-                            ${styles.purpleCircle} 
+                            ${styles.pinkCircle} 
                             ${styles.mediumCircle}
-                            ${styles.third}
+                            ${styles.id2}
+                        `}
+                    />
+                    <div
+                        className={`
+                            ${styles.decorCircle} 
+                            ${styles.pinkCircle} 
+                            ${styles.XlargeCircle}
+                            ${styles.id3}
+                        `}
+                    />
+                    <div
+                        className={`
+                            ${styles.decorCircle}
+                            ${styles.blueCircle}
+                            ${styles.XXsmallCircle}
+                            ${styles.id4}
+                        `}
+                    />
+                    <div
+                        className={`
+                            ${styles.decorCircle}
+                            ${styles.purpleCircle} 
+                            ${styles.mediumCircle} 
+                            ${styles.id5}
+                        `}
+                    />
+                    <div
+                        className={`
+                            ${styles.decorCircle} 
+                            ${styles.blueCircle} 
+                            ${styles.smallCircle}
+                            ${styles.id6}
                         `}
                     />
                 </div>
