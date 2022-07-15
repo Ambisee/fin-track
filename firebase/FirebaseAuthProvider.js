@@ -1,3 +1,8 @@
+/**
+ * firebase/FirebaseAuthProvider.js
+ * 
+ * Defines the provider for the authentication context
+ */
 import { FirebaseAuthContext, useFirebaseAuth } from "./auth";
 
 function FirebaseAuthProvider({ children }) {
