@@ -3,4 +3,77 @@
     width: 100%;
     height: 100%;
     position: relative;
+
+    --top-nav-height: 5rem;
+}
+
+/* Layout Navbar */
+.sideNav {
+    z-index: 20;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+}
+.topNav {
+    z-index: 15;
+    position: fixed;
+}
+.darkFilter {
+    top: 0;
+    left: 0;
+    z-index: 14;
+    width: 100%;
+    height: 100%;
+    display: none;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Layout Navbar - Stateful Styles */
+.navBarToggler.displayNav {
+    opacity: 0;
+}
+.sideNav.displayNav {
+    z-index: 100;
+    transform: translate(0);
+}
+.darkFilter.displayNav {
+    z-index: 90;
+    display: block;
+}
+
+/* Layout Content */
+.content {
+    width: 100%;
+    z-index: 5;
+    height: calc(100vh - var(--top-nav-height));
+    position: relative;
+    top: var(--top-nav-height);
+    overflow-y: auto;
+}
+.content::-webkit-scrollbar {
+    width: 5px;
+    background: transparent;
+}
+.content::-webkit-scrollbar-thumb {
+    background-color: white;
+}
+
+@media screen and (min-width: 700px) {
+    .sideNav,
+    .sideNav.displayNav {
+        left: 0;
+        transition: none;
+        transform: translate(0);
+    }
+    .darkFilter,
+    .darkFilter.displayNav {
+        display: none;
+    }
+    .content {
+        top: var(--top-nav-height);
+        left: 15rem;
+        width: calc(100% - 15rem);
+    }
 }

@@ -8,7 +8,7 @@ export default function DashboardAccountPage() {
 
 DashboardAccountPage.getLayout = function getLayout(page) {
     return (
-        <DashboardLayout>
+        <DashboardLayout pageIndex={1}>
             {page}
         </DashboardLayout>
     )

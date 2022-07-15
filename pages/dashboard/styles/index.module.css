@@ -1,0 +1,8 @@
+/* Dashboard - Home */
+.dashboardHome {
+    padding: 1rem;
+}
+
+.dashboardHome h3 span {
+    white-space: nowrap;
+}

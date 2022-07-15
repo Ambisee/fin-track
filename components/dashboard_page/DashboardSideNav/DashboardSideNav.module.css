@@ -1,13 +1,15 @@
 /* Dashboard Navigation Bar */
 .dashboardNav {
     gap: 1rem;
-    width: 15rem;
+    width: 50%;
     height: 100%;
     display: grid;
-    position: fixed;
+    max-width: 15rem;
+    min-width: 12.5rem;
     border-right: 1px solid white;
-    transition: transform 0.5s linear;
-    background: rgba(143, 0, 255, 0.8);
+    transition: transform 0.5s ease;
+    background: rgba(143, 0, 255, 0.6);
+    backdrop-filter: blur(10px);
     grid-template-rows: 6.25rem auto;
 }
 
@@ -28,19 +30,24 @@
     display: flex;
     padding: 0 1.5rem;
     color: white;
+    position: relative;
     align-items: center;
     text-decoration: none;
-    filter: grayscale(1);
     height: var(--link-height);
     transition: color 0.5s ease;
-    mix-blend-mode: difference;
+}
+.link.currentPage {
+    color: black;
+}
+.link:hover {
+    color: black;
 }
 .linkHighlight {
     top: 0;
     z-index: -1;
     width: 100%;
     position: absolute;
-    height: var(--link-height);
     user-select: none;
+    height: var(--link-height);
     background: rgba(255, 255, 255);
 }

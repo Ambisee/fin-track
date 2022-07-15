@@ -1,0 +1,122 @@
+/* Dashboard Top Navigation */
+.topNavBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--top-nav-height);
+    width: 100%;
+    padding: 1rem;
+}
+.navBarToggler {
+    width: 2rem;
+    border: none;
+    outline: none;
+    height: 1.5rem;
+    position: relative;
+    background-color: transparent;
+}
+.navBarToggler div {
+    width: 100%;
+    height: 3px;
+    left: 0;
+    position: absolute;
+    background-color: white;
+}
+.navBarToggler div:first-child {
+    top: 0;
+}
+.navBarToggler div:nth-child(2) {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.navBarToggler div:last-child {
+    bottom: 0;
+}
+.profile {
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 0.5rem;
+}
+.profileInfo {
+    gap: 1rem;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.profilePicture {
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 50%;
+    background-color: black;
+    border: none;
+}
+.profileName {
+    font-size: 1rem;
+    user-select: none;
+}
+.profileDropdown {
+    position: absolute;
+    display: none;
+    background-color: white;
+    right: 0;
+    top: calc(100% + 0.75rem);
+    width: 100%;
+    border-radius: 5px;
+}
+.profileDropdown *:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.profileDropdown *:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.profileDropdown button,
+.profileDropdown a {
+    width: 100%;
+    border: none;
+    color: black;
+    display: block;
+    cursor: pointer;
+    font-size: 1rem;
+    background: none;
+    padding: 0.75rem;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+.profileDropdown button:hover,
+.profileDropdown a:hover {
+    background-color: black;
+    color: white;
+}
+.profileDropdown::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 50%;
+    transform: translateX(50%);
+    width: 0.25rem;
+    height: 0.25rem;
+    box-sizing: border-box;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent white transparent;
+}
+.profile.displayDropdown .profileInfo {border: 1px solid black;}
+.profile.displayDropdown .profileDropdown {display: block;}
+
+@media screen and (min-width: 700px) {
+    .topNavBar {
+        left: 15rem;
+        padding: 0 3rem;
+        width: calc(100% - 15rem);
+    }
+    .navBarToggler {
+        display: none;
+    }
+}

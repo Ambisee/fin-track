@@ -6,6 +6,8 @@ import DashboardLayout from '../../components/dashboard_page/DashboardLayout/Das
 import { useAuth } from '../../firebase/auth';
 import { projectAuth } from '../../firebase/firebaseClient';
 
+import styles from './styles/index.module.css'
+
 export default function DashboardHomePage() {
     const auth = useAuth()
     const router = useRouter()
@@ -25,22 +27,16 @@ export default function DashboardHomePage() {
     }
 
     return (
-      <>
+      <div className={styles.dashboardHome}>
         <Head>
             <title>{`${process.env.NEXT_PUBLIC_TITLE} | Dashboard`}</title>
         </Head>
-        Current User: {`${auth.user?.displayName}`}
-        <button onClick={() => console.log(projectAuth.currentUser)}>CurrentUser</button>
-        <button onClick={auth.userSignOut}>Sign Out</button>
-      </>
+        <h3>Welcome back, <span>{`${auth?.user.displayName || 'user111'}`}</span></h3>
+      </div>
     )
 }
 
 DashboardHomePage.getLayout = function getLayout(page) {
-  if (projectAuth.currentUser == undefined) {
-    return page
-  }
-
   return (
     <DashboardLayout pageIndex={0}>
       {page}
