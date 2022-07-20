@@ -20,7 +20,6 @@ export default function DashboardLayout(props) {
      */
     const {
         children,
-        user
     } = props
 
     /**
@@ -29,8 +28,9 @@ export default function DashboardLayout(props) {
      *      the side navigation bar is toggled or not
      */
     const [navToggle, setNavToggle] = useState(false)
+    const auth = useAuth()
 
-    if (user == undefined) {
+    if (auth?.user == undefined) {
         return children
     }
 
@@ -43,7 +43,7 @@ export default function DashboardLayout(props) {
                 pageIndex={0} 
             />
             <DashboardTopNav 
-                profileImage={user}
+                profileImage={auth.user}
                 className={styles.topNav}
                 sideBarCallback={() => setNavToggle(true)}
             />

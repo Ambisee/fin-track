@@ -2,7 +2,9 @@
 .dashboardHome {
     padding: 1rem;
 }
-
+.dashboardHome h3 {
+    color: white;
+}
 .dashboardHome h3 span {
     white-space: nowrap;
 }

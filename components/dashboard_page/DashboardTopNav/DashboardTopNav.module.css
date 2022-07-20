@@ -51,7 +51,7 @@
     height: 2.25rem;
     width: 2.25rem;
     border-radius: 50%;
-    background-color: black;
+    background-color: white;
     border: none;
 }
 .profileName {
@@ -107,8 +107,12 @@
     border-style: solid;
     border-color: transparent transparent white transparent;
 }
-.profile.displayDropdown .profileInfo {border: 1px solid black;}
-.profile.displayDropdown .profileDropdown {display: block;}
+.profile.displayDropdown .profileInfo {
+    border: 1px solid white;
+}
+.profile.displayDropdown .profileDropdown {
+    display: block;
+}
 
 @media screen and (min-width: 700px) {
     .topNavBar {

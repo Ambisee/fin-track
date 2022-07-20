@@ -43,12 +43,9 @@ export default function DashboardSideNav(props) {
      *      integer representing the current page or url the user is in
      * hoverIndex: Number = 
      *      integer representing the currently hovered link
-     * currentPageRef: Element = 
-     *      React reference to the current page's Link element
      */
     const [currentPageIndex, setCurrentPageIndex] = useState(pageIndex)
-    const [hoverIndex, setHoverIndex] = useState(currentPage)
-    const currentPageRef = useRef()
+    const [hoverIndex, setHoverIndex] = useState(currentPageIndex)
 
     return (
         <motion.nav className={`${styles.dashboardNav} ${className}`}>
@@ -59,18 +56,20 @@ export default function DashboardSideNav(props) {
                         <li key={index}>
                             <Link href={obj.url} passHref>
                                 <motion.a
-                                    ref={currentPageIndex == index && currentPageRef}
                                     onClick={() => {
-                                        setCurrentPageIndex(index); onRedirect()
+                                        setCurrentPageIndex(index)
+                                        onRedirect()
                                     }}
                                     onHoverStart={() => {
                                         setHoverIndex(index)
-                                        if (!(currentPageIndex == index)) currentPageRef.current.style.color = 'white'
                                     }}
-                                    onHoverEnd={() => {setHoverIndex(pageIndex); currentPageRef.current.style.color = ''}}
+                                    onHoverEnd={() => {
+                                        setHoverIndex(currentPageIndex)
+                                    }}
                                     className={`
                                         ${styles.link}
-                                        ${index == pageIndex && styles.currentPage}
+                                        ${index == currentPageIndex && hoverIndex != index ? styles.notHovered : ""}
+                                        ${index == currentPageIndex && styles.currentPage}
                                     `}
                                 >
                                     <span>{obj.name}</span>

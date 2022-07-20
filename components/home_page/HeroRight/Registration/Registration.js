@@ -13,7 +13,7 @@ import { flashMessage } from '../../utils'
 
 import styles from '../HeroRight.module.css'
 
-export default function Registration(propsw) {
+export default function Registration(props) {
     /**
      * state: Object =
      *      Object that contains the forms' display state

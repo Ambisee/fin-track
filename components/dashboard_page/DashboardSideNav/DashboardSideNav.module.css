@@ -39,6 +39,9 @@
 .link.currentPage {
     color: black;
 }
+.link.currentPage.notHovered {
+    color: white
+}
 .link:hover {
     color: black;
 }

@@ -4,7 +4,6 @@ import Loading from '../../components/common/Loading/Loading';
 import DashboardLayout from '../../components/dashboard_page/DashboardLayout/DashboardLayout';
 
 import { useAuth } from '../../firebase/auth';
-import { projectAuth } from '../../firebase/firebaseClient';
 
 import styles from './styles/index.module.css'
 
