@@ -1,3 +1,10 @@
+/**
+ * /components/common/StyledContainer/StyledContainer.js
+ * 
+ * Application page container component
+ * styled with a background image and
+ * decorative elements
+ */
 import styles from './StyledContainer.module.css'
 import ThemedContainer from '../ThemedContainer/ThemedContainer'
 

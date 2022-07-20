@@ -1,7 +1,19 @@
+/**
+ * /components/home_page/HeroLeft/HeroLeft.js
+ * 
+ * The left section of the landing page's hero section
+ * where the header, brief description, and quick links 
+ * will be displayed
+ */
 import {useSwiper} from 'swiper/react'
 import styles from './HeroLeft.module.css'
 
 export default function HeroLeft() {
+    /**
+     * swiper: ~ =
+     *      reference to the Swiper component. Used to retrieve a callback function
+     *      for the Swiper
+     */
     const swiper = useSwiper()
 
     return (

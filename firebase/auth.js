@@ -37,7 +37,9 @@ function useAuth() {
 }
 
 function useFirebaseAuth() {
-    /** user: UserCredential = Stores the user's credential in the global scope */
+    /** user: UserCredential = 
+     *      Stores the user's credential in the global scope 
+     */
     const [user, setUser] = useState(undefined)
 
     const emailSignIn = (email, password, onSuccess = (success) => { }, onFailure = (error) => { }) => {
@@ -56,7 +58,7 @@ function useFirebaseAuth() {
         signInWithEmailAndPassword(projectAuth, email, password)
             .then(response => {
                 /** 
-                 * response: Object({...UserCredential}) =
+                 * response: UserCredential =
                  *      a UserCredential object containing the credentials of the signed in user
                  */
                 setUser(response.user)
@@ -64,7 +66,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 setUser(null)
@@ -86,7 +88,7 @@ function useFirebaseAuth() {
         signInWithPopup(projectAuth, provider)
             .then(response => {
                 /** 
-                 * response: Object({...UserCredential}) =
+                 * response: UserCredential =
                  *      a UserCredential object containing the credentials of the signed in user
                  */
                 setUser(response.user)
@@ -94,7 +96,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 setUser(null)
@@ -115,7 +117,7 @@ function useFirebaseAuth() {
         signInWithPopup(projectAuth, provider)
             .then(response => {
                 /** 
-                 * response: Object({...UserCredential}) =
+                 * response: UserCredential =
                  *      a UserCredential object containing the credentials of the signed in user
                  */
                 setUser(response.user)
@@ -123,7 +125,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 setUser(null)
@@ -147,7 +149,7 @@ function useFirebaseAuth() {
          *      callback function when the sign-up process failed
          */
         if (password !== confirmPassword) {
-            // Raise an error if `password` and `confirmPassword`
+            /** Raise an error if `password` and `confirmPassword` */
             onFailure({ message: `The password doesn't match!` })
             return
         }
@@ -155,7 +157,7 @@ function useFirebaseAuth() {
         createUserWithEmailAndPassword(projectAuth, email, password)
             .then(response => {
                 /** 
-                 * response: Object({...UserCredential}) =
+                 * response: UserCredential =
                  *      a UserCredential object containing the credentials of the signed in user
                  */
                 setUser(response.user)
@@ -164,7 +166,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 console.log(error)
@@ -177,7 +179,7 @@ function useFirebaseAuth() {
          * Wrapper function for sending a verification email to a new user
          * created through email and password
          * 
-         * user: Object({...UserCredential}) =
+         * user: UserCredential =
          *      the UserCredential object that corresponds to the user to send
          *      a verification email to
          * onSuccess: Function = 
@@ -196,7 +198,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 onFailure({ ...error, message: 'Failed to send a verification email' })
@@ -225,7 +227,7 @@ function useFirebaseAuth() {
             })
             .catch(error => {
                 /** 
-                 * error: Object({code: String, customData: Object, name: String}) =
+                 * error: Object({code: String, customData: AuthError, name: String}) =
                  *      an object containing an AuthError object detailing the error encountered
                  */
                 onFailure({ ...error, message: "Invalid email or user doesn't exist" })
@@ -247,12 +249,12 @@ function useFirebaseAuth() {
              * in the user's authentication state
              */
             if (user) {
-                // Save the user credential to a React state and in cookies
+                /** Save the user credential to a React state and in cookies */
                 const token = await user.getIdToken()
                 setUser(user)
                 nookies.set(undefined, 'token', token, { path: '/' })
             } else {
-                // Clear the saved user credential
+                /** Clear the saved user credential */
                 setUser(null)
                 nookies.set(undefined, 'token', '', { path: '/' })
             }

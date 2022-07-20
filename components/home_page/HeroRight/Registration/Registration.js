@@ -1,3 +1,9 @@
+/**
+ * /components/home_page/HeroRight/Registration/Registration.js
+ * 
+ * The 'Sign up' form component used to
+ * create new users by email and password
+ */
 import { useState } from 'react'
 
 import InputField from '../../InputField/InputField'
@@ -7,12 +13,33 @@ import { flashMessage } from '../../utils'
 
 import styles from '../HeroRight.module.css'
 
-export default function Registration({state, dispatch}) {
-    const auth = useAuth()
+export default function Registration(propsw) {
+    /**
+     * state: Object =
+     *      Object that contains the forms' display state
+     * dispatch: Function =
+     *      the `state`'s corresponding dispatch function 
+     */
+    const {
+        state,
+        dispatch
+    } = props
 
+    /**
+     * newEmail: String = 
+     *      store value of the new email
+     * newPassword: String = 
+     *      store value of the new password
+     * confirmPassword: String = 
+     *      store value of the confirmation password
+     * auth: Object =
+     *      Authentication context used to retrieve the necessary authentication functions
+     */
     const [newEmail, setNewEmail] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const auth = useAuth()
+
 
     return (
         <div 

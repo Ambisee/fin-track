@@ -1,5 +1,11 @@
+/**
+ * components/home_page/HeroRight/Login/Login.js
+ * 
+ * The 'Forgot password' form component used to log
+ * the user in through email and password, or through
+ * one of the login providers
+ */
 import { useState } from "react"
-import { useRouter } from "next/router"
 
 import { flashMessage } from '../../utils'
 import { useAuth } from '../../../../firebase/auth'
@@ -12,6 +18,18 @@ import facebookLogo from "../../../../public/facebook-logo.png"
 import styles from "../HeroRight.module.css"
 
 function wrappedEmailSignIn(auth, email, password, dispatch) {
+  /**
+   * Wrapped email sign-in function for the 'login' process
+   * 
+   * auth: Auth =
+   *    the Auth instance of the current application
+   * email: String =
+   *    the user's email address 
+   * password: String =
+   *    the password the user entered
+   * dispatch: Function =
+   *    the dispatch function for displaying status messages 
+   */
   dispatch({type: SHOW_MESSAGE, payload: {message: 'Signing in...', type: 'info'}})
   
   auth.emailSignIn(
@@ -22,12 +40,30 @@ function wrappedEmailSignIn(auth, email, password, dispatch) {
   )
 }
 
-export default function Login({ state, dispatch }) {
-  const auth = useAuth()
-  const router = useRouter()
+export default function Login(props) {
+  /**
+   * state: Object =
+   *      Object that contains the forms' display state
+   * dispatch: Function =
+   *      the `state`'s corresponding dispatch function 
+   */
+  const {
+    state,
+    dispatch
+  } = props
 
+
+  /**
+   * email: String = 
+   *    store value of email corresponding to an account
+   * password: String = 
+   *    store value of the user-entered password
+   * auth: Object =
+   *    Authentication context used to retrieve the necessary functions
+   */
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const auth = useAuth()
 
   return (
     <div

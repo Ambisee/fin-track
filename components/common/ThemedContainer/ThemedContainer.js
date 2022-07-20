@@ -1,3 +1,9 @@
+/**
+ * /components/common/ThemedContainer/ThemedContainer.js
+ * 
+ * Page container component styled with
+ * a background image
+ */
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 

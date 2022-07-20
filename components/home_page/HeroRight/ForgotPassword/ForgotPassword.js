@@ -1,3 +1,10 @@
+/**
+ * /components/home_page/HeroRight/ForgotPassword/ForgotPassword.js
+ * 
+ * The 'Forgot password' form component used to
+ * reset the password of a user that signed up with an
+ * email and password
+ */
 import { useState } from 'react'
 
 import InputField from '../../InputField/InputField'
@@ -7,9 +14,27 @@ import { flashMessage } from '../../utils'
 
 import styles from '../HeroRight.module.css'
 
-export default function ForgotPassword({state, dispatch}) {
-    const auth = useAuth()
+export default function ForgotPassword(props) {
+    /**
+     * state: Object =
+     *      Object that contains the forms' display state
+     * dispatch: Function =
+     *      the `state`'s corresponding dispatch function 
+     */
+    const {
+        state,
+        dispatch
+    } = props
+
+    /** 
+     * email: String = 
+     *      store value of the email that corresponds to 
+     *      the account whose password is to be reset
+     * auth: Object =
+     *      Authentication context used to retrieve the user's details
+     */
     const [email, setEmail] = useState("")
+    const auth = useAuth()
     
     return (
         <div

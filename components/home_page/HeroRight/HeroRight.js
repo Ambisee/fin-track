@@ -1,15 +1,21 @@
+/**
+ * components/home_page/HeroRight/HeroRight.js
+ * 
+ * The right part of the landing page's hero section
+ * where the login, registration, and forgot password
+ * forms is located
+ */
 import Login from './Login/Login'
 import Registration from './Registration/Registration'
 import ForgotPassword from './ForgotPassword/ForgotPassword'
 import {
-    reducer,
-    defaultValues,
     indexDirectory
 } from '../dispatcher'
 
 import styles from './HeroRight.module.css'
 
 export default function HeroRight(props) {
+    /** The corresponding reducer state and dispatch function */
     const {state, dispatch} = props
 
     return (
