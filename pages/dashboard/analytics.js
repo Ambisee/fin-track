@@ -11,3 +11,11 @@ export default function DashboardAnalyticsPage() {
         </div>
     )
 }
+
+DashboardAnalyticsPage.getLayout = function getLayout(page) {
+    return (
+        <DashboardLayout pageIndex={3}>
+            {page}
+        </DashboardLayout>
+    )
+}

@@ -59,6 +59,7 @@
     background: transparent;
 }
 .content::-webkit-scrollbar-thumb {
+    border-radius: 50px;
     background-color: white;
 }
 
