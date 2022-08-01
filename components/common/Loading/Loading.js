@@ -1,14 +1,14 @@
-/**
- * /components/common/Loading/Loading.js
- * 
- * A loading indicator component to be displayed
- * when a page redirect happens
- */
 import Head from 'next/head'
 
 import styles from './Loading.module.css'
 import circleStyles from '../StyledContainer/StyledContainer.module.css'
 
+/**
+ * A loading indicator component to be displayed
+ * when a page redirect happens
+ * 
+ * @returns 
+ */
 export default function Loading() {
     return (
         <>

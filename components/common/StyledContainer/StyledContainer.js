@@ -1,14 +1,25 @@
+import React from 'react'
+import ThemedContainer from '../ThemedContainer/ThemedContainer'
+import Loading from '../Loading/Loading'
+
+import styles from './StyledContainer.module.css'
+
 /**
- * /components/common/StyledContainer/StyledContainer.js
- * 
  * Application page container component
  * styled with a background image and
  * decorative elements
+ * 
+ * @param {Object} props 
+ *      Properties to be passed into the component
+ * @param {React.Component} props.children 
+ *      Child component to be rendered inside the component
+ * @returns 
  */
-import styles from './StyledContainer.module.css'
-import ThemedContainer from '../ThemedContainer/ThemedContainer'
+export default function StyledContainer(props) {
+    const {
+        children
+    } = props
 
-export default function HomeContainer({ props, children }) {
     return (
         <ThemedContainer>
             <div className={styles.homeContainer}>
@@ -62,7 +73,7 @@ export default function HomeContainer({ props, children }) {
                         `}
                     />
                 </div>
-                {children}
+                {children ? children : <Loading />}
             </div>
         </ThemedContainer>
     )

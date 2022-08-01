@@ -1,13 +1,9 @@
 /**
- * /firebase/firebaseClient.js
- * 
  * Initializes the Firebase Javascript Client SDK
  */
 import { initializeApp } from 'firebase/app'
 import {
     getAuth,
-    setPersistence,
-    browserSessionPersistence
 } from 'firebase/auth'
 
 const config = {

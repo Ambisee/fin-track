@@ -1,21 +1,26 @@
 /**
  * components/home_page/InputField/VisibilityToggler.js
  * 
- * Part of the InputField component. Contains the button component
- * that toggles or detoggles visibility of the value of an InputField
- * with the `password` `type`
+
  */
 import styles from './InputField.module.css'
 
+/**
+ * Part of the InputField component. Contains the button component
+ * that toggles or detoggles visibility of the value of an InputField
+ * with the `password` `type`
+ * 
+ * @param {Object} props 
+ *      The properties that will be passed down to the component
+ * @param {Function} props.toggleOn
+ *      callback function that fires off when the button is toggled
+ * @param {Function} props.toggleOff
+ *      callback function that fires off when the button is not toggled
+ * @param {Boolean} props.isVisible
+ *      The boolean value that shows whether or not the InputField's value is visible
+ * @returns 
+ */
 export default function VisibilityToggler(props) {
-    /**
-     * toggleOn: Function =
-     *      callback function that fires off when the button is toggled
-     * toggleOff: Function =
-     *      callback function that fires off when the button is not toggled
-     * isVisible: Boolean =
-     *      The boolean value that shows whether or not the InputField's value is visible
-     */
     const {
         toggleOn,
         toggleOff,

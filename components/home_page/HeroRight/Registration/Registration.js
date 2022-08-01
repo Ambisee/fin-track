@@ -1,8 +1,7 @@
 /**
  * /components/home_page/HeroRight/Registration/Registration.js
  * 
- * The 'Sign up' form component used to
- * create new users by email and password
+
  */
 import { useState } from 'react'
 
@@ -13,13 +12,19 @@ import { flashMessage } from '../../utils'
 
 import styles from '../HeroRight.module.css'
 
+/**
+ * The 'Sign up' form component used to
+ * create new users by email and password
+ * 
+ * @param {Object} props 
+ *      The properties that will be passed down to the component
+ * @param {Object} state
+ *       Object that contains the forms' display state
+ * @param {Function} dispatch 
+ *      The `state`'s corresponding dispatch function 
+ * @returns 
+ */
 export default function Registration(props) {
-    /**
-     * state: Object =
-     *      Object that contains the forms' display state
-     * dispatch: Function =
-     *      the `state`'s corresponding dispatch function 
-     */
     const {
         state,
         dispatch
@@ -39,7 +44,6 @@ export default function Registration(props) {
     const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const auth = useAuth()
-
 
     return (
         <div 

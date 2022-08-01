@@ -1,6 +1,4 @@
 /**
- * /firebase/auth.js
- * 
  * Defines authentication-related
  * hooks and context
  */
@@ -10,7 +8,8 @@ import {
     useState,
     useEffect,
     useContext,
-    createContext
+    createContext,
+    Context
 } from "react";
 import {
     signInWithPopup,
@@ -29,32 +28,40 @@ import { projectAuth } from "./firebaseClient";
 /** The context used to store the authentication state */
 const FirebaseAuthContext = createContext()
 
+/**
+ * Custom hook to access the authentication context
+ * 
+ * @returns {Context}
+ */
 function useAuth() {
-    /**
-     * Custom hook to access the authentication context
-     */
     return useContext(FirebaseAuthContext)
 }
 
+/**
+ * Custom hook that stores the authentication
+ * methods and states
+ * 
+ * @returns {Object}
+ */
 function useFirebaseAuth() {
     /** user: UserCredential = 
      *      Stores the user's credential in the global scope 
      */
     const [user, setUser] = useState(undefined)
 
+    /**
+     * Wrapper function for signing users in through email 
+     * 
+     * @param {String} email
+     *      user's email address
+     * @param {String} password
+     *      password corresponding to the user's email
+     * @param {Function} onSuccess
+     *      callback function when the sign-in process succeeded
+     * @param {Function} onFailure
+     *      callback function when the sign-in process failed
+     */
     const emailSignIn = (email, password, onSuccess = (success) => { }, onFailure = (error) => { }) => {
-        /** 
-         * Wrapper function for signing users in through email 
-         * 
-         * email: String =
-         *      user's email address
-         * password: String = 
-         *      password corresponding to the user's email
-         * onSuccess: Function = 
-         *      callback function when the sign-in process succeeded
-         * onFailure: Function = 
-         *      callback function when the sign-in process failed
-         */
         signInWithEmailAndPassword(projectAuth, email, password)
             .then(response => {
                 /** 
@@ -74,16 +81,16 @@ function useFirebaseAuth() {
             })
     }
 
+    /**
+     * Wrapper function for signing users in through the Google provider.
+     * Calling this function will create a Google sign-in popup.
+     * 
+     * @param {Function} onSuccess
+     *      callback function when the sign-in process succeeded
+     * @param {Function} onFailure
+     *      callback function when the sign-in process failed
+     */
     const googleSignIn = (onSuccess = (success) => { }, onFailure = (error) => { }) => {
-        /** 
-         * Wrapper function for signing users in through the Google provider.
-         * Calling this function will create a Google sign-in popup.
-         * 
-         * onSuccess: Function = 
-         *      callback function when the sign-in process succeeded
-         * onFailure: Function = 
-         *      callback function when the sign-in process failed
-         */
         const provider = new GoogleAuthProvider()
         signInWithPopup(projectAuth, provider)
             .then(response => {
@@ -103,16 +110,16 @@ function useFirebaseAuth() {
                 onFailure({ ...error, message: `An error occured: ${error.code}` })
             })
     }
-
+    /** 
+     * Wrapper function for signing users in through the Facebook popup.
+     * 
+     * @param {Function} onSuccess 
+     *      callback function when the sign-in process succeeded
+     * @param {Function} onFailure 
+     *      callback function when the sign-in process failed
+     */
     const facebookSignIn = (onSuccess = (success) => { }, onFailure = (error) => { }) => {
-        /** 
-         * Wrapper function for signing users in through the Facebook popup.
-         * 
-         * onSuccess: Function = 
-         *      callback function when the sign-in process succeeded
-         * onFailure: Function = 
-         *      callback function when the sign-in process failed
-         */
+        
         const provider = new FacebookAuthProvider()
         signInWithPopup(projectAuth, provider)
             .then(response => {
@@ -133,21 +140,21 @@ function useFirebaseAuth() {
             })
     }
 
+    /** 
+     * Wrapper function for creating a new user with an email and password
+     * 
+     * @param {String} email 
+     *      An email address to create the account with
+     * @param {String} password 
+     *      A password that will be used to log in into the account
+     * @param {String} confirmPassword
+     *      An instance to which `password` will be compared against
+     * @param {Function} onSuccess 
+     *      callback function when the sign-up process succeeded
+     * @param {Function} onFailure 
+     *      callback function when the sign-up process failed
+     */
     const createNewUser = (email, password, confirmPassword, onSuccess = (success) => { }, onFailure = (error) => { }) => {
-        /** 
-         * Wrapper function for creating a new user with an email and password
-         * 
-         * email: String = 
-         *      An email address to create the account with
-         * password: String = 
-         *      A password that will be used to log in into the account
-         * confirmPassword: String =
-         *      An instance to which `password` will be compared against
-         * onSuccess: Function = 
-         *      callback function when the sign-up process succeeded
-         * onFailure: Function = 
-         *      callback function when the sign-up process failed
-         */
         if (password !== confirmPassword) {
             /** Raise an error if `password` and `confirmPassword` */
             onFailure({ message: `The password doesn't match!` })
@@ -174,19 +181,19 @@ function useFirebaseAuth() {
             })
     }
 
+    /** 
+     * Wrapper function for sending a verification email to a new user
+     * created through email and password
+     * 
+     * @param {UserCredential} user
+     *      the UserCredential object that corresponds to the user to send
+     *      a verification email to
+     * @param {Function} onSuccess 
+     *      callback function when the verification process succeeded
+     * @param {Function} onFailure 
+     *      callback function when the verification process failed
+     */
     const verifyNewUser = (user, onSuccess = () => { }, onFailure = () => { }) => {
-        /** 
-         * Wrapper function for sending a verification email to a new user
-         * created through email and password
-         * 
-         * user: UserCredential =
-         *      the UserCredential object that corresponds to the user to send
-         *      a verification email to
-         * onSuccess: Function = 
-         *      callback function when the verification process succeeded
-         * onFailure: Function = 
-         *      callback function when the verification process failed
-         */
         sendEmailVerification(user)
             .then(response => {
                 /** 
@@ -205,18 +212,18 @@ function useFirebaseAuth() {
             })
     }
 
+    /** 
+     * Wrapper function for sending a verification email to a new user
+     * created through email and password
+     * 
+     * @param {String} email
+     *      the email whose password is to be reset
+     * @param {Function} onSuccess
+     *      callback function when the password reset process succeeded
+     * @param {Function} onFailure
+     *      callback function when the password reset process failed
+     */
     const resetPassword = (email, onSuccess = () => { }, onFailure = () => { }) => {
-        /** 
-         * Wrapper function for sending a verification email to a new user
-         * created through email and password
-         * 
-         * email: String =
-         *      the email whose password is to be reset
-         * onSuccess: Function = 
-         *      callback function when the password reset process succeeded
-         * onFailure: Function = 
-         *      callback function when the password reset process failed
-         */
         sendPasswordResetEmail(projectAuth, email)
             .then(response => {
                 /** 
@@ -234,10 +241,10 @@ function useFirebaseAuth() {
             })
     }
 
+    /**
+     * Wrapper function for signing the user out
+     */
     const userSignOut = () => {
-        /**
-         * Wrapper function for signing the user out
-         */
         signOut(projectAuth)
         setUser(null)
     }

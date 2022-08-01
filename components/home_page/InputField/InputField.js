@@ -1,30 +1,34 @@
 /**
  * components/home_page/InputField/InputField.js
  * 
- * The input field component used in all of the forms in.
  */
 import { useState } from 'react';
 
 import styles from './InputField.module.css'
 import VisibilityToggler from './VisibilityToggler';
 
+/**
+ * The input field component used in all of the forms in.
+ * 
+ * @param {Object} props 
+ *      The properties that will be passed down to the component 
+ * @param {String} props.name
+ *      The name that corresponds to the internal <input> element 
+ * @param {String} props.type
+ *      The type of the internal <input> element.
+ *      Supported types: `text`, `password`, `email`
+ * @param {String | Number} props.value
+ *      The value of the internal <input> element. To be used to
+ *      connect the <input> field and a React state
+ * @param {Boolean} props.required
+ *      The `required` constraint of the <input> elemenat
+ * @param {Number} props.minLength
+ *      The `minLength` constraint of the <input> element
+ * @param {Function} props.onChange
+ *      The callback function that triggers when the value in the <input> changes
+ * @returns 
+ */
 export default function InputField(props) {
-    /**
-     * name: String =
-     *      The name that corresponds to the internal <input> element 
-     * type: String =
-     *      The type of the internal <input> element.
-     *      Supported types: `text`, `password`, `email`
-     * value: ~ =
-     *      The value of the internal <input> element. To be used to
-     *      connect the <input> field and a React state
-     * required: Boolean =
-     *      The `required` constraint of the <input> elemenat
-     * minLength: Number =
-     *      The `minLength` constraint of the <input> element
-     * onChange: Function =
-     *      The callback function that triggers when the value in the <input> changes
-     */
     const { 
         name,
         type,

@@ -1,12 +1,20 @@
-/**
- * firebase/FirebaseAuthProvider.js
- * 
- * Defines the provider for the authentication context
- */
+import React from "react";
 import { FirebaseAuthContext, useFirebaseAuth } from "./auth";
 
-function FirebaseAuthProvider({ children }) {
+/**
+ * Authentication context provider component
+ * 
+ * @param {Object} props 
+ *      Properties that will be passed down to the component
+ * @param {React.Component} children
+ *      Child element that will be rendered inside the component
+ * @returns
+ */
+function FirebaseAuthProvider(props) {
     const auth = useFirebaseAuth()
+    const {
+        children
+    } = props
 
     return (
         <FirebaseAuthContext.Provider value={auth}>

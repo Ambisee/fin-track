@@ -1,6 +1,4 @@
 /**
- * /firebase/firebaseAdmin.js
- * 
  * Initializes the Firebase NodeJS Admin SDK
  */
 import * as firebaseAdmin from 'firebase-admin'

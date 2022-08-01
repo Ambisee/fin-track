@@ -19,7 +19,6 @@
  */
 const defaultValues = {
     curentIndex: 0,
-    showMessage: false,
     type: undefined,
     message: "",
 }

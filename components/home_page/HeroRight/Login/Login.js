@@ -1,10 +1,3 @@
-/**
- * components/home_page/HeroRight/Login/Login.js
- * 
- * The 'Forgot password' form component used to log
- * the user in through email and password, or through
- * one of the login providers
- */
 import { useState } from "react"
 
 import { flashMessage } from '../../utils'
@@ -17,19 +10,19 @@ import googleLogo from "../../../../public/google-logo.png"
 import facebookLogo from "../../../../public/facebook-logo.png"
 import styles from "../HeroRight.module.css"
 
+/**
+ * Wrapped email sign-in function for the 'login' process
+ * 
+ * @param {import("firebase/auth").Auth} auth 
+ *    The Auth instance of the current application
+ * @param {String} email 
+ *    The user's email address 
+ * @param {String} password 
+ *    The password the user entered
+ * @param {Function} dispatch 
+ *    The dispatch function for displaying status messages
+ */
 function wrappedEmailSignIn(auth, email, password, dispatch) {
-  /**
-   * Wrapped email sign-in function for the 'login' process
-   * 
-   * auth: Auth =
-   *    the Auth instance of the current application
-   * email: String =
-   *    the user's email address 
-   * password: String =
-   *    the password the user entered
-   * dispatch: Function =
-   *    the dispatch function for displaying status messages 
-   */
   dispatch({type: SHOW_MESSAGE, payload: {message: 'Signing in...', type: 'info'}})
   
   auth.emailSignIn(
@@ -40,18 +33,24 @@ function wrappedEmailSignIn(auth, email, password, dispatch) {
   )
 }
 
+/**
+ * The 'Forgot password' form component used to log
+ * the user in through email and password, or through
+ * one of the login providers
+ * 
+ * @param {Object} props 
+ *    The properties that will be passed down to the component
+ * @param {Object} props.state
+ *      Object that contains the forms' display state
+ * @param {Function} props.dispatch
+ *      the `state`'s corresponding dispatch function 
+ * @returns 
+ */
 export default function Login(props) {
-  /**
-   * state: Object =
-   *      Object that contains the forms' display state
-   * dispatch: Function =
-   *      the `state`'s corresponding dispatch function 
-   */
   const {
     state,
     dispatch
   } = props
-
 
   /**
    * email: String = 

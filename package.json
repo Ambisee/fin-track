@@ -19,8 +19,11 @@
     "swiper": "^8.2.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.9",
     "@next/bundle-analyzer": "^12.2.3",
+    "babel-loader": "^8.2.5",
     "eslint": "8.18.0",
-    "eslint-config-next": "12.1.6"
+    "eslint-config-next": "12.1.6",
+    "eslint-plugin-storybook": "^0.6.1"
   }
 }
