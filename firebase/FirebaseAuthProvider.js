@@ -6,7 +6,7 @@ import { FirebaseAuthContext, useFirebaseAuth } from "./auth";
  * 
  * @param {Object} props 
  *      Properties that will be passed down to the component
- * @param {React.Component} children
+ * @param {React.Component} props.children
  *      Child element that will be rendered inside the component
  * @returns
  */

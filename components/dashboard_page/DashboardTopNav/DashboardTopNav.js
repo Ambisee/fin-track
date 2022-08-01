@@ -1,24 +1,32 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { REDIRECT, HOVER } from '../dispatcher'
+import { REDIRECT, HOVER, TOGGLE_DROPDOWN } from '../dispatcher'
 import { useAuth } from '../../../firebase/auth'
 
 import styles from './DashboardTopNav.module.css'
 
+/**
+ * The top dashboard navigation bar component.
+ * Part of the dashboard's layout component
+ * 
+ * @param {Object} props
+ *      The properties that will be passed down to the component
+ * @param {String} props.className
+ *      additional CSS class for the parent element of this component
+ * @param {Function} props.sideBarCallback
+ *      function to toggle the side navigation bar in mobile viewports
+ * @param {Object} props.navState
+ *      Dashboard navigation bar's `state` Object
+ * @param {Function} props.navDispatch
+ *      Dashboard navigation bar's `dispatch` function
+ */
 export default function DashboardTopNav(props) {
-    /**
-     * className: String =
-     *      additional CSS class for the parent element of this component
-     * sideBarCallback: Function =
-     *      function to toggle the side navigation bar in mobile viewports
-     * pageDispatch: Function =
-     *      dispatcher function to set the state of the side bar's link
-     */
     const {
         className,
         sideBarCallback,
-        pageDispatch
+        navState,
+        navDispatch
     } = props
 
     /**
@@ -27,7 +35,6 @@ export default function DashboardTopNav(props) {
      * auth: Object =
      *      Authentication context used to retrieve the user's details
      */
-    const [toggleDropdown, setToggleDropdown] = useState(false)
     const auth = useAuth()
 
     return (
@@ -46,7 +53,10 @@ export default function DashboardTopNav(props) {
             <div></div>
 
             {/* Dropdown menu */}
-            <div className={`${styles.profile} ${toggleDropdown && styles.displayDropdown}`} onClick={() => setToggleDropdown(current => !current)}>
+            <div 
+                className={`${styles.profile} ${navState.isDropdownToggled && styles.displayDropdown}`} 
+                onClick={() => navDispatch({type: TOGGLE_DROPDOWN, value: !(navState.isDropdownToggled)})}
+            >
                 <div className={styles.profileInfo}>
                     <span className={styles.profileName}>{auth.user.displayName.split()[0]}</span>
                     <div className={styles.profilePicture}></div>
@@ -55,8 +65,8 @@ export default function DashboardTopNav(props) {
                     <Link href='/dashboard/account' passHref>
                         <a 
                             onClick={() => {
-                                pageDispatch({ type: REDIRECT, index: 1 })
-                                pageDispatch({type: HOVER, index: 1})
+                                navDispatch({ type: REDIRECT, value: 1 })
+                                navDispatch({type: HOVER, value: 1})
                             }}
                         >
                             Settings

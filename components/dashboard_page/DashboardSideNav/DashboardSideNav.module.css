@@ -7,9 +7,8 @@
     max-width: 15rem;
     min-width: 12.5rem;
     border-right: 1px solid white;
-    transition: transform 0.5s ease;
     background: rgba(143, 0, 255, 0.6);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
     grid-template-rows: 6.25rem auto;
 }
 

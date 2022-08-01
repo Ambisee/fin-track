@@ -1,0 +1,40 @@
+/* Date Input */
+.dateInput {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+.dateInput input[type=date] {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    border: none;
+    position: absolute;
+    bottom: 0;
+    background-color: transparent;
+}
+.dateInput input[type=text] {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+}
+.dateInput input[type=text]:hover,
+.dateInput input[type=text]:focus {
+    outline: none;
+}
+.toggleCalendar {
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+}
+.toggleCalendar:hover, 
+.toggleCalendar:focus {
+    outline: none;
+}
+.calendarIcon {
+    transform: rotateZ(180deg);
+}

@@ -1,11 +1,5 @@
-/**
- * components/dashboard_page/DashboardSideNav/DashboardSideNav.js
- * 
- * Part of the dashboard's navigation bar. Contains links
- * for redirecting the user within the dashboard
- */
-
 import Link from "next/link"
+import { useRouter } from "next/router"
 import { motion } from "framer-motion"
 
 import { HOVER, REDIRECT } from "../dispatcher"
@@ -19,40 +13,48 @@ const linkObjects = [
     {name: 'Home', url: '/dashboard'},
     {name: 'Account', url: '/dashboard/account'},
     {name: 'Records', url: '/dashboard/records'},
-    {name: 'Analytics', url: '/dashboard/analytics'}
+    {name: 'Analytics', url: '/dashboard/analytics'},
 ]
 
-/** Highlight element's variants.
- *  Each variant represents which link is being currently being hovered
- */
+/** Highlight element's variants. Each variant represents 
+  * which link is being currently being hovered
+  */
 const variants = {}
-for (let i = 0; i < 4; i++) {variants[i] = {y: `${i * linkHeight}rem`}}
+for (let i = 0; i < linkObjects.length; i++) {variants[i] = {y: `${i * linkHeight}rem`}}
 
+/**
+ * Part of the dashboard's navigation bar. Contains links
+ * for redirecting the user within the dashboard
+ * 
+ * @param {Object} props
+ *      Properties to be passed to the component 
+ * @param {String} props.className
+ *      additional CSS class to be added to the current component's parent element
+ * @param {Function} props.onRedirect
+ *      callback function to be called when a link has been pressed
+ * @param {Object} props.navState
+ *      Dashboard navigation bar's `state` Object
+ * @param {Function} props.navDispatch
+ *      Dashboard navigation bar's `dispatch` function
+ * @returns 
+ */
 export default function DashboardSideNav(props) {
-    /**
-     * pageIndex: Number =
-     *      the index number that corresponds to the current page
-     * className: String =
-     *      additional CSS class to be added to the current component's parent element
-     * onRedirect: Function =
-     *      callback function to be called when a link has been pressed
-     * pageState: Object =
-     *      state Object that keeps track of the current page and hovered link
-     * pageDispatch: Function =
-     *      dispatch function used to change the values of `pageState`
-     */
     const {
-        pageIndex,
         className, 
         onRedirect,
-        pageState,
-        pageDispatch
+        navState,
+        navDispatch
     } = props
 
+    /**
+     * router: ~ =
+     *      NextJS router hook
+     */
+    const router = useRouter()
 
     return (
         <motion.nav className={`${styles.dashboardNav} ${className}`}>
-            <h3>FinTrack</h3>
+            <h3 onClick={() => router.push('/dasboard')}>FinTrack</h3>
             <motion.ul className={styles.links} style={{'--link-height': `${linkHeight}rem`}}>
                 {/* Rendering elements from the `linkObjects` Object */}
                 {linkObjects.map((obj, index) => (
@@ -60,20 +62,20 @@ export default function DashboardSideNav(props) {
                             <Link href={obj.url} passHref>
                                 <motion.a
                                     onClick={() => {
-                                        pageDispatch({type: REDIRECT, index: index})
-                                        pageDispatch({type: HOVER, index: index})
+                                        navDispatch({type: REDIRECT, value: index})
+                                        navDispatch({type: HOVER, value: index})
                                         onRedirect()
                                     }}
                                     onHoverStart={() => {
-                                        pageDispatch({type: HOVER, index: index})
+                                        navDispatch({type: HOVER, value: index})
                                     }}
                                     onHoverEnd={() => {
-                                        pageDispatch({type: HOVER, index: pageState.currentPage})
+                                        navDispatch({type: HOVER, value: navState.currentPage})
                                     }}
                                     className={`
                                         ${styles.link}
-                                        ${index == pageState.currentPage && pageState.hoverIndex != index ? styles.notHovered : ""}
-                                        ${index == pageState.currentPage && styles.currentPage}
+                                        ${index == navState.currentPage && navState.hoverIndex != index ? styles.notHovered : ""}
+                                        ${index == navState.currentPage && styles.currentPage}
                                     `}
                                 >
                                     <span>{obj.name}</span>
@@ -89,7 +91,7 @@ export default function DashboardSideNav(props) {
                     variants={variants}
                     initial={{x: 0, y: 0}}
                     transition={{type: 'spring', bounce: 0, duration: 0.375}}
-                    animate={variants[pageState.hoverIndex]}
+                    animate={variants[navState.hoverIndex]}
                 />
             </motion.ul>
         </motion.nav>
