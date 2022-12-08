@@ -6,11 +6,18 @@ import { AnimatePresence } from 'framer-motion'
 import Loading from "../components/common/Loading/Loading"
 import MessageIndicator from '../components/common/MessageIndicator/MessageIndicator'
 import { reducer, defaultValues, SHOW_MESSAGE } from '../components/home_page/dispatcher'
-import { flashMessage } from '../components/home_page/utils'
+import { flashMessage } from '../components/common/utils'
 
 import styles from './styles/awaiting-verification.module.css'
 import Head from "next/head"
 
+/**
+ * The landing page for users who registered with 
+ * an email and password who logged in without verifying
+ * their account yet.
+ * 
+ * @returns 
+ */
 export default function AwaitingVerificationPage() {
     const [state, dispatch] = useReducer(reducer, defaultValues)
     const auth = useAuth()

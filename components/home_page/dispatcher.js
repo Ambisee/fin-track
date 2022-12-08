@@ -1,6 +1,4 @@
 /**
- * /components/home_page/HeroRight/dispatcher.js
- * 
  * Defines the reducer that will keep track
  * of the forms' states
  */
@@ -19,6 +17,7 @@
  */
 const defaultValues = {
     curentIndex: 0,
+    showMessage: false,
     type: undefined,
     message: "",
 }
@@ -35,8 +34,7 @@ const defaultValues = {
  */
 const handlers = {}
 
-const SHOW_MESSAGE = 'SHOW_MESSAGE'
-const UNSHOW_MESSAGE = 'UNSHOW_MESSAGE'
+const TOGGLE_MESSAGE = 'TOGGLE_MESSAGE'
 const GO_TO_LOGIN = 'GO_TO_LOGIN'
 const GO_TO_REGISTRATION = 'GO_TO_REGISTRATION'
 const GO_TO_FORGOT_PASSWORD = 'GO_TO_FORGOT_PASSWORD'
@@ -51,10 +49,9 @@ const indexDirectory = {
 handlers.GO_TO_LOGIN = (state, action) => ({...state, currentIndex: 0})
 handlers.GO_TO_REGISTRATION = (state, action) => ({...state, currentIndex: 1})
 handlers.GO_TO_FORGOT_PASSWORD = (state, action) => ({...state, currentIndex: 2})
-handlers.UNSHOW_MESSAGE = (state, action) => ({...state, showMessage: false, type: undefined})
-handlers.SHOW_MESSAGE = (state, action) => ({
+handlers.TOGGLE_MESSAGE = (state, action) => ({
     ...state,
-    showMessage: true, 
+    showMessage: action?.payload?.showMessage, 
     message: action?.payload?.message, 
     type: action?.payload?.type
 })
@@ -71,8 +68,7 @@ export {
     reducer, 
     defaultValues, 
     indexDirectory,
-    SHOW_MESSAGE,
-    UNSHOW_MESSAGE,
+    TOGGLE_MESSAGE,
     GO_TO_FORGOT_PASSWORD, 
     GO_TO_REGISTRATION, 
     GO_TO_LOGIN

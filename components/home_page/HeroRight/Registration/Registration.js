@@ -1,14 +1,12 @@
 /**
  * /components/home_page/HeroRight/Registration/Registration.js
- * 
-
  */
 import { useState } from 'react'
 
 import InputField from '../../InputField/InputField'
 import { useAuth } from '../../../../firebase/auth'
 import { GO_TO_LOGIN, indexDirectory, SHOW_MESSAGE} from '../../dispatcher'
-import { flashMessage } from '../../utils'
+import { flashMessage } from '../../../common/utils'
 
 import styles from '../HeroRight.module.css'
 
@@ -54,6 +52,9 @@ export default function Registration(props) {
             `}
         >
             <h4>Create an Account</h4>
+            <p>
+                Sign up for an account with your email and a password. 
+            </p>
             <form 
                 className={styles.registrationForm}
                 onSubmit={(e) => {
@@ -73,6 +74,7 @@ export default function Registration(props) {
                 }}
             >
                 <InputField 
+                    id="registration-email"
                     name="email" 
                     type="email"
                     value={newEmail}
@@ -81,6 +83,7 @@ export default function Registration(props) {
                     validate
                 />
                 <InputField 
+                    id="registration-password"
                     name="password"
                     type="password"
                     value={newPassword}
@@ -89,6 +92,7 @@ export default function Registration(props) {
                     required
                 />
                 <InputField 
+                    id="registration-confirm-password"
                     name="confirm-password" 
                     type="password"
                     value={confirmPassword}

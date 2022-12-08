@@ -51,6 +51,7 @@
     height: 2.25rem;
     width: 2.25rem;
     border-radius: 50%;
+    overflow: hidden;
     background-color: white;
     border: none;
 }
@@ -108,9 +109,9 @@
     border-style: solid;
     border-color: transparent transparent white transparent;
 }
-.profile.displayDropdown .profileInfo {
+/* .profile.displayDropdown .profileInfo {
     border: 1px solid white;
-}
+} */
 .profile.displayDropdown .profileDropdown {
     display: block;
 }
@@ -118,7 +119,7 @@
 @media screen and (min-width: 700px) {
     .topNavBar {
         left: 15rem;
-        padding: 0 3rem;
+        padding: 0 1rem;
         width: calc(100% - 15rem);
     }
     .navBarToggler {

@@ -30,6 +30,7 @@ export default function VisibilityToggler(props) {
     return (
         <button
             type="button"
+            tabIndex={-1}
             className={styles.visibilityToggler}
             onMouseDown={toggleOn}
             onMouseLeave={toggleOff}

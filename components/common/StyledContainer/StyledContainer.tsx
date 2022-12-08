@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import ThemedContainer from '../ThemedContainer/ThemedContainer'
 import Loading from '../Loading/Loading'
 
@@ -9,13 +9,11 @@ import styles from './StyledContainer.module.css'
  * styled with a background image and
  * decorative elements
  * 
- * @param {Object} props 
- *      Properties to be passed into the component
- * @param {React.Component} props.children 
- *      Child component to be rendered inside the component
- * @returns 
+ * @param props Properties to be passed into the component
+ * @param props.children Child component to be rendered inside the component
+ * @return
  */
-export default function StyledContainer(props) {
+export default function StyledContainer(props: { children: ReactNode }) {
     const {
         children
     } = props

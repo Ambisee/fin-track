@@ -1,11 +1,8 @@
 /**
- * components/dashboard_page/dispatcher.js
- * 
  * Defines the reducer that will be used to keep
  * track of the dashboard layout's side bar links
  */
 import { useReducer } from "react"
-
 
 /**
  * handlers: Object =
@@ -15,8 +12,9 @@ import { useReducer } from "react"
  *      - REDIRECT = set the current page index
  *      - TOGGLE_DROPDOWN = toggle the top nav bar's dropdown menu
  *      - TOGGLE_SIDEBAR = toggle the side nav bar in mobile view
+ *      - TOGGLE_LOADING = toggle loading state of the dashboard page
  */
-const handlers = {}
+const handlers: {[key: string]: (state: object, action) => {}} = {}
 
 const HOVER = 'HOVER'
 const REDIRECT = 'REDIRECT'
@@ -32,11 +30,10 @@ handlers.TOGGLE_MESSAGE = (state, action) => ({
     ...state,
     messageIndicator: {
         type: action?.payload?.type,
-        showMessage: action?.payload?.toggle,
+        showMessage: action?.payload?.showMessage,
         message: action?.payload?.message,
     }
 })
-
 
 function reducer(state, action) {
     const handler = handlers[action.type]
@@ -63,6 +60,8 @@ function useNavReducer(pageIndex = 0) {
      * isSideBarToggled: Boolean =
      *      Indicates whether or not the side navigation bar 
      *      is toggled or not in mobile viewports
+     * isLoading: Boolean =
+     *      Indicates whether the page is loading
      * messageIndicator: Object =
      *      Object storing values used by the messageIndicator component
      */
@@ -73,13 +72,13 @@ function useNavReducer(pageIndex = 0) {
         isSideBarToggled: false,
         messageIndicator: {
             type: 'info',
-            showMessage: true,
+            showMessage: false,
             message: 'hello'
         }
     }
 
-    const [state, dispatch] = useReducer(reducer, defaultValues)
-    return [state, dispatch]
+    const [navState, navDispatch] = useReducer(reducer, defaultValues)
+    return {navState, navDispatch}
 }
 
 export {

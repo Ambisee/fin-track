@@ -1,19 +1,20 @@
 import { useState } from "react"
+import {Auth} from 'firebase/auth'
 
-import { flashMessage } from '../../utils'
+import { errorToMessage, flashMessage } from '../../../common/utils'
 import { useAuth } from '../../../../firebase/auth'
-import { GO_TO_FORGOT_PASSWORD, GO_TO_REGISTRATION, indexDirectory, SHOW_MESSAGE } from "../../dispatcher"
 import InputField from "../../InputField/InputField"
 import ProviderLoginButton from "../../ProviderLoginButton/ProviderLoginButton"
+import { ERROR, INFO } from "../../../common/MessageIndicator/MessageIndicator"
+import { GO_TO_FORGOT_PASSWORD, GO_TO_REGISTRATION, indexDirectory, TOGGLE_MESSAGE } from "../../dispatcher"
 
-import googleLogo from "../../../../public/google-logo.png"
-import facebookLogo from "../../../../public/facebook-logo.png"
 import styles from "../HeroRight.module.css"
+import googleLogo from "../../../../public/google-logo.png"
 
 /**
  * Wrapped email sign-in function for the 'login' process
  * 
- * @param {import("firebase/auth").Auth} auth 
+ * @param {Auth} auth 
  *    The Auth instance of the current application
  * @param {String} email 
  *    The user's email address 
@@ -23,13 +24,14 @@ import styles from "../HeroRight.module.css"
  *    The dispatch function for displaying status messages
  */
 function wrappedEmailSignIn(auth, email, password, dispatch) {
-  dispatch({type: SHOW_MESSAGE, payload: {message: 'Signing in...', type: 'info'}})
-  
+  dispatch({type: TOGGLE_MESSAGE, payload: {showMessage: true, message: 'Signing in...', type: INFO}})
+  flashMessage(dispatch, "Signing in...", INFO)
+
   auth.emailSignIn(
     email,
     password,
-    (e) => flashMessage(dispatch, e.message, 'info', 3000),
-    (e) => flashMessage(dispatch, e.message, 'error', 3000)
+    (e) => flashMessage(dispatch, e.message, INFO, 3000),
+    (e) => {flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000); console.log(e)}
   )
 }
 
@@ -75,35 +77,40 @@ export default function Login(props) {
     >
       <h4>Login to your account</h4>
       <form
+        className={styles.loginForm}
         onSubmit={(e) => {
           e.preventDefault()
           wrappedEmailSignIn(auth, email, password, dispatch)
         }}
       >
         <InputField
+          id="login-email"
           name="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {setEmail(e.target.value)}}
           required
-        />
-        <InputField
-          name="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button
-          type="button"
-          className={`
-                ${styles.formLink}
-                ${styles.forgotPasswordButton}
-            `}
-          onClick={() => dispatch({ type: GO_TO_FORGOT_PASSWORD })}
-        >
-          Forgot password?
-        </button>
+        ></InputField>
+        <div style={{width: '100%'}}>
+          <InputField
+            id="login-password"
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => {setPassword(e.target.value)}}
+            required
+          ></InputField>
+          <button
+            type="button"
+            className={`
+                  ${styles.formLink}
+                  ${styles.forgotPasswordButton}
+              `}
+            onClick={() => dispatch({ type: GO_TO_FORGOT_PASSWORD })}
+          >
+            Forgot password?
+          </button>
+        </div>
         <button type="submit" className={styles.submitButton}>
           Login
         </button>
@@ -130,16 +137,11 @@ export default function Login(props) {
           logoBgColor="white"
           onClick={() => {
             auth.googleSignIn(
-              (success) => { },
-              (error) => alert(error)
+              (e) => flashMessage(dispatch, e.message, INFO, 3000),
+              (e) => flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000)
             )
           }}
-        />
-        <ProviderLoginButton
-          providerName="Facebook"
-          imgSrc={facebookLogo}
-          logoBgColor="#4664a5"
-        />
+        ></ProviderLoginButton>
       </div>
     </div>
   )

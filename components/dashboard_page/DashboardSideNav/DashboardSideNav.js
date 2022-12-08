@@ -54,7 +54,7 @@ export default function DashboardSideNav(props) {
 
     return (
         <motion.nav className={`${styles.dashboardNav} ${className}`}>
-            <h3 onClick={() => router.push('/dasboard')}>FinTrack</h3>
+            <h3 onClick={() => router.push('/dashboard')}>FinTrack</h3>
             <motion.ul className={styles.links} style={{'--link-height': `${linkHeight}rem`}}>
                 {/* Rendering elements from the `linkObjects` Object */}
                 {linkObjects.map((obj, index) => (

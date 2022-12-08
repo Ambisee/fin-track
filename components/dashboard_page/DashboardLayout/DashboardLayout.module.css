@@ -53,7 +53,7 @@
 /* Layout Message Indicator */
 .indicatorPos {
     position: absolute;
-    right: -1rem;
+    right: 1rem;
     bottom: 1rem;
 }
 

@@ -3,7 +3,8 @@ import { useState } from 'react'
 import InputField from '../../InputField/InputField'
 import { useAuth } from '../../../../firebase/auth'
 import { indexDirectory, GO_TO_LOGIN, SHOW_MESSAGE } from '../../dispatcher'
-import { flashMessage } from '../../utils'
+import {INFO, ERROR} from '../../../common/MessageIndicator/MessageIndicator'
+import { flashMessage } from '../../../common/utils'
 
 import styles from '../HeroRight.module.css'
 
@@ -52,29 +53,24 @@ export default function ForgotPassword(props) {
             <form 
                 onSubmit={(e) => {
                     e.preventDefault()
-                    dispatch({
-                        type: SHOW_MESSAGE, 
-                        payload: {
-                            type: 'info',
-                            message: "Loading..."
-                        }
-                    })
-                    
+                    flashMessage(dispatch, "Loading...", INFO, 3000)
+
                     auth.resetPassword(
                         email,
                         (e) => {
                             setEmail("")
-                            flashMessage(dispatch, e.message, 'info', 3000)
+                            flashMessage(dispatch, e.message, INFO, 3000)
 
                         },
                         (e) => {
                             setEmail("")
-                            flashMessage(dispatch, e.message, 'error', 3000)
+                            flashMessage(dispatch, e.message, ERROR, 3000)
                         }
                     )
                 }}
             >
-                <InputField 
+                <InputField
+                    id="forgot-email" 
                     name="email"
                     type="email"
                     onChange={e => setEmail(e.target.value)}

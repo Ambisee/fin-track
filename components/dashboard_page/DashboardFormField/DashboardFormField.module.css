@@ -22,6 +22,9 @@
 .dashboardFormField input::placeholder {
     color: rgba(255, 255, 255, 0.8);
 }
+.dashboardFormField:disabled {
+    color: rgba(255,255,255, 0.7);
+}
 .dashboardFormField:focus {
     outline: none;
 }

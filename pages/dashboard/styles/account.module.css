@@ -1,0 +1,75 @@
+/* Dashboard - Account */
+.dashboardAccount {
+    padding: 0 1rem;
+    width: 100%;
+    height: 100%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dashboard - Account - Container */
+.profileContainer {
+    gap: 3rem;
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    padding-top: 1rem;
+    flex-direction: column;
+}
+
+/* Dashboard - Account - Picture Editor */
+.pictureContainer {
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.pictureContainer label {
+    align-self: flex-start;
+}
+.editPicture {
+    position: relative;
+}
+.editPictureButton {
+    width: 5rem;
+    background: rgba(255, 255, 255, 0.4);
+    position: relative;
+    position: absolute;
+    bottom: 5%;
+    right: -5%;
+}
+.pictureDisplay {
+    width: 13rem;
+    height: 13rem;
+    position: relative;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid white;
+    border-radius: 100rem;
+    overflow: hidden;
+}
+
+/* Dashboard - Account - Profile Info Editor */
+.infoContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+.customField {
+    gap: 0.5rem;
+    display: flex; 
+    flex-direction: column;
+}
+
+/* @media screen and (min-width: 62.5rem) { */
+@media screen and (min-width: 57.5rem) {
+    .profileContainer {
+        gap: max(4rem, 7.5%);
+        flex-direction: row-reverse;
+        max-width: initial;
+    }
+}

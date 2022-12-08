@@ -2,12 +2,13 @@ import Head from 'next/head'
 
 import styles from './Loading.module.css'
 import circleStyles from '../StyledContainer/StyledContainer.module.css'
+import { CSSProperties } from 'react'
 
 /**
  * A loading indicator component to be displayed
  * when a page redirect happens
  * 
- * @returns 
+ * @return
  */
 export default function Loading() {
     return (
@@ -25,7 +26,7 @@ export default function Loading() {
                             ${circleStyles.blueCircle}
                             ${styles.first}
                         `}
-                        style={{'--data-order': 1}}
+                        style={{'--data-order': 1} as CSSProperties}
                     ></div>
                     <div
                         className={`
@@ -33,7 +34,7 @@ export default function Loading() {
                             ${circleStyles.purpleCircle}
                             ${styles.second}
                         `}
-                        style={{'--data-order': 2}}
+                        style={{'--data-order': 2} as CSSProperties}
                     ></div>
                     <div
                         className={`
@@ -41,7 +42,7 @@ export default function Loading() {
                             ${circleStyles.pinkCircle}
                             ${styles.third}
                         `}
-                        style={{'--data-order': 3}}
+                        style={{'--data-order': 3} as CSSProperties}
                     ></div>
                 </div>
             </div>

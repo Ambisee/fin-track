@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import Image from 'next/image'
+import { Ref } from 'react'
 
 import { REDIRECT, HOVER, TOGGLE_DROPDOWN } from '../dispatcher'
 import { useAuth } from '../../../firebase/auth'
@@ -13,9 +14,11 @@ import styles from './DashboardTopNav.module.css'
  * @param {Object} props
  *      The properties that will be passed down to the component
  * @param {String} props.className
- *      additional CSS class for the parent element of this component
+ *      Additional CSS class for the parent element of this component
  * @param {Function} props.sideBarCallback
- *      function to toggle the side navigation bar in mobile viewports
+ *      Function to toggle the side navigation bar in mobile viewports
+ * @param {Ref} props.profileInfoRef
+ *      Reference to the profile info section of the top navigation bar
  * @param {Object} props.navState
  *      Dashboard navigation bar's `state` Object
  * @param {Function} props.navDispatch
@@ -26,7 +29,8 @@ export default function DashboardTopNav(props) {
         className,
         sideBarCallback,
         navState,
-        navDispatch
+        profileInfoRef,
+        navDispatch,
     } = props
 
     /**
@@ -56,10 +60,21 @@ export default function DashboardTopNav(props) {
             <div 
                 className={`${styles.profile} ${navState.isDropdownToggled && styles.displayDropdown}`} 
                 onClick={() => navDispatch({type: TOGGLE_DROPDOWN, value: !(navState.isDropdownToggled)})}
+                ref={profileInfoRef}
             >
                 <div className={styles.profileInfo}>
-                    <span className={styles.profileName}>{auth.user.displayName.split()[0]}</span>
-                    <div className={styles.profilePicture}></div>
+                    <span className={styles.profileName}>{auth.user?.displayName?.split()[0] || auth.user?.email.split('@')[0]}</span>
+                    <div className={styles.profilePicture}>
+                        {auth.user.photoURL &&
+                            <Image 
+                                src={auth.user.photoURL}
+                                alt="profile.jpg"
+                                layout="responsive"
+                                width={36}
+                                height={36}
+                            />
+                        }
+                    </div>
                 </div>
                 <div className={styles.profileDropdown}>
                     <Link href='/dashboard/account' passHref>

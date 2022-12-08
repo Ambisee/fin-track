@@ -9,7 +9,7 @@ import MessageIndicator from '../components/common/MessageIndicator/MessageIndic
 import HeroLeft from '../components/home_page/HeroLeft/HeroLeft'
 import HeroRight from '../components/home_page/HeroRight/HeroRight'
 import { reducer, defaultValues } from '../components/home_page/dispatcher'
-import { firebaseAdmin } from '../firebase/firebaseAdmin'
+import { firebaseAdmin } from '../firebase/_firebaseAdmin'
 import { useAuth } from '../firebase/auth'
 
 import styles from './styles/index.module.css'
@@ -29,6 +29,14 @@ const data = {
   }
 }
 
+/**
+ * Application home page component.
+ * Holds the hero section of the home page, which
+ * includes the headers, short description, call-to-action
+ * buttons and the portal forms.
+ *
+ * @returns
+ */
 export default function HomePage() {
   const auth = useAuth()
   const router = useRouter()

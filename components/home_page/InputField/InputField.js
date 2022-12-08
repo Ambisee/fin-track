@@ -1,7 +1,3 @@
-/**
- * components/home_page/InputField/InputField.js
- * 
- */
 import { useState } from 'react';
 
 import styles from './InputField.module.css'
@@ -12,6 +8,8 @@ import VisibilityToggler from './VisibilityToggler';
  * 
  * @param {Object} props 
  *      The properties that will be passed down to the component 
+ * @param {String} props.id
+ *      The `id` property of the input field
  * @param {String} props.name
  *      The name that corresponds to the internal <input> element 
  * @param {String} props.type
@@ -30,6 +28,7 @@ import VisibilityToggler from './VisibilityToggler';
  */
 export default function InputField(props) {
     const { 
+        id,
         name,
         type,
         value,
@@ -52,11 +51,13 @@ export default function InputField(props) {
             `}
         >
             <input
+                id={id}
                 name={name}
                 value={value}
                 type={currentType}
                 minLength={minLength}
                 required={required}
+                spellCheck={false}
                 onChange={(e) => onChange(e)}
                 className={`
                     ${styles.field}
@@ -64,7 +65,7 @@ export default function InputField(props) {
                 `}
             />
             <label
-                htmlFor={name}
+                htmlFor={id}
                 className={styles.fieldName}
             >
                 {name.split('-').join(' ')}

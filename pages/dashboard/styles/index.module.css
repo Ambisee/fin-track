@@ -1,7 +1,10 @@
 /* Dashboard - Home */
 .dashboardHome {
-    padding: 1rem;
+    padding: 0 1rem;
     color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 .dashboardHome h3 span {
     white-space: nowrap;
@@ -9,7 +12,14 @@
 
 /* Dashboard - Home - New Entry Form */
 .newEntryForm {
-    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.newEntryForm form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 .mainHeader {
     font-size: 1rem;
@@ -20,26 +30,58 @@
     content: '';
     width: 1px;
     height: 100%;
-    position: absolute;
-    left: 0;
     top: 0;
+    left: 0;
+    position: absolute;
     background-color: white;
 }
 .entryFormContainer {
+    width: 100%;
+    overflow-x: hidden;
+}
+.entryFormContainer .innerContainer {
     gap: 1rem;
     display: grid;
+    min-width: 32.5rem;
     width: 100%;
-    grid-template-columns: 1fr 2fr 1fr;
-    margin: 0.75rem 0;
-    padding: 0.25rem 0;
+    padding: 0.75rem 0;
     align-items: center;
-    overflow-x: auto;
+    grid-template-columns: 0.75fr 4fr 1.25fr;
 }
-.entryFormContainer::-webkit-scrollbar {
-    height: 3px;
-    color: transparent;
+.detailsForm {
+    min-width: 12.5rem;
 }
-.entryFormContainer::-webkit-scrollbar-thumb {
-    border-radius: 50px;
-    background: white;
+.entryButtonContainer {
+    gap: 1rem;
+    display: grid;
+    grid-template-columns: 4fr 1.25fr;
+}
+
+/* Dashboard - Home - New Entry Form - Action Button */
+.addEntryButton {
+    color: white;
+    background: rgba(67, 85, 255, 0.65);
+}
+.clearEntryButton {
+    color: white;
+    background: rgba(255, 0, 0, 0.65);
+}
+
+/* Dashboard - Home - Most Recent Entries Table*/
+.mostRecentEntries {
+    margin: 1rem 0;
+}
+.moreEntriesLink {
+    font-size: 1rem;
+    text-decoration: none;
+    width: fit-content;
+    color: #05eefe;
+    gap: 0.25rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    float: right;
+}
+.moreEntriesLink:hover {
+    border-bottom: 1px solid #05eefe;
 }

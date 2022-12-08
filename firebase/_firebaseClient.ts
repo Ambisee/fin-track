@@ -1,10 +1,15 @@
 /**
  * Initializes the Firebase Javascript Client SDK
  */
-import { initializeApp } from 'firebase/app'
+import { FirebaseApp, initializeApp } from 'firebase/app'
 import {
-    getAuth,
+    Auth,
+    getAuth, 
 } from 'firebase/auth'
+import { 
+    Firestore, 
+    getFirestore 
+} from 'firebase/firestore'
 
 const config = {
     apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -16,7 +21,8 @@ const config = {
     appId: process.env.NEXT_PUBLIC_APP_ID
 }
 
-const firebaseApp = initializeApp(config)
-const projectAuth = getAuth(firebaseApp)
+const firebaseApp: FirebaseApp = initializeApp(config)
+const projectAuth: Auth = getAuth(firebaseApp)
+const projectFirestore: Firestore = getFirestore(firebaseApp)
 
-export { firebaseApp, projectAuth }
+export { firebaseApp, projectAuth, projectFirestore }

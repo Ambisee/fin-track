@@ -1,0 +1,59 @@
+/* Dashboard Table */
+.tableContainer {
+    width: 100%;
+    display: grid;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid white;
+    grid-template-columns: max(10%, 5.5rem) auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.tableContainer th {
+    border-bottom: 1px solid white;
+}
+.tableContainer > * {
+    padding: 0.25rem 0;
+    overflow: hidden;
+}
+.leftColumn {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+    border-right: 1px solid white;
+    padding: 0 0.25rem;
+}
+.scrollTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+.scrollTable th {
+    text-transform: capitalize;
+}
+.scrollTable th,
+.scrollTable td,
+.leftColumn th,
+.leftColumn td {
+    padding: 0.25rem;
+}
+.scrollTable td:last-child {
+    text-align: center;
+}
+.scrollTable colgroup col:not(:last-of-type) {
+    border-right: 1px solid white;
+}
+
+
+/* Dashboard Table - Delete Entry Button */
+.deleteEntryButton {
+    border: none;
+    color: red;
+    font-size: 1rem;
+    font-weight: 900;
+    background-color: transparent;
+}
+
+/* Dashboard Table - Empty Table Div */
+.emptyTable {
+    padding: 0.5rem 0;
+    color: rgba(180, 180, 180, 1);
+}
