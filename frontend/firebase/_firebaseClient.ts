@@ -1,7 +1,4 @@
-/**
- * Initializes the Firebase Javascript Client SDK
- */
-import { FirebaseApp, initializeApp } from 'firebase/app'
+import { FirebaseApp, FirebaseOptions, initializeApp } from 'firebase/app'
 import {
     Auth,
     getAuth, 
@@ -11,7 +8,11 @@ import {
     getFirestore 
 } from 'firebase/firestore'
 
-const config = {
+/** 
+ * Option object containing all information needed
+ * to initialize the Firebase application
+ */
+const config: FirebaseOptions = {
     apiKey: process.env.NEXT_PUBLIC_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
     databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,

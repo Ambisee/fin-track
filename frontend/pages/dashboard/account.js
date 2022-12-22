@@ -22,7 +22,6 @@ import {
 import DashboardLayout, {
   useLayoutReducer,
 } from "../../components/dashboard_page/DashboardLayout/DashboardLayout"
-import { updateProfile } from 'firebase/auth'
 
 import styles from "./styles/account.module.css"
 
@@ -37,9 +36,7 @@ export default function DashboardAccountPage() {
   })
 
   useEffect(() => {
-    
     dataDispatch({type: SET_ALLOW_EMAIL_REPORT, value: firestore.profileData.canSendReport || false})
-
   }, [firestore.profileData.canSendReport])
 
   return (
@@ -150,7 +147,11 @@ export default function DashboardAccountPage() {
           <div>
             <DashboardActionButton
               onClick={() => {
-                updateProfile(auth.user)
+                auth.setUserProfile(
+                  dataState.displayName, 
+                  undefined, 
+                  (success) => flashMessage(navDispatch, success.message, INFO, 2000)
+                )
               }}
             >
               Apply changes

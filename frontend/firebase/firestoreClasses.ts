@@ -1,4 +1,5 @@
 import { QueryDocumentSnapshot, SnapshotOptions, Timestamp } from "firebase/firestore"
+import { EntryData } from "./types"
 
 /** --- Entry class and converter --- */
 class Entry {
@@ -24,7 +25,7 @@ class Entry {
      * 
      * @return The object that contains the Entry's instance variables
      */
-    getData(): {date: Date, detail: string, amount: string} {
+    getData(): EntryData {
         return {
             date: this.date,
             detail: this.detail,
@@ -75,18 +76,21 @@ class Money {
      *      is valid
      */
     static isValidAmount(amount: string) : boolean {
-        let money: string[] = amount.split('.')
         let result: number[]
+        let money: string[] = amount.split('.')
 
+        // The balance is a valid dollar and cent representation
         if (money[1] == undefined) 
             return false
         
         result = money.map((value) => Number.parseInt(value))
 
+        // Check if all dollar and cent are numbers
         if (result.filter((value) => Number.isNaN(value)).length > 0) 
             return false
 
-        if (result[1] < 0 || result[1] > 100)
+        // Check if the cent are between 0 and 100
+        if (result[1] < 0 || result[1] >= 100)
             return false
 
         return true
@@ -126,6 +130,10 @@ class Money {
      * @return The string representation of the value
      */
     getFloatString() : string {
+        if (this.secondary == 0) {
+            return `${this.primary}.00`
+        }
+
         return `${this.primary}.${this.secondary}`
     }
 

@@ -1,10 +1,6 @@
-/**
- * Initializes the Firebase NodeJS Admin SDK
- */
 import * as firebaseAdmin from 'firebase-admin'
 
 import { ServiceAccountObject } from './types'
-
 
 if (!firebaseAdmin.apps.length) {
     // Initialize the Admin SDK if it's not initialized already

@@ -18,11 +18,10 @@ import {
     UserCredential,
     updateProfile,
     AuthError,
-    Unsubscribe
 } from "firebase/auth";
 
 import { projectAuth } from "./_firebaseClient";
-import { AuthContextObject, SuccessCallback, FailureCallback } from './types'
+import { AuthContextObject, Callback } from './types'
 
 /** The context used to store the authentication state */
 const FirebaseAuthContext = createContext<AuthContextObject>(null)
@@ -59,23 +58,15 @@ function useFirebaseAuth(): AuthContextObject {
     const emailSignIn = (
         email: string, 
         password: string, 
-        onSuccess: SuccessCallback = (success: object) => { },
-        onFailure: FailureCallback = (error: object) => { }
+        onSuccess: Callback<UserCredential & {message: string}> = (success) => {},
+        onFailure: Callback<AuthError & {message: string}> = (error) => {}
     ): void => {
         signInWithEmailAndPassword(projectAuth, email, password)
             .then((response: UserCredential) => {
-                /** 
-                 * response: UserCredential =
-                 *      a UserCredential object containing the credentials of the signed in user
-                 */
                 setUser(response.user)
                 onSuccess({ ...response, message: `Signed in as ${response.user.email}` })
             })
             .catch((error: AuthError) => {
-                /** 
-                 * error: Object({code: String, customData: AuthError, name: String}) =
-                 *      an object containing an AuthError object detailing the error encountered
-                 */
                 setUser(null)
                 onFailure({ ...error, message: `Invalid email or password` })
             })
@@ -90,24 +81,16 @@ function useFirebaseAuth(): AuthContextObject {
      * @return None
      */
     const googleSignIn = (
-        onSuccess: SuccessCallback = (success: object) => { }, 
-        onFailure: FailureCallback = (error: object) => { }
+        onSuccess: Callback<UserCredential & {message: string}> = (success) => {}, 
+        onFailure: Callback<AuthError & {message: string}> = (error) => {}
     ): void => {
         const provider: GoogleAuthProvider = new GoogleAuthProvider()
         signInWithPopup(projectAuth, provider)
             .then((response: UserCredential) => {
-                /** 
-                 * response: UserCredential =
-                 *      a UserCredential object containing the credentials of the signed in user
-                 */
                 setUser(response.user)
                 onSuccess({ ...response, message: `Signed in as ${response.user.email}` })
             })
             .catch((error: AuthError) => {
-                /** 
-                 * error: Object({code: String, customData: AuthError, name: String}) =
-                 *      an object containing an AuthError object detailing the error encountered
-                 */
                 setUser(null)
                 onFailure({ ...error, message: `An error occured: ${error.code}` })
             })
@@ -121,37 +104,29 @@ function useFirebaseAuth(): AuthContextObject {
      * @param confirmPasswordAn instance to which `password` will be compared against
      * @param onSuccess Callback function when the sign-up process succeeded
      * @param onFailure Callback function when the sign-up process failed
-     * @return None
+     * @return
      */
     const createNewUser = (
         email: string,
         password: string,
         confirmPassword: string,
-        onSuccess: SuccessCallback = (success) => { },
-        onFailure: FailureCallback = (error) => { }
+        onSuccess: Callback<UserCredential & {message: string}> = (success) => {},
+        onFailure: Callback<(AuthError | {}) & {message: string}> = (error) => {}
     ): void => {
         if (password !== confirmPassword) {
             /** Raise an error if `password` and `confirmPassword` */
-            onFailure({ message: `The password doesn't match!` })
+            onFailure({ message: "The password doesn't match!" })
             return
         }
         
         createUserWithEmailAndPassword(projectAuth, email, password)
             .then((response: UserCredential) => {
-                /** 
-                 * response: UserCredential =
-                 *      a UserCredential object containing the credentials of the signed in user
-                 */
                 setUser(response.user)
 
-                onSuccess({ message: 'Created a new user, verify the new account now' })
+                onSuccess({ ...response, message: 'Created a new user, verify the new account now' })
                 sendEmailVerification(response.user)
             })
             .catch((error: AuthError) => {
-                /** 
-                 * error: Object({code: String, customData: AuthError, name: String}) =
-                 *      an object containing an AuthError object detailing the error encountered
-                 */
                 onFailure({ ...error, message: `An error occured: ${error.code}` })
             })
     }
@@ -169,15 +144,15 @@ function useFirebaseAuth(): AuthContextObject {
     const setUserProfile = (
         displayName: string | undefined = user?.displayName, 
         photoURL: string | undefined = user?.photoURL, 
-        onSuccess: SuccessCallback = (resp: object) => {}, 
-        onFailure: FailureCallback = (error: object) => {}
+        onSuccess: Callback<{message: string}> = (response) => {}, 
+        onFailure: Callback<AuthError & {message: string}> = (error) => {}
     ): void => {
         updateProfile(user, {
             displayName: displayName || user.displayName,
             photoURL: photoURL || user.photoURL
         })
         .then(() => {
-            onSuccess({ message: "Successfully changed the profile data" })
+            onSuccess({ message: "Profile data updated" })
         })
         .catch((error: AuthError) => {
             onFailure({...error, message: `An error occured: ${error.code}`})
@@ -193,20 +168,16 @@ function useFirebaseAuth(): AuthContextObject {
      * @param onSuccess callback function when the verification process succeeded
      * @param onFailure callback function when the verification process failed
      */
-    const verifyNewUser = (user, onSuccess = (responseObj) => { }, onFailure = (error) => { }) => {
+    const verifyNewUser = (
+        user: User, 
+        onSuccess: Callback<{message: string}> = () => {}, 
+        onFailure: Callback<AuthError & {message: string}> = () => {}
+    ) => {
         sendEmailVerification(user)
             .then(() => {
-                /** 
-                 * response: undefined =
-                 *      UNDEFINED
-                 */
                 onSuccess({ message: 'Verification email sent' })
             })
-            .catch((error: object) => {
-                /** 
-                 * error: Object({code: String, customData: AuthError, name: String}) =
-                 *      an object containing an AuthError object detailing the error encountered
-                 */
+            .catch((error: AuthError) => {
                 onFailure({ ...error, message: 'Failed to send a verification email' })
             })
     }
@@ -222,8 +193,8 @@ function useFirebaseAuth(): AuthContextObject {
      */
     const resetPassword = (
         email: string,
-        onSuccess = (msgObj: object) => { },
-        onFailure: FailureCallback = (error: object) => { }
+        onSuccess: Callback<{message: string}> = (response) => {},
+        onFailure: Callback<AuthError & {message: string}> = (error) => {}
     ) => {
         sendPasswordResetEmail(projectAuth, email)
             .then(() => {
@@ -242,12 +213,12 @@ function useFirebaseAuth(): AuthContextObject {
      * Wrapper function for signing the user out
      */
     const userSignOut = () => {
-        signOut(projectAuth)
         setUser(null)
+        signOut(projectAuth)
     }
 
     useEffect(() => {
-        const unsubscribeAuthListener: Unsubscribe = onIdTokenChanged(projectAuth, async (user) => {
+        const unsubscribeAuthListener = onIdTokenChanged(projectAuth, async (user) => {
             /**
              * Initializing an event listener that listens to changes
              * in the user's authentication state

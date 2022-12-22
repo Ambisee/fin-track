@@ -1,40 +1,42 @@
 import { User } from "firebase/auth";
-import { Entry } from "./firestore_classes";
+import { Timestamp } from "firebase/firestore";
+
+import { Entry } from "./firestoreClasses";
 
 export interface AuthContextObject {
     user: User,
     emailSignIn: (
         email: string,
         password: string,
-        onSuccess: SuccessCallback,
-        onFailure: FailureCallback
+        onSuccess: Callback<any>,
+        onFailure: Callback<any>
     ) => void,
     googleSignIn: (
-        onSuccess: SuccessCallback, 
-        onFailure: FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure: Callback<any>
     ) => void,
     createNewUser: (
         email: string, 
         password: string, 
         confirmPassword: string, 
-        onSuccess: SuccessCallback, 
-        onFailure: FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure: Callback<any>
     ) => void,
     setUserProfile: (
         displayName: string,
         photoURL: string,
-        onSuccess: SuccessCallback,
-        onFailure: FailureCallback
+        onSuccess: Callback<any>,
+        onFailure: Callback<any>
     ) => void,
     verifyNewUser: (
         user: User,
-        onSuccess: SuccessCallback,
-        onFailure: FailureCallback
+        onSuccess: Callback<any>,
+        onFailure: Callback<any>
     ) => void,
     resetPassword: (
         email: string,
-        onSuccess: SuccessCallback,
-        onFailure: FailureCallback
+        onSuccess: Callback<any>,
+        onFailure: Callback<any>
     ) => void,
     userSignOut: () => void
 }
@@ -44,22 +46,22 @@ export interface FirestoreContextObject {
     entryData: object,
     addEntry: (
         entry: Entry, 
-        onSuccess: SuccessCallback, 
-        onFailure:FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure:Callback<any>
     ) => any,
     getAllEntries: (
-        onSuccess: SuccessCallback, 
-        onFailure:FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure:Callback<any>
     ) => any,
     getRecentEntries: (
         lim: number, 
-        onSuccess: SuccessCallback, 
-        onFailure:FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure:Callback<any>
     ) => any,
     deleteEntry: (
         id: string, 
-        onSuccess: SuccessCallback, 
-        onFailure: FailureCallback
+        onSuccess: Callback<any>, 
+        onFailure: Callback<any>
     ) => any
 }
 
@@ -69,5 +71,18 @@ export interface ServiceAccountObject {
     project_id?: string
 }
 
-export type SuccessCallback = (success?: {message: string}) => any
-export type FailureCallback = (error?: {message: string, code?: string}) => any
+export interface EntryData {
+    date: Date,
+    detail: string,
+    amount: string
+}
+
+export interface ProfileData {
+    email: string,
+    displayName: string,
+    isDisabled: boolean,
+    canSendReport: boolean,
+    createdAt: Timestamp | Date,
+}
+
+export type Callback<T> = (data?: void | T) => void
