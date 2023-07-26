@@ -8,6 +8,7 @@ import {
     GoogleAuthProvider,
     EmailAuthProvider,
     reauthenticateWithPopup,
+    reauthenticateWithCredential
 } from 'firebase/auth'
 
 const dataReducerHandlers = {}

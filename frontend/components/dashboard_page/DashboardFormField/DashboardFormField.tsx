@@ -1,10 +1,8 @@
 import { ComponentPropsWithRef } from 'react'
-import styles from './DashboardFormField.module.css'
+
 import DateInput from './DateInput'
 
-interface DashboardFormFieldProps extends ComponentPropsWithRef<'input'> {
-    withLabel: boolean
-}
+import styles from './DashboardFormField.module.css'
 
 /**
  * Custom form field component to be used within
@@ -15,7 +13,9 @@ interface DashboardFormFieldProps extends ComponentPropsWithRef<'input'> {
  * @param props.withLabel Indicates whether or not to display a <label> element to display
  *      the `name` of the field
  */
-export default function DashboardFormField(props: DashboardFormFieldProps) {
+export default function DashboardFormField(
+    props: ComponentPropsWithRef<'input'> & {withLabel: boolean}
+) {
     const {
         withLabel = true,
         ...inputAttr

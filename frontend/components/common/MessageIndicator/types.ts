@@ -1,11 +1,15 @@
-import { INFO, ERROR, WARNING } from "./MessageIndicator"
+import {INFO, WARNING, ERROR} from './constants'
 
-export type IndicatorStatus =
-    typeof INFO |
-    typeof ERROR |
-    typeof WARNING
+export type SeverityLevel = (typeof INFO) | (typeof WARNING) | (typeof ERROR)
+
+export interface IndicatorProps {
+    state: IndicatorState,
+    className?: string,
+    onClose?: () => void,
+}
 
 export interface IndicatorState {
-    type: IndicatorStatus,
+    type: SeverityLevel,
+    show: boolean,
     message?: string
 }

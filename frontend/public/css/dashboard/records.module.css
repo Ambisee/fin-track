@@ -1,0 +1,11 @@
+.recordsTables {
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    padding: 1rem;
+}
+
+.recordsTables h4 {
+    margin-bottom: 1rem;
+}

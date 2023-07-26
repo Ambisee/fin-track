@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "components/home_page/HeroRight/Login/Login.jsx", "next.config.js"  ],
   "exclude": [
     "node_modules"
   ]

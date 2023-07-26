@@ -5,11 +5,12 @@
     overflow: hidden;
     border-radius: 10px;
     border: 1px solid white;
-    grid-template-columns: max(10%, 5.5rem) auto;
+    grid-template-columns: max(15%, 6.25rem) auto;
     background-color: rgba(0, 0, 0, 0.5);
 }
 .tableContainer th {
     border-bottom: 1px solid white;
+    white-space: nowrap;
 }
 .tableContainer > * {
     padding: 0.25rem 0;
@@ -33,7 +34,8 @@
 .scrollTable td,
 .leftColumn th,
 .leftColumn td {
-    padding: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
 }
 .scrollTable td:last-child {
     text-align: center;

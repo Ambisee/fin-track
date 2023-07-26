@@ -16,10 +16,12 @@ import {
     DocumentData,
     QuerySnapshot,
     DocumentReference,
+    where,
+    QueryConstraint,
 } from "firebase/firestore";
 
 import { useAuth } from "./auth";
-import { projectAuth, projectFirestore } from "./_firebaseClient";
+import { projectFirestore } from "./_firebaseClient";
 import {
     Entry,
     entryConverter
@@ -36,7 +38,7 @@ const FirestoreContext = createContext<FirestoreContextObject>(null)
  *      to handle interaction with Firestore
  */
 function useFirestore() {
-    return useContext<FirestoreContextObject>(FirestoreContext)
+    return useContext(FirestoreContext)
 }
 
 /**
@@ -56,7 +58,6 @@ function useFirebaseFirestore() : FirestoreContextObject {
             return
         }
 
-
         const entryRef = query(
             collection(projectFirestore, 'userData', auth.user.uid, 'entries'), 
             orderBy('date', 'desc')
@@ -67,30 +68,6 @@ function useFirebaseFirestore() : FirestoreContextObject {
             'userData', 
             auth.user.uid
         )
-        
-        // getDoc(docRef)
-        //     .then(result => {
-        //         if (result.exists()) {
-        //             setProfileData(result.data())
-        //         }
-        //         else {
-        //             console.log(projectAuth.currentUser)
-
-        //             setDoc(docRef, {
-        //                 email: auth.user.email,
-        //                 displayName: auth.user.displayName,
-        //                 isDisabled: false,
-        //                 canSendReport: true,
-        //                 createdAt: Timestamp.now(),
-        //             } as ProfileData).then(() => {
-        //                 getDoc(docRef).then(result => setProfileData(result.data()))
-        //             })
-        //             .catch(error => {
-        //                 console.log(error)
-        //             })
-        //         }
-        //     })
-        
 
         const unsubscribeProfile = onSnapshot(docRef, (snapshot) => {
             if (snapshot.exists()) {
@@ -114,6 +91,13 @@ function useFirebaseFirestore() : FirestoreContextObject {
                 payload.push({...entry.data().getData(), id: entry.id})
             }
 
+            /** debug
+            for (let entry of querySnapshot.docChanges()) {
+                console.log(entry.type, entry.newIndex, entry.oldIndex)
+                console.log(entry.doc.data())
+            }
+            */
+            
             setEntryData(payload)
         })
 
@@ -191,7 +175,7 @@ function useFirebaseFirestore() : FirestoreContextObject {
         const entriesCollection = collection(projectFirestore, 'userData', auth.user.uid, 'entries').withConverter(entryConverter)
         const q = query(entriesCollection, limit(lim), orderBy('date', 'desc'))
 
-        console.log(entriesCollection.path) // debug
+        // console.log(entriesCollection.path) // debug
 
         getDocs(q)
             .then((result: QuerySnapshot<Entry>) => {
@@ -205,6 +189,26 @@ function useFirebaseFirestore() : FirestoreContextObject {
         .catch((error: any) => {
             onFailure(error)
         })
+    }
+
+    /**
+     * 
+     * @param detail 
+     * @param startDate 
+     * @param endDate 
+     * @param countLimit 
+     * @returns 
+     */
+    const getEntries = (
+        constraints: QueryConstraint[]
+    ) : Entry[] => {
+        const entryList = collection(projectFirestore, 'userData', auth.user.uid, 'entries').withConverter(entryConverter)
+        const q = query(
+            entryList, 
+            ...constraints
+        )
+
+        return 
     }
 
     /**

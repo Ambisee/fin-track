@@ -2,7 +2,39 @@
  * Defines the reducer that will be used to keep
  * track of the dashboard layout's side bar links
  */
-import { useReducer } from "react"
+import { Dispatch, useReducer } from "react"
+
+import { HOVER, REDIRECT, TOGGLE_DROPDOWN, TOGGLE_SIDEBAR } from "./constants"
+import { NavDispatcherArgs, NavDispatchTypes, NavStateCollection } from './types'
+import { INFO } from "../common/MessageIndicator/constants"
+
+
+/**
+ * currentPage: Number =
+ *      The link index of the current page
+ * hoverIndex: Number =
+ *      The link index of the currently hovered link
+ * isDropdownToggled: Boolean =
+ *      Indicates whether or not the dropdown menu is toggled or not
+ * isSideBarToggled: Boolean =
+ *      Indicates whether or not the side navigation bar 
+ *      is toggled or not in mobile viewports
+ * isLoading: Boolean =
+ *      Indicates whether the page is loading
+ * messageIndicator: Object =
+ *      Object storing values used by the messageIndicator component
+ */
+const defaultValues: NavStateCollection = {
+    currentPage: 0,
+    hoverIndex: 0,
+    isDropdownToggled: false,
+    isSideBarToggled: false,
+    indicatorState: {
+        type: INFO,
+        show: false,
+        message: ""
+    }
+}
 
 /**
  * handlers: Object =
@@ -14,13 +46,7 @@ import { useReducer } from "react"
  *      - TOGGLE_SIDEBAR = toggle the side nav bar in mobile view
  *      - TOGGLE_LOADING = toggle loading state of the dashboard page
  */
-const handlers: {[key: string]: (state: object, action) => {}} = {}
-
-const HOVER = 'HOVER'
-const REDIRECT = 'REDIRECT'
-const TOGGLE_DROPDOWN = 'TOGGLE_DROPDOWN'
-const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR'
-const TOGGLE_MESSAGE = 'TOGGLE_MESSAGE'
+const handlers: {[key in NavDispatchTypes]: (state: any, action: any) => any} = {} as any
 
 handlers.HOVER = (state, action) => ({...state, hoverIndex: action.value})
 handlers.REDIRECT = (state, action) => ({...state, currentPage: action.value})
@@ -28,9 +54,9 @@ handlers.TOGGLE_DROPDOWN = (state, action) => ({...state, isDropdownToggled: act
 handlers.TOGGLE_SIDEBAR = (state, action) => ({...state, isSideBarToggled: action.value})
 handlers.TOGGLE_MESSAGE = (state, action) => ({
     ...state,
-    messageIndicator: {
+    indicatorState: {
         type: action?.payload?.type,
-        showMessage: action?.payload?.showMessage,
+        show: action?.payload?.show,
         message: action?.payload?.message,
     }
 })
@@ -49,43 +75,16 @@ function reducer(state, action) {
  *      The initial page's index number
  * @returns 
  */
-function useNavReducer(pageIndex = 0) {
-    /**
-     * currentPage: Number =
-     *      The link index of the current page
-     * hoverIndex: Number =
-     *      The link index of the currently hovered link
-     * isDropdownToggled: Boolean =
-     *      Indicates whether or not the dropdown menu is toggled or not
-     * isSideBarToggled: Boolean =
-     *      Indicates whether or not the side navigation bar 
-     *      is toggled or not in mobile viewports
-     * isLoading: Boolean =
-     *      Indicates whether the page is loading
-     * messageIndicator: Object =
-     *      Object storing values used by the messageIndicator component
-     */
-    const defaultValues = {
-        currentPage: pageIndex,
-        hoverIndex: pageIndex,
-        isDropdownToggled: false,
-        isSideBarToggled: false,
-        messageIndicator: {
-            type: 'info',
-            showMessage: false,
-            message: 'hello'
-        }
-    }
+function useNavReducer(pageIndex = 0): [NavStateCollection, Dispatch<NavDispatcherArgs>] {
+    defaultValues.currentPage = pageIndex
+    defaultValues.hoverIndex = pageIndex
 
-    const [navState, navDispatch] = useReducer(reducer, defaultValues)
-    return {navState, navDispatch}
+    const [state, dispatch] = useReducer(reducer, defaultValues)
+    return [state, dispatch]
 }
 
+
+
 export {
-    HOVER,
-    REDIRECT,
-    TOGGLE_DROPDOWN,
-    TOGGLE_SIDEBAR,
-    TOGGLE_MESSAGE,
     useNavReducer
 }

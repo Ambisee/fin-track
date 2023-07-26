@@ -1,17 +1,19 @@
 import StyledContainer from '../components/common/StyledContainer/StyledContainer'
 import FirebaseAuthProvider from '../firebase/FirebaseAuthProvider'
+import FirestoreProvider from '../firebase/FirestoreProvider'
 
-import '../public/global.css'
-import 'swiper/css'
+import '../public/css/global.css'
 
 function MyApp({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => page)
   
   return (
     <FirebaseAuthProvider>
-      <StyledContainer>
+      <FirestoreProvider>
+        <StyledContainer>
           {getLayout(<Component {...pageProps} />)}
         </StyledContainer>
+      </FirestoreProvider>
     </FirebaseAuthProvider>
   )
 }

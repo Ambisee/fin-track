@@ -1,12 +1,15 @@
 import Image from "next/image"
-import React, { ReactNode } from "react"
+import { ReactNode } from "react"
 
-import backgroundImage from "../../../public/background(1).png"
+import backgroundImage from "../../../public/images/background(1).png"
 import styles from "./ThemedContainer.module.css"
 
 /**
- * Page container component styled with
- * a background image
+ * <ThemedContainer />
+ * 
+ * Global application container component. Used
+ * to display the background image shared across
+ * all pages of the application.
  *
  * @param props Properties that will be passed down to the component
  * @param props.children The child components that will be rendered inside of the component

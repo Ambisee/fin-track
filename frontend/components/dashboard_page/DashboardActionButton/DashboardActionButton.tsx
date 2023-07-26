@@ -1,9 +1,6 @@
 import React, { ComponentPropsWithRef, ReactNode } from 'react'
-import styles from './DashboardActionButton.module.css'
 
-interface DashboardActionButtonProps extends ComponentPropsWithRef<'button'> {
-    children: ReactNode
-}
+import styles from './DashboardActionButton.module.css'
 
 /**
  * Button component that triggers 
@@ -14,7 +11,9 @@ interface DashboardActionButtonProps extends ComponentPropsWithRef<'button'> {
  * @param props.buttonAtr The attribute of the inner <button> element
  * @returns 
  */
-export default function DashboardActionButton(props: DashboardActionButtonProps) {
+export default function DashboardActionButton(
+    props:  ComponentPropsWithRef<'button'> & {children: ReactNode}
+) : JSX.Element {
     const {
         children,
         ...buttonAttr

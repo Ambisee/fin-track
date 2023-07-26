@@ -2,11 +2,7 @@ import Image from 'next/image'
 import { ComponentPropsWithRef, useRef } from 'react'
 
 import styles from './DateInput.module.css'
-import arrowHead from '../../../public/arrow-head.svg'
-
-interface DateInputProps extends ComponentPropsWithRef<'input'> {
-    id: any
-}
+import arrowHead from '../../../public/images/arrow-head.svg'
 
 /**
  * Custom component for `date` type DashboardFormField
@@ -15,7 +11,9 @@ interface DateInputProps extends ComponentPropsWithRef<'input'> {
  * @param props.id The identifier for react to handle re-render
  * @param props.inputProps The attributes of the inner <input> elements
  */
-export default function DateInput(props: DateInputProps) {
+export default function DateInput(
+    props: ComponentPropsWithRef<'input'> & {id: any}
+) {
     const {...inputProps} = props
     
     const dateRef = useRef<HTMLInputElement>()
@@ -28,6 +26,7 @@ export default function DateInput(props: DateInputProps) {
             `}
         >
             <input 
+                id={`${inputProps.id}_date`}
                 type="date" 
                 name={inputProps.name}
                 value={inputProps.value} 
@@ -35,6 +34,7 @@ export default function DateInput(props: DateInputProps) {
                 onChange={inputProps.onChange}
             />
             <input
+                id={inputProps.id}
                 type="text"
                 name={inputProps.name}
                 value={inputProps.value}

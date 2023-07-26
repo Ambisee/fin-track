@@ -1,7 +1,7 @@
-import { User } from "firebase/auth";
-import { Timestamp } from "firebase/firestore";
+import { User } from "firebase/auth"
+import { Timestamp } from "firebase/firestore"
 
-import { Entry } from "./firestoreClasses";
+import { Entry } from "./firestoreClasses"
 
 export interface AuthContextObject {
     user: User,
@@ -19,7 +19,7 @@ export interface AuthContextObject {
         email: string, 
         password: string, 
         confirmPassword: string, 
-        onSuccess: Callback<any>, 
+        onSuccess: Callback<any>,
         onFailure: Callback<any>
     ) => void,
     setUserProfile: (
@@ -42,8 +42,8 @@ export interface AuthContextObject {
 }
 
 export interface FirestoreContextObject {
-    profileData: object,
-    entryData: object,
+    profileData: ProfileData,
+    entryData: (EntryData & {id: string})[],
     addEntry: (
         entry: Entry, 
         onSuccess: Callback<any>, 
@@ -79,10 +79,10 @@ export interface EntryData {
 
 export interface ProfileData {
     email: string,
-    displayName: string,
+    displayName: string | undefined,
     isDisabled: boolean,
     canSendReport: boolean,
     createdAt: Timestamp | Date,
 }
 
-export type Callback<T> = (data?: void | T) => void
+export type Callback<T> = (data: void | T) => void

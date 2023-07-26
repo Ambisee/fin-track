@@ -123,7 +123,8 @@ function useFirebaseAuth(): AuthContextObject {
             .then((response: UserCredential) => {
                 setUser(response.user)
 
-                onSuccess({ ...response, message: 'Created a new user, verify the new account now' })
+                onSuccess({ ...response, message: 'New account created. Please verify the new account now' })
+                updateProfile(response.user, {displayName: response.user.email.split('@')[0]})
                 sendEmailVerification(response.user)
             })
             .catch((error: AuthError) => {
@@ -218,7 +219,7 @@ function useFirebaseAuth(): AuthContextObject {
     }
 
     useEffect(() => {
-        const unsubscribeAuthListener = onIdTokenChanged(projectAuth, async (user) => {
+        const unsubscribeAuthListener = onIdTokenChanged(projectAuth, async (user: User) => {
             /**
              * Initializing an event listener that listens to changes
              * in the user's authentication state

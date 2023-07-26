@@ -61,10 +61,12 @@
 .content {
     width: 100%;
     z-index: 5;
-    height: calc(100vh - var(--top-nav-height));
-    position: relative;
-    top: var(--top-nav-height);
     overflow-y: auto;
+    position: relative;
+    scrollbar-width: thin;
+    top: var(--top-nav-height);
+    scrollbar-color: white transparent;
+    height: calc(100vh - var(--top-nav-height));
 }
 .content::-webkit-scrollbar {
     width: 5px;

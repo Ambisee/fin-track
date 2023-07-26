@@ -1,37 +1,34 @@
 import { useState } from "react"
-import {Auth} from 'firebase/auth'
 
-import { errorToMessage, flashMessage } from '../../../common/utils'
-import { useAuth } from '../../../../firebase/auth'
 import InputField from "../../InputField/InputField"
 import ProviderLoginButton from "../../ProviderLoginButton/ProviderLoginButton"
-import { ERROR, INFO } from "../../../common/MessageIndicator/MessageIndicator"
-import { GO_TO_FORGOT_PASSWORD, GO_TO_REGISTRATION, indexDirectory, TOGGLE_MESSAGE } from "../../dispatcher"
+import { useAuth } from '../../../../firebase/auth'
+import { useHomeContext } from "../../context"
+import { flashMessage } from '../../../common/helper'
+import { errorToMessage } from "../../../common/constants"
+import { ERROR, INFO } from "../../../common/MessageIndicator/constants"
+import { GO_TO_FORGOT_PASSWORD, GO_TO_REGISTRATION, indexDirectory } from "../../constants"
 
 import styles from "../HeroRight.module.css"
-import googleLogo from "../../../../public/google-logo.png"
+import googleLogo from "../../../../public/images/google-logo.png"
 
 /**
  * Wrapped email sign-in function for the 'login' process
  * 
- * @param {Auth} auth 
- *    The Auth instance of the current application
- * @param {String} email 
- *    The user's email address 
- * @param {String} password 
- *    The password the user entered
- * @param {Function} dispatch 
- *    The dispatch function for displaying status messages
+ * @param auth The Auth instance of the current application
+ * @param email The user's email address 
+ * @param password The password the user entered
+ * @param dispatch The dispatch function for displaying status messages
  */
 function wrappedEmailSignIn(auth, email, password, dispatch) {
-  dispatch({type: TOGGLE_MESSAGE, payload: {showMessage: true, message: 'Signing in...', type: INFO}})
+  console.log('helo') // debug
   flashMessage(dispatch, "Signing in...", INFO)
 
   auth.emailSignIn(
     email,
     password,
     (e) => flashMessage(dispatch, e.message, INFO, 3000),
-    (e) => {flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000); console.log(e)}
+    (e) => {flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000)}
   )
 }
 
@@ -40,39 +37,24 @@ function wrappedEmailSignIn(auth, email, password, dispatch) {
  * the user in through email and password, or through
  * one of the login providers
  * 
- * @param {Object} props 
- *    The properties that will be passed down to the component
- * @param {Object} props.state
- *      Object that contains the forms' display state
- * @param {Function} props.dispatch
- *      the `state`'s corresponding dispatch function 
+ * @param props  The properties that will be passed down to the component
+ * @param props.state Object that contains the forms' display state
+ * @param props.dispatch The `state`'s corresponding dispatch function 
  * @returns 
- */
-export default function Login(props) {
-  const {
-    state,
-    dispatch
-  } = props
-
-  /**
-   * email: String = 
-   *    store value of email corresponding to an account
-   * password: String = 
-   *    store value of the user-entered password
-   * auth: Object =
-   *    Authentication context used to retrieve the necessary functions
-   */
+*/
+export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const auth = useAuth()
+  const {state, dispatch} = useHomeContext()
 
   return (
     <div
       className={`
             ${styles.login} 
             ${styles.formDiv}
-            ${state.currentIndex == indexDirectory['REGISTRATION'] ? styles.flipRight : ""}
-            ${state.currentIndex == indexDirectory['FORGOT_PASSWORD'] ? styles.flipLeft : ""}
+            ${state.currentIndex == indexDirectory.REGISTRATION ? styles.flipRight : ""}
+            ${state.currentIndex == indexDirectory.FORGOT_PASSWORD ? styles.flipLeft : ""}
         `}
     >
       <h4>Login to your account</h4>
@@ -138,7 +120,8 @@ export default function Login(props) {
           onClick={() => {
             auth.googleSignIn(
               (e) => flashMessage(dispatch, e.message, INFO, 3000),
-              (e) => flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000)
+              // (e) => flashMessage(dispatch, errorToMessage[e.code], ERROR, 3000)
+              (e) => flashMessage(dispatch, e.code, ERROR, 3000)
             )
           }}
         ></ProviderLoginButton>
