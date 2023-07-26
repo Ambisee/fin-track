@@ -1,0 +1,71 @@
+:root {
+  --dark-primary: 0 0 0;
+  --dark-secondary: 255 255 255;
+  --light-primary: 255 255 255;
+  --light-secondary: 0 0 0;
+
+  --tertiary-color: 143 0 255;
+
+  --theme-switch-transition: 200ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    --primary-color: var(--dark-primary);
+    --secondary-color: var(--dark-secondary);
+
+    min-height: 100vh;
+
+    background: rgb(var(--primary-color));
+    color: rgb(var(--secondary-color));
+
+    font-family: var(--font-raleway);
+    transition: var(--theme-switch-transition);
+}
+
+a {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button {
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+#inner-body-wrapper {
+    min-height: 100vh;
+    max-width: 100rem;
+    margin: 0 auto;
+}
+
+
+/* Themes */
+body.dark-theme {
+    --primary-color: var(--dark-primary);
+    --secondary-color: var(--dark-secondary);
+}
+
+body.light-theme {
+    --primary-color: var(--light-primary);
+    --secondary-color: var(--light-secondary);
+}

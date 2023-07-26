@@ -1,0 +1,1 @@
+type AvailableThemes = "dark" | "light"
