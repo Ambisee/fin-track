@@ -10,7 +10,7 @@ interface GlobalLayoutProps {
     children: React.ReactNode
 }
 
-const raleway = Raleway({
+export const raleway = Raleway({
     subsets: ["latin"]
 })
 

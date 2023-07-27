@@ -1,3 +1,59 @@
 #main {
-    height: 100%;
+    /* Box */
+    min-height: calc(100vh - 4rem); /* 4rem = 3rem (min-height of header) + 0.5rem * 2 (vertical padding of header) */
+    padding: 0 clamp(1rem, 5vw, 3rem);
+
+    /* Display */
+    display: grid;
+    align-items: center;
+
+}
+
+.hero-container {
+    /* Display */
+    display: grid;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.title-container {
+    /* Position */
+    position: relative;
+
+    /* Font */
+    font-size: clamp(2rem, 4vw, 3.5rem);
+
+}
+.title-container span {
+    white-space: nowrap;
+}
+
+.short-description-container {
+    /* Box */
+    min-width: 12.5rem;
+    max-width: 20rem;
+
+    /* Font */
+    font-size: 0.8rem;
+}
+.hero-title-colored-text {
+    color: rgb(var(--tertiary-color));
+}
+.herot-title-underlined-text {
+    text-decoration: 1px solid white underline;
+}
+
+.action-links-container {
+    /* Display */
+    display: grid;
+    gap: 1rem;
+}
+.action-links-container * {
+    min-width: max-content;
+    max-width: 15rem;
+    width: 15%;
+}
+#action-link-2 {
+    --action-button-color: var(--secondary-color);
+    --action-button-hover-color: var(--primary-color);
 }

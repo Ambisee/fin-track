@@ -6,7 +6,7 @@ interface PublicLayoutProps {
     children: React.ReactNode
 }
 
-const GlobalLayout: React.FC<PublicLayoutProps> = ({
+const PublicLayout: React.FC<PublicLayoutProps> = ({
     children
 }) => {
     return (
@@ -17,4 +17,4 @@ const GlobalLayout: React.FC<PublicLayoutProps> = ({
     )
 }
 
-export default GlobalLayout
+export default PublicLayout

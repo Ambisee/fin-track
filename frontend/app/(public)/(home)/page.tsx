@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
 import styles from "./page.module.css"
+import ActionLink from "@/components/ActionLink/ActionLink"
 
 export const metadata: Metadata = {
     title: "Home | FinTrack",
@@ -10,21 +11,29 @@ export const metadata: Metadata = {
 
 export default function Home() {
     return (
-        <main id={styles["main"]} className={styles["hero-container"]}>
-            <h1>
-                Take <br/>
-                <span className={styles["hero-title-colored-text"]}>personal finance</span> <br/>
-                into <br/>
-                <span>your own hands</span>
-            </h1>
-            <p>
-                Financial management at
-                the tip of your fingers. Record
-                and track your daily income
-                and expenses with ease.
-            </p>
-            <div>
-                
+        <main id={styles["main"]}>
+            <div className={styles["hero-container"]}>
+                <h1 className={styles["title-container"]}>
+                    Take <br/>
+                    <span className={styles["hero-title-colored-text"]}><u>personal finance</u>
+                    </span> <br/>
+                    into <br/>
+                    <span><u>your own hands</u></span>
+                </h1>
+                <p className={styles["short-description-container"]}>
+                    Financial management at
+                    the tip of your fingers. Record
+                    and track your daily income
+                    and expenses with ease.
+                </p>
+                <div className={styles["action-links-container"]}>
+                    <ActionLink href="/login">
+                        Get started
+                    </ActionLink>
+                    <ActionLink id={styles["action-link-2"]} href="/about">
+                        Learn more
+                    </ActionLink>
+                </div>
             </div>
         </main>
     )

@@ -30,7 +30,7 @@ const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
             body.classList.add(themeState)
             body.classList.remove(themeState === "dark-theme" ? "light-theme" : "dark-theme")
         }
-        
+
     }, [themeState])
 
     const setTheme = (theme: Theme) => {

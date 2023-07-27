@@ -4,13 +4,15 @@ import Link from "next/link"
 import styles from "./PublicHeader.module.css"
 import ThemeSwitchButton from "../ThemeSwitchButton/ThemeSwitchButton";
 
-interface PublicHeaderProps {}
+interface PublicHeaderProps {
+    className?: string
+}
 
 export const PublicHeader: React.FC<PublicHeaderProps> = ({
-
+    className
 }) => {
     return (
-        <header id={styles["header"]}>
+        <header id={styles["header"]} className={className}>
             <Link href="/" className={styles["app-title-container"]}>
                 <div className={styles["dummy-app-icon"]}></div> {/* Replace with app image later */}
                 <h4 className={styles["app-title"]}>FinTrack</h4>
