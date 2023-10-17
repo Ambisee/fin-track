@@ -4,7 +4,7 @@ import styles from "./page.module.css"
 import ActionLink from "@/components/ActionLink/ActionLink"
 
 export const metadata: Metadata = {
-    title: "Home | FinTrack",
+    title: "FinTrack | Home",
     description: `FinTrack is an application that allows user to record their spendings and earnings.`
 }
   

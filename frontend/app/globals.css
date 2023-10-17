@@ -1,12 +1,20 @@
 :root {
   --dark-primary: 0 0 0;
   --dark-secondary: 255 255 255;
+  --dark-tertiary-cyan: 0 240 255;
   --light-primary: 255 255 255;
   --light-secondary: 0 0 0;
-
-  --tertiary-color: 143 0 255;
+  /* --light-tertiary-cyan: 0 211 224; */
+  --light-tertiary-cyan: 0 183 194;
+  
+  --tertiary-color-purple: 143 0 255;
+  --tertiary-color-purple-hover: 97 0 172;
+  --tertiary-color-cyan: 0 240 255;
+  --tertiary-color-cyan-hover: 0 211 224;
 
   --theme-switch-transition: 200ms ease;
+
+  --header-min-height: 3rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,9 +35,6 @@ html {
 }
 
 body {
-    --primary-color: var(--dark-primary);
-    --secondary-color: var(--dark-secondary);
-
     min-height: 100vh;
 
     background: rgb(var(--primary-color));
@@ -52,6 +57,25 @@ button {
     cursor: pointer;
 }
 
+input {
+    background-color: transparent;
+    outline: none;
+    border: none;
+
+    color: rgb(var(--secondary-color));
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover {
+    caret-color: rgb(var(--secondary-color));
+    background-clip: text;
+    animation-delay: background-color 60000s;
+
+    -webkit-caret-color: rgb(var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: rgb(var(--secondary-color));
+    -webkit-animation-delay: background-color 60000s;
+}
+
 #inner-body-wrapper {
     min-height: 100vh;
     max-width: 100rem;
@@ -60,12 +84,14 @@ button {
 
 
 /* Themes */
-body.dark-theme {
+[data-theme='dark-theme'] body {
     --primary-color: var(--dark-primary);
     --secondary-color: var(--dark-secondary);
+    --tertiary-color-cyan: var(--dark-tertiary-cyan);
 }
 
-body.light-theme {
+[data-theme='light-theme'] body {
     --primary-color: var(--light-primary);
     --secondary-color: var(--light-secondary);
+    --tertiary-color-cyan: var(--light-tertiary-cyan);
 }

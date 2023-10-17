@@ -1,5 +1,5 @@
 .action-link {
-    --action-button-color: var(--tertiary-color);
+    --action-button-color: var(--tertiary-color-purple);
     --action-button-hover-color: var(--light-primary);
     
     /* Box */

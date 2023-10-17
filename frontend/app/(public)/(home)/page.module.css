@@ -1,7 +1,7 @@
 #main {
     /* Box */
     min-height: calc(100vh - 4rem); /* 4rem = 3rem (min-height of header) + 0.5rem * 2 (vertical padding of header) */
-    padding: 0 clamp(1rem, 5vw, 3rem);
+    padding: 0 clamp(1rem, 5vw, 5rem);
 
     /* Display */
     display: grid;
@@ -21,7 +21,7 @@
     position: relative;
 
     /* Font */
-    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-size: clamp(2rem, 3vw, 3.5rem);
 
 }
 .title-container span {
@@ -34,13 +34,11 @@
     max-width: 20rem;
 
     /* Font */
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 1.1vw, 3rem);
+    font-weight: 400;
 }
 .hero-title-colored-text {
-    color: rgb(var(--tertiary-color));
-}
-.herot-title-underlined-text {
-    text-decoration: 1px solid white underline;
+    color: rgb(var(--tertiary-color-purple));
 }
 
 .action-links-container {

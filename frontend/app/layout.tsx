@@ -1,37 +1,55 @@
+/* eslint-disable @next/next/no-before-interactive-script-outside-document */
 "use client"
 
-import { Raleway } from "next/font/google";
-
-import ThemeContextProvider from "@/components/ThemeContextProvider/ThemeContextProvider";
+import { ReactNode } from "react"
+import Script from "next/script"
+import { Raleway } from "next/font/google"
+import ThemeProvider from "@/components/ThemeProvider/ThemeProvider"
 
 import "./globals.css"
 
 interface GlobalLayoutProps {
-    children: React.ReactNode
+    children: ReactNode
 }
 
 export const raleway = Raleway({
     subsets: ["latin"]
 })
 
-const GlobalLayout: React.FC<GlobalLayoutProps> = ({
-    children
-}) => {
-    return (
-        <html lang="en">
-            <body 
-                className={`
-                    ${raleway.className}
-                `}
-            >
-                <div id="inner-body-wrapper">
-                    <ThemeContextProvider>
-                        {children}
-                    </ThemeContextProvider>
-                </div>
-            </body>
-        </html>
-    )
-}
+// Script to retrieve the theme from the localStorage first
+const themeScript = `
+    const theme = localStorage.getItem('theme')
 
-export default GlobalLayout;
+    if (theme === null) {
+        document.documentElement.setAttribute("data-theme", "dark-theme");
+    }
+    else if (["dark-theme", "light-theme"].includes(theme)) {
+        document.documentElement.setAttribute("data-theme", theme);
+    }
+    else {
+        
+    }
+`
+
+export default function GlobaLayout({
+    children
+}: GlobalLayoutProps) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+        <head>
+            <script dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
+        </head>
+        <body   
+            className={`
+                ${raleway.className}
+            `}
+        >
+            <ThemeProvider>
+                <div id="inner-body-wrapper">
+                {children}
+                </div>
+            </ThemeProvider>
+        </body>
+    </html>
+  )
+}

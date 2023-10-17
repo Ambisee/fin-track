@@ -1,22 +1,22 @@
 "use client"
 
 import { forwardRef } from "react"
+import useTheme from "@/hooks/useTheme"
 
 import styles from "./ThemeSwitchButton.module.css"
-import useTheme from "@/hooks/useTheme"
 
 interface ThemeSwitchButtonProps 
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
-const ThemeSwitchButton = forwardRef<HTMLButtonElement, ThemeSwitchButtonProps>(({
+const ThemeSwitchButton = forwardRef<HTMLButtonElement, ThemeSwitchButtonProps>(function ThemeSwitchButton({
     className,
     ...props
-}, ref) => {
-    const themeContext = useTheme()
+}, ref) {
+    const {theme, setTheme} = useTheme()
 
     return (
         <button 
-            onClick={() => themeContext.setTheme(themeContext.theme === "dark-theme" ? "light-theme" : "dark-theme")}
+            onClick={() => setTheme(theme === "dark-theme" ? "light-theme" : "dark-theme")}
             className={`
                 ${styles["style-switch-button"]} 
                 ${className ?? ""}
@@ -31,6 +31,4 @@ const ThemeSwitchButton = forwardRef<HTMLButtonElement, ThemeSwitchButtonProps>(
     );
 })   
 
-ThemeSwitchButton.displayName = "ThemeSwitchButton"
- 
-export default ThemeSwitchButton;
+export default ThemeSwitchButton

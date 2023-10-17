@@ -8,9 +8,9 @@ interface PublicHeaderProps {
     className?: string
 }
 
-export const PublicHeader: React.FC<PublicHeaderProps> = ({
-    className
-}) => {
+export default function PublicHeader({
+    className,
+}: PublicHeaderProps) {
     return (
         <header id={styles["header"]} className={className}>
             <Link href="/" className={styles["app-title-container"]}>
@@ -46,5 +46,3 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
         </header>
     );
 }
- 
-export default PublicHeader;

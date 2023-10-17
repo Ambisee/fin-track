@@ -9,18 +9,16 @@ interface ActionLinkProps extends LinkProps {
     id?: string,
 }
 
-const ActionLink: React.FC<ActionLinkProps> = ({
+export default function ActionLink({
     className,
     children,
     href,
     id,
     ...props
-}) => {
+}: ActionLinkProps) {
     return (
         <Link href={href} id={id} className={`${className} ${styles["action-link"]}`}>
             {children}
         </Link>
     );
 }
- 
-export default ActionLink;
