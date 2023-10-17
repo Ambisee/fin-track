@@ -1,0 +1,67 @@
+/* Form Element and Input Fields */
+.form-element {
+    --grid-gap-value: 1rem;
+
+    /* Box */
+    width: 90%;
+    margin: 0.5rem auto;
+
+    /* Display */
+    display: grid;
+    grid-template-columns: minmax(5rem, 100%);
+    gap: var(--grid-gap-value);
+}
+.input-field {
+    /* Box */
+    min-height: 2.5rem;
+}
+
+/* Forgot Password Link */
+.forgot-password-link-container {
+    /* Font */
+    font-size: clamp(0.5rem, 2.5vw, 0.65rem);
+    font-weight: 700;
+
+    /* Position */
+    position: relative;
+}
+.forgot-password-link {
+    /* Position */
+    position: absolute;
+    top: calc(-1 * var(--grid-gap-value) + 0.1rem);
+    right: 0;
+
+    /* Color */
+    color: rgb(var(--tertiary-color-cyan));
+}
+.forgot-password-link:hover {
+    /* Text */
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.submit-button {
+    padding: 1rem 0.5rem;
+}
+
+/* Register Link */
+.register-link-container {
+    /* Text */
+    text-align: center;
+    text-wrap: nowrap;
+    
+    /* Font */
+    font-size: clamp(0.4rem, 2.75vw, 0.7rem);
+    font-weight: 600;
+
+    /* Display */
+    justify-self: center;
+}
+.register-link {
+    /* Color */
+    color: rgb(var(--tertiary-color-cyan));
+}
+.register-link:hover {
+    /* Text */
+    text-decoration: underline;
+}

@@ -1,0 +1,40 @@
+.provider-sign-in-button {
+    /* Color */
+    color: rgb(var(--secondary-color));
+
+    /* Border */
+    border: 1px solid rgb(var(--secondary-color));
+    border-radius: 0.5rem;
+
+    /* Display */
+    display: flex;
+    align-items: center;
+
+    /* Overflow */
+    overflow: hidden;
+}
+
+.provider-icon-wrapper {
+    /* Box */
+    padding: 0.25rem;
+
+    /* Display */
+    display: grid;
+}
+.provider-icon {
+    /* Box */
+    aspect-ratio: 1;
+}
+
+.button-text {
+    /* Box */
+    height: 100%;
+    padding: 0 0.5rem;
+    
+    /* Border */
+    border-left: 1px solid rgb(var(--secondary-color));
+
+    /* Display */
+    display: flex;
+    align-items: center;
+}

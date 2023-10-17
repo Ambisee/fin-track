@@ -6,15 +6,13 @@ interface PublicLayoutProps {
     children: React.ReactNode
 }
 
-const PublicLayout: React.FC<PublicLayoutProps> = ({
+export default function PublicLayout({
     children
-}) => {
-    return (
-        <>
-            <PublicHeader />
-            {children}
-        </>
-    )
+}: PublicLayoutProps) {
+  return (
+    <>
+        <PublicHeader />
+        {children}
+    </>
+  )
 }
-
-export default PublicLayout

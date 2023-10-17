@@ -1,0 +1,33 @@
+.form-template {
+    /* Box */
+    width: 100%;
+}
+
+.template-input-container {
+    margin-top: 0.5rem;
+}
+
+.bottom-lined {
+    --input-padding: 0.5rem;
+    --label-filled-state-padding: 0;
+    --label-filled-state-left: 0;
+    --extra-widget-border-radius: 0;
+    --extra-widget-icon-color: var(--secondary-color);
+    --extra-widget-background-color: var(--primary-color) / 0;
+
+    /* Border */
+    border-bottom: 1.5px solid rgb(var(--secondary-color));
+}
+
+.outlined {
+    --input-padding: 1.25rem;
+    --label-filled-state-padding: 0.5rem;
+    --label-filled-state-left: calc(var(--input-padding) - var(--label-filled-state-padding));
+    --extra-widget-border-radius: 50rem;
+    --extra-widget-icon-color: var(--primary-color);
+    --extra-widget-background-color: var(--secondary-color);
+
+    /* Border */
+    border: 1.5px solid rgb(var(--secondary-color));
+    border-radius: var(--extra-widget-border-radius);
+}

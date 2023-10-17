@@ -1,0 +1,17 @@
+.container {
+    /* Box */
+    width: 80%;
+    margin: 0 auto;
+
+    /* Position */
+    position: relative;
+}
+
+.title {
+    /* Font */
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    /* Text */
+    text-align: center;
+}

@@ -1,9 +1,7 @@
-const About: React.FC<never> = () => {
+export default function About() {
     return (
         <div>
             This is the about page
         </div>
     );
 }
- 
-export default About;
