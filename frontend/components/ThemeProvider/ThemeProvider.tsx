@@ -2,6 +2,8 @@
 
 import { createContext, useState, useEffect, ReactNode, SetStateAction } from "react";
 
+import "../../supabase/initialize_supabase.ts"
+
 type Theme = "dark-theme" | "light-theme"
 interface ThemeContextObject {
     theme: Theme,
@@ -39,4 +41,4 @@ export default function ThemeProvider({children}: ThemeProviderProps) {
     )
 }
 
-export {ThemeContext, ThemeContextObject}
+export { ThemeContext }
