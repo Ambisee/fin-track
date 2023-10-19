@@ -2,8 +2,8 @@
 "use client"
 
 import { ReactNode } from "react"
-import Script from "next/script"
 import { Raleway } from "next/font/google"
+
 import ThemeProvider from "@/components/ThemeProvider/ThemeProvider"
 
 import "./globals.css"
@@ -34,22 +34,22 @@ const themeScript = `
 export default function GlobaLayout({
     children
 }: GlobalLayoutProps) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-        <head>
-            <script dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
-        </head>
-        <body   
-            className={`
-                ${raleway.className}
-            `}
-        >
-            <ThemeProvider>
-                <div id="inner-body-wrapper">
-                {children}
-                </div>
-            </ThemeProvider>
-        </body>
-    </html>
-  )
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <head>
+                <script id="get-theme" dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
+            </head>
+            <body   
+                className={`
+                    ${raleway.className}
+                `}
+            >
+                <ThemeProvider>
+                    <div id="inner-body-wrapper">
+                    {children}
+                    </div>
+                </ThemeProvider>
+            </body>
+        </html>
+    )
 }
