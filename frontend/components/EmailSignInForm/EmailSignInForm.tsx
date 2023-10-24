@@ -10,13 +10,15 @@ import PortalButton from "../PortalButton/PortalButton"
 import styles from "./EmailSignInForm.module.css"
 import Link from "next/link"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
+import { sbClient } from "@/supabase/supabase_client"
 
 export default function EmailSignInForm() {
-    const {register, watch, formState: { errors }} = useForm()
+    const {register, watch, handleSubmit, formState: { errors }} = useForm()
 
     const emailRegisterObject = register("email", {
         required: {value: true, message: "This field is required."}
     })
+
     const passwordRegisterObject = register("password", {
         required: {value: true, message: "This field is required."}
     })
@@ -41,11 +43,28 @@ export default function EmailSignInForm() {
                     />
                 </div>
                 <div className={styles["forgot-password-link-container"]}>
-                    <Link href="/forgot-passsword" className={styles["forgot-password-link"]}>
+                    <Link href="/forgot-password" className={styles["forgot-password-link"]}>
                         Forgot your password? 
                     </Link>
                 </div>
-                <PortalButton className={styles['submit-button']}>
+                <PortalButton 
+                    className={styles['submit-button']}
+                    onClick={handleSubmit(
+                        (data) => {
+                            sbClient.auth.signInWithPassword({
+                                email: data.email,
+                                password: data.password
+                            }).then((value) => {
+                                if (value.error) {
+                                    alert(value.error.message)
+                                }
+                            })
+                        },
+                        (errors) => {
+                            console.log(errors)
+                        }
+                    )}
+                >
                     Login
                 </PortalButton>
                 <div className={styles["register-link-container"]}>
