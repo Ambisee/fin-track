@@ -1,0 +1,49 @@
+.form-element {
+    --grid-gap-value: 1rem;
+    --input-height: 2.5rem;
+
+    width: 80%;
+    min-width: 10rem;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: minmax(5rem, 100%);
+    gap: var(--grid-gap-value);
+
+    position: relative;
+}
+
+.input-element {
+    min-height: var(--input-height);
+}
+
+.simple-validation-message {
+    font-size: 0.6rem;
+
+    position: absolute;
+}
+.error-text {
+    color: red;
+}
+
+.password-requirements-message {
+    font-size: 0.55rem;
+}
+.password-requirements-message span {
+    font-size: 0.65rem;
+}
+.password-requirements-message ul {
+    list-style-position: inside;
+    list-style-type: square;
+}
+
+.submit-button {
+    margin-top: 1rem;
+}
+.verification-required-message {
+    margin-top:  calc(-1 * var(--grid-gap-value) + 0.5rem);
+    
+    font-size: 0.75rem;
+
+    justify-self: center;
+}
