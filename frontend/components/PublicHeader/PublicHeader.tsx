@@ -36,7 +36,7 @@ export default function PublicHeader({
                                 ${styles["register-link"]}
                             `}
                         >
-                            <Link href="/register">
+                            <Link href="/registration">
                                 Sign Up
                             </Link>
                         </li>

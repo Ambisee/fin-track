@@ -1,6 +1,6 @@
 .portal-button {
     /* Box */
-    width: clamp(4rem, 60%, 15rem);
+    width: clamp(10rem, 60%, 15rem);
     padding: 1.25rem 0;
 
     /* Display */

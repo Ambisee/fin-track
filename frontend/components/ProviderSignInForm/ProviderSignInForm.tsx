@@ -1,13 +1,11 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Roboto } from "next/font/google"
 
-import { supabase } from "@/supabase/initialize_supabase"
-import { getURL } from "@/helpers/getUrl"
-import BaseSignInForm from "../BaseSignInForm/BaseSignInForm"
+import { sbClient } from "@/supabase/supabase_client"
+import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import ProviderSignInButton from "../ProviderSignInButton/ProviderSignInButton"
 
 import styles from "./ProviderSignInForm.module.css"
@@ -19,25 +17,21 @@ const roboto = Roboto({
 
 export default function ProviderSignInForm() {
     const router = useRouter()
-    
-    useEffect(() => {
-        async function foo() {
-            const user = await supabase.auth.getUser()
-            console.log(user)
-        }
-        foo()
-    }, [])
 
     return (
-        <BaseSignInForm title="Sign in with a provider">
+        <BaseFormWrapper title="Sign in with a provider">
             <div className={styles["button-container"]}>
                 <ProviderSignInButton
                     onClick={
                         () => {
-                            supabase.auth.signInWithOAuth({
+                            sbClient.auth.signInWithOAuth({
                                 provider: "google",
                                 options: {
-                                    redirectTo: getURL("/register")
+                                    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/login-callback`,
+                                    queryParams: {
+                                        access_type: 'offline',
+                                        prompt: 'consent'
+                                    }
                                 }
                             })
                         }
@@ -60,6 +54,6 @@ export default function ProviderSignInForm() {
                     Sign in with Google
                 </ProviderSignInButton>
             </div>
-        </BaseSignInForm>
+        </BaseFormWrapper>
     )
 }

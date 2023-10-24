@@ -11,8 +11,7 @@ export default function PasswordField({
     watchedValue,
     registerObject,
     fieldDisplayName,
-    includeValidation,
-    validationComponent,
+    validationComponent : ValComp,
     showLabel=true,
     ...props
 }: PasswordFieldProps) {
@@ -28,8 +27,7 @@ export default function PasswordField({
     return (
         <FormTemplate 
             variant={variant}
-            includeValidation={includeValidation} 
-            validationComponent={includeValidation ? validationComponent : undefined} 
+            validationComponent={ValComp ? <ValComp error="" /> : undefined} 
         >
             <div 
                     className={`

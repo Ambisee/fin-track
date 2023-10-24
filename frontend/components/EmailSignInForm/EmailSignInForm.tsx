@@ -9,7 +9,7 @@ import PortalButton from "../PortalButton/PortalButton"
 
 import styles from "./EmailSignInForm.module.css"
 import Link from "next/link"
-import BaseSignInForm from "../BaseSignInForm/BaseSignInForm"
+import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 
 export default function EmailSignInForm() {
     const {register, watch, formState: { errors }} = useForm()
@@ -22,7 +22,7 @@ export default function EmailSignInForm() {
     })
 
     return (
-        <BaseSignInForm title="Sign in with an email">
+        <BaseFormWrapper title="Sign in with an email">
             <form className={styles["form-element"]}>
                 <div className={styles["input-field-wrapper"]}>
                     <TextField 
@@ -50,7 +50,7 @@ export default function EmailSignInForm() {
                 </PortalButton>
                 <div className={styles["register-link-container"]}>
                     <span>
-                        Don&apos;t have an account? <Link href="register" className={styles["register-link"]}>Create an account</Link>
+                        Don&apos;t have an account? <Link href="/registration" className={styles["register-link"]}>Create an account</Link>
                     </span>
                 </div>
                 <ErrorMessage
@@ -64,6 +64,6 @@ export default function EmailSignInForm() {
                     }
                 />
             </form>
-        </BaseSignInForm>
+        </BaseFormWrapper>
     )
 }
