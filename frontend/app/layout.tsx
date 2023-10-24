@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-before-interactive-script-outside-document */
-"use client"
 
 import { ReactNode } from "react"
 import { Raleway } from "next/font/google"
@@ -13,7 +12,7 @@ interface GlobalLayoutProps {
 }
 
 export const raleway = Raleway({
-    subsets: ["latin"]
+    subsets: ["latin-ext"]
 })
 
 // Script to retrieve the theme from the localStorage first
@@ -46,7 +45,7 @@ export default function GlobaLayout({
             >
                 <ThemeProvider>
                     <div id="inner-body-wrapper">
-                    {children}
+                        {children}
                     </div>
                 </ThemeProvider>
             </body>
