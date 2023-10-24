@@ -1,6 +1,7 @@
 .form-element {
-    --grid-gap-value: 1rem;
-    --input-height: 2.5rem;
+    --grid-gap-value: 0.75rem;
+    --input-height: 2rem;
+    --error-text-font-size: 0.6rem;
 
     width: 80%;
     min-width: 10rem;
@@ -14,19 +15,25 @@
 }
 
 .input-element {
-    min-height: var(--input-height);
+    height: var(--input-height);
 }
 
-.simple-validation-message {
-    font-size: 0.6rem;
-
-    position: absolute;
+.error-text-font {
+    font-size: var(--error-text-font-size);
 }
-.error-text {
+.error-text-color {
     color: red;
 }
+.error-text-pos-absolute {
+    position: absolute;
+}
+.hide-error {
+    opacity: 0;
+}
+
 
 .password-requirements-message {
+    margin-top: calc(var(--error-text-font-size) + 0.25rem);
     font-size: 0.55rem;
 }
 .password-requirements-message span {
@@ -38,12 +45,13 @@
 }
 
 .submit-button {
-    margin-top: 1rem;
+    padding: 1rem 0;
+    margin-top: 0.75rem;
 }
 .verification-required-message {
-    margin-top:  calc(-1 * var(--grid-gap-value) + 0.5rem);
+    margin-top:  calc(-1 * var(--grid-gap-value) + 0.125rem);
     
-    font-size: 0.75rem;
+    font-size: 0.6rem;
 
     justify-self: center;
 }

@@ -1,35 +1,26 @@
 .input-container {
-    /* Box */
     min-height: 2.5rem;
     width: 100%;
     
-    /* Display */
     display: grid;
     grid-template-columns: 1fr;
 
-    /* Position */
     position: relative;
 }
 
 .input-label {
-    /* Position */
     position: absolute;
     top: 50%;
     left: var(--input-padding);
 
-    /* Font */
-    font-size: clamp(0.5rem, 100%, 0.9rem);
+    font-size: clamp(0.65rem, 3vw, 0.9rem);
 
-    /* Text */
     color: rgb(var(--secondary-color));
 
-    /* Transform */
     translate: 0 -50%;
 
-    /* Transition */
     transition: 250ms ease;
 
-    /* Pointer events */
     pointer-events: none; 
 }
 .input-label.hidden {
@@ -38,26 +29,18 @@
 
 .input-element.filled ~ .input-label,
 .input-element:focus ~ .input-label {
-    /* Font */
-    font-size: 0.6rem;
+    font-size: 0.45rem;
 
-    /* Box */
     padding: 0 var(--label-filled-state-padding);
 
-    /* Position */
     top: 0;
     left: var(--label-filled-state-left);
-
-    /* Background */
-    background-color: rgb(var(--primary-color));
 }
 
 
 .input-element {
-    /* Box */
     height: 100%;
     padding: 0 var(--input-padding);
 
-    /* Display */
     display: block;
 }

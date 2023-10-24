@@ -1,6 +1,7 @@
 .form-template {
-    /* Box */
     width: 100%;
+
+    position: relative;
 }
 
 .template-input-container {
@@ -15,7 +16,6 @@
     --extra-widget-icon-color: var(--secondary-color);
     --extra-widget-background-color: var(--primary-color) / 0;
 
-    /* Border */
     border-bottom: 1.5px solid rgb(var(--secondary-color));
 }
 
@@ -27,7 +27,6 @@
     --extra-widget-icon-color: var(--primary-color);
     --extra-widget-background-color: var(--secondary-color);
 
-    /* Border */
     border: 1.5px solid rgb(var(--secondary-color));
     border-radius: var(--extra-widget-border-radius);
 }
