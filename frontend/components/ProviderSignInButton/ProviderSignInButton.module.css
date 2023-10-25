@@ -1,36 +1,27 @@
 .provider-sign-in-button {
-    /* Color */
     color: inherit;
 
-    /* Border */
     border: 1px solid rgb(var(--secondary-color));
     border-radius: 0.5rem;
 
-    /* Display */
     display: flex;
     align-items: center;
 
-    /* Overflow */
     overflow: hidden;
 
-    /* Transition */
     transition: var(--theme-switch-transition);
 }
 
 .button-text {
-    /* Box */
     height: 100%;
     padding: 0 1rem;
 
-    /* Display */
     display: flex;
     align-items: center;
 
-    /* Transition */
     transition: var(--theme-switch-transition);
 }
 
 .provider-sign-in-button:hover {
-    /* Shadow */
     box-shadow: 0 0 0.4rem rgb(var(--secondary-color));
 }

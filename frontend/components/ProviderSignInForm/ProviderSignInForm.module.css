@@ -1,31 +1,23 @@
 .button-container {
-    /* Box */
     margin: 1rem 0;
     
-    /* Display */
     display: grid;
     gap: 0.5rem;
 }
 .provider-button {
-    /* Display */
     justify-self: center;
 }
 
 /* Google Sign In Button */
 .google-button {
-    /* Background */
     background-color: rgb(255, 255, 255);
 
-    /* Color */
     color: rgb(var(--dark-primary));
 
-    /* Border */
     border-color: rgb(var(--dark-primary));
 }
 .google-icon {
-    /* Box */
     padding: 0.5rem;
 
-    /* Display */
     display: grid;
 }

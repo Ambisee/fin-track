@@ -1,9 +1,7 @@
 #header {
-    /* Box */
     min-height: var(--header-min-height);
     padding: 0.5rem 1rem;
     
-    /* Display */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -11,60 +9,47 @@
 }
 
 .app-title-container {
-    /* Box */
     min-width: 3.5rem;
     
-    /* Display */
     display: flex;
     align-items: center;
     gap: clamp(0.5rem, 50%, 1rem);
 }
 
-.dummy-app-icon { /* Remove or edit when app image replaced the dummy icon */
-    /* Box */
+.dummy-app-icon { 
     width: 2rem;
     aspect-ratio: 1;
     
-    /* Border */
     border-radius: 10rem;
 
-    /* Background */
     background: rgb(var(--tertiary-color-purple))
 }
 .clickables-container {
     --inter-clickables-gap: 1rem;
     
-    /* Display */
     display: flex;
     justify-content: center;
     align-items: center;
     gap: calc(var(--inter-clickables-gap) + 1rem);
 }
 .page-links-container {
-    /* Display */
     display: flex;
     gap: var(--inter-clickables-gap);
 
-    /* List styles */
     list-style: none;
 
-    /* Text styles */
     text-transform: uppercase;
 }
 
 .page-link {
-    /* Box */
     padding: 0.1rem 0.2rem;
     
-    /* Font */
     font-size: 0.75rem;
     
-    /* Transition */
     transition:
         100ms ease
 }
 .page-link:hover {
-    /* Text */
     color: rgb(var(--secondary-color) / 0.5);
 }
 

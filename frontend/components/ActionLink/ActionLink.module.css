@@ -2,32 +2,24 @@
     --action-button-color: var(--tertiary-color-purple);
     --action-button-hover-color: var(--light-primary);
     
-    /* Box */
     padding: 0.5rem 1.75rem;
     box-sizing: border-box;
 
-    /* Display */
     display: inline-block;
 
-    /* Font */
     font-size: 1rem;
     font-weight: 600;
 
-    /* Text */
     color: rgb(var(--action-button-color));
     text-align: center;
 
-    /* Border */
     border: 0.25rem solid rgb(var(--action-button-color));
 
-    /* Transition */
     transition: 250ms ease;
 }
 
 .action-link:hover {
-    /* Background */
     background-color: rgb(var(--action-button-color));
 
-    /* Text */
     color: rgb(var(--action-button-hover-color));
 }
