@@ -1,6 +1,7 @@
 "use client"
 
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { ErrorMessage } from "@hookform/error-message"
 
 import TextField from "../FormField/TextField/TextField"
@@ -14,6 +15,7 @@ import { sbClient } from "@/supabase/supabase_client"
 import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
 export default function EmailSignInForm() {
+    const router = useRouter() 
     const {register, watch, handleSubmit, formState: { errors }} = useForm()
 
     const emailRegisterObject = register("email", {
@@ -26,7 +28,35 @@ export default function EmailSignInForm() {
 
     return (
         <BaseFormWrapper title="Sign in with an email">
-            <form className={styles["form-element"]}>
+            <form 
+                className={styles["form-element"]}
+                onSubmit={(e) => {
+                    e.preventDefault()
+                    
+                    handleSubmit(
+                        (data) => {
+                            sbClient.auth.signInWithPassword({
+                                email: data.email,
+                                password: data.password,
+                            }).then((value) => {
+                                if (value.data?.user) {
+                                    router.push("/dashboard")
+                                    return
+                                }
+
+                                if (value?.error) {
+                                    alert(value?.error.message)
+                                }
+                            })
+                        },
+                        (errors) => {
+                            console.log(errors)
+                        }
+                    )()
+                    
+                    return false;
+                }}
+            >
                 <div className={styles["input-field-wrapper"]}>
                     <TextField 
                         fieldDisplayName="Email" 
@@ -50,21 +80,7 @@ export default function EmailSignInForm() {
                 </div>
                 <PortalButton 
                     className={styles['submit-button']}
-                    onClick={handleSubmit(
-                        (data) => {
-                            sbClient.auth.signInWithPassword({
-                                email: data.email,
-                                password: data.password
-                            }).then((value) => {
-                                if (value.error) {
-                                    alert(value.error.message)
-                                }
-                            })
-                        },
-                        (errors) => {
-                            console.log(errors)
-                        }
-                    )}
+                    type="submit"
                 >
                     Login
                 </PortalButton>

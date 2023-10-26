@@ -107,7 +107,42 @@ export default function RegistrationForm() {
 
     return (
         <BaseFormWrapper>
-            <form className={styles["form-element"]}>
+            <form 
+                className={styles["form-element"]}
+                onSubmit={(e) => {
+                    e.preventDefault()
+
+                    handleSubmit(
+                        (data) => {
+                            sbClient.auth.signUp({
+                                email: data.email,
+                                password: data.password,
+                                options: {
+                                    data: {
+                                        username: data.username
+                                    }
+                                }
+                            }).then((value) => {
+                                if (value.error) {
+                                    alert(value.error.message)
+                                    return
+                                }
+
+                                alert(
+                                    "The account has been created and a verification email has been sent to " +
+                                    `${value.data.user?.email}. Please verify your email address before ` +
+                                    "logging in. "
+                                )
+                            })
+                        },
+                        (errors) => {
+                            
+                        }
+                    )()
+
+                    return false;
+                }}
+            >
             <div>
                     <TextField 
                         fieldDisplayName="Username" 
@@ -242,35 +277,9 @@ export default function RegistrationForm() {
                         {errors["confirm-password"] ? errors["confirm-password"].message as string : ""}
                     </div>
                 </div>
-                <PortalButton 
+                <PortalButton
+                    type="submit" 
                     className={styles["submit-button"]}
-                    onClick={handleSubmit(
-                        (data) => {
-                            sbClient.auth.signUp({
-                                email: data.email,
-                                password: data.password,
-                                options: {
-                                    data: {
-                                        username: data.username
-                                    }
-                                }
-                            }).then((value) => {
-                                if (value.error) {
-                                    alert(value.error.message)
-                                    return
-                                }
-
-                                alert(
-                                    "The account has been created and a verification email has been sent to " +
-                                    `${value.data.user?.email}. Please verify your email address before ` +
-                                    "logging in. "
-                                )
-                            })
-                        },
-                        (errors) => {
-                            
-                        }
-                    )}
                 >
                     Create account
                 </PortalButton>

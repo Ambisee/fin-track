@@ -54,6 +54,7 @@ export default function PasswordField({
                         {displayName}
                     </label>
                     <button 
+                        tabIndex={-1}
                         type="button" 
                         onClick={() => setShowPassword(current => !current)}
                         className={`

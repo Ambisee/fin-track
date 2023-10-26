@@ -1,29 +1,62 @@
 "use client"
 
-import Link from "next/link"
 import { useForm } from "react-hook-form"
 
 import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import PortalButton from "../PortalButton/PortalButton"
 import { sbClient } from "@/supabase/supabase_client"
+import { IS_EMAIL_REGEX } from "@/helpers/input_validation"
 
 import styles from "./ForgotPasswordForm.module.css"
-import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
 
 export default function ForgotPasswordForm() {
-    const { register, watch, handleSubmit, formState: { errors } } = useForm()
+    const { register, watch, handleSubmit, formState: { errors } } = useForm({
+        mode: "onChange"
+    })
     
     const emailRegisterObject = register("email", {
         required: {
             value: true,
             message: "This field is required."
+        },
+        pattern: {
+            value: IS_EMAIL_REGEX,
+            message: "Please provide a valid email address."
         }
     })
 
     return (
         <BaseFormWrapper>
-            <form className={styles["form-element"]}>
+            <form 
+                className={styles["form-element"]}
+                onSubmit={(e) => {
+                    e.preventDefault()
+
+                    handleSubmit(
+                        (data) => {
+                            sbClient.auth.resetPasswordForEmail(data.email)
+                                .then((value) => {
+                                    if (value?.error) {
+                                        alert(value.error.message)
+                                        return;
+                                    }
+
+                                    alert(
+                                        "Check your inbox at " +
+                                        `${data.email} for further instruction ` +
+                                        "on how to reset your password."
+                                    )
+                                })
+                        },
+                        (errors) => {
+                            
+                        }
+                    )()
+
+                    return false;
+                }}
+            >
                 <p className={styles["form-description"]}>
                     By submitting this form, an email will be sent to the inbox of the email address
                     specified (if the email address links to a valid account). Please check the email
@@ -35,17 +68,19 @@ export default function ForgotPasswordForm() {
                         watchedValue={watch("email")}
                         fieldDisplayName="Email"
                     />
+                    <div 
+                        className={`
+                            ${styles["error-text-color"]}
+                            ${styles["error-text-font"]}
+                            ${styles["error-text-pos-absolute"]}
+                            ${errors.email === undefined ? styles["hide-error"] : ""}
+                        `}
+                    >
+                        {(errors?.email !== undefined) ? errors.email.message as string : ""}
+                    </div>
                 </div>
                 <PortalButton
-                    onClick={handleSubmit(
-                        (data) => {
-                            sbClient.auth.resetPasswordForEmail(data.email)
-                                .then((value) => console.log(value))
-                        },
-                        (errors) => {
-                            
-                        }
-                    )}
+                    type="submit"
                 >
                     Submit
                 </PortalButton>
