@@ -1,18 +1,13 @@
 .portal-button {
-    /* Box */
     width: clamp(10rem, 60%, 15rem);
     padding: 1.25rem 0;
 
-    /* Display */
     place-self: center;
 
-    /* Background Color */
     background-color: rgb(var(--tertiary-color-purple));
 
-    /* Color */
     color: rgb(var(--light-primary));
 
-    /* Transition */
     transition: var(--theme-switch-transition);
 }
 

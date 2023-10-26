@@ -14,8 +14,6 @@ export default function Login() {
         <main id={styles["main"]}>
             <div className={styles["login-container"]}>
                 <h2 className={styles["login-page-title"]}>Login to your account</h2>
-                
-                
                 <div className={styles["inner-form-container"]}>
                     <div>
                         {/* Email Sign In Form */}
