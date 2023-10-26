@@ -7,7 +7,7 @@ import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
 import styles from "./page.module.css"
 
 export const metadata: Metadata = {
-
+    title: "FinTrack | Forgot Password"
 }
 
 export default function ForgotPassword() {
