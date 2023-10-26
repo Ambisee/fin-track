@@ -3,6 +3,7 @@ import Link from "next/link"
 
 import styles from "./PublicHeader.module.css"
 import ThemeSwitchButton from "../ThemeSwitchButton/ThemeSwitchButton";
+import { LOGIN_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes";
 
 interface PublicHeaderProps {
     className?: string
@@ -26,7 +27,7 @@ export default function PublicHeader({
                 <nav>
                     <ul className={styles["page-links-container"]}>
                         <li className={styles["page-link"]}>
-                            <Link href="/login">
+                            <Link href={LOGIN_PAGE_URL}>
                                 Login
                             </Link>
                         </li>
@@ -36,7 +37,7 @@ export default function PublicHeader({
                                 ${styles["register-link"]}
                             `}
                         >
-                            <Link href="/registration">
+                            <Link href={REGISTRATION_PAGE_URL}>
                                 Sign Up
                             </Link>
                         </li>

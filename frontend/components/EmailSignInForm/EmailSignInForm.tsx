@@ -11,6 +11,7 @@ import styles from "./EmailSignInForm.module.css"
 import Link from "next/link"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import { sbClient } from "@/supabase/supabase_client"
+import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
 export default function EmailSignInForm() {
     const {register, watch, handleSubmit, formState: { errors }} = useForm()
@@ -43,7 +44,7 @@ export default function EmailSignInForm() {
                     />
                 </div>
                 <div className={styles["forgot-password-link-container"]}>
-                    <Link href="/forgot-password" className={styles["forgot-password-link"]}>
+                    <Link href={FORGOT_PASSWORD_PAGE_URL} className={styles["forgot-password-link"]}>
                         Forgot your password? 
                     </Link>
                 </div>
@@ -69,7 +70,7 @@ export default function EmailSignInForm() {
                 </PortalButton>
                 <div className={styles["register-link-container"]}>
                     <span>
-                        Don&apos;t have an account? <Link href="/registration" className={styles["register-link"]}>Create an account</Link>
+                        Don&apos;t have an account? <Link href={REGISTRATION_PAGE_URL} className={styles["register-link"]}>Create an account</Link>
                     </span>
                 </div>
                 <ErrorMessage

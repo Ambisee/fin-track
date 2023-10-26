@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server"
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 
 import { sbKey, sbURL } from "@/supabase/constants"
+import { FORGOT_PASSWORD_PAGE_URL, LOGIN_PAGE_URL, REGISTRATION_PAGE_URL } from "./helpers/url_routes"
 
-const portal_urls = ['/login', '/registration', '/forgot-password']
+const portal_urls = [LOGIN_PAGE_URL, REGISTRATION_PAGE_URL, FORGOT_PASSWORD_PAGE_URL]
 const dashboard_urls = ['/dashboard']
 
 export async function middleware(req: NextRequest) {
@@ -39,9 +40,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-        '/login',
-        '/registration',
-        '/forgot-password', 
+        ...portal_urls,
         '/dashboard/:path*'
     ],
 }

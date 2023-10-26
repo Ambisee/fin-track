@@ -2,6 +2,7 @@ import { Metadata } from "next"
 
 import styles from "./page.module.css"
 import ActionLink from "@/components/ActionLink/ActionLink"
+import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
 
 export const metadata: Metadata = {
     title: "FinTrack | Home",
@@ -27,7 +28,7 @@ export default function Home() {
                     and expenses with ease.
                 </p>
                 <div className={styles["action-links-container"]}>
-                    <ActionLink href="/login">
+                    <ActionLink href={LOGIN_PAGE_URL}>
                         Get started
                     </ActionLink>
                     <ActionLink id={styles["action-link-2"]} href="/about">

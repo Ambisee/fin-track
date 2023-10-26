@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import RegistrationForm from "@/components/RegistrationForm/RegistrationForm"
 
 import styles from "./page.module.css"
+import { LOGIN_PAGE_URL } from "@/helpers/url_routes";
 
 export const metadata: Metadata = {
     title: "FinTrack | Registration"
@@ -20,7 +21,7 @@ export default function Registration() {
                     <RegistrationForm />
                     <div className={styles["to-login-link-container"]}>
                         <span>
-                            Already have an account? <Link href="/login" className={styles["to-login-link"]}>Sign in into your account</Link>
+                            Already have an account? <Link href={LOGIN_PAGE_URL} className={styles["to-login-link"]}>Sign in into your account</Link>
                         </span>
                     </div>
                 </div>
