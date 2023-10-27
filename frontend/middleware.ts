@@ -40,7 +40,9 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-        ...portal_urls,
+        LOGIN_PAGE_URL,
+        REGISTRATION_PAGE_URL,
+        FORGOT_PASSWORD_PAGE_URL,
         '/dashboard/:path*'
     ],
 }
