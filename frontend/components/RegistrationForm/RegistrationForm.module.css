@@ -52,6 +52,7 @@
     margin-top:  calc(-1 * var(--grid-gap-value) + 0.125rem);
     
     font-size: 0.6rem;
+    font-weight: 700;
 
     justify-self: center;
 }

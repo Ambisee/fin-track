@@ -1,21 +1,22 @@
 "use client"
 
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { ErrorMessage } from "@hookform/error-message"
 
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
 import PortalButton from "../PortalButton/PortalButton"
-
-import styles from "./EmailSignInForm.module.css"
-import Link from "next/link"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
+import usePortalLoader from "@/hooks/usePortalLoader"
 import { sbClient } from "@/supabase/supabase_client"
 import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
+import styles from "./EmailSignInForm.module.css"
+
 export default function EmailSignInForm() {
     const router = useRouter() 
+    const { setIsLoading } = usePortalLoader()
     const {register, watch, handleSubmit, formState: { errors }} = useForm()
 
     const emailRegisterObject = register("email", {
@@ -32,14 +33,15 @@ export default function EmailSignInForm() {
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
-                    
                     handleSubmit(
                         (data) => {
+                            setIsLoading(true);
                             sbClient.auth.signInWithPassword({
                                 email: data.email,
                                 password: data.password,
                             }).then((value) => {
                                 if (value.data?.user) {
+                                    setIsLoading(false)
                                     router.push("/dashboard")
                                     return
                                 }
@@ -89,16 +91,6 @@ export default function EmailSignInForm() {
                         Don&apos;t have an account? <Link href={REGISTRATION_PAGE_URL} className={styles["register-link"]}>Create an account</Link>
                     </span>
                 </div>
-                <ErrorMessage
-                    errors={errors}
-                    name="multipleErrorInput"
-                    render={({ messages }) =>
-                        messages &&
-                            Object.entries(messages).map(([type, message]) => (
-                                <p key={type}>{message}</p>
-                            ))
-                    }
-                />
             </form>
         </BaseFormWrapper>
     )

@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation"
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
+import PortalButton from "../PortalButton/PortalButton"
+import usePortalLoader from "@/hooks/usePortalLoader"
 import { sbClient } from "@/supabase/supabase_client"
+import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
 import { 
     IS_EMAIL_REGEX,
     ONLY_ALPHANUMERIC,
@@ -19,8 +22,6 @@ import {
 } from "@/helpers/input_validation"
 
 import styles from "./RegistrationForm.module.css"
-import PortalButton from "../PortalButton/PortalButton"
-import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
 
 const passwordRequirements = new Map<
     "minLength" | "upperCase" | "lowerCase" | "digit" | "specialChar" | "noSpace", boolean
@@ -64,6 +65,7 @@ const validatePassword = (value: string) => {
 
 export default function RegistrationForm() {
     const router = useRouter()
+    const { setIsLoading } = usePortalLoader()
     const { register, watch, handleSubmit, formState: { errors, dirtyFields } } = useForm({
         mode: "onChange"
     })
@@ -114,9 +116,9 @@ export default function RegistrationForm() {
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
-
                     handleSubmit(
                         (data) => {
+                            setIsLoading(true)
                             sbClient.auth.signUp({
                                 email: data.email,
                                 password: data.password,
@@ -126,6 +128,7 @@ export default function RegistrationForm() {
                                     }
                                 }
                             }).then((value) => {
+                                setIsLoading(false)
                                 if (value.error) {
                                     alert(value.error.message)
                                     return

@@ -5,12 +5,14 @@ import { useForm } from "react-hook-form"
 import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import PortalButton from "../PortalButton/PortalButton"
+import usePortalLoader from "@/hooks/usePortalLoader"
 import { sbClient } from "@/supabase/supabase_client"
 import { IS_EMAIL_REGEX } from "@/helpers/input_validation"
 
 import styles from "./ForgotPasswordForm.module.css"
 
 export default function ForgotPasswordForm() {
+    const { setIsLoading } = usePortalLoader()
     const { register, watch, handleSubmit, formState: { errors } } = useForm({
         mode: "onChange"
     })
@@ -32,11 +34,12 @@ export default function ForgotPasswordForm() {
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
-
                     handleSubmit(
                         (data) => {
+                            setIsLoading(true)
                             sbClient.auth.resetPasswordForEmail(data.email)
                                 .then((value) => {
+                                    setIsLoading(false)
                                     if (value?.error) {
                                         alert(value.error.message)
                                         return;
