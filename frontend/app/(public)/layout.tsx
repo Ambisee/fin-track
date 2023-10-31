@@ -10,9 +10,9 @@ export default function PublicLayout({
     children
 }: PublicLayoutProps) {
   return (
-    <>
+    <div id="inner-body-wrapper">
         <PublicHeader />
         {children}
-    </>
+    </div>
   )
 }

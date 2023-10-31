@@ -6,14 +6,15 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(req: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies }, {
         supabaseKey: sbKey,
-        supabaseUrl: sbURL
+        supabaseUrl: sbURL,
     })
     const { searchParams } = new URL(req.url)
     const code = searchParams.get('code')
 
     if (code) {
-        await supabase.auth.exchangeCodeForSession(code)
+        const { data } = await supabase.auth.exchangeCodeForSession(code)
+        return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`))
     }
 
-    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`))
+    return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/login`))
 }

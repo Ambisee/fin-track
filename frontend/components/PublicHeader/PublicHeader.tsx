@@ -23,7 +23,7 @@ export default function PublicHeader({
                     ${styles["clickables-container"]}
                 `}
             >
-                <ThemeSwitchButton />
+                <ThemeSwitchButton className={styles["theme-switch-button"]} />
                 <nav>
                     <ul className={styles["page-links-container"]}>
                         <li className={styles["page-link"]}>

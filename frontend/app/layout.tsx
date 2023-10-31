@@ -44,9 +44,7 @@ export default function GlobaLayout({
                 `}
             >
                 <ThemeProvider>
-                    <div id="inner-body-wrapper">
-                        {children}
-                    </div>
+                    {children}
                 </ThemeProvider>
             </body>
         </html>

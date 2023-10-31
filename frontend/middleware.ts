@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 
 import { sbKey, sbURL } from "@/supabase/constants"
@@ -9,6 +9,11 @@ const dashboard_urls = ['/dashboard']
 
 export async function middleware(req: NextRequest) {
     const res = NextResponse.next()
+    
+    if (process.env.DISABLE_MIDDLEWARE === "true") {
+        return res
+    }
+
     const sb_middleware = createMiddlewareClient({ req, res }, {
         supabaseKey: sbKey,
         supabaseUrl: sbURL
@@ -40,9 +45,9 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
-        LOGIN_PAGE_URL,
-        REGISTRATION_PAGE_URL,
-        FORGOT_PASSWORD_PAGE_URL,
+        '/login',
+        '/registration',
+        '/forgot-password',
         '/dashboard/:path*'
     ],
 }

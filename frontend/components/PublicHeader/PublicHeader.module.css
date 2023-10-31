@@ -24,6 +24,11 @@
 
     background: rgb(var(--tertiary-color-purple))
 }
+
+.theme-switch-button {
+    max-width: 1rem;
+}
+
 .clickables-container {
     --inter-clickables-gap: 1rem;
     
