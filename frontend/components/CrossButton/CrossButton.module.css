@@ -1,0 +1,38 @@
+.button-element {
+    min-width: 1rem;
+    max-width: 10rem;
+    
+    aspect-ratio: 1;
+
+    position: relative;
+}
+
+.line {
+    width: 100%;
+    min-height: 1px;
+
+    background-color: rgb(var(--secondary-color));
+
+    transform-origin: center;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    scale: 1;
+    translate: -50% -50%;
+
+    transition: var(--theme-switch-transition);
+}
+
+.line:first-child {
+    rotate: 45deg;
+}
+
+.line:last-child {
+    rotate: -45deg;
+}
+
+.button-element:hover .line {
+    scale: 1.2;
+}

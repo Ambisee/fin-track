@@ -1,0 +1,36 @@
+.button-element {
+    aspect-ratio: 1;
+    min-width: 2rem;
+    max-width: 5rem;
+
+    position: relative;
+}
+
+.line {
+    height: 2px;
+
+    background: rgb(var(--secondary-color));
+
+    position: absolute;
+    left: 0;
+}
+
+.line:first-child {
+    width: 100%;
+    
+    top: 0;
+}
+
+.line:nth-child(2) {
+    width: 66%;
+
+    top: 50%;
+    
+    translate: 0 -50%;
+}
+
+.line:last-child {
+    width: 33%;
+
+    bottom: 0;
+}

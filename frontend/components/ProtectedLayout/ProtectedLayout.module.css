@@ -1,0 +1,100 @@
+.outer-container {
+    height: 100vh;
+
+    position: relative;
+}
+
+.nav-bar {
+    position: absolute;
+    
+    top: 0;
+    right: 100%;
+
+    z-index: 100;
+
+    transition: translate 0.35s ease;
+}
+
+.nav-bar.show {
+    translate: 100% 0;
+}
+
+.main-element {
+    max-height: 100vh;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.content-container {
+    overflow: auto;
+}
+.content-container::-webkit-scrollbar {
+    width: 10px;
+
+    background: transparent;
+}
+.content-container::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--secondary-color) / 0.35);
+    
+    border: 1px solid rgb(var(--secondary-color) / 0.35);
+    border-radius: 50rem;
+}
+
+.backdrop {
+    width: 100vw;
+    height: 100vh;
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    z-index: 75;
+
+    background: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0.35rem);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
+    transition-delay: visibility 0.35s ease;
+}
+
+.backdrop.show {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+}
+
+@media screen and (min-width: 600px) {
+    .outer-container {
+        display: grid;
+        grid-template-columns: auto 1fr;
+    }    
+
+    .nav-bar {
+        left: 0;
+        position: relative;
+
+        transition: none;
+        transition-property: translate;
+    }
+    .nav-bar.show {
+        translate: 0;
+    }
+
+    .cross-button {
+        display: none;
+    }
+
+    .nav-toggler-button {
+        visibility: hidden;
+    }
+
+    .backdrop,
+    .backdrop.show {
+        visibility: hidden;
+    }
+}
