@@ -27,15 +27,15 @@ export default function EntryForm(props: EntryFormProps) {
     }
 
     const dateRegisterObject = register("date", {
-        required: true,
+        required: "Please enter a date value.",
         valueAsDate: true,
     })
     const descRegisterObject = register("description")
     const amountRegisterObject = register("amount", {
-        required: true,
+        required: "Please enter an amount.",
         pattern: {
-            value: /\\/,
-            message: ""
+            value: /^([1-9]\d{0,2}(,\d{3})*|\d+)(\.\d{2})?$/,
+            message: "Please enter a valid currency value. (e.g. 12.10, 0.12, 1,000.50)."
         }
     })
 
@@ -51,7 +51,12 @@ export default function EntryForm(props: EntryFormProps) {
                         (data) => {
                             alert("Submitted")
                         },
-                        (error) => {
+                        (errors) => {
+                            let errMessage = ""
+                            for (const key in errors) {
+                                errMessage += `- ${errors[key]?.message}\n`
+                            }
+                            alert(errMessage)
                         }
                     )(e)
                 }}
