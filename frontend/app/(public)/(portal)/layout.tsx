@@ -4,7 +4,7 @@ import PortalLoaderProvider from "@/components/PortalLoaderProvider/PortalLoader
 import PortalLoadingIndicator from "@/components/PortalLoadingIndiciator/PortalLoadingIndicator"
 
 interface PortalLayoutProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 export default function PortalLayout(props: PortalLayoutProps) {

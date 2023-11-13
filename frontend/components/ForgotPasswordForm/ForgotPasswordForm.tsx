@@ -1,22 +1,25 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import PortalButton from "../PortalButton/PortalButton"
 import usePortalLoader from "@/hooks/usePortalLoader"
+import RecoveryForm from "../RecoveryForm/RecoveryForm"
 import { sbClient } from "@/supabase/supabase_client"
 import { IS_EMAIL_REGEX } from "@/helpers/input_validation"
 
 import styles from "./ForgotPasswordForm.module.css"
 
 export default function ForgotPasswordForm() {
+    const [showResetPassword, setShowResetPassword] = useState(false)
     const { setIsLoading } = usePortalLoader()
     const { register, watch, handleSubmit, formState: { errors } } = useForm({
         mode: "onChange"
     })
-    
+
     const emailRegisterObject = register("email", {
         required: {
             value: true,
@@ -28,6 +31,14 @@ export default function ForgotPasswordForm() {
         }
     })
 
+    if (showResetPassword) {
+        return (
+            <BaseFormWrapper>
+                <RecoveryForm />
+            </BaseFormWrapper>
+        )
+    }
+
     return (
         <BaseFormWrapper>
             <form 
@@ -37,7 +48,12 @@ export default function ForgotPasswordForm() {
                     handleSubmit(
                         (data) => {
                             setIsLoading(true)
-                            sbClient.auth.resetPasswordForEmail(data.email)
+                            sbClient.auth.resetPasswordForEmail(
+                                data.email,
+                                {
+                                    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/forgot-password`
+                                }
+                            )
                                 .then((value) => {
                                     setIsLoading(false)
                                     if (value?.error) {

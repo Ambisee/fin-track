@@ -8,7 +8,7 @@ interface PortalLoaderContextObject {
 }
 
 interface PortalLoaderProviderProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 const PortalLoaderContext = createContext<PortalLoaderContextObject>({} as PortalLoaderContextObject)

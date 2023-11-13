@@ -1,0 +1,25 @@
+#main {
+    min-height: calc(100vh - var(--header-min-height) - 1rem);
+
+    display: flex;
+    justify-content: center;
+}
+
+.outer-form-container {
+    width: 85%;
+    min-width: 7.5rem;
+    max-width: 30rem;
+    margin-bottom: 2rem;
+
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto 1fr;
+}
+
+.page-title {
+    text-align: center;
+}
+
+.inner-form-container {
+    align-self: center;
+}

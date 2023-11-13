@@ -1,0 +1,18 @@
+.form-element {
+    --grid-gap-value: 0.75rem;
+    --input-height: 2rem;
+
+    width: 75%;
+    min-width: 10rem;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: minmax(5rem, 100%);
+    gap: var(--grid-gap-value);
+
+    position: relative;
+}
+
+.input-element {
+    height: var(--input-height);
+}
