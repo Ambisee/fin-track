@@ -49,7 +49,19 @@ export default function EntryForm(props: EntryFormProps) {
                     e.preventDefault()
                     handleSubmit(
                         (data) => {
-                            alert("Submitted")
+                            sbClient.from("entry").insert({
+                                date: data.date,
+                                description: data.description,
+                                amount: data.amount,
+                                amount_is_positive: sign
+                            }).then((value) => {
+                                if (value.error) {
+                                    alert(value.error.message)
+                                    return
+                                }
+
+                                alert(value.statusText)
+                            })
                         },
                         (errors) => {
                             let errMessage = ""
