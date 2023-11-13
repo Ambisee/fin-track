@@ -4,7 +4,7 @@ import ProtectedNavbar from "@/components/ProtectedNavbar/ProtectedNavbar"
 import ProtectedLayout from "@/components/ProtectedLayout/ProtectedLayout"
 
 interface DashboardLayoutProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 export default function DashboardLayout(props: DashboardLayoutProps) {

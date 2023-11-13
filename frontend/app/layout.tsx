@@ -8,7 +8,7 @@ import ThemeProvider from "@/components/ThemeProvider/ThemeProvider"
 import "./globals.css"
 
 interface GlobalLayoutProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 export const raleway = Raleway({

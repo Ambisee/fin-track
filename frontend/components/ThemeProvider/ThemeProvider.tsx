@@ -9,7 +9,7 @@ interface ThemeContextObject {
 }
 
 interface ThemeProviderProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 const ThemeContext = createContext<ThemeContextObject>({} as ThemeContextObject)

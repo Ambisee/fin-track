@@ -3,7 +3,7 @@
 import PublicHeader from "@/components/PublicHeader/PublicHeader"
 
 interface PublicLayoutProps {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 export default function PublicLayout({

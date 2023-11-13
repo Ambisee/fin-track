@@ -150,7 +150,7 @@ export default function RegistrationForm() {
                     return false;
                 }}
             >
-            <div>
+                <div>
                     <TextField 
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
