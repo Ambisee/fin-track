@@ -29,14 +29,15 @@
 
 .input-element.filled ~ .input-label,
 .input-element:focus ~ .input-label {
+    padding: 0 var(--label-filled-state-padding);
+    
     font-size: 0.45rem;
 
-    padding: 0 var(--label-filled-state-padding);
+    background-color: rgb(var(--primary-color));
 
     top: 0;
     left: var(--label-filled-state-left);
 }
-
 
 .input-element {
     height: 100%;

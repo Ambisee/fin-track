@@ -13,17 +13,15 @@ interface ValidationComponentProps {
 }
  
 interface FormTemplateCommonProps {
-    children: ReactNode,
-    validationComponent?: ReactNode,
+    children?: ReactNode,
     variant?: FormFieldVariant,
 }
 
 type CommonFieldProps = 
     Omit<React.HTMLProps<HTMLInputElement>, "children" | "type"> & 
-    Omit<FormTemplateCommonProps, "children" | "validationComponent"> &  
+    Omit<FormTemplateCommonProps, "children" > &  
 {
     className?: string,
-    validationComponent?: FC<{error: string}>, // Replace with a react component that accepts an `error` prop
     variant?: FormFieldVariant,
     fieldDisplayName?: string,
     showLabel?: boolean,
@@ -31,7 +29,7 @@ type CommonFieldProps =
 
 interface UseHookFormFieldProps {
     registerObject?: UseFormRegisterReturn,
-    watchedValue?: string,
+    watchedValue?: any,
 }
 
 const defaultProps: Pick<CommonFieldProps, "variant" | "showLabel"> = {
@@ -45,11 +43,6 @@ export default function FormTemplate({
     variant="bottom-lined",
     ...props
 }: FormTemplateProps) {
-    const renderValidation = () => {
-        if (props.validationComponent === undefined) return <></>
-        return props.validationComponent
-    }
-
     return (
         <div className={styles["form-template"]}>
             <div 
@@ -60,9 +53,8 @@ export default function FormTemplate({
             >
                 {children}
             </div>
-            {renderValidation()}
         </div>
     )
 }
 
-export type { FormTemplateProps, CommonFieldProps, UseHookFormFieldProps, ValidationComponentProps }
+export type { FormTemplateProps, CommonFieldProps, UseHookFormFieldProps }

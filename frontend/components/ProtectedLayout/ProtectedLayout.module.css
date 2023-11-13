@@ -15,6 +15,10 @@
     transition: translate 0.35s ease;
 }
 
+.header {
+    z-index: 50;
+}
+
 .nav-bar.show {
     translate: 100% 0;
 }
@@ -24,6 +28,8 @@
 
     display: grid;
     grid-template-rows: auto 1fr;
+
+    z-index: 25;
 }
 
 .content-container {
@@ -39,6 +45,79 @@
     
     border: 1px solid rgb(var(--secondary-color) / 0.35);
     border-radius: 50rem;
+}
+
+.entry-form-toggler {
+    width: 3rem;
+    aspect-ratio: 1;
+
+    background-color: rgb(var(--tertiary-color-purple));
+    color: rgb(var(--light-primary));
+    
+    border-radius: 50rem;
+
+    position: fixed;
+
+    bottom: 1.5rem;
+    right: 1.5rem;
+
+    z-index: 30;
+
+    font-size: 2rem;
+    font-weight: 200;
+
+    scale: 1;
+
+    transition: var(--theme-switch-transition);
+}
+.entry-form-toggler:hover {
+    scale: 1.1;
+}
+
+.entry-form-container {
+    min-width: 15rem;
+    max-width: 25rem;
+    width: 70%;
+    height: 90%;
+    padding: 1rem;
+
+    background-color: rgb(var(--primary-color));
+
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    border: 1px solid rgb(var(--secondary-color));
+    border-radius: 1rem;
+    
+    z-index: 100;
+    
+    opacity: 0;
+    visibility: hidden;
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+    
+    transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
+    transition-delay: visibility 0.35s ease;
+}
+.entry-form-container.show {
+    visibility: visible;
+    opacity: 1;
+
+    transition: opacity 0.35s ease;
+}
+.entry-form-header {
+    display: flex;
+    flex-direction: row-reverse;
+}
+.entry-form-close-button {
+    width: 1.5rem;
+    aspect-ratio: 1;
 }
 
 .backdrop {
@@ -65,6 +144,7 @@
 .backdrop.show {
     visibility: visible;
     opacity: 1;
+    
     transition: opacity 0.35s ease;
 }
 
@@ -77,6 +157,8 @@
     .nav-bar {
         left: 0;
         position: relative;
+
+        z-index: 75;
 
         transition: none;
         transition-property: translate;
@@ -93,8 +175,42 @@
         visibility: hidden;
     }
 
+    /*
     .backdrop,
     .backdrop.show {
         visibility: hidden;
+    }
+    */
+    
+    .entry-form-container {
+        z-index: 125;
+    }
+
+    .backdrop {
+        width: 100vw;
+        height: 100vh;
+    
+        position: absolute;
+    
+        top: 0;
+        left: 0;
+    
+        z-index: 100;
+    
+        background: rgb(0 0 0 / 0);
+        backdrop-filter: blur(0.35rem);
+    
+        opacity: 0;
+        visibility: hidden;
+    
+        transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
+        transition-delay: visibility 0.35s ease;
+    }
+    
+    .backdrop.show {
+        visibility: visible;
+        opacity: 1;
+        
+        transition: opacity 0.35s ease;
     }
 }

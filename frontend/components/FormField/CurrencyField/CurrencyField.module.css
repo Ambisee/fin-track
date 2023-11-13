@@ -1,0 +1,85 @@
+.input-container {
+    min-height: 2.5rem;
+
+    display: grid;
+    grid-template-columns: minmax(2rem, 0.01fr) 1fr;
+
+    position: relative;
+}
+.input-container > * {
+    min-height: 0;
+    min-width: 0;
+}
+
+.sign-toggler {
+    color: rgb(var(--extra-widget-icon-color));
+    background-color: rgb(var(--extra-widget-background-color));
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 
+        var(--extra-widget-border-radius)
+        0
+        0
+        var(--extra-widget-border-radius)
+    ;
+
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    width: 100%;
+    height: 100%;
+    
+    display: block;
+
+    position: relative;
+}
+
+.input-element {
+    width: 100%;
+    height: 100%;
+    padding: 0 var(--input-padding);
+
+    box-sizing: border-box;
+
+    display: block;
+
+    inset: 0;
+}
+
+.input-label {
+    position: absolute;
+    top: 50%;
+    left: var(--input-padding);
+
+    font-size: clamp(0.65rem, 3vw, 0.9rem);
+
+    color: rgb(var(--secondary-color));
+
+    translate: 0 -50%;
+
+    transition: 250ms ease;
+
+    pointer-events: none; 
+}
+.input-label.hidden {
+    display: none;
+}
+
+.input-element.filled ~ .input-label,
+.input-element:focus ~ .input-label {
+    font-size: 0.45rem;
+
+    padding: 0 var(--label-filled-state-padding);
+
+    background-color: rgb(var(--primary-color));
+
+    top: 0;
+    left: var(--label-filled-state-left);
+}
+
+

@@ -40,8 +40,8 @@ export default function EmailSignInForm() {
                                 email: data.email,
                                 password: data.password,
                             }).then((value) => {
+                                setIsLoading(false)
                                 if (value.data?.user) {
-                                    setIsLoading(false)
                                     router.push("/dashboard")
                                     return
                                 }

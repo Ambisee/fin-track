@@ -1,6 +1,11 @@
+"use client"
+
+import { useState } from "react"
+
 import FormTemplate, { CommonFieldProps, FormTemplateProps, UseHookFormFieldProps } from "../FormTemplate"
 
 import styles from "./TextField.module.css"
+import { UseFormRegisterReturn } from "react-hook-form"
 
 type TextFieldProps = CommonFieldProps & UseHookFormFieldProps 
 
@@ -10,7 +15,6 @@ export default function TextField({
     watchedValue,
     registerObject,
     fieldDisplayName,
-    validationComponent: ValComp,
     showLabel=true,
     ...props
 }: TextFieldProps) {
@@ -23,7 +27,6 @@ export default function TextField({
 
     return (
         <FormTemplate 
-            validationComponent={ValComp ? <ValComp error="" /> : <></>}
             variant={variant} 
         >
             <div 
@@ -44,17 +47,15 @@ export default function TextField({
                 />
 
                 {/* Label that floats when input field is focused or filled */}
-                {showLabel &&
-                    <label 
-                        htmlFor={props.id} 
-                        className={`
-                            ${styles["input-label"]}
-                            ${showLabel ? "" : styles["hidden"]}
-                        `}
-                    >
-                        {displayName}
-                    </label>
-                }
+                <label 
+                    htmlFor={props.id} 
+                    className={`
+                        ${styles["input-label"]}
+                        ${showLabel ? "" : styles["hidden"]}
+                    `}
+                >
+                    {displayName}
+                </label>
             </div>
         </FormTemplate>
     )

@@ -36,10 +36,10 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
             <nav className={styles["nav-element"]}>
                 <ul className={styles["nav-list"]}>
                     <li className={styles["nav-item"]}>
-                        <Link href="#">Home</Link>
+                        <Link href="/dashboard">Home</Link>
                     </li>
                     <li className={styles["nav-item"]}>
-                        <Link href="#">Settings</Link>
+                        <Link href="/dashboard/settings">Settings</Link>
                     </li>
                     <li className={styles["nav-item"]}>
                         <Link href="#">Entries</Link>

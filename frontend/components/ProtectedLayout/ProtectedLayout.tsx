@@ -6,26 +6,30 @@ import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
 
 import styles from "./ProtectedLayout.module.css"
+import EntryForm from "../EntryForm/EntryForm"
+import CrossButton from "../CrossButton/CrossButton"
 
 interface ProtectedLayoutProps {
-    children: ReactNode
+    children?: ReactNode
 }
 
 export default function ProtectedLayout(props: ProtectedLayoutProps) {
     const [isNavToggled, setIsNavToggled] = useState(false)
+    const [isDropdownToggled, setIsDropdownToggled] = useState(false)
+    const [isEntryFormToggled, setIsEntryFormToggled] = useState(false)
+
     const dropdownTogglerRef = useRef<HTMLDivElement>(null)
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false)
     
     return (
         <div 
             className={styles["outer-container"]}
             onClick={(e) => {
-                if (!isDropdownVisible) {
+                if (!isDropdownToggled) {
                     return;
                 }
 
                 if (!dropdownTogglerRef.current?.contains(e.target as Node) || e.target !== dropdownTogglerRef.current) {
-                    setIsDropdownVisible(false);
+                    setIsDropdownToggled(false);
                 }
             }}
         >
@@ -44,19 +48,45 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                     className={styles["header"]}
                     togglerClassName={styles["nav-toggler-button"]}
                     dropdownTogglerRef={dropdownTogglerRef}
-                    dropdownTogglerCallback={() => setIsDropdownVisible(cur => !cur)}
-                    isDropdownVisible={isDropdownVisible}
+                    dropdownTogglerCallback={() => setIsDropdownToggled(cur => !cur)}
+                    isDropdownVisible={isDropdownToggled}
                     navTogglerCallback={() => {setIsNavToggled(cur => !cur)}} 
                 />
+                
+                {/* Content container */}
                 <div className={styles["content-container"]}>
                     {props.children}
                 </div>
+                <button 
+                    className={styles["entry-form-toggler"]}
+                    onClick={() => {setIsEntryFormToggled(true)}}
+                >
+                    +
+                </button>
             </main>
             <div 
-                onMouseDown={() => {setIsNavToggled(cur => !cur)}}
+                className={`
+                    ${styles["entry-form-container"]}
+                    ${isEntryFormToggled && styles["show"]}
+                `}
+            >
+                <div className={styles["entry-form-header"]}>
+                    <CrossButton 
+                        className={styles["entry-form-close-button"]} 
+                        onClick={() => setIsEntryFormToggled(false)}
+                    />
+                </div>
+                <EntryForm title="New Entry" />
+            </div>
+
+            <div 
+                onMouseDown={() => {
+                    if (isNavToggled) setIsNavToggled(false)
+                    if (isEntryFormToggled) setIsEntryFormToggled(false)
+                }}
                 className={`
                     ${styles["backdrop"]}
-                    ${isNavToggled && styles["show"]}
+                    ${(isNavToggled || isEntryFormToggled) && styles["show"]}
                 `}
             />
         </div>

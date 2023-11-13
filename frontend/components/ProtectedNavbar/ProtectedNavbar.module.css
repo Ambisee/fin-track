@@ -3,7 +3,7 @@
     min-width: 12.5rem;
     height: 100vh;
 
-    background: rgb(var(--secondary-color) / 0.35);
+    background: rgb(var(--secondary-color) / 0.1);
     
     border-right: 1px solid rgb(var(--secondary-color));
 

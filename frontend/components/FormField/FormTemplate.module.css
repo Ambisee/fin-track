@@ -21,7 +21,7 @@
 
 .outlined {
     --input-padding: 1.25rem;
-    --label-filled-state-padding: 0.5rem;
+    --label-filled-state-padding: 0.35rem;
     --label-filled-state-left: calc(var(--input-padding) - var(--label-filled-state-padding));
     --extra-widget-border-radius: 50rem;
     --extra-widget-icon-color: var(--primary-color);
