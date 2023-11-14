@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
 import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import DateField from "../FormField/DateField/DateField"
 import { sbClient } from "@/supabase/supabase_client"
 import { DashboardDataContextObject, useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
@@ -113,18 +113,18 @@ export default function EntryForm(props: EntryFormProps) {
                     </div>
                 </div>
                 <div className={styles["button-container"]}>
-                    <PortalButton 
+                    <ActionButton 
                         className={`${styles["submit-button"]} ${styles["form-button"]}`}
                     >
                         Submit
-                    </PortalButton>
-                    <PortalButton 
+                    </ActionButton>
+                    <ActionButton 
                         className={`${styles["clear-button"]} ${styles["form-button"]}`}
                         type="button"
                         onClick={clearField}
                     >
                         Clear
-                    </PortalButton>
+                    </ActionButton>
                 </div>
             </form>
         </BaseFormWrapper>

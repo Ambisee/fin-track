@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import usePortalLoader from "@/hooks/usePortalLoader"
 import { sbClient } from "@/supabase/supabase_client"
 import { LOGIN_PAGE_URL } from "@/helpers/url_routes"
@@ -284,12 +284,12 @@ export default function RegistrationForm() {
                         {errors["confirm-password"] ? errors["confirm-password"].message as string : ""}
                     </div>
                 </div>
-                <PortalButton
+                <ActionButton
                     type="submit" 
                     className={styles["submit-button"]}
                 >
                     Create account
-                </PortalButton>
+                </ActionButton>
                 <span className={styles["verification-required-message"]}>*Email verification required.</span>
             </form>
         </BaseFormWrapper>

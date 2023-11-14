@@ -23,7 +23,7 @@
     align-self: flex-end;
 }
 
-.form-button {
+button.form-button {
     width: 100%;
     height: 2.5rem;
     padding: 0;
@@ -33,21 +33,21 @@
     border-radius: 50rem;
 }
 
-.submit-button {
+button.submit-button {
     color: rgb(var(--tertiary-color-purple));
 
     border: 3px solid rgb(var(--tertiary-color-purple));
 }
-.submit-button:hover {
+button.submit-button:hover {
     color: rgb(var(--light-primary));
 }
 
-.clear-button {
+button.clear-button {
     color: red;
     
     border: 3px solid red;
 }
-.clear-button:hover {
+button.clear-button:hover {
     background-color: red;
     color: rgb(var(--light-primary));
 }

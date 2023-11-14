@@ -1,4 +1,4 @@
-.portal-button {
+.action-button {
     width: clamp(10rem, 60%, 15rem);
     padding: 1.25rem 0;
 
@@ -11,6 +11,6 @@
     transition: var(--theme-switch-transition);
 }
 
-.portal-button:hover {
+.action-button:hover {
     background-color: rgb(var(--tertiary-color-purple-hover));
 }

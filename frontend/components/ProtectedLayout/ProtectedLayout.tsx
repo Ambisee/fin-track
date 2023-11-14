@@ -6,7 +6,7 @@ import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
 import EntryForm from "../EntryForm/EntryForm"
 import CrossButton from "../CrossButton/CrossButton"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import DashboardDataProvider, { DashboardDataContextObject } from "../DashboardDataProvider/DashboardDataProvider"
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
@@ -86,12 +86,12 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         />
                     </div>
                     <EntryForm title="New Entry" />
-                    <PortalButton
+                    <ActionButton
                         className={styles["bottom-close-button"]}
                         onClick={() => {setIsEntryFormToggled(false)}}
                     >
                         Close
-                    </PortalButton>
+                    </ActionButton>
                 </div>
 
                 <div 

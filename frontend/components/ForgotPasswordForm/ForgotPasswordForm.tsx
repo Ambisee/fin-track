@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 
 import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import usePortalLoader from "@/hooks/usePortalLoader"
 import RecoveryForm from "../RecoveryForm/RecoveryForm"
 import { sbClient } from "@/supabase/supabase_client"
@@ -98,11 +98,11 @@ export default function ForgotPasswordForm() {
                         {(errors?.email !== undefined) ? errors.email.message as string : ""}
                     </div>
                 </div>
-                <PortalButton
+                <ActionButton
                     type="submit"
                 >
                     Submit
-                </PortalButton>
+                </ActionButton>
             </form>
         </BaseFormWrapper>
     )

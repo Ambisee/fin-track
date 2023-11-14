@@ -1,17 +1,17 @@
 import { HTMLProps, DetailedHTMLProps, ButtonHTMLAttributes } from "react"
 
-import styles from "./PortalButton.module.css"
+import styles from "./ActionButton.module.css"
 
-interface PortalButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {}
+interface ActionButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {}
 
-export default function PortalButton(props: PortalButtonProps) {   
+export default function ActionButton(props: ActionButtonProps) {   
     return (
         <button 
             type={props.type} 
             onClick={props.onClick} 
             className={`
-                ${styles["portal-button"]} 
                 ${props.className}
+                ${styles["action-button"]} 
             `}
         >
             {props.children}

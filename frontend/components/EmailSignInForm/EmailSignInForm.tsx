@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import usePortalLoader from "@/hooks/usePortalLoader"
 import { sbClient } from "@/supabase/supabase_client"
@@ -80,12 +80,12 @@ export default function EmailSignInForm() {
                         Forgot your password? 
                     </Link>
                 </div>
-                <PortalButton 
+                <ActionButton 
                     className={styles['submit-button']}
                     type="submit"
                 >
                     Login
-                </PortalButton>
+                </ActionButton>
                 <div className={styles["register-link-container"]}>
                     <span>
                         Don&apos;t have an account? <Link href={REGISTRATION_PAGE_URL} className={styles["register-link"]}>Create an account</Link>

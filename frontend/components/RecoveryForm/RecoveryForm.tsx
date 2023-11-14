@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form"
 
 import PasswordField from "../FormField/PasswordField/PasswordField"
-import PortalButton from "../PortalButton/PortalButton"
+import ActionButton from "../ActionButton/ActionButton"
 import { sbClient } from "@/supabase/supabase_client"
 
 // import styles from "./RecoveryForm.module.css"
@@ -200,12 +200,12 @@ export default function RecoveryForm() {
                         {errors["confirm-password"] ? errors["confirm-password"].message as string : ""}
                     </div>
                 </div>
-                <PortalButton 
+                <ActionButton 
                     className={registrationFormStyles["submit-button"]}
                     type="submit"
                 >
                     Submit
-                </PortalButton>
+                </ActionButton>
             </form>
         </BaseFormWrapper>
     )
