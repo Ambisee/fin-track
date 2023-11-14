@@ -1,0 +1,11 @@
+.welcome-text {
+    padding-bottom: 1rem;
+
+    border-bottom: 1px solid rgb(var(--secondary-color));
+
+    position: relative;
+}
+
+.recent-entry-container {
+    margin-top: 1rem;
+}

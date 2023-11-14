@@ -82,7 +82,7 @@ export default function EntryForm(props: EntryFormProps) {
                 }}
             >
                 <div className={styles["field-container"]}>
-                    <div>
+                    <div className={styles["field-wrapper"]}>
                         <DateField 
                             variant="outlined"
                             className={styles["input-field"]}
@@ -91,7 +91,7 @@ export default function EntryForm(props: EntryFormProps) {
                             watchedValue={!isNaN(watch("date"))}
                         />
                     </div>
-                    <div>
+                    <div className={styles["field-wrapper"]}>
                         <TextField
                             variant="outlined"
                             className={styles["input-field"]}
@@ -100,7 +100,7 @@ export default function EntryForm(props: EntryFormProps) {
                             fieldDisplayName="Description"
                         />
                     </div>
-                    <div>
+                    <div className={styles["field-wrapper"]}>
                         <CurrencyField 
                             variant="outlined"
                             className={styles["input-field"]}

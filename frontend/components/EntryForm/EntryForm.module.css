@@ -5,14 +5,11 @@
 
     box-sizing: border-box;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
 }
 
-.field-container {
-    display: grid;
-    gap: 0.25rem;
+.field-wrapper {
+    margin-top: 1.25rem;
 }
 
 .input-field {
@@ -22,6 +19,8 @@
 .button-container {
     display: grid;
     gap: 1rem;
+
+    align-self: flex-end;
 }
 
 .form-button {
