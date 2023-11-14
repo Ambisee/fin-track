@@ -13,6 +13,13 @@ export async function GET(req: NextRequest) {
 
     if (code) {
         const { data } = await supabase.auth.exchangeCodeForSession(code)
+
+        if (data.user?.user_metadata.username === undefined) {
+            await supabase.auth.updateUser({
+                data: { username: data.user?.user_metadata.name }
+            })
+        }
+
         return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`))
     }
 
