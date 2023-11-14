@@ -38,7 +38,7 @@ export default function ProtectedHeader(props: ProtectedHeaderProps) {
                 `}
                 onClick={props.navTogglerCallback} 
             />
-            <h4>
+            <h4 className={styles["page-title"]}>
                 Home
             </h4>
             <div 

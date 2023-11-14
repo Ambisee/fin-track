@@ -14,6 +14,13 @@
 .nav-toggler-button {
     width: 1.5rem;
     height: 1.5rem;
+    
+    position: absolute;
+    left: var(--header-h-padding);
+}
+
+.page-title {
+    visibility: hidden;
 }
 
 .profile-container {
@@ -60,7 +67,6 @@
 .profile-dropdown::before {
     content: "";
     
-
     position: absolute;
     left: 50%;
     bottom: 100%;
@@ -94,4 +100,10 @@
 .profile-dropdown-link:hover {
     background-color: rgb(var(--primary-color) / 0.5);
     color: rgb(var(--secondary-color));
+}
+
+@media screen and (min-width: 600px) {
+    .page-title {
+        visibility: visible;
+    }        
 }

@@ -4,12 +4,13 @@ import { ReactNode, useState, useRef, useEffect } from "react"
 
 import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
-
 import EntryForm from "../EntryForm/EntryForm"
 import CrossButton from "../CrossButton/CrossButton"
+import PortalButton from "../PortalButton/PortalButton"
+import DashboardDataProvider, { DashboardDataContextObject } from "../DashboardDataProvider/DashboardDataProvider"
+import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 import styles from "./ProtectedLayout.module.css"
-import DashboardDataProvider, { DashboardDataContextObject } from "../DashboardDataProvider/DashboardDataProvider"
 
 interface ProtectedLayoutProps {
     children?: ReactNode,
@@ -17,11 +18,15 @@ interface ProtectedLayoutProps {
 }
 
 export default function ProtectedLayout(props: ProtectedLayoutProps) {
-    const [isNavToggled, setIsNavToggled] = useState(false)
-    const [isDropdownToggled, setIsDropdownToggled] = useState(false)
-    const [isEntryFormToggled, setIsEntryFormToggled] = useState(false)
-
     const dropdownTogglerRef = useRef<HTMLDivElement>(null)
+    const { 
+        isNavToggled, 
+        setIsNavToggled,
+        isDropdownToggled, 
+        setIsDropdownToggled,
+        isEntryFormToggled, 
+        setIsEntryFormToggled
+    } = useLayout()
 
     return (
         <DashboardDataProvider value={props.contextValue}>
@@ -81,6 +86,12 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         />
                     </div>
                     <EntryForm title="New Entry" />
+                    <PortalButton
+                        className={styles["bottom-close-button"]}
+                        onClick={() => {setIsEntryFormToggled(false)}}
+                    >
+                        Close
+                    </PortalButton>
                 </div>
 
                 <div 
