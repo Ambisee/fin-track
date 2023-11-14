@@ -8,6 +8,7 @@ import NavTogglerButton from "../NavTogglerButton/NavTogglerButton"
 import { sbClient } from "@/supabase/supabase_client";
 
 import styles from "./ProtectedHeader.module.css"
+import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 interface ProtectedHeaderProps {
     title?: string,
@@ -21,6 +22,7 @@ interface ProtectedHeaderProps {
 
 export default function ProtectedHeader(props: ProtectedHeaderProps) {
     const router = useRouter()
+    const { user } = useDashboardData()
     
     return (
         <header 
@@ -44,7 +46,7 @@ export default function ProtectedHeader(props: ProtectedHeaderProps) {
                 className={styles["profile-container"]}
                 onClick={props.dropdownTogglerCallback}
             >
-                <span>User</span>
+                <span>{user?.user_metadata?.username || "No username"}</span>
                 <div className={styles["profile-icon"]} />
 
                 <div 

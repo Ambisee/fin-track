@@ -9,6 +9,7 @@ import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import PortalButton from "../PortalButton/PortalButton"
 import DateField from "../FormField/DateField/DateField"
 import { sbClient } from "@/supabase/supabase_client"
+import { DashboardDataContextObject, useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 import styles from "./EntryForm.module.css"
 
@@ -19,6 +20,7 @@ interface EntryFormProps {
 export default function EntryForm(props: EntryFormProps) {
     const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm()
     const [sign, setSign] = useState(true)
+    const { user } = useDashboardData() as DashboardDataContextObject
 
     const clearField = () => {
         setValue("date", "")
@@ -30,6 +32,7 @@ export default function EntryForm(props: EntryFormProps) {
         required: "Please enter a date value.",
         valueAsDate: true,
     })
+
     const descRegisterObject = register("description")
     const amountRegisterObject = register("amount", {
         required: "Please enter an amount.",
@@ -48,19 +51,24 @@ export default function EntryForm(props: EntryFormProps) {
                 onSubmit={(e) => {
                     e.preventDefault()
                     handleSubmit(
-                        (data) => {
+                        async (data) => {
+                            if (user === null) {
+                                return {value: {error: "No signed in user."}}
+                            }
+                            
                             sbClient.from("entry").insert({
                                 date: data.date,
                                 description: data.description,
                                 amount: data.amount,
-                                amount_is_positive: sign
+                                amount_is_positive: !sign,
+                                created_by: user.id
                             }).then((value) => {
                                 if (value.error) {
                                     alert(value.error.message)
                                     return
                                 }
 
-                                alert(value.statusText)
+                                alert("Sucessfully added the new entry.")
                             })
                         },
                         (errors) => {
@@ -113,11 +121,7 @@ export default function EntryForm(props: EntryFormProps) {
                     <PortalButton 
                         className={`${styles["clear-button"]} ${styles["form-button"]}`}
                         type="button"
-                        onClick={(e) => {
-                            setValue("date", "")
-                            setValue("description", "")
-                            setValue("amount", "")
-                        }}
+                        onClick={clearField}
                     >
                         Clear
                     </PortalButton>
