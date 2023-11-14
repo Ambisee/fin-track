@@ -4,6 +4,7 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { sbKey, sbURL } from "@/supabase/constants"
 import { FORGOT_PASSWORD_PAGE_URL, LOGIN_PAGE_URL, REGISTRATION_PAGE_URL } from "./helpers/url_routes"
 import { handleRequestToPasswordRecovery } from "./helpers/middleware_helper"
+import { Database } from "./supabase"
 
 const portal_urls = [LOGIN_PAGE_URL, REGISTRATION_PAGE_URL, FORGOT_PASSWORD_PAGE_URL]
 const dashboard_urls = ['/dashboard']
@@ -18,7 +19,7 @@ export async function middleware(req: NextRequest) {
     // console.log(req.headers.get("referer"))
     // req.headers.forEach((val, key) => console.log(key))
 
-    const sbMiddleware = createMiddlewareClient({ req, res }, {
+    const sbMiddleware = createMiddlewareClient<Database>({ req, res }, {
         supabaseKey: sbKey,
         supabaseUrl: sbURL
     })
