@@ -1,9 +1,18 @@
-.welcome-text {
+.page-intro-container {
     padding-bottom: 1rem;
 
     border-bottom: 1px solid rgb(var(--secondary-color));
+}
 
-    position: relative;
+.welcome-text {
+    margin-bottom: 0.75rem;
+}
+
+.new-entry-button {
+    height: 2.5rem;
+    padding: 0;
+
+    border-radius: 50rem;
 }
 
 .recent-entry-container {
