@@ -70,7 +70,8 @@
 
     transition: var(--theme-switch-transition);
 }
-.entry-form-toggler:hover {
+.entry-form-toggler:hover,
+.entry-form-toggler:focus {
     scale: 1.1;
 }
 
@@ -126,11 +127,13 @@ button.bottom-close-button {
     padding: 0;
     
     background-color: transparent;
+    color: rgb(var(--secondary-color));
     
     border-radius: 50rem;
     border: 3px solid rgb(var(--secondary-color));
 }
-button.bottom-close-button:hover {
+button.bottom-close-button:hover,
+button.bottom-close-button:focus {
     background-color: rgb(var(--secondary-color));
     color: rgb(var(--primary-color));
 }

@@ -11,6 +11,7 @@
     transition: var(--theme-switch-transition);
 }
 
-.action-button:hover {
+.action-button:hover,
+.action-button:focus {
     background-color: rgb(var(--tertiary-color-purple-hover));
 }

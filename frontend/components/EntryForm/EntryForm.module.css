@@ -45,7 +45,8 @@ button.submit-button {
 
     border: 3px solid rgb(var(--tertiary-color-purple));
 }
-button.submit-button:hover {
+button.submit-button:hover,
+button.submit-button:focus {
     color: rgb(var(--light-primary));
 }
 
@@ -54,7 +55,8 @@ button.clear-button {
     
     border: 3px solid red;
 }
-button.clear-button:hover {
+button.clear-button:hover,
+button.clear-button:focus {
     background-color: red;
     color: rgb(var(--light-primary));
 }
