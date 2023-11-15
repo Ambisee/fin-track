@@ -2,7 +2,7 @@
   --dark-primary: 0 0 0;
   --dark-secondary: 255 255 255;
   --dark-tertiary-cyan: 0 240 255;
-  --light-primary: 255 255 255;
+  --light-primary: 215 215 215;
   --light-secondary: 0 0 0;
   /* --light-tertiary-cyan: 0 211 224; */
   --light-tertiary-cyan: 0 183 194;
@@ -81,7 +81,6 @@ input:-webkit-autofill:hover {
     max-width: 100rem;
     margin: 0 auto;
 }
-
 
 /* Themes */
 [data-theme='dark-theme'] body {

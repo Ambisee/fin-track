@@ -17,5 +17,5 @@
     fill: rgb(var(--dark-primary));
 }
 .style-switch-icon-svg .right-half {
-    fill: rgb(var(--light-primary));
+    fill: rgb(var(--dark-secondary));
 }
