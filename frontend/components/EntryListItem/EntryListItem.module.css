@@ -1,0 +1,38 @@
+.item-element:first-child {
+    border-top: none;
+}
+.item-element {
+    padding: 1rem 0;
+
+    list-style: none;
+    list-style-position: inside;
+    
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+.item-element:last-child {
+    border-bottom: none;
+}
+
+.description-text {
+    font-size: clamp(0.75rem, 3vw, 1.25rem);
+}
+.description-date {
+    font-size: 0.75rem;
+}
+
+.right-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arrow-head {
+    width: 1.5rem;
+    height: 1.5rem;
+
+    rotate: 90deg;
+}

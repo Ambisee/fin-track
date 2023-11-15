@@ -1,8 +1,9 @@
 "use client"
 
-import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 import ActionButton from "../ActionButton/ActionButton"
+import EntryList from "../EntryList/EntryList"
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
+import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 import styles from "./DashboardHomeContent.module.css"
 
@@ -20,6 +21,12 @@ export default function DashboardHomeContent() {
                 >
                     Add a new entry
                 </ActionButton>
+            </div>
+            <div className={styles["recent-entry-container"]}>
+                <span className={styles["recent-entry-title"]}>
+                    Recent entries
+                </span>
+                <EntryList data={data.data as any} />
             </div>
         </>
     )
