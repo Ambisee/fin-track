@@ -46,7 +46,7 @@ export default function EntryForm(props: EntryFormProps) {
         <BaseFormWrapper
             title={props.title}
         >
-            <form 
+            <form
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()

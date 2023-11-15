@@ -19,10 +19,6 @@
     left: var(--header-h-padding);
 }
 
-.page-title {
-    visibility: hidden;
-}
-
 .profile-container {
     display: flex;
     align-items: center;
@@ -100,10 +96,4 @@
 .profile-dropdown-link:hover {
     background-color: rgb(var(--primary-color) / 0.5);
     color: rgb(var(--secondary-color));
-}
-
-@media screen and (min-width: 600px) {
-    .page-title {
-        visibility: visible;
-    }        
 }

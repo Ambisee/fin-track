@@ -31,6 +31,12 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
     return (
         <DashboardDataProvider value={props.contextValue}>
             <div 
+                onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                        setIsEntryFormToggled(false)
+                        setIsNavToggled(false)
+                    }
+                }}
                 className={styles["outer-container"]}
                 onClick={(e) => {
                     if (!isDropdownToggled) {
@@ -73,7 +79,7 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         +
                     </button>
                 </main>
-                <div 
+                <div
                     className={`
                         ${styles["entry-form-container"]}
                         ${isEntryFormToggled && styles["show"]}

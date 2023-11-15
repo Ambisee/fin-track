@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
+import { MouseEventHandler } from "react"
 
 import ThemeSwitchButton from "../ThemeSwitchButton/ThemeSwitchButton"
+import CrossButton from "../CrossButton/CrossButton"
+import NavTogglerButton from "../NavTogglerButton/NavTogglerButton"
+import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 import styles from "./ProtectedNavbar.module.css"
-import CrossButton from "../CrossButton/CrossButton"
-import { MouseEventHandler } from "react"
-import NavTogglerButton from "../NavTogglerButton/NavTogglerButton"
 
 interface ProtectedNavbarProps {
     className?: string,
@@ -16,6 +17,8 @@ interface ProtectedNavbarProps {
 }
 
 export default function ProtectedNavbar(props: ProtectedNavbarProps) {
+    const { setIsNavToggled } = useLayout()
+    
     return (
         <div 
             className={`
@@ -36,16 +39,16 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
             <nav className={styles["nav-element"]}>
                 <ul className={styles["nav-list"]}>
                     <li className={styles["nav-item"]}>
-                        <Link href="/dashboard">Home</Link>
+                        <Link onClick={() => {setIsNavToggled(false)}} href="/dashboard">Home</Link>
                     </li>
                     <li className={styles["nav-item"]}>
-                        <Link href="/dashboard/settings">Settings</Link>
+                        <Link onClick={() => {setIsNavToggled(false)}} href="/dashboard/settings">Settings</Link>
                     </li>
                     <li className={styles["nav-item"]}>
-                        <Link href="#">Entries</Link>
+                        <Link onClick={() => {setIsNavToggled(false)}} href="#">Entries</Link>
                     </li> 
                     <li className={styles["nav-item"]}>
-                        <Link href="#">Analytics</Link>
+                        <Link onClick={() => {setIsNavToggled(false)}} href="#">Analytics</Link>
                     </li> 
                 </ul>
             </nav>

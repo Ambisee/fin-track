@@ -38,9 +38,6 @@ export default function ProtectedHeader(props: ProtectedHeaderProps) {
                 `}
                 onClick={props.navTogglerCallback} 
             />
-            <h4 className={styles["page-title"]}>
-                Home
-            </h4>
             <div 
                 ref={props.dropdownTogglerRef}
                 className={styles["profile-container"]}
