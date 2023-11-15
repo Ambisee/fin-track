@@ -1,14 +1,14 @@
-.page-intro-container {
-    padding-bottom: 1rem;
+.welcome-text {
+    padding-bottom: 0.75rem;
 
     border-bottom: 1px solid rgb(var(--secondary-color));
 }
 
-.welcome-text {
-    margin-bottom: 0.75rem;
+.action-button-container {
+    margin-top: 0.75rem;
 }
 
-.new-entry-button {
+.action-button {
     height: 2.5rem;
     padding: 0;
 

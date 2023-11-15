@@ -12,10 +12,10 @@ export default function DashboardHomeContent() {
     
     return (
         <>
-            <div className={styles["page-intro-container"]}>
-                <h2 className={styles["welcome-text"]}>Welcome back, {user?.user_metadata.username}.</h2>
+            <h2 className={styles["welcome-text"]}>Welcome back, {user?.user_metadata.username}.</h2>
+            <div className={styles["action-button-container"]}>
                 <ActionButton 
-                    className={styles["new-entry-button"]}
+                    className={styles["action-button"]}
                     onClick={() => setIsEntryFormToggled(true)}
                 >
                     Add a new entry
