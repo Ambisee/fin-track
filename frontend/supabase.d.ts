@@ -62,3 +62,5 @@ export interface Database {
     }
   }
 }
+
+export type Entry = Database["public"]["Tables"]["entry"]["Row"]

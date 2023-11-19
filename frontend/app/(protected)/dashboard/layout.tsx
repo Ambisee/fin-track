@@ -1,4 +1,5 @@
 import { ReactNode } from "react"
+import { notFound } from "next/navigation"
 import { User } from "@supabase/auth-helpers-nextjs"
 
 import ProtectedNavbar from "@/components/ProtectedNavbar/ProtectedNavbar"
@@ -11,8 +12,12 @@ interface DashboardLayoutProps {
 }
 
 export default async function DashboardLayout(props: DashboardLayoutProps) {
-    const user = (await sbServer.auth.getUser()).data.user as User
-    const data = (await sbServer.from("entry").select("*").eq("created_by", user.id))
+    const { user } = (await sbServer.auth.getUser()).data
+    const data = (await sbServer.from("entry").select("*").order("date", {ascending: false}))
+
+    if ((user === null) || (data === null)) {
+        return notFound()
+    }
 
     const layoutContextValue = { user, data }
 

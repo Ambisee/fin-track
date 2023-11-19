@@ -7,14 +7,14 @@ import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
 import EntryForm from "../EntryForm/EntryForm"
 import CrossButton from "../CrossButton/CrossButton"
 import ActionButton from "../ActionButton/ActionButton"
-import DashboardDataProvider, { DashboardDataContextObject } from "../DashboardDataProvider/DashboardDataProvider"
+import DashboardDataProvider, { DashboardDataProviderProps } from "../DashboardDataProvider/DashboardDataProvider"
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 import styles from "./ProtectedLayout.module.css"
 
 interface ProtectedLayoutProps {
     children?: ReactNode,
-    contextValue: DashboardDataContextObject
+    contextValue: DashboardDataProviderProps["value"]
 }
 
 export default function ProtectedLayout(props: ProtectedLayoutProps) {
@@ -91,7 +91,9 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                             onClick={() => setIsEntryFormToggled(false)}
                         />
                     </div>
-                    <EntryForm title="New Entry" />
+                    <EntryForm 
+                        title="New Entry" 
+                    />
                     <ActionButton
                         className={styles["bottom-close-button"]}
                         onClick={() => {setIsEntryFormToggled(false)}}

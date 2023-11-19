@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps } from "react"
 import { useForm } from "react-hook-form"
 
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
@@ -13,7 +13,7 @@ import { DashboardDataContextObject, useDashboardData } from "../DashboardDataPr
 
 import styles from "./EntryForm.module.css"
 
-interface EntryFormProps {
+interface EntryFormProps extends Pick<HTMLProps<HTMLDivElement>, "onKeyDown"> {
     title?: string,
 }
 
@@ -43,9 +43,7 @@ export default function EntryForm(props: EntryFormProps) {
     })
 
     return (
-        <BaseFormWrapper
-            title={props.title}
-        >
+        <BaseFormWrapper title={props.title}>
             <form
                 className={styles["form-element"]}
                 onSubmit={(e) => {
