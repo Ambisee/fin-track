@@ -4,6 +4,7 @@ import EntryListItem from "../EntryListItem/EntryListItem"
 import styles from "./EntryList.module.css"
 
 interface EntryListProps {
+    className?: string,
     data: {
         amount: unknown
         amount_is_positive: boolean
@@ -17,7 +18,11 @@ interface EntryListProps {
 
 export default function EntryList(props: EntryListProps) {
     return (
-        <ul className={styles["list-element"]}>
+        <ul className={`
+                ${styles["list-element"]}
+                ${props.className}
+            `}
+        >
             {props.data.map((value) => (<EntryListItem key={value.id} data={value}/>))}
         </ul>
     )

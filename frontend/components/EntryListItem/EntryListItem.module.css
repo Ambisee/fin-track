@@ -1,5 +1,5 @@
 .item-element {
-    padding: 1rem 0;
+    padding: 1rem;
 
     list-style: none;
     list-style-position: inside;
@@ -8,9 +8,14 @@
 
     display: grid;
     grid-template-columns: 1fr auto;
+
+    transition: background-color 0.2s ease;
 }
 .item-element:last-child {
     border-bottom: none;
+}
+.item-element:hover {
+    background-color: rgb(var(--secondary-color) / 0.2);
 }
 
 .description-text {
@@ -21,6 +26,7 @@
 }
 .description-amount {
     font-size: 1rem;
+    font-weight: 700;
 
     text-align: center;
 }

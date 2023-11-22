@@ -26,7 +26,7 @@ export default function DashboardHomeContent() {
                 <span className={styles["recent-entry-title"]}>
                     Recent entries
                 </span>
-                <EntryList data={data} />
+                <EntryList className={styles["recent-entry-list"]} data={data} />
             </div>
         </>
     )
