@@ -29,12 +29,13 @@
     font-weight: 700;
 
     text-align: center;
+    text-wrap: nowrap;
 }
 .description-amount.plus {
-    color: rgb(0, 255, 0);
+    color: rgb(var(--tertiary-color-purple));
 }
 .description-amount.minus {
-    color: rgb(255, 0, 0);
+    color: rgb(var(--warning-color));
 }
 
 .right-container {
@@ -43,11 +44,21 @@
     gap: 1rem;
 }
 
+.utility-button {
+    display: flex;
+    align-items: center;
+}
 .arrow-head {
     width: 1.5rem;
     height: 1.5rem;
 
     rotate: 90deg;
-
+    
     fill: rgb(var(--secondary-color));
+
+    transition: 0.25s ease;
+}
+.utility-button:hover .arrow-head,
+.utility-button:focus .arrow-head {
+    translate: 10% 0;
 }

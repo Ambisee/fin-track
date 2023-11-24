@@ -4,9 +4,10 @@
   --dark-tertiary-cyan: 0 240 255;
   --light-primary: 215 215 215;
   --light-secondary: 0 0 0;
-  /* --light-tertiary-cyan: 0 211 224; */
   --light-tertiary-cyan: 0 183 194;
-  
+
+  --warning-color: 229 90 52;
+
   --tertiary-color-purple: 143 0 255;
   --tertiary-color-purple-hover: 97 0 172;
   --tertiary-color-cyan: 0 240 255;
