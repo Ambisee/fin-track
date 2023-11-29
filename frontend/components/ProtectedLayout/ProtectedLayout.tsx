@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState, useRef, useEffect } from "react"
+import { ReactNode, useState, useRef, useEffect, useMemo } from "react"
 
 import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
@@ -30,7 +30,7 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
 
     return (
         <DashboardDataProvider value={props.contextValue}>
-            <div 
+            <div
                 onKeyDown={(e) => {
                     if (e.key === "Escape") {
                         setIsEntryFormToggled(false)
@@ -80,6 +80,12 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                     </button>
                 </main>
                 <div
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === "Escape") {
+                            setIsEntryFormToggled(false)
+                        }
+                    }}
                     className={`
                         ${styles["entry-form-container"]}
                         ${isEntryFormToggled && styles["show"]}
