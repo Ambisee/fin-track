@@ -23,10 +23,11 @@ export default function DashboardHomeContent() {
                 </ActionButton>
             </div>
             <div className={styles["recent-entry-container"]}>
-                <span className={styles["recent-entry-title"]}>
-                    Recent entries
-                </span>
-                <EntryList className={styles["recent-entry-list"]} data={data} />
+                <EntryList 
+                    title="Recent entries"
+                    className={styles["recent-entry-list"]} 
+                    data={data} 
+                />
             </div>
         </>
     )

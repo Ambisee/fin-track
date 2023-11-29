@@ -1,0 +1,11 @@
+.list-header {
+    padding: 0 1rem;
+    
+    display: flex;
+    justify-content: space-between;   
+    align-items: center;
+}
+
+.list-title {
+    border-bottom: 2px solid rgb(var(--secondary-color));
+}
