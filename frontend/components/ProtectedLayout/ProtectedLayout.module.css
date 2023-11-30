@@ -93,7 +93,7 @@
     grid-template-rows: auto 1fr auto;
 
     border: 1px solid rgb(var(--secondary-color));
-    border-radius: 1rem;
+    border-radius: 0.75rem;
     
     z-index: 100;
     
