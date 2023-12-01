@@ -43,7 +43,6 @@ export default function DateField({
                     textFieldRef.current = e
                 }}
                 onFocus={showDatePicker}
-                onKeyDown={(e) => {}}
                 onClick={showDatePicker}
                 autoComplete="false"
                 type="text"
