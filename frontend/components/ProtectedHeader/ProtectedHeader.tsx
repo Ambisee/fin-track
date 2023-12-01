@@ -6,9 +6,9 @@ import { MouseEventHandler, Ref, useEffect, useRef, useState } from "react"
 
 import NavTogglerButton from "../NavTogglerButton/NavTogglerButton"
 import { sbClient } from "@/supabase/supabase_client";
+import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 import styles from "./ProtectedHeader.module.css"
-import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 interface ProtectedHeaderProps {
     title?: string,

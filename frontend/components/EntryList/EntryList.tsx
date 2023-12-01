@@ -8,11 +8,16 @@ import { Entry } from "@/supabase"
 import { sbClient } from "@/supabase/supabase_client"
 
 import styles from "./EntryList.module.css"
+import EntryForm from "../EntryForm/EntryForm"
+import ActionButton from "../ActionButton/ActionButton"
+import CrossButton from "../CrossButton/CrossButton"
+import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 interface EntryListProps {
     title?: string,
     description?: string,
     className?: string,
+    editButtonCallback?: (data: Entry) => void,
     data: Entry[],
 }
 
@@ -20,8 +25,8 @@ const selectedIds = new Set<number>()
 const selectCallbacks: (() => void)[] = []
 
 export default function EntryList(props: EntryListProps) {
-    const [isSelectedList, setIsSelectedList] = useState(Array(props.data.length).fill(false))
     const selectedIdsRef = useRef(selectedIds)
+    const [isSelectedList, setIsSelectedList] = useState(Array(props.data.length).fill(false))
     
     const createRemoveFromSelected = (id: number, compIndex: number) => {
         return () => {
@@ -91,6 +96,11 @@ export default function EntryList(props: EntryListProps) {
                         isSelected={isSelectedList[index]}
                         selectCallback={createAddToSelected(value.id, index)}
                         deselectCallback={createRemoveFromSelected(value.id, index)}
+                        editButtonCallback={() => {
+                            if (props.editButtonCallback !== undefined) {
+                                props.editButtonCallback(value)
+                            }
+                        }}
                     />
                 ))}
             </ul>

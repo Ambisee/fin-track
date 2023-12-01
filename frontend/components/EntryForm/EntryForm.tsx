@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps } from "react"
-import { useForm } from "react-hook-form"
+import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps, useEffect } from "react"
+import { FieldErrors, FieldValues, useForm } from "react-hook-form"
 
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
 import TextField from "../FormField/TextField/TextField"
@@ -12,20 +12,100 @@ import { sbClient } from "@/supabase/supabase_client"
 import { DashboardDataContextObject, useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 import styles from "./EntryForm.module.css"
+import { Entry } from "@/supabase"
+import { User } from "@supabase/supabase-js"
+import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
-interface EntryFormProps extends Pick<HTMLProps<HTMLDivElement>, "onKeyDown"> {
-    title?: string,
+type EntryFormType =  {type?: "NEW_ENTRY"} | {type?: "EDIT_ENTRY", values?: Entry}
+type EntryFormProps = HTMLProps<HTMLDivElement> & EntryFormType & {
+    values?: unknown,
+    title?: string
+}
+
+const updateSupabaseEntry = (data: FieldValues, id: number, sign: boolean, user: User) => {
+    if (user === null) {
+        return {value: {error: "No signed in user."}}
+    }
+
+    sbClient.from("entry")
+        .update({
+            date: data.date,
+            description: data.description,
+            amount: data.amount,
+            amount_is_positive: !sign
+        })
+        .eq("id", id)
+        .then((value) => {
+            if (value.error) {
+                alert(value.error.message)
+                return
+            }
+    
+            alert("Sucessfully made the change to the entry.")
+        })
+}
+
+const insertSupabaseEntry = (data: FieldValues, sign: boolean, user: User) => {
+    if (user === null) {
+        return {value: {error: "No signed in user."}}
+    }
+    
+    sbClient.from("entry").insert({
+        date: data.date,
+        description: data.description,
+        amount: data.amount,
+        amount_is_positive: !sign,
+        created_by: user.id
+    }).then((value) => {
+        if (value.error) {
+            alert(value.error.message)
+            return
+        }
+
+        alert("Sucessfully added the new entry.")
+    })
+}
+
+const handleError = (errors: FieldErrors<FieldValues>) => {
+    let errMessage = ""
+    for (const key in errors) {
+        errMessage += `- ${errors[key]?.message}\n`
+    }
+    alert(errMessage)
 }
 
 export default function EntryForm(props: EntryFormProps) {
-    const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm()
-    const [sign, setSign] = useState(true)
+    const [sign, setSign] = useState(props.type === "EDIT_ENTRY" && props.values !== undefined ? !props.values.amount_is_positive : true)
     const { user } = useDashboardData() as DashboardDataContextObject
+    const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm()
 
-    const clearField = () => {
+    useEffect(() => {
+        if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
+            setValue("date", props.values.date)
+            setValue("description", props.values.description)
+            setValue("amount", (props.values.amount as string).slice(1))
+        }
+    }, [props.type, props.values, setValue])
+
+    const clearFields = () => {
         setValue("date", "")
         setValue("description", "")
         setValue("amount", "")
+    }
+
+    const resetFields = () => {
+        if (props.type !== "EDIT_ENTRY") {
+            return
+        }
+
+        if (props.values === undefined) {
+            return
+        }
+
+        setValue("date", props.values.date)
+        setValue("description", props.values.description)
+        setValue("amount", (props.values.amount as string).slice(1))
+        setSign(!props.values.amount_is_positive)
     }
 
     const dateRegisterObject = register("date", {
@@ -49,33 +129,17 @@ export default function EntryForm(props: EntryFormProps) {
                 onSubmit={(e) => {
                     e.preventDefault()
                     handleSubmit(
-                        async (data) => {
-                            if (user === null) {
-                                return {value: {error: "No signed in user."}}
+                        (data) => {
+                            if (props.type === "NEW_ENTRY") {
+                                insertSupabaseEntry(data, sign, user)
+                                return
                             }
-                            
-                            sbClient.from("entry").insert({
-                                date: data.date,
-                                description: data.description,
-                                amount: data.amount,
-                                amount_is_positive: !sign,
-                                created_by: user.id
-                            }).then((value) => {
-                                if (value.error) {
-                                    alert(value.error.message)
-                                    return
-                                }
-
-                                alert("Sucessfully added the new entry.")
-                            })
+                            if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
+                                updateSupabaseEntry(data, props.values.id, sign, user)
+                                return
+                            }
                         },
-                        (errors) => {
-                            let errMessage = ""
-                            for (const key in errors) {
-                                errMessage += `- ${errors[key]?.message}\n`
-                            }
-                            alert(errMessage)
-                        }
+                        (errors) => handleError(errors)
                     )(e)
                 }}
             >
@@ -119,9 +183,18 @@ export default function EntryForm(props: EntryFormProps) {
                     <ActionButton 
                         className={`${styles["clear-button"]} ${styles["form-button"]}`}
                         type="button"
-                        onClick={clearField}
+                        onClick={(e) => {
+                            if (props.type === "NEW_ENTRY") {
+                                clearFields()
+                                return
+                            }
+                            if (props.type === "EDIT_ENTRY") {
+                                resetFields()
+                                return
+                            }
+                        }}
                     >
-                        Clear
+                        {props.type === "EDIT_ENTRY" ? "Reset" : "Clear"}
                     </ActionButton>
                 </div>
             </form>

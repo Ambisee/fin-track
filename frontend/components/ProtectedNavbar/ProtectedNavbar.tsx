@@ -17,7 +17,7 @@ interface ProtectedNavbarProps {
 }
 
 export default function ProtectedNavbar(props: ProtectedNavbarProps) {
-    const { setIsNavToggled } = useLayout()
+    const { setIsNavToggled, setIsBackdropVisible } = useLayout()
     
     return (
         <div 
@@ -39,16 +39,45 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
             <nav className={styles["nav-element"]}>
                 <ul className={styles["nav-list"]}>
                     <li className={styles["nav-item"]}>
-                        <Link onClick={() => {setIsNavToggled(false)}} href="/dashboard">Home</Link>
+                        <Link 
+                            href="/dashboard"
+                            onClick={() => {
+                                setIsNavToggled(false)
+                                setIsBackdropVisible(false)
+                            }} 
+                        >
+                            Home
+                        </Link>
                     </li>
                     <li className={styles["nav-item"]}>
-                        <Link onClick={() => {setIsNavToggled(false)}} href="/dashboard/settings">Settings</Link>
+                        <Link 
+                            href="/dashboard/settings"
+                            onClick={() => {
+                                setIsNavToggled(false)
+                                setIsBackdropVisible(false)
+                            }}
+                        >
+                            Settings
+                        </Link>
                     </li>
                     <li className={styles["nav-item"]}>
-                        <Link onClick={() => {setIsNavToggled(false)}} href="#">Entries</Link>
+                        <Link 
+                            href="#"
+                            onClick={() => {
+                                setIsNavToggled(false)
+                                setIsBackdropVisible(false)
+                            }} 
+                        >
+                            Entries
+                        </Link>
                     </li> 
                     <li className={styles["nav-item"]}>
-                        <Link onClick={() => {setIsNavToggled(false)}} href="#">Analytics</Link>
+                        <Link 
+                            onClick={() => {
+                                setIsNavToggled(false)
+                                setIsBackdropVisible(false)
+                            }} 
+                            href="#">Analytics</Link>
                     </li> 
                 </ul>
             </nav>

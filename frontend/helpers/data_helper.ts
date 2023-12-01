@@ -8,26 +8,58 @@ function handleDataChange(
 ) {
     const newEntries: Entry[] = [...current]
     
-    if (payload.eventType === "INSERT") {
-        handleInsert(newEntries, payload)
-    }
-
-    if (payload.eventType === "DELETE") {
-        handleDelete(newEntries, payload)
+    switch(payload.eventType) {
+        case "INSERT":
+            handleInsert(newEntries, payload)
+            break
+        case "DELETE":
+            handleDelete(newEntries, payload)
+            break
+        case "UPDATE":
+            handleUpdate(newEntries, payload)
+        default:
     }
 
     return newEntries
+}
+
+function handleUpdate(
+    newEntries: Entry[],
+    payload: RealtimePostgresChangesPayload<Entry[]>
+) {
+    let index = -1
+
+    for (let i = 0; i < newEntries.length; i++) {
+        if (newEntries[i].id === (payload.new as Entry).id) {
+            index = i
+            break
+        }
+    }
+
+    if (index === -1) {
+        return
+    }
+
+    newEntries[index] = {
+        id: (payload.new as Entry).id,
+        amount: (payload.new as Entry).amount,
+        description: (payload.new as Entry).description,
+        date: (payload.new as Entry).date,
+        created_at: (payload.new as Entry).created_at,
+        created_by: (payload.new as Entry).created_by,
+        amount_is_positive: (payload.new as Entry).amount_is_positive,
+    }
 }
 
 function handleDelete(
     newEntries: Entry[],
     payload: RealtimePostgresChangesPayload<Entry[]>
 ) {
-    let index = -1;
+    let index = -1
 
     for (let i = 0; i < newEntries.length; i++) {
         if (newEntries[i].id == (payload.old as Entry).id) {
-            index = i;
+            index = i
             break
         }
     }
@@ -50,10 +82,10 @@ function handleInsert(
     newEntries: Entry[], 
     payload: RealtimePostgresChangesPayload<Entry[]>
 ) {
-    let index = -1;
+    let index = -1
     const newEntry = payload.new
 
-    for (let i = 1; i < newEntries.length; i++) {
+    for (let i = 0; i < newEntries.length; i++) {
         const newEntryDate = new Date((newEntry as Entry).date)
         const d1 = new Date(newEntries[i-1].date)
         const d2 = new Date(newEntries[i].date)

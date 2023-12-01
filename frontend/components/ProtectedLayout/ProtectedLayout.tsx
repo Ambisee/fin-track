@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState, useRef, useEffect, useMemo } from "react"
+import { ReactNode, useState, useRef, useEffect, useMemo, Children } from "react"
 
 import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
@@ -23,9 +23,12 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
         isNavToggled, 
         setIsNavToggled,
         isDropdownToggled, 
+        isBackdropVisible,
         setIsDropdownToggled,
         isEntryFormToggled, 
-        setIsEntryFormToggled
+        setIsEntryFormToggled,
+        setIsBackdropVisible,
+        backdropToggleCallbacks
     } = useLayout()
 
     return (
@@ -33,8 +36,13 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
             <div
                 onKeyDown={(e) => {
                     if (e.key === "Escape") {
+                        setIsBackdropVisible(false)
                         setIsEntryFormToggled(false)
                         setIsNavToggled(false)
+
+                        for (const callback of backdropToggleCallbacks) {
+                            callback()
+                        }
                     }
                 }}
                 className={styles["outer-container"]}
@@ -50,7 +58,10 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
             >
                 <div className={styles["nav-container"]}>
                     <ProtectedNavbar 
-                        crossButtonCallback={() => {setIsNavToggled(cur => !cur)}} 
+                        crossButtonCallback={() => {
+                            setIsNavToggled(cur => !cur)
+                            setIsBackdropVisible(cur => !cur)
+                        }} 
                         crossButtonClassName={styles["cross-button"]}
                         className={`
                             ${styles["nav-bar"]}
@@ -65,7 +76,10 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         dropdownTogglerRef={dropdownTogglerRef}
                         dropdownTogglerCallback={() => setIsDropdownToggled(cur => !cur)}
                         isDropdownVisible={isDropdownToggled}
-                        navTogglerCallback={() => {setIsNavToggled(cur => !cur)}} 
+                        navTogglerCallback={() => {
+                            setIsNavToggled(cur => !cur)
+                            setIsBackdropVisible(cur => !cur)
+                        }} 
                     />
                     
                     {/* Content container */}
@@ -74,16 +88,22 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                     </div>
                     <button 
                         className={styles["entry-form-toggler"]}
-                        onClick={() => {setIsEntryFormToggled(true)}}
+                        onClick={() => {
+                            setIsEntryFormToggled(true)
+                            setIsBackdropVisible(true)
+                        }}
                     >
                         +
                     </button>
                 </main>
+
+                {/* New Entry Form */}
                 <div
                     tabIndex={0}
                     onKeyDown={(e) => {
                         if (e.key === "Escape") {
                             setIsEntryFormToggled(false)
+                            setIsBackdropVisible(false)
                         }
                     }}
                     className={`
@@ -94,15 +114,22 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                     <div className={styles["entry-form-header"]}>
                         <CrossButton 
                             className={styles["entry-form-close-button"]} 
-                            onClick={() => setIsEntryFormToggled(false)}
+                            onClick={() => {
+                                setIsEntryFormToggled(false)
+                                setIsBackdropVisible(false)
+                            }}
                         />
                     </div>
                     <EntryForm 
+                        type="NEW_ENTRY"
                         title="New Entry" 
                     />
                     <ActionButton
                         className={styles["bottom-close-button"]}
-                        onClick={() => {setIsEntryFormToggled(false)}}
+                        onClick={() => {
+                            setIsEntryFormToggled(false)
+                            setIsBackdropVisible(false)
+                        }}
                     >
                         Close
                     </ActionButton>
@@ -110,12 +137,22 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
 
                 <div 
                     onMouseDown={() => {
-                        if (isNavToggled) setIsNavToggled(false)
-                        if (isEntryFormToggled) setIsEntryFormToggled(false)
+                        setIsBackdropVisible(false)
+                        if (isNavToggled) {
+                            setIsNavToggled(false)
+                        }
+
+                        if (isEntryFormToggled) {
+                            setIsEntryFormToggled(false)
+                        }
+                        
+                        for (const callback of backdropToggleCallbacks) {
+                            callback()
+                        }
                     }}
                     className={`
                         ${styles["backdrop"]}
-                        ${(isNavToggled || isEntryFormToggled) && styles["show"]}
+                        ${isBackdropVisible && styles["show"]}
                     `}
                 />
             </div>

@@ -6,9 +6,13 @@ interface ProtectedLayoutContextObject {
     isNavToggled: boolean,
     isDropdownToggled: boolean,
     isEntryFormToggled: boolean,
+    isBackdropVisible: boolean,
+    backdropToggleCallbacks: (() => void)[],
     setIsDropdownToggled: Dispatch<SetStateAction<boolean>>,
     setIsNavToggled: Dispatch<SetStateAction<boolean>>,
-    setIsEntryFormToggled: Dispatch<SetStateAction<boolean>>
+    setIsEntryFormToggled: Dispatch<SetStateAction<boolean>>,
+    setIsBackdropVisible: Dispatch<SetStateAction<boolean>>,
+    setBackdropToggleCallbacks: Dispatch<SetStateAction<(() => void)[]>>
 }
 
 interface ProtectedLayoutProviderProps {
@@ -25,14 +29,20 @@ function useLayoutState() {
     const [isNavToggled, setIsNavToggled] = useState(false)
     const [isDropdownToggled, setIsDropdownToggled] = useState(false)
     const [isEntryFormToggled, setIsEntryFormToggled] = useState(false)
+    const [isBackdropVisible, setIsBackdropVisible] = useState(false)
+    const [backdropToggleCallbacks, setBackdropToggleCallbacks] = useState<(() => void)[]>([])
 
     return {
         isNavToggled,
         isDropdownToggled,
         isEntryFormToggled,
+        isBackdropVisible,
+        backdropToggleCallbacks,
         setIsDropdownToggled,
         setIsNavToggled,
-        setIsEntryFormToggled
+        setIsEntryFormToggled,
+        setIsBackdropVisible,
+        setBackdropToggleCallbacks
     }
 }
 
