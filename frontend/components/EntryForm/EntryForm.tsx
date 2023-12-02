@@ -17,17 +17,18 @@ import { User } from "@supabase/supabase-js"
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 type EntryFormType =  {type?: "NEW_ENTRY"} | {type?: "EDIT_ENTRY", values?: Entry}
-type EntryFormProps = HTMLProps<HTMLDivElement> & EntryFormType & {
+type EntryFormProps = Pick<HTMLProps<HTMLFormElement>, "id"> & EntryFormType & {
     values?: unknown,
     title?: string
 }
 
-const updateSupabaseEntry = (data: FieldValues, id: number, sign: boolean, user: User) => {
+const updateSupabaseEntry = async (data: FieldValues, id: number, sign: boolean, user: User) => {
     if (user === null) {
-        return {value: {error: "No signed in user."}}
+        alert("No signed in user.")
+        return
     }
 
-    sbClient.from("entry")
+    return sbClient.from("entry")
         .update({
             date: data.date,
             description: data.description,
@@ -45,12 +46,13 @@ const updateSupabaseEntry = (data: FieldValues, id: number, sign: boolean, user:
         })
 }
 
-const insertSupabaseEntry = (data: FieldValues, sign: boolean, user: User) => {
+const insertSupabaseEntry = async (data: FieldValues, sign: boolean, user: User) => {
     if (user === null) {
-        return {value: {error: "No signed in user."}}
+        alert("No signed in user.")
+        return
     }
     
-    sbClient.from("entry").insert({
+    return sbClient.from("entry").insert({
         date: data.date,
         description: data.description,
         amount: data.amount,
@@ -125,6 +127,7 @@ export default function EntryForm(props: EntryFormProps) {
     return (
         <BaseFormWrapper title={props.title}>
             <form
+                id={props.id}
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -132,11 +135,12 @@ export default function EntryForm(props: EntryFormProps) {
                         (data) => {
                             if (props.type === "NEW_ENTRY") {
                                 insertSupabaseEntry(data, sign, user)
-                                return
+                                    .then(() => {
+                                        clearFields()
+                                    })
                             }
-                            if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
+                            else if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
                                 updateSupabaseEntry(data, props.values.id, sign, user)
-                                return
                             }
                         },
                         (errors) => handleError(errors)

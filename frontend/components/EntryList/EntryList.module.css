@@ -9,3 +9,40 @@
 .list-title {
     border-bottom: 2px solid rgb(var(--secondary-color));
 }
+
+.delete-selected-button {
+    min-height: 1rem;
+    aspect-ratio: 1;
+
+    visibility: hidden;
+    opacity: 0;
+
+    transition: opacity var(--theme-switch-transition), visibility var(--theme-switch-transition);
+
+    transition-delay: visibility var(--theme-switch-transition);
+}
+.delete-selected-button.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.trash-can-icon {
+    fill: rgb(var(--secondary-color));
+}
+
+.header-left {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-list-message-container {
+    padding: 0 1rem;
+    color: rgb(var(--secondary-color) / 0.5);
+}
+.empty-list-header::after {
+    content: ' ...';
+    letter-spacing: 0.1rem;
+}
+.empty-list-description {
+    font-size: 0.75rem;
+}

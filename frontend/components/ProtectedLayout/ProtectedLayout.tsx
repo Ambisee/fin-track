@@ -121,6 +121,7 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         />
                     </div>
                     <EntryForm 
+                        id="new-entry-form"
                         type="NEW_ENTRY"
                         title="New Entry" 
                     />
@@ -134,7 +135,6 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         Close
                     </ActionButton>
                 </div>
-
                 <div 
                     onMouseDown={() => {
                         setIsBackdropVisible(false)

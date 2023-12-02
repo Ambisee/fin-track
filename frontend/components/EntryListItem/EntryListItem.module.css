@@ -19,6 +19,12 @@
 }
 
 .description-text {
+    max-width: 100%;
+    padding-right: 1rem;
+
+    overflow: hidden;
+    word-break: break-word;
+
     font-size: clamp(1.1rem, 3vw, 1.5rem);
 }
 .description-date {

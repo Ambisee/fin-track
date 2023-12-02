@@ -50,7 +50,7 @@
 
     opacity: 0;
 
-    z-index: 1000;
+    z-index: 125;
 
     transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
     transition-delay: visibility 0.35s ease;

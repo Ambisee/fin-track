@@ -84,9 +84,9 @@ function handleInsert(
 ) {
     let index = -1
     const newEntry = payload.new
+    const newEntryDate = new Date((newEntry as Entry).date)
 
-    for (let i = 0; i < newEntries.length; i++) {
-        const newEntryDate = new Date((newEntry as Entry).date)
+    for (let i = 1; i < newEntries.length; i++) {
         const d1 = new Date(newEntries[i-1].date)
         const d2 = new Date(newEntries[i].date)
 

@@ -13,7 +13,11 @@ interface DashboardLayoutProps {
 
 export default async function DashboardLayout(props: DashboardLayoutProps) {
     const { user } = (await sbServer.auth.getUser()).data
-    const data = (await sbServer.from("entry").select("*").order("date", {ascending: false}))
+    const data = await sbServer
+        .from("entry")
+        .select("*")
+        .order("date", {ascending: false})
+        .limit(1000)
 
     if ((user === null) || (data === null)) {
         return notFound()
