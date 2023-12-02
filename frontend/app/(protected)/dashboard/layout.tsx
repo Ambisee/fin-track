@@ -6,14 +6,16 @@ import ProtectedNavbar from "@/components/ProtectedNavbar/ProtectedNavbar"
 import ProtectedLayout from "@/components/ProtectedLayout/ProtectedLayout"
 import { sbServer } from "@/supabase/supabase_server"
 import ProtectedLayoutProvider from "@/components/ProtectedLayoutProvider/ProtectedLayoutProvider"
+import { cookies } from "next/headers"
 
 interface DashboardLayoutProps {
     children?: ReactNode
 }
 
 export default async function DashboardLayout(props: DashboardLayoutProps) {
-    const { user } = (await sbServer.auth.getUser()).data
-    const data = await sbServer
+    const cookieStore = cookies()
+    const { user } = (await sbServer(cookieStore).auth.getUser()).data
+    const data = await sbServer(cookieStore)
         .from("entry")
         .select("*")
         .order("date", {ascending: false})
