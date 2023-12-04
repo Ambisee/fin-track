@@ -22,15 +22,6 @@ export async function middleware(req: NextRequest) {
     })
 
     const { data: { user } } = await sbMiddleware.auth.getUser()
-<<<<<<< HEAD
-    const site_url = new URL(process.env.NEXT_PUBLIC_SITE_URL as string)
-
-    if (site_url.host !== req.nextUrl.host) {
-        console.log(site_url.host, req.nextUrl.host)
-        return NextResponse.error()
-    }
-=======
->>>>>>> v2
 
     /**
      * User logged in, user visits one of the portal pages
