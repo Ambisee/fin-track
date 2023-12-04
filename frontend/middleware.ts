@@ -16,33 +16,25 @@ export async function middleware(req: NextRequest) {
         return res
     }
 
-    // console.log(req.headers.get("referer"))
-    // req.headers.forEach((val, key) => console.log(key))
-
     const sbMiddleware = createMiddlewareClient<Database>({ req, res }, {
         supabaseKey: sbKey,
         supabaseUrl: sbURL
     })
 
     const { data: { user } } = await sbMiddleware.auth.getUser()
-    const site_url = new URL(process.env.NEXT_PUBLIC_SITE_URL as string)
-
-    if (site_url.host !== req.nextUrl.host) {
-        return NextResponse.error()
-    }
 
     /**
      * User logged in, user visits one of the portal pages
      */
     if (user && portal_urls.includes(req.nextUrl.pathname)) {
-        return NextResponse.redirect(new URL("/dashboard", site_url.origin))
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin))
     }
 
     /**
      * No user logged in, dashboard page access attempted
      */
     if (!user && req.nextUrl.pathname.startsWith(dashboard_urls[0])) {
-        return NextResponse.redirect(new URL(site_url.origin))
+        return NextResponse.redirect(new URL("/", req.nextUrl.origin))
     }
 
     /**
