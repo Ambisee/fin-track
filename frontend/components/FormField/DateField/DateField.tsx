@@ -1,6 +1,6 @@
 "use client"
 
-import { InputHTMLAttributes, RefObject, forwardRef, useRef } from "react"
+import { useRef, useState } from "react"
 import { UseFormRegisterReturn } from "react-hook-form"
 
 import FormTemplate, { CommonFieldProps, UseHookFormFieldProps } from "../FormTemplate"
@@ -23,6 +23,7 @@ export default function DateField({
 }: DateFieldProps) {
    const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
    const textFieldRef = useRef<HTMLInputElement | null>(null)
+   const [isEmpty, setIsEmpty] = useState(true)
    const {ref, onChange, ...regObjRest} = registerObject as UseFormRegisterReturn
 
    const showDatePicker = () => {
@@ -44,11 +45,14 @@ export default function DateField({
                 }}
                 onFocus={showDatePicker}
                 onClick={showDatePicker}
+                onChange={(e) => {
+                    setIsEmpty(c => e.target.value !== "" ? false : true)
+                }}
                 autoComplete="false"
                 type="text"
                 className={`
                     ${styles["input-element"]}
-                    ${watchedValue && styles["filled"]}
+                    ${(watchedValue || !isEmpty) && styles["filled"]}
                 `}
                 {...props}
 

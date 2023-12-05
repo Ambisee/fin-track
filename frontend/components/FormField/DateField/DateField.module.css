@@ -56,13 +56,14 @@
     position: absolute;
     visibility: hidden;
     bottom: 0;
-
 }
 
 .date-picker {
     width: 100%;
     max-height: 2.5rem;
     padding: 0.5rem;
+
+    display: flex;
 
     border-top-right-radius: var(--extra-widget-border-radius);
     border-bottom-right-radius: var(--extra-widget-border-radius);
@@ -77,6 +78,8 @@
 .date-picker svg {
     height: 100%;
     aspect-ratio: 1;
+
+    place-self: center;
 
     box-sizing: border-box;
 }
