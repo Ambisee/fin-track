@@ -152,6 +152,7 @@ button.bottom-close-button:focus {
 
     background: rgb(0 0 0 / 0);
     backdrop-filter: blur(0.35rem);
+    -webkit-backdrop-filter: blur(0.35rem);
 
     opacity: 0;
     visibility: hidden;
@@ -213,6 +214,7 @@ button.bottom-close-button:focus {
     
         background: rgb(0 0 0 / 0);
         backdrop-filter: blur(0.35rem);
+        -webkit-backdrop-filter: blur(0.35rem);
     
         opacity: 0;
         visibility: hidden;
