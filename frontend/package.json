@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:safari": "npx playwright test --headed --browser=webkit",
     "gen-types": "npx supabase gen types typescript --project-id 'gjniozckblfslplhhzkc' --schema public > ./supabase.d.ts"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "typescript": "5.1.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.1",
     "@types/react": "^18.2.16",
     "supabase": "^1.110.1"
   }
