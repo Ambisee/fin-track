@@ -76,6 +76,11 @@ input:-webkit-autofill:hover {
     -webkit-text-fill-color: rgb(var(--secondary-color));
     -webkit-animation-delay: background-color 60000s;
 }
+input[type="date"] {
+    display: block;
+    appearance: textfield;
+    min-height: 1.2em;
+}
 
 #inner-body-wrapper {
     min-height: 100vh;
