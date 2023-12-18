@@ -40,7 +40,7 @@
     text-decoration: underline;
 }
 
-@media screen and ((max-width: 600px) and (min-height: 600px)) { 
+@media screen and (min-height: 650px) { 
     .inner-form-container {
         align-self: center;
         transform: translateY(
