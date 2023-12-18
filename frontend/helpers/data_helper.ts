@@ -90,7 +90,6 @@ function handleInsert(
         const d1 = new Date(newEntries[i-1].date)
         const d2 = new Date(newEntries[i].date)
 
-        // Set the `index` as `i` if the `Entry[i-1].date > newEntry.date > Entry[i].date`
         if (
             (d1.getTime() > newEntryDate.getTime()) && 
             (newEntryDate.getTime() >= d2.getTime())

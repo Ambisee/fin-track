@@ -58,7 +58,7 @@ export default function ForgotPasswordForm() {
                                     setIsLoading(false)
                                     if (value?.error) {
                                         alert(value.error.message)
-                                        return;
+                                        return
                                     }
 
                                     alert(
