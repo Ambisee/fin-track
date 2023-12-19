@@ -124,8 +124,9 @@ export default function RegistrationForm() {
                                 password: data.password,
                                 options: {
                                     data: {
-                                        username: data.username
-                                    }
+                                        username: data.username,
+                                    },
+                                    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/login-callback`
                                 }
                             }).then((value) => {
                                 setIsLoading(false)
