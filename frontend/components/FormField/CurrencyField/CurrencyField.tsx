@@ -42,9 +42,8 @@ export default function CurrencyField({
                         className={styles["sign-toggler"]}
                         onClick={() => toggleSign()}
                     >
-                        <span>
-                            {sign ? "\u2212" : "+"}
-                        </span>
+                        <span className={styles["horizontal"]}></span>
+                        <span className={`${styles["vertical"]} ${!sign && styles["visible"]}`}></span>
                     </button>
                 <div className={styles["input-wrapper"]}>
                     <input 

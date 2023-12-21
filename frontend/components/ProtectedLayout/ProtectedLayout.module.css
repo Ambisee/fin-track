@@ -75,6 +75,22 @@
     scale: 1.1;
     opacity: 1;
 }
+.entry-form-toggler .horizontal,
+.entry-form-toggler .vertical {
+    width: 50%;
+    height: 0.225rem;
+
+    background-color: rgb(var(--light-primary));
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    translate: -50% -50%;
+}
+.entry-form-toggler .vertical {
+    rotate: 90deg;
+}
 
 .entry-form-container {
     min-width: 17.5rem;

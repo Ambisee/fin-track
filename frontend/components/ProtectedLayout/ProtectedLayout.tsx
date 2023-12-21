@@ -93,7 +93,8 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                             setIsBackdropVisible(true)
                         }}
                     >
-                        +
+                        <span className={styles["horizontal"]}></span>
+                        <span className={styles["vertical"]}></span>
                     </button>
                 </main>
 
