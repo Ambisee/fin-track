@@ -4,30 +4,68 @@
     border-bottom: 1px solid rgb(var(--secondary-color));
 }
 
+.settings-group {
+    padding: 1.75rem 0;
+}
+.settings-group-title {
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+
+    font-size: 1.5rem;
+    
+    display: inline-block;
+
+    border-bottom: 1px solid rgb(var(--secondary-color));
+}
+
 .settings-field-section {
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 .field-title {
     padding-bottom: 0.25rem;
 
-    font-size: 1.5rem;
+    font-size: 1.15rem;
 }
 .field-desc {
     font-size: 0.75rem;
+    color: rgb(var(--secondary-color) / 0.8);
 }
 .input-element-container {
     max-width: 50rem;
     margin-top: 1.25rem;
 }
+.input-element {
+    min-height: 2.5rem;
+}
 
 .save-settings-button {
-    max-height: 2rem;
-
-    position: fixed;
+    width: 50%;
+    max-width: 15rem;
+    max-height: 3rem;
+    margin-top: 1.75rem;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     border-radius: 50rem;
+}
+
+.reset-password-button {
+    max-height: 2.5rem;
+    max-width: 10rem;
+    margin-top: 1.6rem;
+    
+    border-radius: 50rem;
+}
+
+.monthly-report-cb-container {
+    margin-top: 1rem;
+    
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.monthly-report-cb-container label {
+    cursor: pointer;
 }
