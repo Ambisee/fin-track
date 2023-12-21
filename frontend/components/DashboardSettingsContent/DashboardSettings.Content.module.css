@@ -1,0 +1,33 @@
+.page-title {
+    padding-bottom: 0.75rem;
+
+    border-bottom: 1px solid rgb(var(--secondary-color));
+}
+
+.settings-field-section {
+    padding: 2rem 0;
+}
+.field-title {
+    padding-bottom: 0.25rem;
+
+    font-size: 1.5rem;
+}
+.field-desc {
+    font-size: 0.75rem;
+}
+.input-element-container {
+    max-width: 50rem;
+    margin-top: 1.25rem;
+}
+
+.save-settings-button {
+    max-height: 2rem;
+
+    position: fixed;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50rem;
+}
