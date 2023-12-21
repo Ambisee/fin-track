@@ -1,6 +1,6 @@
 .action-button {
     width: clamp(10rem, 60%, 15rem);
-    padding: 1.25rem 0;
+    height: 3rem;
 
     place-self: center;
 
