@@ -38,9 +38,9 @@ export default function DashboardHomeContent() {
 
 	return (
 		<>
-			<h2 className={styles["welcome-text"]}>
+			<h1 className={styles["welcome-text"]}>
 				Welcome back, {user?.user_metadata.username}.
-			</h2>
+			</h1>
 			<div className={styles["action-button-container"]}>
 				<ActionButton
 					className={styles["action-button"]}
