@@ -30,7 +30,7 @@
     font-weight: 500;
 }
 .vertical, .horizontal {
-    width: 60%;
+    width: 45%;
     height: 0.225rem;
 
     background-color: rgb(var(--extra-widget-icon-color));

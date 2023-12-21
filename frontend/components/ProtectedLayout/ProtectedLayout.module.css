@@ -32,6 +32,8 @@
 
 .content-container {
     overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable both-edges;
 }
 .content-container::-webkit-scrollbar {
     width: 10px;
@@ -77,7 +79,7 @@
 }
 .entry-form-toggler .horizontal,
 .entry-form-toggler .vertical {
-    width: 50%;
+    width: 35%;
     height: 0.225rem;
 
     background-color: rgb(var(--light-primary));
