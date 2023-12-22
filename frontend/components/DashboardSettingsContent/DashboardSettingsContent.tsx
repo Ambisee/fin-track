@@ -14,7 +14,7 @@ import styles from "./DashboardSettings.Content.module.css"
 
 export default function DashboardSettingsContent() {
     const { user } = useDashboardData()
-    const {register} = useForm()
+    const { register: registerForPassword } = useForm()
     
     return (
         <div className={styles["container"]}>
@@ -63,6 +63,7 @@ export default function DashboardSettingsContent() {
                     <form>
                         <div className={styles["input-element-container"]}>
                             <PasswordField
+                                {...registerForPassword("old-password")}
                                 className={styles["input-element"]}
                                 variant="outlined"
                                 showToggler={false}
@@ -71,6 +72,7 @@ export default function DashboardSettingsContent() {
                         </div>
                         <div className={styles["input-element-container"]}>
                             <PasswordField
+                                {...registerForPassword("new-password")}
                                 className={styles["input-element"]}
                                 variant="outlined"
                                 showToggler={false}
@@ -79,6 +81,7 @@ export default function DashboardSettingsContent() {
                         </div>
                         <div className={styles["input-element-container"]}>
                             <PasswordField
+                                {...registerForPassword("confirm-new-password")}
                                 className={styles["input-element"]}
                                 variant="outlined"
                                 showToggler={false}
