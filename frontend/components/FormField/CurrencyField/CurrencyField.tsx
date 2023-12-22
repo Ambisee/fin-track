@@ -1,4 +1,6 @@
 import { SetStateAction } from "react"
+import { JetBrains_Mono, Ubuntu_Mono } from "next/font/google"
+
 import FormTemplate, {CommonFieldProps, UseHookFormFieldProps} from "../FormTemplate"
 
 import styles from "./CurrencyField.module.css"
@@ -7,6 +9,11 @@ type CurrencyFieldProps = CommonFieldProps & UseHookFormFieldProps & {
     sign: boolean,
     toggleSign: () => void,
 }
+
+const jetBrainsMono = JetBrains_Mono({
+    weight: ["200"],
+    subsets: ["latin"]
+})
 
 export default function CurrencyField({
     sign,
@@ -39,11 +46,13 @@ export default function CurrencyField({
                     <button 
                         type="button"
                         tabIndex={-1}
-                        className={styles["sign-toggler"]}
+                        className={`
+                            ${styles["sign-toggler"]}
+                            ${jetBrainsMono.className}
+                        `}
                         onClick={() => toggleSign()}
                     >
-                        <span className={styles["horizontal"]}></span>
-                        <span className={`${styles["vertical"]} ${!sign && styles["visible"]}`}></span>
+                        {sign ? "\u2013" : "+"}
                     </button>
                 <div className={styles["input-wrapper"]}>
                     <input 

@@ -1,6 +1,7 @@
 "use client"
 
 import { ReactNode, useState, useRef, useEffect, useMemo, Children } from "react"
+import { Raleway } from "next/font/google"
 
 import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
@@ -16,6 +17,10 @@ interface ProtectedLayoutProps {
     children?: ReactNode,
     contextValue: DashboardDataProviderProps["value"]
 }
+
+const raleway = Raleway({
+    subsets: ["latin-ext"]
+})
 
 export default function ProtectedLayout(props: ProtectedLayoutProps) {
     const dropdownTogglerRef = useRef<HTMLDivElement>(null)
@@ -87,14 +92,16 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                         {props.children}
                     </div>
                     <button 
-                        className={styles["entry-form-toggler"]}
+                        className={`
+                            ${styles["entry-form-toggler"]}
+                            ${raleway.className}
+                        `}
                         onClick={() => {
                             setIsEntryFormToggled(true)
                             setIsBackdropVisible(true)
                         }}
                     >
-                        <span className={styles["horizontal"]}></span>
-                        <span className={styles["vertical"]}></span>
+                        <span>+</span>
                     </button>
                 </main>
 

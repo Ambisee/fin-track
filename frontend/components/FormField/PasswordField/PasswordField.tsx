@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import FormTemplate, { CommonFieldProps, UseHookFormFieldProps } from "../FormTemplate"
 
 import styles from "./PasswordField.module.css"
