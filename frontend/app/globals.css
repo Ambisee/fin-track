@@ -65,7 +65,9 @@ input {
 
     color: rgb(var(--secondary-color));
 }
+input:autofill,
 input:-webkit-autofill,
+input:autofill:hover,
 input:-webkit-autofill:hover {
     caret-color: rgb(var(--secondary-color));
     background-clip: text;

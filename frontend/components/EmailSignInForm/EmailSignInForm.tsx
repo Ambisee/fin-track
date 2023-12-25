@@ -13,11 +13,12 @@ import { sbClient } from "@/supabase/supabase_client"
 import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
 import styles from "./EmailSignInForm.module.css"
+import { useEffect } from "react"
 
 export default function EmailSignInForm() {
     const router = useRouter() 
     const { setIsLoading } = usePortalLoader()
-    const {register, watch, handleSubmit, formState: { errors }} = useForm()
+    const { register, watch, handleSubmit, formState: { errors } } = useForm()
 
     const emailRegisterObject = register("email", {
         required: {value: true, message: "This field is required."}
@@ -64,7 +65,6 @@ export default function EmailSignInForm() {
                         fieldDisplayName="Email" 
                         className={styles["input-field"]}
                         registerObject={emailRegisterObject}
-                        watchedValue={watch("email")}
                     />
                 </div>
                 <div className={styles["input-field-wrapper"]}>
@@ -72,7 +72,6 @@ export default function EmailSignInForm() {
                         fieldDisplayName="Password"
                         className={styles["input-field"]}
                         registerObject={passwordRegisterObject}
-                        watchedValue={watch("password")}
                     />
                 </div>
                 <div className={styles["forgot-password-link-container"]}>

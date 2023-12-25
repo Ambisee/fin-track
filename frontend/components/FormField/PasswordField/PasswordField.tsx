@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import FormTemplate, { CommonFieldProps, UseHookFormFieldProps } from "../FormTemplate"
 
 import styles from "./PasswordField.module.css"
@@ -17,11 +17,30 @@ export default function PasswordField({
     showToggler=true,
     ...props
 }: PasswordFieldProps) {
+    const [filled, setFilled] = useState(false)
     const [showPassword, setShowPassword] = useState<boolean>(false)
+    const inputRef = useRef<HTMLInputElement | null>(null)
+
+    useEffect(() => {
+        if (inputRef.current?.value === undefined || inputRef.current.value === "") {
+            setFilled(false)
+        } else {
+            setFilled(true)
+        }
+    }, [])
 
     const initializeDisplayName = () => {
         if (fieldDisplayName !== undefined) return fieldDisplayName
         return props.name?.split(" ").map(text => `${text[0]}${text.slice(1)}`).join(" ") ?? ""
+    }
+
+    const isFilled = () => {
+        let res = true
+
+        res &&= (watchedValue !== undefined ? watchedValue : true)
+        res &&= (watchedValue !== undefined ? true : filled)
+
+        return res
     }
 
     const displayName = initializeDisplayName()
@@ -39,13 +58,31 @@ export default function PasswordField({
             >
                 <input
                     required
+                    onChange={(e) => {
+                        registerObject?.onChange(e)
+                        props?.onChange?.(e)
+
+                        if (e.target.value === undefined || e.target.value === "") {
+                            setFilled(false)
+                        } else {
+                            setFilled(true)
+                        }
+                    }}
+                    onBlur={(e) => {
+                        registerObject?.onBlur(e)
+                        props?.onBlur?.(e)
+                    }}
+                    name={registerObject?.name}
+                    ref={(e) => {
+                        registerObject?.ref(e)
+                        inputRef.current = e
+                    }}
                     type={showPassword ? "text" : "password"}
                     className={`
                         ${styles["input-element"]}
-                        ${(watchedValue) && styles["filled"]}
+                        ${isFilled() && styles["filled"]}
                     `}
                     {...props}
-                    {...(registerObject ?? {})}
                 />
                 <label 
                     htmlFor={props.id} 

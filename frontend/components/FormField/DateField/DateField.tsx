@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { UseFormRegisterReturn } from "react-hook-form"
 
 import FormTemplate, { CommonFieldProps, UseHookFormFieldProps } from "../FormTemplate"
@@ -23,13 +23,30 @@ export default function DateField({
 }: DateFieldProps) {
    const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
    const textFieldRef = useRef<HTMLInputElement | null>(null)
-   const [isEmpty, setIsEmpty] = useState(true)
+   const [filled, setFilled] = useState(false)
    const {ref, onChange, ...regObjRest} = registerObject as UseFormRegisterReturn
+
+    useEffect(() => {
+        if (textFieldRef.current?.value === undefined || textFieldRef.current.value === "") {
+            setFilled(false)
+        } else {
+            setFilled(true)
+        }
+    }, [])
 
    const showDatePicker = () => {
         if (datePickerProviderRef.current !== undefined && datePickerProviderRef.current !== null) {
             datePickerProviderRef.current.showPicker()
         } 
+    }
+
+    const isFilled = () => {
+        let res = true;
+
+        res &&= (watchedValue !== undefined ? watchedValue : true)
+        res &&= (watchedValue !== undefined ? true : filled)
+
+        return res
     }
 
   return (
@@ -43,16 +60,20 @@ export default function DateField({
                     ref(e)
                     textFieldRef.current = e
                 }}
+                onChange={(e) => {
+                    if (e.target.value === "" || e.target.value === undefined) {
+                        setFilled(false)
+                    } else {
+                        setFilled(true)
+                    }
+                }}
                 onFocus={showDatePicker}
                 onClick={showDatePicker}
-                onChange={(e) => {
-                    setIsEmpty(c => e.target.value !== "" ? false : true)
-                }}
                 autoComplete="false"
                 type="text"
                 className={`
                     ${styles["input-element"]}
-                    ${(watchedValue || !isEmpty) && styles["filled"]}
+                    ${isFilled() && styles["filled"]}
                 `}
                 {...props}
 

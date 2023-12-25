@@ -113,6 +113,7 @@ export default function RegistrationForm() {
     return (
         <BaseFormWrapper>
             <form 
+                autoComplete="off"
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -152,10 +153,11 @@ export default function RegistrationForm() {
                 }}
             >
                 <div>
-                    <TextField 
+                    <TextField
+                        required 
+                        autoComplete="new-password"
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
-                        watchedValue={watch("username")}
                         registerObject={usernameRegisterObject}
                     />
                     <div 
@@ -171,9 +173,10 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <TextField 
+                        required
+                        autoComplete="new-password"
                         fieldDisplayName="Email" 
                         className={styles["input-element"]} 
-                        watchedValue={watch("email")}
                         registerObject={emailRegisterObject}
                     />
                     <div 
@@ -189,12 +192,13 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <PasswordField 
+                        required
+                        autoComplete="new-password"
                         fieldDisplayName="Password" 
                         className={`
                             ${styles["input-element"]}
                             ${styles["password-field"]}
                         `}
-                        watchedValue={watch("password")}
                         registerObject={passwordRegisterObject}
                     />
                     <div 
@@ -271,7 +275,6 @@ export default function RegistrationForm() {
                     <PasswordField  
                         fieldDisplayName="Confirm Password"
                         className={styles["input-element"]} 
-                        watchedValue={watch("confirm-password")}
                         registerObject={confirmPasswordRegisterObject}
                     />
                     <div 
