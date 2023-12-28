@@ -10,10 +10,10 @@ import { sbClient } from "@/supabase/supabase_client"
 import styles from "./EntryList.module.css"
 
 interface EntryListProps {
-	title?: string
-	description?: string
-	className?: string
-	editButtonCallback?: (data: Entry) => void
+	title?: string,
+	description?: string,
+	className?: string,
+	editButtonCallback?: (data: Entry) => void, 
 	data: Entry[]
 }
 
@@ -25,7 +25,7 @@ export default function EntryList(props: EntryListProps) {
 		Array(props.data.length).fill(false)
 	)
 
-	const createRemoveFromSelected = (id: number, compIndex: number) => {
+	const createRemoveFromSelectedCallback = (id: number, compIndex: number) => {
 		return () => {
 			if (isSelectedList[compIndex] === false) {
 				return
@@ -41,7 +41,7 @@ export default function EntryList(props: EntryListProps) {
 		}
 	}
 
-	const createAddToSelected = (id: number, compIndex: number) => {
+	const createAddToSelectedCallback = (id: number, compIndex: number) => {
 		return () => {
 			if (isSelectedList[compIndex] === true) {
 				return
@@ -114,6 +114,7 @@ export default function EntryList(props: EntryListProps) {
                     {(props.data.length > 0) &&
                         <Checkbox
                             name="select-all-checkbox"
+                            checked={selectedIdsRef.current.size === props.data.length}
                             onClick={(e) => {
                                 if (!e.currentTarget.checked) {
                                     setIsSelectedList(Array(props.data.length).fill(false))
@@ -138,8 +139,8 @@ export default function EntryList(props: EntryListProps) {
 						key={value.id}
 						data={value}
 						isSelected={isSelectedList[index]}
-						selectCallback={createAddToSelected(value.id, index)}
-						deselectCallback={createRemoveFromSelected(value.id, index)}
+						selectCallback={createAddToSelectedCallback(value.id, index)}
+						deselectCallback={createRemoveFromSelectedCallback(value.id, index)}
 						editButtonCallback={() => {
 							if (props.editButtonCallback !== undefined) {
 								props.editButtonCallback(value)
