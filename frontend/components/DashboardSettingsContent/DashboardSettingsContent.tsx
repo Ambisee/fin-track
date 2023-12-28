@@ -84,7 +84,7 @@ export default function DashboardSettingsContent({
                             <TextField 
                                 variant="outlined"
                                 showLabel={false}
-                                placeholder={user.user_metadata.username}
+                                placeholder={user?.user_metadata.username ?? "No username"}
                                 registerObject={register("general.username", {
                                     pattern: {
                                         value: ONLY_ALPHANUMERIC,
@@ -115,6 +115,11 @@ export default function DashboardSettingsContent({
                             e.preventDefault()
                             handleSubmit(
                                 async (data) => {
+                                    if (user === null) {
+                                        alert("No user signed in")
+                                        return
+                                    }
+                                    
                                     const old_email = user.email
 
                                     const {error} = await sbClient.auth.updateUser({
@@ -138,7 +143,7 @@ export default function DashboardSettingsContent({
                             <TextField 
                                 variant="outlined"
                                 showLabel={false}
-                                placeholder={user.email}
+                                placeholder={user?.email ?? "No email"}
                                 registerObject={register("account-access.new-email")}
                             />
                             <ActionButton
@@ -160,7 +165,7 @@ export default function DashboardSettingsContent({
                     <ActionButton
                         className={styles["save-settings-button"]}
                         onClick={async (e) => {
-                            if (user.email === undefined) {
+                            if (user === null || user.email === undefined) {
                                 alert("No user signed in.")
                                 return
                             }

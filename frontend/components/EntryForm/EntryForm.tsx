@@ -133,6 +133,11 @@ export default function EntryForm(props: EntryFormProps) {
                     e.preventDefault()
                     handleSubmit(
                         (data) => {
+                            if (user === null) {
+                                alert("No user signed in")
+                                return
+                            }
+
                             if (props.type === "NEW_ENTRY") {
                                 insertSupabaseEntry(data, sign, user)
                                     .then(() => {

@@ -21,6 +21,7 @@ const selectedIds = new Set<number>()
 
 export default function EntryList(props: EntryListProps) {
 	const selectedIdsRef = useRef(selectedIds)
+    const allSelectedCheckboxRef = useRef<HTMLInputElement | null>(null)
 	const [isSelectedList, setIsSelectedList] = useState(
 		Array(props.data.length).fill(false)
 	)
@@ -35,6 +36,15 @@ export default function EntryList(props: EntryListProps) {
 				const newArr = [...c]
 				newArr[compIndex] = false
 				selectedIdsRef.current.delete(id)
+
+                if (
+                    allSelectedCheckboxRef.current !== null &&
+                    allSelectedCheckboxRef.current !== undefined
+                ) {
+                    if (selectedIdsRef.current.size !== props.data.length) {
+                        allSelectedCheckboxRef.current.checked = false
+                    }
+                }
 
 				return newArr
 			})
@@ -51,6 +61,15 @@ export default function EntryList(props: EntryListProps) {
 				const newArr = [...c]
 				newArr[compIndex] = true
 				selectedIdsRef.current.add(id)
+
+                if (
+                    allSelectedCheckboxRef.current !== null &&
+                    allSelectedCheckboxRef.current !== undefined
+                ) {
+                    if (props.data.length === selectedIdsRef.current.size) {
+                        allSelectedCheckboxRef.current.checked = true
+                    }
+                }
 
 				return newArr
 			})
@@ -113,8 +132,8 @@ export default function EntryList(props: EntryListProps) {
 					</button>
                     {(props.data.length > 0) &&
                         <Checkbox
+                            ref={allSelectedCheckboxRef}
                             name="select-all-checkbox"
-                            checked={selectedIdsRef.current.size === props.data.length}
                             onClick={(e) => {
                                 if (!e.currentTarget.checked) {
                                     setIsSelectedList(Array(props.data.length).fill(false))
