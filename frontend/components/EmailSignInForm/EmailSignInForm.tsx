@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { useRouter } from "next/navigation"
 
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
@@ -13,10 +12,8 @@ import { sbClient } from "@/supabase/supabase_client"
 import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
 import styles from "./EmailSignInForm.module.css"
-import { useEffect } from "react"
 
 export default function EmailSignInForm() {
-    const router = useRouter() 
     const { setIsLoading } = usePortalLoader()
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
 
@@ -43,8 +40,12 @@ export default function EmailSignInForm() {
                             }).then((value) => {
                                 setIsLoading(false)
                                 if (value.data?.user) {
-                                    router.push("/dashboard")
-                                    return
+                                    /**
+                                     * Using the Web API function
+                                     * since we need to refresh the
+                                     * dashboard states
+                                     */
+                                    return window.location.assign("/dashboard")
                                 }
 
                                 if (value?.error) {
