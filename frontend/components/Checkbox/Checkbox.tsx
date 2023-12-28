@@ -1,4 +1,4 @@
-import { HTMLProps } from "react"
+import { forwardRef, HTMLProps } from "react"
 
 import styles from "./Checkbox.module.css"
 
@@ -6,12 +6,13 @@ interface CheckboxProps extends Omit<HTMLProps<HTMLInputElement>, "type"> {
 
 }
 
-export default function Checkbox({
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({
     className,
     ...props
-}: CheckboxProps) {
+}, ref) {
     return (
         <input 
+            ref={ref}
             className={`
                 ${styles["select-checkbox"]}
                 ${className}
@@ -20,4 +21,6 @@ export default function Checkbox({
             {...props}
         />
     )
-}
+})
+
+export default Checkbox

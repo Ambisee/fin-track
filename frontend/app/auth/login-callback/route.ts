@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
 
         if (data.user?.user_metadata.username === undefined) {
             await supabase.auth.updateUser({
-                data: { username: data.user?.user_metadata.name }
+                data: { 
+                    username: (data.user?.user_metadata.name as string).split(" ").join(""),
+                    allow_report: false
+                }
             })
         }
 
