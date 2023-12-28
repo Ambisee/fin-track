@@ -78,6 +78,10 @@ export default function RegistrationForm() {
         pattern: {
             value: ONLY_ALPHANUMERIC,
             message: "Usernames can only have alphabets and numbers."
+        },
+        minLength: {
+            value: 8,
+            message: "Usernames must be at least 8 characters long."
         }
     })
 
