@@ -78,6 +78,10 @@ export default function RegistrationForm() {
         pattern: {
             value: ONLY_ALPHANUMERIC,
             message: "Usernames can only have alphabets and numbers."
+        },
+        minLength: {
+            value: 8,
+            message: "Usernames must be at least 8 characters long."
         }
     })
 
@@ -113,6 +117,7 @@ export default function RegistrationForm() {
     return (
         <BaseFormWrapper>
             <form 
+                autoComplete="off"
                 className={styles["form-element"]}
                 onSubmit={(e) => {
                     e.preventDefault()
@@ -124,8 +129,9 @@ export default function RegistrationForm() {
                                 password: data.password,
                                 options: {
                                     data: {
-                                        username: data.username
-                                    }
+                                        username: data.username,
+                                    },
+                                    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/login-callback`
                                 }
                             }).then((value) => {
                                 setIsLoading(false)
@@ -151,10 +157,11 @@ export default function RegistrationForm() {
                 }}
             >
                 <div>
-                    <TextField 
+                    <TextField
+                        required 
+                        autoComplete="new-password"
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
-                        watchedValue={watch("username")}
                         registerObject={usernameRegisterObject}
                     />
                     <div 
@@ -170,9 +177,10 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <TextField 
+                        required
+                        autoComplete="new-password"
                         fieldDisplayName="Email" 
                         className={styles["input-element"]} 
-                        watchedValue={watch("email")}
                         registerObject={emailRegisterObject}
                     />
                     <div 
@@ -188,12 +196,13 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <PasswordField 
+                        required
+                        autoComplete="new-password"
                         fieldDisplayName="Password" 
                         className={`
                             ${styles["input-element"]}
                             ${styles["password-field"]}
                         `}
-                        watchedValue={watch("password")}
                         registerObject={passwordRegisterObject}
                     />
                     <div 
@@ -270,7 +279,6 @@ export default function RegistrationForm() {
                     <PasswordField  
                         fieldDisplayName="Confirm Password"
                         className={styles["input-element"]} 
-                        watchedValue={watch("confirm-password")}
                         registerObject={confirmPasswordRegisterObject}
                     />
                     <div 

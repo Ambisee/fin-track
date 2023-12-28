@@ -42,8 +42,8 @@ export async function middleware(req: NextRequest) {
      * url.
      */
     if (req.nextUrl.pathname.startsWith("/recovery")) {
-        const res = await handleRequestToPasswordRecovery(req, sbMiddleware)
-        return res
+        const handleRes = await handleRequestToPasswordRecovery(req, res, sbMiddleware)
+        return handleRes
     }
 
     return res

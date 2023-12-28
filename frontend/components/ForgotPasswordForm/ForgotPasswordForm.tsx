@@ -58,7 +58,7 @@ export default function ForgotPasswordForm() {
                                     setIsLoading(false)
                                     if (value?.error) {
                                         alert(value.error.message)
-                                        return;
+                                        return
                                     }
 
                                     alert(
@@ -84,7 +84,6 @@ export default function ForgotPasswordForm() {
                 <div className={styles["input-field"]}>
                     <TextField 
                         registerObject={emailRegisterObject}
-                        watchedValue={watch("email")}
                         fieldDisplayName="Email"
                     />
                     <div 

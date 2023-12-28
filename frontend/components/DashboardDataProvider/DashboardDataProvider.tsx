@@ -45,10 +45,9 @@ export default function DashboardDataProvider(props: DashboardDataProviderProps)
                     event: "*",
                     schema: "public",
                     table: "entry",
-                    // filter: `created_by=eq.${user.id}`
+                    filter: `created_by=eq.${user.id}`
                 },
                 (payload: RealtimePostgresChangesPayload<Entry[]>) => {
-                    console.log(payload)
                     setData(current => handleDataChange(current, payload))
                 }
             )
