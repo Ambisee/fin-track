@@ -62,7 +62,7 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                     </li>
                     <li className={styles["nav-item"]}>
                         <Link 
-                            href="#"
+                            href="/dashboard/entries"
                             onClick={() => {
                                 setIsNavToggled(false)
                                 setIsBackdropVisible(false)
@@ -77,7 +77,10 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                                 setIsNavToggled(false)
                                 setIsBackdropVisible(false)
                             }} 
-                            href="#">Analytics</Link>
+                            href="/dashboard/analytics"
+                        >
+                            Analytics
+                        </Link>
                     </li> 
                 </ul>
             </nav>
