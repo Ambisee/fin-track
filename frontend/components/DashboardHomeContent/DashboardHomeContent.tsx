@@ -11,6 +11,7 @@ import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider
 import { Entry } from "@/supabase"
 
 import styles from "./DashboardHomeContent.module.css"
+import EntryFormPopup from "../EntryFormPopup/EntryFormPopup"
 
 export default function DashboardHomeContent() {
 	const [editValues, setEditValues] = useState<Entry | undefined>(undefined)
@@ -60,44 +61,14 @@ export default function DashboardHomeContent() {
 					data={data}
 				/>
 			</div>
-			<div
-				tabIndex={0}
-				onKeyDown={(e) => {
-					if (e.key === "Escape") {
-						setIsEditFormVisible(false)
-						setIsBackdropVisible(false)
-					}
-				}}
-				className={`
-                    ${styles["edit-entry-form-container"]}
-                    ${isEditFormVisible && styles["visible"]}
-                `}
-			>
-				<div className={styles["entry-form-header"]}>
-					<CrossButton
-						className={styles["entry-form-close-button"]}
-						onClick={() => {
-							setIsEditFormVisible(false)
-							setIsBackdropVisible(false)
-						}}
-					/>
-				</div>
-				<EntryForm
-					id="edit-values-form"
-					type="EDIT_ENTRY"
-					values={editValues}
-					title="Edit Entry"
-				/>
-				<ActionButton
-					className={styles["bottom-close-button"]}
-					onClick={() => {
-						setIsEditFormVisible(false)
-						setIsBackdropVisible(false)
-					}}
-				>
-					Close
-				</ActionButton>
-			</div>
-		</>
+            <EntryFormPopup 
+                showPopupCallback={(arg) => {
+                    setIsEditFormVisible(arg)
+                    setIsBackdropVisible(arg)
+                }}
+                isPopupVisible={isEditFormVisible}
+                values={editValues}
+            />
+        </>
 	)
 }

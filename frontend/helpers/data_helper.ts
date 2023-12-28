@@ -2,6 +2,18 @@ import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 
 import { Entry } from "@/supabase"
 
+interface DataGroup {
+    month: string,
+    year: number,
+    data: Entry[]
+}
+
+const months = [
+    'January', 'February', 'March', 'April', 
+    'May', 'June', 'July', 'August', 
+    'September', 'October', 'November', 'December'
+]
+
 function handleDataChange(
     current: Entry[],
     payload: RealtimePostgresChangesPayload<Entry[]>
@@ -106,4 +118,43 @@ function handleInsert(
     newEntries.splice(index, 0, newEntry as Entry)
 }
 
-export { handleDataChange }
+function sortDataByGroup(
+    data: Entry[]
+) {
+    const map: Map<string, Entry[]> = new Map()
+    const result: DataGroup[] = []
+
+    for (let i = 0; i < data.length; i++) {
+        const row_date = new Date(data[i].date)
+        const row_date_str = row_date.toISOString().slice(0,7)
+
+        if (!map.has(row_date_str)) {
+            map.set(row_date_str, [])
+        }
+
+        map.get(row_date_str)?.push(data[i])
+    }
+
+    Array.from(map.keys()).forEach(key => {
+        let group: DataGroup = {month: '', year: 0, data: []}
+        
+        if (map.get(key) === undefined) {
+            return
+        }
+        
+        const d = new Date((map.get(key) as Entry[])[0].date)
+        
+        group.month = months[d.getMonth()]
+        group.year = d.getFullYear()
+        group.data = map.get(key) as Entry[]
+
+        result.push(group)
+    })
+
+    return result
+}
+
+export { 
+    handleDataChange,
+    sortDataByGroup
+}
