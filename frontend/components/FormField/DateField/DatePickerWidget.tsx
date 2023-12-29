@@ -1,15 +1,21 @@
-import { useState, forwardRef, ChangeEventHandler } from "react"
+import { useState, forwardRef, ChangeEventHandler, DetailedHTMLProps, HTMLProps, Dispatch, SetStateAction, useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 
-import styles from "./DatePicker.module.css"
+import styles from "./DatePickerWidget.module.css"
 
 interface DatePickerWidgetProps {
-    onChange: (arg: string) => void
+    className?: string,
+    onChange: (arg: string) => void,
+    setIsVisible?: Dispatch<SetStateAction<boolean>>,
+    isVisible?: boolean
 }
 
-const DatePickerWidget = forwardRef(function DatePickerWidget({
-    onChange
-}: DatePickerWidgetProps, ref) {
+const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(function DatePickerWidget({
+    className,
+    onChange,
+    setIsVisible=() => {},
+    isVisible=true
+}, ref) {
     const today = new Date()
 
     const [compValue, setCompValue] = useState(today.toLocaleDateString('en-ca'))
@@ -18,11 +24,18 @@ const DatePickerWidget = forwardRef(function DatePickerWidget({
     const [year, setYear] = useState(today.getUTCFullYear())
 
     const setDateValue = (date: number, month: number, year: number) => {
+        if (date === -1 || month === -1) {
+            setCompValue("")
+            setDate(-1)
+
+            onChange("")
+            return
+        }
+        
         const newValue = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`
         setCompValue(newValue)
-        if (onChange !== undefined) {
-            onChange(newValue)
-        }
+
+        onChange(newValue)
     }
 
     const getNumDays = (month: number, year: number) => {
@@ -112,85 +125,96 @@ const DatePickerWidget = forwardRef(function DatePickerWidget({
     }
 
     return (
-        <>
-            <div 
-                className={styles["container"]}
-            >
-                <div className={styles["month-year-display"]}>
-                    <select value={month} onChange={(e) => setMonth(Number(e.target.value))}>
-                        <option value={1}>January</option>
-                        <option value={2}>February</option>
-                        <option value={3}>March</option>
-                        <option value={4}>April</option>
-                        <option value={5}>May</option>
-                        <option value={6}>June</option>
-                        <option value={7}>July</option>
-                        <option value={8}>August</option>
-                        <option value={9}>September</option>
-                        <option value={10}>October</option>
-                        <option value={11}>November</option>
-                        <option value={12}>December</option>
-                    </select>
-                    <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
-                        {
-                            (() => {
-                                const years = []
+        <div 
+            ref={ref}
+            onKeyDown={(e) => {
+                e.preventDefault()
+                if (e.key === "Escape") {
+                    setIsVisible(false)
+                }
+            }}
+            className={`
+                ${className}
+                ${styles["container"]}
+                ${isVisible && styles["visible"]}
+            `}
+        >
+            <div className={styles["month-year-display"]}>
+                <select value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+                    <option value={1}>January</option>
+                    <option value={2}>February</option>
+                    <option value={3}>March</option>
+                    <option value={4}>April</option>
+                    <option value={5}>May</option>
+                    <option value={6}>June</option>
+                    <option value={7}>July</option>
+                    <option value={8}>August</option>
+                    <option value={9}>September</option>
+                    <option value={10}>October</option>
+                    <option value={11}>November</option>
+                    <option value={12}>December</option>
+                </select>
+                <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
+                    {
+                        (() => {
+                            const years = []
 
-                                for (let i = -50; i <= 50; i++) {
-                                    years.push(
-                                        <option key={uuidv4()} value={year + i}>{year + i}</option>
-                                    )
-                                }
+                            for (let i = -50; i <= 50; i++) {
+                                years.push(
+                                    <option key={uuidv4()} value={year + i}>{year + i}</option>
+                                )
+                            }
 
-                                return years
-                            })()
-                        }
-                    </select>
-                </div>
-                <div>
-                    <div className={styles["calendar-container"]}>
-                        <table className={styles["calendar"]}>
-                            <thead>
-                                <tr className={styles["day-of-the-week"]}>
-                                    <th>Sun</th>
-                                    <th>Mon</th>
-                                    <th>Tue</th>
-                                    <th>Wed</th>
-                                    <th>Thu</th>
-                                    <th>Fri</th>
-                                    <th>Sat</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {renderCalendar(month, year)}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div className={styles["footer-buttons"]}>
-                    <button 
-                        onClick={() => {
-                            const today = new Date()
-                            
-                            setMonth(today.getMonth() + 1)
-                            setYear(today.getUTCFullYear())
-                            setDate(today.getDate())
-
-                            setDateValue(today.getDate(), today.getMonth() + 1, today.getUTCFullYear())
-                        }}
-                    >
-                        Today
-                    </button>  
-                    <button 
-                        onClick={() => {
-                            setDate(-1)
-                        }}
-                    >
-                        Clear
-                    </button>
+                            return years
+                        })()
+                    }
+                </select>
+            </div>
+            <div>
+                <div className={styles["calendar-container"]}>
+                    <table className={styles["calendar"]}>
+                        <thead>
+                            <tr className={styles["day-of-the-week"]}>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {renderCalendar(month, year)}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </>
+            <div className={styles["footer-buttons"]}>
+                <button 
+                    type="button"
+                    onClick={() => {
+                        const today = new Date()
+                        
+                        setMonth(today.getMonth() + 1)
+                        setYear(today.getUTCFullYear())
+                        setDate(today.getDate())
+
+                        setDateValue(today.getDate(), today.getMonth() + 1, today.getUTCFullYear())
+                    }}
+                >
+                    Today
+                </button>  
+                <button 
+                    type="button"
+                    onClick={() => {
+                        setDateValue(-1, -1, -1)
+                    }}
+                >
+                    Clear
+                </button>
+            </div>
+        </div>
     )
 })
 

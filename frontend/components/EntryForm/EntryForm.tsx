@@ -166,6 +166,7 @@ export default function EntryForm(props: EntryFormProps) {
                     <div className={styles["field-wrapper"]}>
                         <TextField
                             variant="outlined"
+                            autoComplete="off"
                             className={styles["input-field"]}
                             registerObject={descRegisterObject}
                             watchedValue={watch("description")}
@@ -175,6 +176,7 @@ export default function EntryForm(props: EntryFormProps) {
                     <div className={styles["field-wrapper"]}>
                         <CurrencyField 
                             variant="outlined"
+                            autoComplete="off"
                             className={styles["input-field"]}
                             registerObject={amountRegisterObject}
                             watchedValue={watch("amount")}
