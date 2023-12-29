@@ -1,10 +1,17 @@
 .container {
-    /* width: 25vw; */
-    min-width: 17.5rem;
-    max-width: 25rem;
+    width: 75%;
+    min-width: 27.5rem;
+    max-width: 50rem;
 
     border: 1px solid black;
     border-radius: 0.25rem;
+
+    background-color: rgb(var(--secondary-color));
+
+    visibility: hidden;
+}
+.container.visible {
+    visibility: visible;
 }
 
 .month-year-display {
