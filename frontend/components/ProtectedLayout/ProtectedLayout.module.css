@@ -61,20 +61,23 @@
     bottom: 1.5rem;
     right: 1.5rem;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     z-index: 30;
 
     scale: 1;
 
-    font-size: 4rem;
-    font-weight: 200;
-
     opacity: 0.7;
 
     transition: var(--theme-switch-transition);
+}
+.entry-form-toggler span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    font-size: 4rem;
+    font-weight: 200;
+
+    translate: -50% -50%;
 }
 .entry-form-toggler:hover,
 .entry-form-toggler:focus {
