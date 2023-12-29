@@ -1,0 +1,62 @@
+.container {
+    /* width: 25vw; */
+    min-width: 17.5rem;
+    max-width: 25rem;
+
+    border: 1px solid black;
+    border-radius: 0.25rem;
+}
+
+.month-year-display {
+    padding: 1rem 0.25rem;
+
+    display: flex;
+    justify-content: space-around;
+
+    background-color: rgb(0 0 0 / 0.2);
+}
+
+.calendar {
+    width: 100%;
+}
+
+.calendar td {
+    width: calc(100% / 7);
+    min-width: 1.5rem;
+
+    text-align: center;
+}
+.calendar td button {
+    width: 100%;
+    aspect-ratio: 1;
+
+    display: block;
+
+    box-sizing: border-box;
+
+    background-color: transparent;
+
+    outline: none;
+    border: none;
+    border-radius: 50rem;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+.calendar td button.current-date {
+    color: white;
+    background-color: rgb(0 0 0);
+}
+.calendar td button:not(.current-date):hover {
+    background-color: rgb(0 0 0 / 0.1);
+}
+
+.footer-buttons {
+    padding: 0.5rem 0;
+
+    display: flex;
+    justify-content: space-around;
+
+    background-color: rgb(0 0 0 / 0.2);
+}
