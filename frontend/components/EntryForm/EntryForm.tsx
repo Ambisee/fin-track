@@ -159,6 +159,7 @@ export default function EntryForm(props: EntryFormProps) {
                             className={styles["input-field"]}
                             fieldDisplayName="Date"
                             registerObject={dateRegisterObject}
+                            setValue={(val: string) => setValue("date", val)}
                             watchedValue={!isNaN(watch("date"))}
                         />
                     </div>
