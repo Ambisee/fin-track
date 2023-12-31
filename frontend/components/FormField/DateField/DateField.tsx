@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { UseFormRegisterReturn } from "react-hook-form"
 
 import FormTemplate, { CommonFieldProps, UseHookFormFieldProps } from "../FormTemplate"
@@ -26,20 +26,13 @@ export default function DateField({
     ...props
 }: DateFieldProps) {
     const [filled, setFilled] = useState(false)
-    const [hasShowPicker, setHasShowPicker] = useState(false)
     const [isPickerVisible, setIsPickerVisible] = useState(false)
     const {ref, onChange, ...regObjRest} = registerObject as UseFormRegisterReturn
 
     const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
     const textFieldRef = useRef<HTMLInputElement | null>(null)
 
-    useEffect(() => {
-        let input = document.createElement('input')
-        input.setAttribute('type','date')
-        input.classList.add(styles["showpicker-support-checker"])
-
-        setHasShowPicker("showPicker" in HTMLInputElement.prototype)
-    }, [])
+    const hasShowPicker = ("showPicker" in HTMLInputElement.prototype)
 
     const showDatePicker = () => {
         if (!hasShowPicker) {
