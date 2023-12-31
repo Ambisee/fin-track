@@ -35,14 +35,12 @@ export default function GlobaLayout({
 }: GlobalLayoutProps) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <head>
-                <script id="get-theme" dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
-            </head>
             <body   
                 className={`
-                    ${raleway.className}
+                ${raleway.className}
                 `}
             >
+                <script id="get-theme" dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
                 <ThemeProvider>
                     {children}
                 </ThemeProvider>
