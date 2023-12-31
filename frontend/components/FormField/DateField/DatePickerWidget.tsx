@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 import styles from "./DatePickerWidget.module.css"
 
 interface DatePickerWidgetProps {
+    value?: string,
     className?: string,
     onChange: (arg: string) => void,
     setIsVisible?: Dispatch<SetStateAction<boolean>>,
@@ -12,20 +13,23 @@ interface DatePickerWidgetProps {
 
 const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(function DatePickerWidget({
     className,
+    value,
     onChange,
     setIsVisible=() => {},
     isVisible=true
 }, ref) {
-    const today = new Date()
+    let initialValue = new Date()
 
-    const [compValue, setCompValue] = useState(today.toLocaleDateString('en-ca'))
-    const [date, setDate] = useState(today.getDate())
-    const [month, setMonth] = useState(today.getMonth() + 1)
-    const [year, setYear] = useState(today.getUTCFullYear())
+    const [compValue, setCompValue] = useState(initialValue.toLocaleDateString('en-ca'))
+    const [date, setDate] = useState(initialValue.getDate())
+    const [month, setMonth] = useState(initialValue.getMonth() + 1)
+    const [year, setYear] = useState(initialValue.getUTCFullYear())
+    const [internalValue, setInternalValue] = useState({year, month, date})
 
     const setDateValue = (date: number, month: number, year: number) => {
         if (date === -1 || month === -1) {
             setCompValue("")
+            setInternalValue(c => ({...c, date: -1}))
             setDate(-1)
 
             onChange("")
@@ -33,6 +37,7 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
         }
         
         const newValue = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`
+        setInternalValue({year, month, date})
         setCompValue(newValue)
 
         onChange(newValue)
@@ -100,9 +105,9 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
                                 <button
                                     className={`
                                         ${(
-                                            val == date &&
-                                            month == m &&
-                                            year == y
+                                            val == internalValue.date &&
+                                            month == internalValue.month &&
+                                            year == internalValue.year
                                         ) && styles["current-date"]}
                                     `}
                                     onClick={() => {
