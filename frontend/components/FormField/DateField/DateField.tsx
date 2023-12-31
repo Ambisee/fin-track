@@ -21,18 +21,32 @@ export default function DateField({
     registerObject,
     fieldDisplayName,
     watchedValue,
+    setValue,
     variant,
     ...props
 }: DateFieldProps) {
     const [filled, setFilled] = useState(false)
+    const [hasShowPicker, setHasShowPicker] = useState(true)
     const [isPickerVisible, setIsPickerVisible] = useState(false)
     const {ref, onChange, ...regObjRest} = registerObject as UseFormRegisterReturn
 
     const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
     const textFieldRef = useRef<HTMLInputElement | null>(null)
 
+    useEffect(() => {
+        let input = document.createElement('input')
+        input.setAttribute('type','date')
+
+        try {
+            input.showPicker()
+            setHasShowPicker(true)
+        } catch (error) {
+            setHasShowPicker(false)
+        }
+    }, [])
+
     const showDatePicker = () => {
-        if (!isDateInputAvailable()) {
+        if (!hasShowPicker) {
             setIsPickerVisible(c => !c)
             return
         }
@@ -53,23 +67,6 @@ export default function DateField({
         res &&= (watchedValue !== undefined ? true : filled)
 
         return res
-    }
-
-    /**
-     * Check if <input type="date" /> is supported
-     * in the user's browser or not.
-     * 
-     * Code from the answer by Italo Borssatto copied from the post below.
-     * https://stackoverflow.com/questions/10193294/how-can-i-tell-if-a-browser-supports-input-type-date
-     */
-    const isDateInputAvailable = () => {
-        var input = document.createElement('input')
-        input.setAttribute('type','date')
-    
-        var notADateValue = 'not-a-date'
-        input.setAttribute('value', notADateValue)
-    
-        return (input.value !== notADateValue)
     }
     
     return (
@@ -104,11 +101,13 @@ export default function DateField({
                         ) {
                             return
                         }
-
+                        
                         if (
                             isNaN(d.getTime())
                         ) {
                             textFieldRef.current.value = ""
+                            datePickerProviderRef.current.value = ""
+                            setValue("")
                             return
                         }
 
@@ -121,7 +120,7 @@ export default function DateField({
                         textFieldRef.current.value = payload
                         datePickerProviderRef.current.value = payload
 
-                        props.setValue(payload)
+                        setValue(payload)
                     }}
                     autoComplete="false"
                     type="text"
@@ -135,7 +134,7 @@ export default function DateField({
                 <label className={styles["input-label"]}>
                     {fieldDisplayName ?? props.name?.split(" ").map(text => `${text[0].toUpperCase()}${text.slice(1)}`).join(" ")}
                 </label>
-                {!isDateInputAvailable() &&
+                {!hasShowPicker &&
                     <DatePickerWidget 
                         ref={datePickerProviderRef}
                         setIsVisible={setIsPickerVisible}
@@ -144,12 +143,12 @@ export default function DateField({
                             ${styles["date-picker-widget"]}
                         `}
                         onChange={(value) => {
-                            props.setValue(value)
+                            setValue(value)
                             setIsPickerVisible(false)
                         }}
                     />
                 }
-                {isDateInputAvailable() &&
+                {hasShowPicker &&
                     <input 
                         type="date"
                         ref={datePickerProviderRef}
@@ -176,8 +175,8 @@ export default function DateField({
                     />
                 }
                 <button 
-                    className={styles["date-picker"]} 
                     type="button"
+                    className={styles["date-picker"]} 
                     onClick={showDatePicker}
                 >
                     <svg viewBox="0 0 549 630" xmlns="http://www.w3.org/2000/svg">
