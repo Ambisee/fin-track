@@ -96,3 +96,8 @@
 
     box-sizing: border-box;
 }
+
+.showpicker-support-checker::-webkit-calendar-picker-indicator {
+    visibility: hidden;
+    display: none;
+}

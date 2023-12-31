@@ -26,7 +26,7 @@ export default function DateField({
     ...props
 }: DateFieldProps) {
     const [filled, setFilled] = useState(false)
-    const [hasShowPicker, setHasShowPicker] = useState(true)
+    const [hasShowPicker, setHasShowPicker] = useState(false)
     const [isPickerVisible, setIsPickerVisible] = useState(false)
     const {ref, onChange, ...regObjRest} = registerObject as UseFormRegisterReturn
 
@@ -36,13 +36,9 @@ export default function DateField({
     useEffect(() => {
         let input = document.createElement('input')
         input.setAttribute('type','date')
+        input.classList.add(styles["showpicker-support-checker"])
 
-        try {
-            input.showPicker()
-            setHasShowPicker(true)
-        } catch (error) {
-            setHasShowPicker(false)
-        }
+        setHasShowPicker("showPicker" in HTMLInputElement.prototype)
     }, [])
 
     const showDatePicker = () => {
@@ -62,8 +58,8 @@ export default function DateField({
 
     const isFilled = () => {
         let res = true;
-
-        res &&= (watchedValue !== undefined ? watchedValue : true)
+        
+        res &&= (watchedValue !== undefined ? !isNaN(watchedValue) : true)
         res &&= (watchedValue !== undefined ? true : filled)
 
         return res
@@ -136,6 +132,7 @@ export default function DateField({
                 </label>
                 {!hasShowPicker &&
                     <DatePickerWidget 
+                        value={watchedValue}
                         ref={datePickerProviderRef}
                         setIsVisible={setIsPickerVisible}
                         isVisible={isPickerVisible}
