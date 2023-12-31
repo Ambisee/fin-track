@@ -65,7 +65,7 @@ export default function DateField({
     }, [])
 
     const showDatePicker = () => {
-        if (!hasShowPicker) {
+        if (!hasShowPicker()) {
             setIsPickerVisible(c => !c)
             return
         }
@@ -159,7 +159,7 @@ export default function DateField({
                 <label className={styles["input-label"]}>
                     {fieldDisplayName ?? props.name?.split(" ").map(text => `${text[0].toUpperCase()}${text.slice(1)}`).join(" ")}
                 </label>
-                {!hasShowPicker &&
+                {!hasShowPicker() &&
                     <DatePickerWidget 
                         value={watchedValue}
                         ref={datePickerProviderRef}
@@ -174,7 +174,7 @@ export default function DateField({
                         }}
                     />
                 }
-                {hasShowPicker &&
+                {hasShowPicker() &&
                     <input 
                         type="date"
                         ref={datePickerProviderRef}
