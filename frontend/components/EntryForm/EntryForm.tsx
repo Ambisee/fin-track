@@ -160,7 +160,7 @@ export default function EntryForm(props: EntryFormProps) {
                             fieldDisplayName="Date"
                             registerObject={dateRegisterObject}
                             setValue={(val: string) => setValue("date", val)}
-                            watchedValue={!isNaN(watch("date"))}
+                            watchedValue={watch("date")}
                         />
                     </div>
                     <div className={styles["field-wrapper"]}>
