@@ -32,6 +32,7 @@ function handleDataChange(
         default:
     }
 
+
     return newEntries
 }
 
@@ -61,6 +62,37 @@ function handleUpdate(
         created_by: (payload.new as Entry).created_by,
         amount_is_positive: (payload.new as Entry).amount_is_positive,
     }
+
+    const newEntry = newEntries.splice(index, 1)[0]
+    const newEntryDate = new Date(newEntry.date)
+    
+    index = -1
+
+    if (
+        newEntryDate.getTime() > new Date(newEntries[0].date).getTime()
+    ) {
+        newEntries.splice(0, 0, newEntry as Entry)
+        return
+    }
+
+    for (let i = 1; i < newEntries.length; i++) {
+        const d1 = new Date(newEntries[i - 1].date)
+        const d2 = new Date(newEntries[i].date)
+
+        if (
+            (d1.getTime() > newEntryDate.getTime()) && 
+            (newEntryDate.getTime() >= d2.getTime())
+        ) {
+            index = i
+            break
+        }
+    }
+
+    if (index == -1) {
+        index = newEntries.length
+    }
+
+    newEntries.splice(index, 0, newEntry)
 }
 
 function handleDelete(
@@ -97,6 +129,13 @@ function handleInsert(
     let index = -1
     const newEntry = payload.new
     const newEntryDate = new Date((newEntry as Entry).date)
+
+    if (
+        newEntryDate.getTime() > new Date(newEntries[0].date).getTime()
+    ) {
+        newEntries.splice(0, 0, newEntry as Entry)
+        return
+    }
 
     for (let i = 1; i < newEntries.length; i++) {
         const d1 = new Date(newEntries[i-1].date)
@@ -144,8 +183,8 @@ function sortDataByGroup(
         
         const d = new Date((map.get(key) as Entry[])[0].date)
         
-        group.month = months[d.getMonth()]
-        group.year = d.getFullYear()
+        group.month = months[d.getUTCMonth()]
+        group.year = d.getUTCFullYear()
         group.data = map.get(key) as Entry[]
 
         result.push(group)

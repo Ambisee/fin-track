@@ -1,15 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 
 import { Entry } from "@/supabase"
 import { sortDataByGroup } from "@/helpers/data_helper"
 import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 import EntryList from "../EntryList/EntryList"
-import ActionButton from "../ActionButton/ActionButton"
-import CrossButton from "../CrossButton/CrossButton"
-import EntryForm from "../EntryForm/EntryForm"
 
 import styles from "./DashboardEntriesContent.module.css"
 import EntryFormPopup from "../EntryFormPopup/EntryFormPopup"
@@ -28,30 +25,35 @@ export default function DashboardEntriesContent() {
 		}
 	}, [setBackdropToggleCallbacks])
 
-    const toggleEntryEditForm = (data: Entry) => {
-        setEditValues(data)
-        setIsBackdropVisible(true)
-        setIsEditFormVisible(true)
-    }
+
+    const tables = useMemo(() => {
+        const toggleEntryEditForm = (data: Entry) => {
+            setEditValues(data)
+            setIsBackdropVisible(true)
+            setIsEditFormVisible(true)
+        }
+
+        return sortDataByGroup(data).map((value) => {
+            return (
+                <div
+                    className={styles["entry-list-wrapper"]}
+                    key={value.month + `${value.year}`}
+                >
+                    <EntryList 
+                        className={styles["entry-list"]}
+                        data={value.data}
+                        title={`${value.month} ${value.year}`}
+                        editButtonCallback={toggleEntryEditForm}
+                    />
+                </div>
+            )
+        })
+    }, [data, setIsBackdropVisible])
 
     return (
         <>
             <h1 className={styles["page-title"]}>Entries</h1>
-            {sortDataByGroup(data).map((value) => {
-                return (
-                    <div
-                        className={styles["entry-list-wrapper"]}
-                        key={value.month + `${value.year}`}
-                    >
-                        <EntryList 
-                            className={styles["entry-list"]}
-                            data={value.data}
-                            title={`${value.month} ${value.year}`}
-                            editButtonCallback={toggleEntryEditForm}
-                        />
-                    </div>
-                )
-            })}
+            {tables}
             <EntryFormPopup 
                 showPopupCallback={(arg) => {
                     setIsEditFormVisible(arg)
