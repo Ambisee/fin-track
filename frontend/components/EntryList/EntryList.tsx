@@ -17,10 +17,8 @@ interface EntryListProps {
 	data: Entry[]
 }
 
-const selectedIds = new Set<number>()
-
 export default function EntryList(props: EntryListProps) {
-	const selectedIdsRef = useRef(selectedIds)
+	const selectedIdsRef = useRef(new Set<number>())
     const allSelectedCheckboxRef = useRef<HTMLInputElement | null>(null)
 	const [isSelectedList, setIsSelectedList] = useState(
 		Array(props.data.length).fill(false)
