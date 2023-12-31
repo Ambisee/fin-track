@@ -32,10 +32,20 @@ export default function DateField({
     const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
     const textFieldRef = useRef<HTMLInputElement | null>(null)
 
-    const hasShowPicker = ("showPicker" in HTMLInputElement.prototype)
+    const hasShowPicker = () => {
+        let input = document.createElement("input")
+        input.setAttribute("type", "date")
+
+        try {
+            input.showPicker()
+            return true
+        } catch (e) {
+            return false
+        }
+    }
 
     const showDatePicker = () => {
-        if (!hasShowPicker) {
+        if (!hasShowPicker()) {
             setIsPickerVisible(c => !c)
             return
         }
@@ -123,7 +133,7 @@ export default function DateField({
                 <label className={styles["input-label"]}>
                     {fieldDisplayName ?? props.name?.split(" ").map(text => `${text[0].toUpperCase()}${text.slice(1)}`).join(" ")}
                 </label>
-                {!hasShowPicker &&
+                {!hasShowPicker() &&
                     <DatePickerWidget 
                         value={watchedValue}
                         ref={datePickerProviderRef}
@@ -138,7 +148,7 @@ export default function DateField({
                         }}
                     />
                 }
-                {hasShowPicker &&
+                {hasShowPicker() &&
                     <input 
                         type="date"
                         ref={datePickerProviderRef}
