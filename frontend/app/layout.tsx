@@ -26,7 +26,7 @@ const themeScript = `
         document.documentElement.setAttribute("data-theme", theme);
     }
     else {
-        
+        document.documentElement.setAttribute("data-theme", "dark-theme");   
     }
 `
 
