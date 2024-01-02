@@ -30,6 +30,17 @@
 # local env files
 **/.env*.local
 **/.env*.production
+**/.env*
+
+# virtual environments
+**/virtualenv
+**/venv
+
+# mock database files
+**/*.sqlite3
+
+# python caches
+**/__pycache__
 
 # vercel
 .vercel
