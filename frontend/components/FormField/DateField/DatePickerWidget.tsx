@@ -20,15 +20,36 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
 }, ref) {
     let initialValue = new Date()
 
-    const [compValue, setCompValue] = useState(initialValue.toLocaleDateString('en-ca'))
     const [date, setDate] = useState(initialValue.getDate())
     const [month, setMonth] = useState(initialValue.getMonth() + 1)
     const [year, setYear] = useState(initialValue.getUTCFullYear())
     const [internalValue, setInternalValue] = useState({year, month, date})
 
+    useEffect(() => {
+        if (value === undefined) {
+            return
+        }
+
+        const date = new Date(value)
+        if (isNaN(date.getTime())) {
+            setInternalValue(c => ({...c, date: -1}))
+            setDate(-1)
+            return
+        }
+
+        const yyyy = date.getUTCFullYear()
+        const mm = date.getUTCMonth() + 1
+        const dd = date.getUTCDate()
+
+        console.log(yyyy, mm, dd)
+        setDate(dd)
+        setMonth(mm)
+        setYear(yyyy)
+        setInternalValue({year: yyyy, month: mm, date: dd})
+    }, [value])
+
     const setDateValue = (date: number, month: number, year: number) => {
         if (date === -1 || month === -1) {
-            setCompValue("")
             setInternalValue(c => ({...c, date: -1}))
             setDate(-1)
 
@@ -38,7 +59,6 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
         
         const newValue = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`
         setInternalValue({year, month, date})
-        setCompValue(newValue)
 
         onChange(newValue)
     }
@@ -132,9 +152,10 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
     return (
         <div 
             ref={ref}
+            tabIndex={0}
             onKeyDown={(e) => {
-                e.preventDefault()
                 if (e.key === "Escape") {
+                    e.stopPropagation()
                     setIsVisible(false)
                 }
             }}
