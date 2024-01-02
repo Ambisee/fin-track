@@ -1,11 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 import { useForm } from "react-hook-form"
 
 import TextField from "../FormField/TextField/TextField"
-import PasswordField from "../FormField/PasswordField/PasswordField"
 import ActionButton from "../ActionButton/ActionButton"
 import Checkbox from "../Checkbox/Checkbox"
 import { sbClient } from "@/supabase/supabase_client"
@@ -25,10 +23,10 @@ export default function DashboardSettingsContent({
     const { register, watch, handleSubmit } = useForm({
         defaultValues: {
             'general': {
-                'username': ''
+                'username': undefined
             },
             'account-access': {
-                'new-email': ''
+                'new-email': undefined
             },
             'notifications': {
                 'allow-report': prefetchedUser.user_metadata.allow_report ?? false
@@ -82,6 +80,7 @@ export default function DashboardSettingsContent({
                         </p>
                         <div className={styles["input-element-container"]}>
                             <TextField 
+                                autoComplete="new-password"
                                 variant="outlined"
                                 showLabel={false}
                                 placeholder={user?.user_metadata.username ?? "No username"}
@@ -141,6 +140,7 @@ export default function DashboardSettingsContent({
                             )()
                         }}>
                             <TextField 
+                                autoComplete="off"
                                 variant="outlined"
                                 showLabel={false}
                                 placeholder={user?.email ?? "No email"}

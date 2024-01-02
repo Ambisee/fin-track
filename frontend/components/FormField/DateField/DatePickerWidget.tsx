@@ -32,6 +32,8 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
 
         const date = new Date(value)
         if (isNaN(date.getTime())) {
+            setInternalValue(c => ({...c, date: -1}))
+            setDate(-1)
             return
         }
 

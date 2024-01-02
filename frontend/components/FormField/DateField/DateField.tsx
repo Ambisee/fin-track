@@ -31,9 +31,6 @@ export default function DateField({
     const datePickerProviderRef = useRef<HTMLInputElement | null>(null)
     const datePickerToggleRef = useRef<HTMLButtonElement | null>(null)
 
-    const hasShowPicker = false
-    // const hasShowPicker = ("showPicker" in HTMLInputElement.prototype)
-    
     useEffect(() => {
         const handleOutsideClick = (e: Event) => {
             if (
@@ -65,18 +62,7 @@ export default function DateField({
     }, [])
 
     const showDatePicker = () => {
-        if (!hasShowPicker) {
-            setIsPickerVisible(c => !c)
-            return
-        }
-
-        if (
-            datePickerProviderRef.current !== undefined && 
-            datePickerProviderRef.current !== null
-        ) {
-            datePickerProviderRef.current.showPicker()
-            return
-        }
+        setIsPickerVisible(c => !c)
     }
 
     const isFilled = () => {
@@ -159,47 +145,19 @@ export default function DateField({
                 <label className={styles["input-label"]}>
                     {fieldDisplayName ?? props.name?.split(" ").map(text => `${text[0].toUpperCase()}${text.slice(1)}`).join(" ")}
                 </label>
-                {!hasShowPicker &&
-                    <DatePickerWidget 
-                        value={watchedValue}
-                        ref={datePickerProviderRef}
-                        setIsVisible={setIsPickerVisible}
-                        isVisible={isPickerVisible}
-                        className={`
-                            ${styles["date-picker-widget"]}
-                        `}
-                        onChange={(value) => {
-                            setValue(value)
-                            setIsPickerVisible(false)
-                        }}
-                    />
-                }
-                {hasShowPicker &&
-                    <input 
-                        type="date"
-                        ref={datePickerProviderRef}
-                        className={styles["date-picker-provider"]}
-                        onChange={(e) => {
-                            if (textFieldRef.current === null || textFieldRef.current === undefined) {
-                                return
-                            }
-                            textFieldRef.current.value = e.target.value
-                            
-                            if (
-                                e.target.value === undefined || 
-                                e.target.value === null ||
-                                e.target.value === ""
-                            ) {
-                                setFilled(false)
-                            } else {
-                                setFilled(true)
-                            }
-
-                            onChange(e)
-                        }}
-                        {...regObjRest}
-                    />
-                }
+                <DatePickerWidget 
+                    value={watchedValue}
+                    ref={datePickerProviderRef}
+                    setIsVisible={setIsPickerVisible}
+                    isVisible={isPickerVisible}
+                    className={`
+                        ${styles["date-picker-widget"]}
+                    `}
+                    onChange={(value) => {
+                        setValue(value)
+                        setIsPickerVisible(false)
+                    }}
+                />
                 <button 
                     type="button"
                     ref={datePickerToggleRef}
