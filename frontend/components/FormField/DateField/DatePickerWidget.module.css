@@ -55,11 +55,11 @@
     transition: 0.25s ease;
 }
 .calendar td button.current-date {
-    color: white;
-    background-color: rgb(var(--primary-color) / 0.2);
+    color: rgb(var(--secondary-color));
+    background-color: rgb(var(--primary-color));
 }
 .calendar td button:not(.current-date):hover {
-    background-color: rgb(var(--primary-color) / 0.1);
+    background-color: rgb(var(--primary-color) / 0.2);
 }
 
 .footer-buttons {
