@@ -70,7 +70,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 					</svg>
 				</button>
 				<Checkbox
-					checked={props.isSelected}
+					checked={props.isSelected ?? false}
 					onChange={() => {
 						if (props.isSelected) {
 							props.deselectCallback()
