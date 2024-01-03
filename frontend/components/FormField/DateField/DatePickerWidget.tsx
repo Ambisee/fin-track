@@ -41,7 +41,6 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
         const mm = date.getUTCMonth() + 1
         const dd = date.getUTCDate()
 
-        console.log(yyyy, mm, dd)
         setDate(dd)
         setMonth(mm)
         setYear(yyyy)
