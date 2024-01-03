@@ -37,7 +37,7 @@ export default function DashboardDataProvider(props: DashboardDataProviderProps)
     const [data, setData] = useState<Entry[]>(props.value.data.data as Entry[])
 
     useEffect(() => {
-        const channel = sbClient
+        const dataChannel = sbClient
             .channel("data-channel")
             .on(
                 "postgres_changes",
@@ -53,8 +53,24 @@ export default function DashboardDataProvider(props: DashboardDataProviderProps)
             )
             .subscribe()
 
+        const userInfoChannel = sbClient.auth.onAuthStateChange((e) => {
+            if (e === "USER_UPDATED") {
+                console.log("D")
+                sbClient.auth.getUser()
+                    .then((value) => {
+                        if (value.error) {
+                            alert(value.error.message)
+                            return
+                        }
+        
+                        setUser(value.data.user)
+                    })
+            }
+        })
+
         return () => {
-            channel.unsubscribe()
+            dataChannel.unsubscribe()
+            userInfoChannel.data.subscription.unsubscribe()
         }
     }, [user.id])
 
