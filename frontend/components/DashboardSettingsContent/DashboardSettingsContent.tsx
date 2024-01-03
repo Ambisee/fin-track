@@ -29,7 +29,7 @@ export default function DashboardSettingsContent({
                 'new-email': undefined
             },
             'notifications': {
-                'allow-report': prefetchedUser.user_metadata.allow_report ?? false
+                'allow-report': user.user_metadata.allow_report ?? prefetchedUser.user_metadata.allow_report 
             }
         }
     })
@@ -58,8 +58,9 @@ export default function DashboardSettingsContent({
                                     alert(`An error occured: ${error.message}.`)
                                     return
                                 }
-
+                                
                                 alert("Successfully updated the user's settings.")
+                                return
                             },
                             async (errors) => {
                                 if (errors["general"] === undefined) {
@@ -67,6 +68,7 @@ export default function DashboardSettingsContent({
                                 }
 
                                 alert(`An error occured: ${errors["general"]["username"]?.message}`)
+                                return
                             }
                         )()
                     }}
@@ -106,7 +108,7 @@ export default function DashboardSettingsContent({
                     <h3 className={styles["field-title"]}>Email</h3>
                     <p className={styles["field-desc"]}>
                         The email address that is linked to this account.
-                        Changing email address requires the user to 
+                        Changing email address may require the user to 
                         reauthenticate.
                     </p>
                     <div className={styles["input-element-container"]}>

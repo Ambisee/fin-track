@@ -1,0 +1,11 @@
+### Tasks:
+- Frontend:
+  - [ ] Improve the user interface and experience of the date inputs
+    - [ ] Replace the dropdowns for selecting months and years with overlays
+    - [ ] Add arrow buttons to decrement and increment the month values
+  - [ ] Add a net total and net debit/credit indicator in the bottom of the entry list component
+  - [ ] Create the filter bar in the entries page
+    - [ ] Filter queries based on the following criteria
+      - [ ] Date range
+      - [ ] Amount range and +/-
+      - [ ] Text in Description

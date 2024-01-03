@@ -130,8 +130,13 @@ function handleInsert(
     const newEntry = payload.new
     const newEntryDate = new Date((newEntry as Entry).date)
 
+    if (newEntries.length == 0) {
+        newEntries.push(newEntry as Entry)
+        return
+    }
+
     if (
-        newEntryDate.getTime() > new Date(newEntries[0].date).getTime()
+        newEntryDate.getTime() >= new Date(newEntries[0].date).getTime()
     ) {
         newEntries.splice(0, 0, newEntry as Entry)
         return
@@ -141,6 +146,7 @@ function handleInsert(
         const d1 = new Date(newEntries[i-1].date)
         const d2 = new Date(newEntries[i].date)
 
+        
         if (
             (d1.getTime() > newEntryDate.getTime()) && 
             (newEntryDate.getTime() >= d2.getTime())
