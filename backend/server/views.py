@@ -1,15 +1,14 @@
-import os
-
-from dotenv import load_dotenv
+from .data_retrieval import DataRetriever
 from django.http import \
     HttpRequest, \
-    HttpResponse
-
-load_dotenv(".env")
-
-secret_key: str | None = os.getenv("SUPABASE_SECRET_KEY")
-supabase_url: str | None = os.getenv("SUPABASE_URL")
+    HttpResponse, JsonResponse
 
 
 def foo(req: HttpRequest) -> HttpResponse:
-    return HttpResponse("No credentials")
+    retriever = DataRetriever.initialize()
+    res = retriever.get_allow_report_users()
+
+    print(len(res))
+    data = retriever.get_period_data(res[0], 12, 2023)
+
+    return JsonResponse({'data': data})
