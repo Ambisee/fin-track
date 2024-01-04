@@ -9,3 +9,15 @@
       - [ ] Date range
       - [ ] Amount range and +/-
       - [ ] Text in Description
+
+- Backend:
+  - [ ] Implement the server side code that handles document generation and deliveries
+    - [ ] Data retrieval functions
+      - Retrieve the list of users that allows the application to send reports
+      - Retrieve the users' entries data that corresponds to the current mont
+    - [ ] Document generation engine
+      - Determines which document type the user requests
+      - Prepares the document template and populate them with data from the user
+      - Save the document to a remote storage system for backup
+    - [ ] Document delivery system
+      - Schedule the deliveries of document into the user's email address
