@@ -11,10 +11,6 @@ const dashboard_urls = ['/dashboard']
 
 export async function middleware(req: NextRequest) {
     const res = NextResponse.next()
-    
-    if (process.env.DISABLE_MIDDLEWARE === "true") {
-        return res
-    }
 
     const sbMiddleware = createMiddlewareClient<Database>({ req, res }, {
         supabaseKey: sbKey,
