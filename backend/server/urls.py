@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import foo
+from .views import retrieve_all_data 
 
 urlpatterns = [
-    path("", view=foo)
+    path("", view=retrieve_all_data)
 ]
