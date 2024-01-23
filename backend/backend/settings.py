@@ -10,11 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+import sys
+import pdfkit
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+PDFKIT_CONFIG = None
+if sys.platform == "win32":
+    PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=os.path.join(BASE_DIR, "wkhtmltox\\wkhtmltox\\bin\\wkhtmltopdf.exe"))
+else:
+    PDFKIT_CONFIG = None
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
