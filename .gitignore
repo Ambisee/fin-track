@@ -53,7 +53,6 @@
 **/*fin-track*.json
 **/wkhtmltox
 *.pdf
-*.txt
 
 ## Root Folder
 change_ext.py
