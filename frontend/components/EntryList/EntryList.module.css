@@ -1,5 +1,7 @@
 .list-header {
     padding: 0 1rem;
+
+    padding-right: 1.75rem;
     
     display: flex;
     justify-content: space-between;   

@@ -1,6 +1,8 @@
 .select-checkbox {
-    min-width: 1rem;
-    min-height: 1rem;
+    --width: 1.25rem;
+
+    min-width: var(--width);
+    min-height: var(--width);
     aspect-ratio: 1;
     margin: 0;
 
@@ -16,7 +18,7 @@
 .select-checkbox::before {
     content: "";
     
-    width: 0.5rem;
+    width: calc(var(--width) - 0.575rem);
     aspect-ratio: 1;
 
     position: absolute;
@@ -28,7 +30,7 @@
 
     transition: 0.25s ease;
 
-    box-shadow: inset 0.5rem 0.5rem rgb(var(--secondary-color));
+    box-shadow: inset var(--width) var(--width) rgb(var(--secondary-color));
 }
 .select-checkbox:checked::before {
     scale: 1;

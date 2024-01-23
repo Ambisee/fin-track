@@ -31,6 +31,7 @@
 **/.env*.local
 **/.env*.production
 **/.env*
+**/.vscode
 
 # virtual environments
 **/virtualenv
@@ -48,7 +49,10 @@
 # other files
 **/.prettierrc
 .gitignore
-*.txt
+**/*google*.json
+**/*fin-track*.json
+**/wkhtmltox
+*.pdf
 
 ## Root Folder
 change_ext.py
