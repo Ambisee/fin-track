@@ -49,6 +49,10 @@
 # other files
 **/.prettierrc
 .gitignore
+**/*google*.json
+**/*fin-track*.json
+**/wkhtmltox
+*.pdf
 *.txt
 
 ## Root Folder
