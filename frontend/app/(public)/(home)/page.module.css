@@ -1,5 +1,5 @@
 #main {
-    min-height: calc(100vh - 4rem); /* 4rem = 3rem (min-height of header) + 0.5rem * 2 (vertical padding of header) */
+    min-height: calc(100svh - 4rem); /* 4rem = 3rem (min-height of header) + 0.5rem * 2 (vertical padding of header) */
     padding: 0 clamp(2rem, 5vw, 5rem);
 
     display: grid;
