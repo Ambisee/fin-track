@@ -1,7 +1,7 @@
 .list-header {
     padding: 0 1rem;
 
-    padding-right: 1.75rem;
+    padding-right: 1rem;
     
     display: flex;
     justify-content: space-between;   
@@ -13,7 +13,7 @@
 }
 
 .delete-selected-button {
-    min-height: 1rem;
+    min-height: 1.25rem;
     aspect-ratio: 1;
 
     visibility: hidden;
@@ -34,7 +34,8 @@
 
 .header-left {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 1.25rem;
 }
 
 .empty-list-message-container {
