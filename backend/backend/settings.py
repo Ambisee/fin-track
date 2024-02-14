@@ -21,8 +21,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PDFKIT_CONFIG = None
 if sys.platform == "win32":
     PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=os.path.join(BASE_DIR, "wkhtmltox\\wkhtmltox\\bin\\wkhtmltopdf.exe"))
-else:
-    PDFKIT_CONFIG = None
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -46,7 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'server.apps.ServerConfig'
+    'rest_framework',
+    'rest_framework_api_key',
+
+    'generation.apps.GenerationConfig'
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework_api_key.permissions.HasAPIKey",
+    ]
+}
 
 TEMPLATES = [
     {
