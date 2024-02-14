@@ -15,7 +15,7 @@
     top: 50%;
     left: var(--input-padding);
 
-    font-size: clamp(0.65rem, 3vw, 0.9rem);
+    font-size: clamp(0.65rem, 3svw, 0.9rem);
 
     color: rgb(var(--secondary-color));
 

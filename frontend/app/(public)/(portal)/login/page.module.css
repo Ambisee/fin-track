@@ -1,5 +1,5 @@
 #main {
-    min-height: calc(100vh - var(--header-min-height) - 1rem);
+    min-height: calc(100svh - var(--header-min-height) - 1rem);
 
     display: flex;
     justify-content: center;
@@ -27,7 +27,7 @@
 
 .divider {
     width: 100%;
-    margin: clamp(1rem, 2.5vh, 2.5rem) 0;
+    margin: clamp(1rem, 2.5svh, 2.5rem) 0;
 
     position: relative;
 
