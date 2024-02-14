@@ -3,7 +3,7 @@
 
     min-height: var(--header-min-height);
     max-height: 7.5rem;
-    height: 10vh;
+    height: 10svh;
     padding: 0.5rem 1.25rem;
 
     display: flex;
@@ -22,7 +22,7 @@
 .profile-container {
     display: flex;
     align-items: center;
-    gap: clamp(0.75rem, 3vw, 1.5rem);
+    gap: clamp(0.75rem, 3svw, 1.5rem);
 
     font-size: 0.85rem;
 
@@ -36,7 +36,7 @@
     aspect-ratio: 1;
     min-width: 2rem;
     max-width: 3rem;
-    width: 5vw;
+    width: 5svw;
 
     border-radius: 50%;
 

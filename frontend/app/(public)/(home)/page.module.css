@@ -1,6 +1,6 @@
 #main {
     min-height: calc(100svh - 4rem); /* 4rem = 3rem (min-height of header) + 0.5rem * 2 (vertical padding of header) */
-    padding: 0 clamp(2rem, 5vw, 5rem);
+    padding: 0 clamp(2rem, 5svw, 5rem);
 
     display: grid;
     align-items: center;
@@ -16,7 +16,7 @@
 .title-container {
     position: relative;
 
-    font-size: clamp(2rem, 3vw, 3.5rem);
+    font-size: clamp(2rem, 3svw, 3.5rem);
 
 }
 .title-container span {
@@ -27,7 +27,7 @@
     min-width: 12.5rem;
     max-width: 20rem;
 
-    font-size: clamp(0.75rem, 1.1vw, 3rem);
+    font-size: clamp(0.75rem, 1.1svw, 3rem);
     font-weight: 400;
 }
 .hero-title-colored-text {

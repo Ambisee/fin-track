@@ -24,7 +24,7 @@
 }
 
 .main-element {
-    max-height: 100vh;
+    max-height: 100svh;
 
     display: grid;
     grid-template-rows: auto 1fr;
@@ -149,8 +149,8 @@ button.bottom-close-button:focus {
 }
 
 .backdrop {
-    width: 100vw;
-    height: 100vh;
+    width: 100svw;
+    height: 100svh;
 
     position: absolute;
 
@@ -209,8 +209,8 @@ button.bottom-close-button:focus {
     }
 
     .backdrop {
-        width: 100vw;
-        height: 100vh;
+        width: 100svw;
+        height: 100svh;
     
         position: absolute;
     

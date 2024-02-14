@@ -27,7 +27,7 @@
     overflow: hidden;
     word-break: break-word;
 
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-size: clamp(1.1rem, 3svw, 1.5rem);
 }
 .description-date {
     font-size: 0.75rem;

@@ -1,7 +1,7 @@
 .nav-container {
     max-width: 25rem;
     min-width: 12.5rem;
-    height: 100vh;
+    height: 100svh;
 
     background: rgb(var(--secondary-color) / 0.1);
     
@@ -54,8 +54,8 @@
 }
 
 .backdrop {
-    width: 100vw;
-    height: 100vh;
+    width: 100svw;
+    height: 100svh;
 
     top: 0;
     left: 0;

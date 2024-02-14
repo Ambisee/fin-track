@@ -15,7 +15,7 @@
 
 /* Forgot Password Link */
 .forgot-password-link-container {
-    font-size: clamp(0.5rem, 2.5vw, 0.65rem);
+    font-size: clamp(0.5rem, 2.5svw, 0.65rem);
     font-weight: 700;
 
     position: relative;
@@ -41,7 +41,7 @@
     text-align: center;
     text-wrap: nowrap;
     
-    font-size: clamp(0.4rem, 2.75vw, 0.7rem);
+    font-size: clamp(0.4rem, 2.75svw, 0.7rem);
     font-weight: 600;
 
     justify-self: center;
