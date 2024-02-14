@@ -9,7 +9,6 @@
     width: 85%;
     min-width: 7.5rem;
     max-width: 30rem;
-    margin-bottom: 2rem;
 
     display: grid;
     grid-auto-flow: row;

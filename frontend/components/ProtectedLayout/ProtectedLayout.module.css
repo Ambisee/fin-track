@@ -32,8 +32,6 @@
 
 .content-container {
     overflow: auto;
-    scrollbar-width: thin;
-    scrollbar-gutter: stable both-edges;
 }
 .content-container::-webkit-scrollbar {
     width: 10px;
