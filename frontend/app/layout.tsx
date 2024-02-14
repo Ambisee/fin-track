@@ -12,7 +12,8 @@ interface GlobalLayoutProps {
 }
 
 export const raleway = Raleway({
-    subsets: ["latin-ext"]
+    subsets: ["latin-ext"],
+    weight: ["300", "400", "500", "700"]
 })
 
 // Script to retrieve the theme from the localStorage first
@@ -37,7 +38,7 @@ export default function GlobaLayout({
         <html lang="en" suppressHydrationWarning>
             <body   
                 className={`
-                ${raleway.className}
+                    ${raleway.className}
                 `}
             >
                 <script id="get-theme" dangerouslySetInnerHTML={{__html: themeScript}} /> {/* WARNING - dangerouslySetInnerHTML on a <script> tag */}
