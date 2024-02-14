@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 
 import TextField from "../FormField/TextField/TextField"
 import PasswordField from "../FormField/PasswordField/PasswordField"
@@ -14,6 +15,7 @@ import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_r
 import styles from "./EmailSignInForm.module.css"
 
 export default function EmailSignInForm() {
+    const router = useRouter()
     const { setIsLoading } = usePortalLoader()
     const { register, watch, handleSubmit, formState: { errors } } = useForm()
 
@@ -45,7 +47,10 @@ export default function EmailSignInForm() {
                                      * since we need to refresh the
                                      * dashboard states
                                      */
-                                    return window.location.assign("/dashboard")
+                                    
+
+                                    router.refresh()
+                                    router.push('/dashboard')
                                 }
 
                                 if (value?.error) {

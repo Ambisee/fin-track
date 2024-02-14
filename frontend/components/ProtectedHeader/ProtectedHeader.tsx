@@ -67,7 +67,8 @@ export default function ProtectedHeader(props: ProtectedHeaderProps) {
                                 className={styles["profile-dropdown-link"]}
                                 onClick={() => {
                                     sbClient.auth.signOut().then(() => {
-                                        router.push("/");
+                                        router.refresh()
+                                        router.push("/")
                                     })
                                 }}
                             >
