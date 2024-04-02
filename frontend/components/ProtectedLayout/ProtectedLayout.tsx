@@ -18,10 +18,6 @@ interface ProtectedLayoutProps {
     contextValue: DashboardDataProviderProps["value"]
 }
 
-const raleway = Raleway({
-    subsets: ["latin-ext"]
-})
-
 export default function ProtectedLayout(props: ProtectedLayoutProps) {
     const dropdownTogglerRef = useRef<HTMLDivElement>(null)
     const { 
@@ -94,7 +90,6 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                     <button 
                         className={`
                             ${styles["entry-form-toggler"]}
-                            ${raleway.className}
                         `}
                         onClick={() => {
                             setIsEntryFormToggled(true)
