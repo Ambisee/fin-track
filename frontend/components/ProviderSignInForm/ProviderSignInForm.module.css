@@ -10,14 +10,17 @@
 
 /* Google Sign In Button */
 .google-button {
+    width: 12.5rem;
+    height: 2.5rem;
+
     background-color: rgb(255, 255, 255);
-
     color: rgb(var(--dark-primary));
-
     border-color: rgb(var(--dark-primary));
 }
 .google-icon {
     padding: 0.5rem;
+    
+    box-sizing: content-box;
 
     display: grid;
 }
