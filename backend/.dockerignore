@@ -1,1 +1,8 @@
+# system packages
 **/wkhtmltox
+
+# folders
+**/virtualenv
+**/db*
+**/__pycache__
+**/.vscode
