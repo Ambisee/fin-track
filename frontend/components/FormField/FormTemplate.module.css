@@ -8,6 +8,10 @@
     margin-top: 0.5rem;
 }
 
+.template-input-container input {
+    font-size: 1rem;
+}
+
 .bottom-lined {
     --input-padding: 0.5rem;
     --label-filled-state-padding: 0;
