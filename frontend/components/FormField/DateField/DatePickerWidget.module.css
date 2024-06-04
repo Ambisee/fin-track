@@ -1,5 +1,5 @@
 .container {
-    width: 75%;
+    width: 80%;
     min-width: 27.5rem;
     max-width: 50rem;
 
@@ -27,6 +27,8 @@
     width: 100%;
 
     background-color: rgb(var(--secondary-color));
+
+    table-layout: fixed;
 }
 
 .calendar td {
@@ -35,6 +37,13 @@
 
     text-align: center;
 }
+
+.calendar th {
+    font-size: small;
+
+    color: rgb(var(--primary-color));
+}
+
 .calendar td button {
     width: 100%;
     aspect-ratio: 1;
