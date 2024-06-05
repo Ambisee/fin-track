@@ -52,7 +52,7 @@ export default function DashboardEntriesContent() {
 
     return (
         <>
-            <h1 className={styles["page-title"]}>Entries</h1>
+            <h2 className={styles["page-title"]}>Entries</h2>
             {tables}
             <EntryFormPopup 
                 showPopupCallback={(arg) => {

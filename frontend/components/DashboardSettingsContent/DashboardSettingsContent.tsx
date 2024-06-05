@@ -36,7 +36,7 @@ export default function DashboardSettingsContent({
     
     return (
         <>
-            <h1 className={styles["page-title"]}>Settings</h1>
+            <h2 className={styles["page-title"]}>Settings</h2>
             <section className={styles["settings-group"]}>
                 <form
                     onSubmit={(e) => {
@@ -75,7 +75,7 @@ export default function DashboardSettingsContent({
                 >
                     <h2 className={styles["settings-group-title"]}>General</h2>
                     <section className={styles["settings-field-section"]}>
-                        <h3 className={styles["field-title"]}>Username</h3>
+                        <h4 className={styles["field-title"]}>Username</h4>
                         <p className={styles["field-desc"]}>
                             The identifier of the user. This value will be displayed
                             on the monthly report sent at the end of every month.
@@ -105,7 +105,7 @@ export default function DashboardSettingsContent({
             <section className={styles["settings-group"]}>
                 <h2 className={styles["settings-group-title"]}>Account Access</h2>
                 <section className={styles["settings-field-section"]}>
-                    <h3 className={styles["field-title"]}>Email</h3>
+                    <h4 className={styles["field-title"]}>Email</h4>
                     <p className={styles["field-desc"]}>
                         The email address that is linked to this account.
                         Changing email address may require the user to 
@@ -158,7 +158,7 @@ export default function DashboardSettingsContent({
                     </div>
                 </section>
                 <section className={styles["settings-field-section"]}>
-                    <h3 className={styles["field-title"]}>Password</h3>
+                    <h4 className={styles["field-title"]}>Password</h4>
                     <p className={styles["field-desc"]}>
                         Send an email to the account&apos;s email address which contains steps to reset their password. 
                         If the account is created through an email provider,
@@ -195,7 +195,7 @@ export default function DashboardSettingsContent({
             <section className={styles["section-group"]}>
                 <h2 className={styles["settings-group-title"]}>Notifications</h2>
                 <section className={styles["settings-field-section"]}>
-                    <h3 className={styles["field-title"]}>Monthly report</h3>
+                    <h4 className={styles["field-title"]}>Monthly report</h4>
                     <p className={styles["field-desc"]}>
                         Authorize the application to send a monthly transaction report to
                         be sent to their email. Reports will be sent to the email specified on the

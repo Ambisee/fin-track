@@ -1,5 +1,5 @@
 .page-title {
-    padding-bottom: 0.75rem;
+    padding: 0.75rem 0;
 
     border-bottom: 1px solid rgb(var(--secondary-color));
 }
@@ -14,22 +14,18 @@
     font-size: 1.5rem;
     
     display: inline-block;
-
-    border-bottom: 1px solid rgb(var(--secondary-color));
 }
 
 .settings-field-section {
     padding: 1rem 0;
 }
 .field-title {
-    padding-bottom: 0.25rem;
-
-    font-size: 1.15rem;
+    padding-bottom: 0.5rem;
 }
 .field-desc {
     max-width: 50rem;
 
-    font-size: 0.75rem;
+    font-size: 0.85rem;
 
     color: rgb(var(--secondary-color) / 0.8);
 }
