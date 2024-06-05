@@ -31,9 +31,7 @@ export default function EntryListItem(props: EntryListItemProps) {
             `}
 		>
 			<div className={styles["description-container"]}>
-                <div>
-				    <h4 className={styles["description-text"]}>{props.data.description}</h4>
-                </div>
+                <h4 className={styles["description-text"]}>{props.data.description}</h4>
 				<span className={styles["description-date"]}>{props.data.date}</span>
 			</div>
 			<div className={styles["right-container"]}>
@@ -41,10 +39,10 @@ export default function EntryListItem(props: EntryListItemProps) {
 					className={`
                         ${styles["description-amount"]}
                         ${
-													styles[
-														props.data.amount_is_positive ? "plus" : "minus"
-													]
-												}
+                            styles[
+                                props.data.amount_is_positive ? "plus" : "minus"
+                            ]
+                        }
                     `}
 				>
 					{props.data.amount_is_positive ? "+" : "-"}{" "}
