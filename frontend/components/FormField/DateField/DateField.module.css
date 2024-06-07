@@ -2,7 +2,7 @@
     position: relative;
 
     display: grid;
-    grid-template-columns: 1fr minmax(2.75rem, 0.1fr);
+    grid-template-columns: 1fr 2.75rem;
 }
 
 .input-field-container > * {
