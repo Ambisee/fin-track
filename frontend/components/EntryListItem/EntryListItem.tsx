@@ -40,7 +40,7 @@ export default function EntryListItem(props: EntryListItemProps) {
             <div className={styles["content-view"]}>
                 <div className={styles["item-view"]}>
                     <div className={styles["description-container"]}>
-                        <h4 className={styles["description-text"]}>{props.data.title}</h4>
+                        <h4 className={styles["description-title"]}>{props.data.title}</h4>
                         <span className={styles["description-date"]}>{props.data.date}</span>
                     </div>
                     <div className={styles["right-container"]}>
