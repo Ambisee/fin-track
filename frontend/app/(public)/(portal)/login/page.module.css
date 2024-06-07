@@ -45,7 +45,7 @@
     flex-grow: 2;
 }
 
-@media screen and (min-height: 650px) {
+@media screen and (min-height: 640px) {
     .inner-form-container {
         transform: translateY(calc(-1 * var(--header-min-height)));
     }
