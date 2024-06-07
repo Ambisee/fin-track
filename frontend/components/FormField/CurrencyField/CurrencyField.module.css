@@ -72,7 +72,7 @@
 
 .input-element.filled ~ .input-label,
 .input-element:focus ~ .input-label {
-    font-size: 0.45rem;
+    font-size: 0.6rem;
 
     padding: 0 var(--label-filled-state-padding);
 

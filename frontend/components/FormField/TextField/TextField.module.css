@@ -31,7 +31,7 @@
 .input-element:focus ~ .input-label {
     padding: 0 var(--label-filled-state-padding);
     
-    font-size: 0.45rem;
+    font-size: 0.6rem;
 
     background-color: rgb(var(--primary-color));
 
