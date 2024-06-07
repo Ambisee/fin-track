@@ -42,7 +42,7 @@ export default function DashboardHomeContent() {
 			<h2 className={styles["welcome-text"]}>
 				Welcome back, {user?.user_metadata.username}.
 			</h2>
-			<div className={styles["action-button-container"]}>
+			{/* <div className={styles["action-button-container"]}>
 				<ActionButton
 					className={styles["action-button"]}
 					onClick={() => {
@@ -52,7 +52,7 @@ export default function DashboardHomeContent() {
 				>
 					Add a new entry
 				</ActionButton>
-			</div>
+			</div> */}
 			<div className={styles["recent-entry-container"]}>
 				<EntryList
 					title="Recent entries"
