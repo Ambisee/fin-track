@@ -17,7 +17,7 @@ export default function ActionLink({
     ...props
 }: ActionLinkProps) {
     return (
-        <Link href={href} id={id} className={`${className} ${styles["action-link"]}`}>
+        <Link href={href} id={id} className={`${styles["action-link"]} ${className}`}>
             {children}
         </Link>
     );
