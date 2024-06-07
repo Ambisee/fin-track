@@ -1,7 +1,6 @@
 "use client"
 
 import { ReactNode, useState, useRef, useEffect, useMemo, Children } from "react"
-import { Raleway } from "next/font/google"
 
 import ProtectedNavbar from "../ProtectedNavbar/ProtectedNavbar"
 import ProtectedHeader from "../ProtectedHeader/ProtectedHeader"
