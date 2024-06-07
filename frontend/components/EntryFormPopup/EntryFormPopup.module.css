@@ -60,3 +60,16 @@ button.bottom-close-button:hover {
     background-color: rgb(var(--secondary-color));
     color: rgb(var(--primary-color));
 }
+
+@media screen and (min-width: 640px) {
+    .entry-form-container {
+        z-index: 125;
+    }
+}
+
+@media screen and (min-width: 1536px) {
+    .entry-form-container {
+        max-width: 35rem;
+        aspect-ratio: 11 / 16;
+    }
+}

@@ -1,6 +1,8 @@
 .outer-container {
     height: 100svh;
 
+    overflow: hidden;
+
     position: relative;
 }
 
@@ -89,7 +91,7 @@
     min-width: 17.5rem;
     max-width: 25rem;
     width: 85%;
-    min-height: 30rem;
+    min-height: 35rem;
     padding: 1rem;
 
     background-color: rgb(var(--primary-color));
@@ -177,7 +179,7 @@ button.bottom-close-button:focus {
     transition: opacity 0.35s ease;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 640px) {
     .outer-container {
         display: grid;
         grid-template-columns: auto 1fr;
@@ -235,5 +237,12 @@ button.bottom-close-button:focus {
         opacity: 1;
         
         transition: opacity 0.35s ease;
+    }
+}
+
+@media screen and (min-width: 1536px) {
+    .entry-form-container {
+        max-width: 35rem;
+        aspect-ratio: 11 / 16;
     }
 }
