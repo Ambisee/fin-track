@@ -3,7 +3,7 @@
 
     min-height: var(--header-min-height);
     max-height: 7.5rem;
-    height: 10svh;
+    height: 12.5svh;
     padding: 0.5rem 1.25rem;
 
     display: flex;
@@ -35,7 +35,7 @@
 .profile-icon {
     aspect-ratio: 1;
     min-width: 2rem;
-    max-width: 3rem;
+    max-width: 2.5rem;
     width: 5svw;
 
     border-radius: 50%;
