@@ -207,6 +207,7 @@ button.bottom-close-button:focus {
     }
     
     .entry-form-container {
+        min-height: 32.5rem;
         z-index: 125;
     }
 
