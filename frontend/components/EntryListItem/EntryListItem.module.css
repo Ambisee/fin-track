@@ -101,6 +101,8 @@
     align-self: center;
     transition: rotate 0.25s ease;
 
+    fill: rgb(var(--secondary-color));
+
     cursor: pointer;
 }
 .item-element.select-mode .arrow-head-icon {
@@ -132,7 +134,7 @@
 }
 .control-button.edit:hover,
 .control-button.edit:focus {
-    color: rgb(var(--secondary-color));
+    color: rgb(var(--light-primary));
     background-color: rgb(var(--tertiary-color-purple));
 }
 .control-button.delete {
@@ -141,7 +143,7 @@
 }
 .control-button.delete:hover,
 .control-button.delete:focus {
-    color: rgb(var(--secondary-color));
+    color: rgb(var(--light-primary));
     background-color: rgb(var(--warning-color));
 }
 
