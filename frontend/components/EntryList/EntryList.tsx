@@ -8,6 +8,7 @@ import { Entry } from "@/supabase"
 import { sbClient } from "@/supabase/supabase_client"
 
 import styles from "./EntryList.module.css"
+import ActionButton from "../ActionButton/ActionButton"
 
 interface EntryListProps {
 	title?: string,
@@ -20,6 +21,7 @@ interface EntryListProps {
 export default function EntryList(props: EntryListProps) {
 	const selectedIdsRef = useRef(new Set<number>())
     const allSelectedCheckboxRef = useRef<HTMLInputElement | null>(null)
+    const [isSelectMode, setIsSelectMode] = useState(false)
 	const [isSelectedList, setIsSelectedList] = useState(
 		Array(props.data.length).fill(false)
 	)
@@ -51,10 +53,25 @@ export default function EntryList(props: EntryListProps) {
 
 	const createAddToSelectedCallback = (id: number, compIndex: number) => {
 		return () => {
-			if (isSelectedList[compIndex] === true) {
+            // View mode behaviour
+            if (!isSelectMode) {
+                if (isSelectedList[compIndex]) {
+                    isSelectedList[compIndex] = false;
+                    return
+                }
+
+                setIsSelectedList((c) => {
+                    const newArr = Array(c.length).fill(false)
+                    newArr[compIndex] = true
+                    return newArr
+                })
+            }
+
+            // Select mode behaviour
+            if (isSelectedList[compIndex]) {
 				return
 			}
-
+            
 			setIsSelectedList((c) => {
 				const newArr = [...c]
 				newArr[compIndex] = true
@@ -94,9 +111,55 @@ export default function EntryList(props: EntryListProps) {
 
 	return (
 		<>
-			<div className={styles["list-header"]}>
-				<h3 className={styles["list-title"]}>{props.title}</h3>
-				<div className={styles["header-left"]}>
+            <h3 className={styles["list-title"]}>{props.title}</h3>
+			<div className={styles["list-controls"]}>
+                <div 
+                    className={styles["mobile-list-head"]}
+                >
+                    <div 
+                        className={styles["left"]}
+                        onClick={(e) => {
+                            setIsSelectedList(Array(props.data.length).fill(false))
+                            if (isSelectMode) {
+                                selectedIdsRef.current.clear()
+                            }
+
+                            setIsSelectMode(c => !c)
+                        }}
+                    >
+                        <Checkbox checked={isSelectMode} readOnly></Checkbox>
+                        <p>Select Mode</p>
+                    </div>
+                    {isSelectMode && 
+                        <div className={styles["right"]}>
+                            <ActionButton className={styles["select-all"]}
+                                onClick={(e) => {
+                                    if (e.currentTarget.innerText === "Deselect All") {
+                                        setIsSelectedList(Array(props.data.length).fill(false))
+                                        selectedIdsRef.current.clear()
+                                        e.currentTarget.innerText = "Select All"
+                                    } else {
+                                        setIsSelectedList(Array(props.data.length).fill(true))
+                                        props.data.forEach((val) => selectedIdsRef.current.add(val.id))
+                                        e.currentTarget.innerText = "Deselect All"
+                                    }
+                                }}
+                            >
+                                Select All
+                            </ActionButton>
+                            <ActionButton className={styles["delete"]}
+                                onClick={(e) => {
+                                    if (confirm("Would you like to delete the selected entries ?")) {
+                                        deleteEntries()
+                                    }
+                                }}
+                            >
+                                Delete
+                            </ActionButton>
+                        </div>
+                    }
+                </div>
+                {/* <div className={styles["header-left"]}>
 					<button
 						className={`
                             ${styles["delete-selected-button"]}
@@ -143,7 +206,7 @@ export default function EntryList(props: EntryListProps) {
                             }}
                         />
                     }
-				</div>
+				</div> */}
 			</div>
 			<ul
 				className={`
@@ -155,9 +218,27 @@ export default function EntryList(props: EntryListProps) {
 					<EntryListItem
 						key={value.id}
 						data={value}
+                        isSelectMode={isSelectMode}
 						isSelected={isSelectedList[index]}
 						selectCallback={createAddToSelectedCallback(value.id, index)}
 						deselectCallback={createRemoveFromSelectedCallback(value.id, index)}
+                        deleteButtonCallback={() => {
+                            sbClient
+                                .from("entry")
+                                .delete()
+                                .eq("id", value.id)
+                                .then((data) => {
+                                    if (data.error) {
+                                        alert(data.error)
+                                        return
+                                    }
+
+                                    setIsSelectedList(Array(props.data.length).fill(false))
+                                    selectedIdsRef.current.clear()
+                                    
+                                    alert("Successfully deleted the entries.")
+                                })
+                        }}
 						editButtonCallback={() => {
 							if (props.editButtonCallback !== undefined) {
 								props.editButtonCallback(value)

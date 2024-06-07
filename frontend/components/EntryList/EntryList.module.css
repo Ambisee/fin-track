@@ -1,19 +1,90 @@
-.list-header {
-    padding: 0 1rem;
-
-    padding-right: 1rem;
+.list-controls {
+    display: flex;
+    align-items: center;
+}
+.mobile-list-head {
+    width: 100%;
+    min-height: 2.5rem;
     
     display: flex;
-    justify-content: space-between;   
-    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .left {
+        width: fit-content;
+        padding: 0.25rem;
+
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .left:hover {
+        cursor: pointer;
+    }
+
+    .right {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+
+        .select-all {
+            width: 100%;
+            height: 100%;
+            padding: 0.5rem 0.75rem;
+
+            font-size: 0.85rem;
+
+            color: rgb(var(--tertiary-color-purple));
+            background-color: transparent;
+
+            border: 2px solid rgb(var(--tertiary-color-purple));
+            border-radius: 20rem;
+        }
+        .select-all:hover {
+            color: rgb(var(--light-primary));
+            background-color: rgb(var(--tertiary-color-purple));
+        }
+
+        .delete {
+            width: fit-content;
+            height: 100%;
+            padding: 0.5rem 0.75rem;
+
+            font-size: 0.85rem;
+
+            color: rgb(var(--warning-color));
+            background-color: transparent;
+            
+            border-radius: 20rem;
+            border: 2px solid rgb(var(--warning-color));
+        }
+        .delete:hover {
+            color: rgb(var(--light-primary));
+            background-color: rgb(var(--warning-color));
+        }
+    }
+}
+
+.edit-mode-button {
+    width: initial;
+    height: initial;
+    padding: 0.5rem 0.75rem;
+
+    background-color: transparent;
+
+    border-radius: 20rem;
+    border: 2px solid rgb(var(--tertiary-color-purple));
+}
+.edit-mode-button:hover {
+    background: rgb(var(--tertiary-color-purple));
 }
 
 .list-title {
-    border-bottom: 2px solid rgb(var(--secondary-color));
+    margin-bottom: 0.75rem;
 }
 
 .delete-selected-button {
-    min-height: 1.25rem;
+    min-height: 1.5rem;
     aspect-ratio: 1;
 
     visibility: hidden;
@@ -48,4 +119,13 @@
 }
 .empty-list-description {
     font-size: 0.75rem;
+}
+
+@media screen and (min-width: 380px) {
+    .mobile-list-head {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
 }

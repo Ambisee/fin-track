@@ -1,5 +1,5 @@
 .select-checkbox {
-    --width: 1.25rem;
+    --width: 1.5rem;
 
     min-width: var(--width);
     min-height: var(--width);

@@ -1,31 +1,42 @@
 .item-element {
-    padding: 1rem 1rem;
+    max-height: calc(2.5rem + 2rem);
+    padding: 1rem;
+    margin: 0.5rem 0;
+    
+    border-radius: 0.5rem;
+    border: 1px solid rgb(var(--secondary-color) / 0.2);
 
     list-style: none;
     list-style-position: inside;
-    
-    border-bottom: 1px solid rgb(var(--secondary-color) / 0.2);
+
+    overflow: hidden;
 
     position: relative;
 
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-
-    transition: background-color 0.2s ease;
+    transition: background-color 0.25s ease;
 }
 .item-element.selected {
     background-color: rgb(var(--secondary-color) / 0.2);
 }
-.item-element:last-child {
-    border-bottom: none;
+.item-element.toggled {
+    max-height: 100vw;
 }
 
+.item-view {
+    padding-bottom: 1rem;
+
+    display: flex;
+}
+
+.description-container {
+    max-width: 50%;
+}
 .description-text {
-    max-width: 100%;
     padding-right: 1rem;
 
     overflow: hidden;
-    word-break: break-word;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     font-size: clamp(1.1rem, 3svw, 1.5rem);
 }
@@ -50,6 +61,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: auto;
 }
 
 .widget-container {
@@ -66,27 +78,86 @@
     align-items: center;
 }
 .edit-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
     
     fill: rgb(var(--secondary-color));
 
     transition: 0.25s ease;
 }
-.edit-button:hover {
+.edit-button:hover, .edit-button:focus {
     .edit-icon {
         fill: rgb(var(--secondary-color) / 0.5);
     }
 }
 
-@media screen and (max-width: 640px) {
+.arrow-head-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.5rem;
+
+    rotate: 180deg;
+
+    align-self: center;
+    transition: rotate 0.25s ease;
+
+    cursor: pointer;
+}
+.item-element.select-mode .arrow-head-icon {
+    display: none;
+}
+.item-element.toggled .arrow-head-icon {
+    rotate: 0deg;
+}
+
+.control-buttons {
+    margin-top: 1rem;
+    
+    display: flex;
+    gap: 0.5rem;
+}
+.control-button {
+    width: min-content;
+    height: min-content;
+    min-width: 15ch;
+    padding: 0.4rem 0.5rem;
+
+    background-color: transparent;
+
+    border: 2px solid rgb(var(--tertiary-color-purple));
+    border-radius: 20rem;
+}
+.control-button.edit {
+    color: rgb(var(--tertiary-color-purple));
+}
+.control-button.edit:hover,
+.control-button.edit:focus {
+    color: rgb(var(--secondary-color));
+    background-color: rgb(var(--tertiary-color-purple));
+}
+.control-button.delete {
+    border-color: rgb(var(--warning-color));
+    color: rgb(var(--warning-color));
+}
+.control-button.delete:hover,
+.control-button.delete:focus {
+    color: rgb(var(--secondary-color));
+    background-color: rgb(var(--warning-color));
+}
+
+@media screen and (min-width: 640px) {
     .item-element {
-        grid-template-columns: minmax(auto, calc(100% - 7.5rem)) 3.75rem 3.75rem;
+        max-height: calc(3rem + 2rem);
+        margin: 0;
+
+        border-radius: 0;
+        border: none;
+    }
+    .item-element:not(:last-child) {
+        border-bottom: 1px solid rgb(var(--secondary-color) / 0.5);
     }
     
-    .description-text {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    .description-container {
+        max-width: 60%;
     }
 }
