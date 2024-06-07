@@ -118,7 +118,7 @@
     display: flex;
     gap: 0.5rem;
 }
-.control-button {
+button.control-button {
     width: min-content;
     height: min-content;
     min-width: 15ch;
@@ -129,20 +129,20 @@
     border: 2px solid rgb(var(--tertiary-color-purple));
     border-radius: 20rem;
 }
-.control-button.edit {
+button.control-button.edit {
     color: rgb(var(--tertiary-color-purple));
 }
-.control-button.edit:hover,
-.control-button.edit:focus {
+button.control-button.edit:hover,
+button.control-button.edit:focus {
     color: rgb(var(--light-primary));
     background-color: rgb(var(--tertiary-color-purple));
 }
-.control-button.delete {
+button.control-button.delete {
     border-color: rgb(var(--warning-color));
     color: rgb(var(--warning-color));
 }
-.control-button.delete:hover,
-.control-button.delete:focus {
+button.control-button.delete:hover,
+button.control-button.delete:focus {
     color: rgb(var(--light-primary));
     background-color: rgb(var(--warning-color));
 }

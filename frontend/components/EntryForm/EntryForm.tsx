@@ -2,6 +2,7 @@
 
 import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps, useEffect } from "react"
 import { FieldErrors, FieldValues, useForm } from "react-hook-form"
+import Quill  from "quill/core"
 
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
 import TextField from "../FormField/TextField/TextField"
@@ -10,11 +11,10 @@ import ActionButton from "../ActionButton/ActionButton"
 import DateField from "../FormField/DateField/DateField"
 import { sbClient } from "@/supabase/supabase_client"
 import { DashboardDataContextObject, useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
-
-import styles from "./EntryForm.module.css"
 import { Entry } from "@/supabase"
 import { User } from "@supabase/supabase-js"
-import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
+
+import styles from "./EntryForm.module.css"
 
 type EntryFormType =  {type?: "NEW_ENTRY"} | {type?: "EDIT_ENTRY", values?: Entry}
 type EntryFormProps = Pick<HTMLProps<HTMLFormElement>, "id"> & EntryFormType & {
@@ -31,7 +31,7 @@ const updateSupabaseEntry = async (data: FieldValues, id: number, sign: boolean,
     return sbClient.from("entry")
         .update({
             date: data.date,
-            description: data.description,
+            title: data.title,
             amount: data.amount,
             amount_is_positive: !sign
         })
@@ -54,7 +54,7 @@ const insertSupabaseEntry = async (data: FieldValues, sign: boolean, user: User)
     
     return sbClient.from("entry").insert({
         date: data.date,
-        description: data.description,
+        title: data.title,
         amount: data.amount,
         amount_is_positive: !sign,
         created_by: user.id
@@ -84,14 +84,14 @@ export default function EntryForm(props: EntryFormProps) {
     useEffect(() => {
         if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
             setValue("date", props.values.date)
-            setValue("description", props.values.description)
+            setValue("title", props.values.title)
             setValue("amount", (props.values.amount as string).slice(1))
         }
     }, [props.type, props.values, setValue])
 
     const clearFields = () => {
         setValue("date", "")
-        setValue("description", "")
+        setValue("title", "")
         setValue("amount", "")
     }
 
@@ -105,7 +105,7 @@ export default function EntryForm(props: EntryFormProps) {
         }
 
         setValue("date", props.values.date)
-        setValue("description", props.values.description)
+        setValue("title", props.values.title)
         setValue("amount", (props.values.amount as string).slice(1))
         setSign(!props.values.amount_is_positive)
     }
@@ -115,7 +115,7 @@ export default function EntryForm(props: EntryFormProps) {
         valueAsDate: true,
     })
 
-    const descRegisterObject = register("description")
+    const descRegisterObject = register("title")
     const amountRegisterObject = register("amount", {
         required: "Please enter an amount.",
         pattern: {
@@ -169,8 +169,8 @@ export default function EntryForm(props: EntryFormProps) {
                             autoComplete="off"
                             className={styles["input-field"]}
                             registerObject={descRegisterObject}
-                            watchedValue={watch("description")}
-                            fieldDisplayName="Description"
+                            watchedValue={watch("title")}
+                            fieldDisplayName="Title"
                         />
                     </div>
                     <div className={styles["field-wrapper"]}>
