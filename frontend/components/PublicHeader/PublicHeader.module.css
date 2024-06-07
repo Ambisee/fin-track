@@ -58,8 +58,12 @@
     color: rgb(var(--secondary-color) / 0.5);
 }
 
-@media screen and (max-width: 640px) {
+.register-link {
+    display: none;
+}
+
+@media screen and (min-width: 640px) {
     .register-link {
-        display: none;
+        display: initial;
     }
 }
