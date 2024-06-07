@@ -20,7 +20,8 @@ interface EntryListProps {
 
 export default function EntryList(props: EntryListProps) {
 	const selectedIdsRef = useRef(new Set<number>())
-    const allSelectedCheckboxRef = useRef<HTMLInputElement | null>(null)
+    // const allSelectedCheckboxRef = useRef<HTMLInputElement | null>(null)
+    const [isAllSelected, setIsAllSelected] = useState(false)
     const [isSelectMode, setIsSelectMode] = useState(false)
 	const [isSelectedList, setIsSelectedList] = useState(
 		Array(props.data.length).fill(false)
@@ -38,11 +39,13 @@ export default function EntryList(props: EntryListProps) {
 				selectedIdsRef.current.delete(id)
 
                 if (
-                    allSelectedCheckboxRef.current !== null &&
-                    allSelectedCheckboxRef.current !== undefined
+                    // allSelectedCheckboxRef.current !== null &&
+                    // allSelectedCheckboxRef.current !== undefined
+                    true
                 ) {
                     if (selectedIdsRef.current.size !== props.data.length) {
-                        allSelectedCheckboxRef.current.checked = false
+                        setIsAllSelected(false)
+                        // allSelectedCheckboxRef.current.checked = false
                     }
                 }
 
@@ -65,6 +68,8 @@ export default function EntryList(props: EntryListProps) {
                     newArr[compIndex] = true
                     return newArr
                 })
+                
+                return
             }
 
             // Select mode behaviour
@@ -78,11 +83,13 @@ export default function EntryList(props: EntryListProps) {
 				selectedIdsRef.current.add(id)
 
                 if (
-                    allSelectedCheckboxRef.current !== null &&
-                    allSelectedCheckboxRef.current !== undefined
+                    // allSelectedCheckboxRef.current !== null &&
+                    // allSelectedCheckboxRef.current !== undefined
+                    true
                 ) {
                     if (props.data.length === selectedIdsRef.current.size) {
-                        allSelectedCheckboxRef.current.checked = true
+                        setIsAllSelected(true)
+                        // allSelectedCheckboxRef.current.checked = true
                     }
                 }
 
@@ -113,6 +120,8 @@ export default function EntryList(props: EntryListProps) {
 		<>
             <h3 className={styles["list-title"]}>{props.title}</h3>
 			<div className={styles["list-controls"]}>
+
+                {/* Mobile Viewport Head */}
                 <div 
                     className={styles["mobile-list-head"]}
                 >
@@ -127,25 +136,35 @@ export default function EntryList(props: EntryListProps) {
                             setIsSelectMode(c => !c)
                         }}
                     >
-                        <Checkbox checked={isSelectMode} readOnly></Checkbox>
-                        <p>Select Mode</p>
+                        <Checkbox 
+                            id={`select-mode-${props.title}`} 
+                            checked={isSelectMode} 
+                            readOnly
+                        />
+                        <label 
+                            className={styles["checkbox-label"]} 
+                            htmlFor={`select-mode-${props.title}`}
+                            onClick={(e) => e.preventDefault()}
+                        >
+                            Select Mode
+                        </label>
                     </div>
                     {isSelectMode && 
                         <div className={styles["right"]}>
                             <ActionButton className={styles["select-all"]}
                                 onClick={(e) => {
-                                    if (e.currentTarget.innerText === "Deselect All") {
+                                    if (isAllSelected) {
                                         setIsSelectedList(Array(props.data.length).fill(false))
                                         selectedIdsRef.current.clear()
-                                        e.currentTarget.innerText = "Select All"
+                                        setIsAllSelected(false)
                                     } else {
                                         setIsSelectedList(Array(props.data.length).fill(true))
                                         props.data.forEach((val) => selectedIdsRef.current.add(val.id))
-                                        e.currentTarget.innerText = "Deselect All"
+                                        setIsAllSelected(true)
                                     }
                                 }}
                             >
-                                Select All
+                                {isAllSelected ? "Deselect All" : "Select All"}
                             </ActionButton>
                             <ActionButton className={styles["delete"]}
                                 onClick={(e) => {
@@ -159,7 +178,9 @@ export default function EntryList(props: EntryListProps) {
                         </div>
                     }
                 </div>
-                {/* <div className={styles["header-left"]}>
+
+                {/* Desktop Viewport Head */}
+                {/* <div className={styles["desktop-list-head"]}>
 					<button
 						className={`
                             ${styles["delete-selected-button"]}
