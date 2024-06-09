@@ -11,6 +11,7 @@ import DashboardDataProvider, { DashboardDataProviderProps } from "../DashboardD
 import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 import styles from "./ProtectedLayout.module.css"
+import EntryFormPopup from "../EntryFormPopup/EntryFormPopup"
 
 interface ProtectedLayoutProps {
     children?: ReactNode,
@@ -100,43 +101,14 @@ export default function ProtectedLayout(props: ProtectedLayoutProps) {
                 </main>
 
                 {/* New Entry Form */}
-                <div
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === "Escape") {
-                            setIsEntryFormToggled(false)
-                            setIsBackdropVisible(false)
-                        }
+                <EntryFormPopup 
+                    type="NEW_ENTRY"
+                    isPopupVisible={isEntryFormToggled}
+                    showPopupCallback={(toggle) => {
+                        setIsEntryFormToggled(toggle)
+                        setIsBackdropVisible(toggle)
                     }}
-                    className={`
-                        ${styles["entry-form-container"]}
-                        ${isEntryFormToggled && styles["show"]}
-                    `}
-                >
-                    <div className={styles["entry-form-header"]}>
-                        <CrossButton 
-                            className={styles["entry-form-close-button"]} 
-                            onClick={() => {
-                                setIsEntryFormToggled(false)
-                                setIsBackdropVisible(false)
-                            }}
-                        />
-                    </div>
-                    <EntryForm 
-                        id="new-entry-form"
-                        type="NEW_ENTRY"
-                        title="New Entry" 
-                    />
-                    <ActionButton
-                        className={styles["bottom-close-button"]}
-                        onClick={() => {
-                            setIsEntryFormToggled(false)
-                            setIsBackdropVisible(false)
-                        }}
-                    >
-                        Close
-                    </ActionButton>
-                </div>
+                />
                 <div 
                     onMouseDown={() => {
                         setIsBackdropVisible(false)

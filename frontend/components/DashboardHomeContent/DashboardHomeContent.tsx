@@ -61,7 +61,8 @@ export default function DashboardHomeContent() {
 					data={data}
 				/>
 			</div>
-            <EntryFormPopup 
+            <EntryFormPopup
+                type="EDIT_ENTRY"
                 showPopupCallback={(arg) => {
                     setIsEditFormVisible(arg)
                     setIsBackdropVisible(arg)
