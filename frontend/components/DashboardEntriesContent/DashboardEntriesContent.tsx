@@ -55,6 +55,7 @@ export default function DashboardEntriesContent() {
             <h2 className={styles["page-title"]}>Entries</h2>
             {tables}
             <EntryFormPopup 
+                type="EDIT_ENTRY"
                 showPopupCallback={(arg) => {
                     setIsEditFormVisible(arg)
                     setIsBackdropVisible(arg)
