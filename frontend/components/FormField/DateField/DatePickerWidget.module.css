@@ -1,17 +1,19 @@
 .container {
     width: 80%;
-    min-width: 27.5rem;
-    max-width: 50rem;
+    min-width: 17.5rem;
+    max-width: 25rem;
 
     border: 1px solid black;
     border-radius: 0.25rem;
 
     background-color: rgb(var(--secondary-color));
-
-    visibility: hidden;
 }
-.container.visible {
-    visibility: visible;
+.container::backdrop {  
+    background-color: transparent;
+
+    /* background: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0.35rem);
+    -webkit-backdrop-filter: blur(0.35rem); */
 }
 
 .month-year-display {
@@ -25,13 +27,14 @@
 
 .calendar {
     width: 100%;
+    /* padding: 0.5rem; */
 
     background-color: rgb(var(--secondary-color));
-
     table-layout: fixed;
 }
 
 .calendar td {
+    padding: 0.2rem;
     width: calc(100% / 7);
     min-width: 1.5rem;
 
@@ -67,12 +70,13 @@
     color: rgb(var(--secondary-color));
     background-color: rgb(var(--primary-color));
 }
-.calendar td button:not(.current-date):hover {
+.calendar td button:not(.current-date):hover,
+.calendar td button:not(.current-date):focus {
     background-color: rgb(var(--primary-color) / 0.2);
 }
 
 .footer-buttons {
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
 
     display: flex;
     justify-content: space-around;
@@ -80,5 +84,16 @@
     background-color: rgb(0 0 0 / 0.2);
 }
 .footer-buttons button {
+    padding: 0.5rem 1.5rem;
+
     color: rgb(var(--primary-color));
+    border: 1px solid rgb(var(--primary-color));
+    border-radius: 5rem;
+
+    transition: 0.25s ease;
+}
+.footer-buttons button:hover,
+.footer-buttons button:focus {
+    background-color: rgb(var(--primary-color));
+    color: rgb(var(--secondary-color));
 }

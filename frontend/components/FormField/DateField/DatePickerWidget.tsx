@@ -1,22 +1,20 @@
-import { useState, forwardRef, ChangeEventHandler, DetailedHTMLProps, HTMLProps, Dispatch, SetStateAction, useEffect } from "react"
+import { useState, forwardRef, ChangeEventHandler, DetailedHTMLProps, HTMLProps, Dispatch, SetStateAction, useEffect, useRef, CSSProperties } from "react"
 import { v4 as uuidv4 } from "uuid"
 
 import styles from "./DatePickerWidget.module.css"
 
 interface DatePickerWidgetProps {
-    value?: string,
-    className?: string,
-    onChange: (arg: string) => void,
-    setIsVisible?: Dispatch<SetStateAction<boolean>>,
-    isVisible?: boolean
+    value?: string
+    className?: string
+    style?: CSSProperties
+    onChange: (arg?: string) => void
 }
 
-const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(function DatePickerWidget({
+const DatePickerWidget = forwardRef<HTMLDialogElement, DatePickerWidgetProps>(function DatePickerWidget({
     className,
     value,
     onChange,
-    setIsVisible=() => {},
-    isVisible=true
+    style
 }, ref) {
     let initialValue = new Date()
 
@@ -119,15 +117,19 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
 
                             </td>
                         }
+
+                        const isCurrentDate = (
+                            val == internalValue.date &&
+                            month == internalValue.month &&
+                            year == internalValue.year
+                        )
+
                         return (
                             <td key={uuidv4()}>
                                 <button
+                                    tabIndex={isCurrentDate ? 0 : undefined}
                                     className={`
-                                        ${(
-                                            val == internalValue.date &&
-                                            month == internalValue.month &&
-                                            year == internalValue.year
-                                        ) && styles["current-date"]}
+                                        ${isCurrentDate && styles["current-date"]}
                                     `}
                                     onClick={() => {
                                         setMonth(m)
@@ -149,19 +151,27 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
     }
 
     return (
-        <div 
+        <dialog
             ref={ref}
-            tabIndex={0}
+            style={style}
+            onClick={(e) => {
+                // Close the widget if the backdrop is clicked
+                // 
+                // Note: The dialog window should be fully covered by the 
+                // child element for this to work as intended
+                if ((e.target as HTMLElement).nodeName === "DIALOG") {
+                    onChange(undefined)
+                }
+            }}
             onKeyDown={(e) => {
                 if (e.key === "Escape") {
                     e.stopPropagation()
-                    setIsVisible(false)
+                    onChange(undefined)
                 }
             }}
             className={`
                 ${className}
                 ${styles["container"]}
-                ${isVisible && styles["visible"]}
             `}
         >
             <div className={styles["month-year-display"]}>
@@ -239,7 +249,7 @@ const DatePickerWidget = forwardRef<HTMLDivElement, DatePickerWidgetProps>(funct
                     Clear
                 </button>
             </div>
-        </div>
+        </dialog>
     )
 })
 
