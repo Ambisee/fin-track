@@ -2,7 +2,6 @@
 
 import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps, useEffect } from "react"
 import { FieldErrors, FieldValues, useForm } from "react-hook-form"
-import Quill  from "quill/core"
 
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
 import TextField from "../FormField/TextField/TextField"
