@@ -33,6 +33,10 @@
     box-sizing: border-box;
 }
 
+div:focus {
+    outline: none;
+}
+
 html {
     height: 100%;
 }
