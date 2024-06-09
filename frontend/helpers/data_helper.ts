@@ -61,6 +61,7 @@ function handleUpdate(
         created_at: (payload.new as Entry).created_at,
         created_by: (payload.new as Entry).created_by,
         amount_is_positive: (payload.new as Entry).amount_is_positive,
+        note: (payload.new as Entry).note
     }
 
     const newEntry = newEntries.splice(index, 1)[0]
@@ -163,6 +164,12 @@ function handleInsert(
     newEntries.splice(index, 0, newEntry as Entry)
 }
 
+/**
+ * Group the entry data by each entry's months and years
+ * 
+ * @param data the entry data array
+ * @returns {DataGroup[]} the array of data groups
+ */
 function sortDataByGroup(
     data: Entry[]
 ) {
