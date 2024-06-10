@@ -2,7 +2,6 @@
     width: 95%;
     height: 95%;
     min-height: 30rem;
-    padding: 1rem;
 
     background-color: rgb(var(--primary-color));
 
@@ -14,7 +13,7 @@
     border: 1px solid rgb(var(--secondary-color));
     border-radius: 0.75rem;
 
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
 
@@ -33,6 +32,14 @@
     visibility: visible;
 
     opacity: 1;
+}
+.entry-form-container > *:first-child {
+    padding: 1rem;
+    padding-bottom: 0;
+}
+.entry-form-container > *:last-child {
+    padding: 1rem;
+    padding-top: 0;
 }
 
 .entry-form-header {
@@ -62,8 +69,6 @@ button.bottom-close-button:hover {
 
 @media screen and (min-width: 640px) {
     .entry-form-container {
-        min-width: 17.5rem;
-        max-width: 25rem;       
         z-index: 125;
     }
 }

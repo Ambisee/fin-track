@@ -37,19 +37,7 @@ export default function EntryFormPopup({
             />
         )
     }
- 
-    let entryFormProps = { type: props.type, values: undefined, title: "", id: "" }
-    
-    if (props.type === "EDIT_ENTRY") {
-        entryFormProps.values = props.values as any
-        entryFormProps.title = "Edit Entry"
-        entryFormProps.id = "edit-entry-form"
-    } else {
-        entryFormProps.title = "New Entry"
-        entryFormProps.id = "new-entry-form"
-    }
-    
-    
+        
     return (
         <div
             tabIndex={0}
@@ -72,14 +60,16 @@ export default function EntryFormPopup({
                 />
             </div>
             {entryForm}
-            <ActionButton
-                className={styles["bottom-close-button"]}
-                onClick={() => {
-                    showPopupCallback(false)
-                }}
-            >
-                Close
-            </ActionButton>
+            <div>
+                <ActionButton
+                    className={styles["bottom-close-button"]}
+                    onClick={() => {
+                        showPopupCallback(false)
+                    }}
+                >
+                    Close
+                </ActionButton>
+            </div>
         </div>
     )
 }

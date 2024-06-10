@@ -27,7 +27,7 @@
     --input-padding: 1.25rem;
     --label-filled-state-padding: 0.35rem;
     --label-filled-state-left: calc(var(--input-padding) - var(--label-filled-state-padding));
-    --extra-widget-border-radius: 2rem;
+    --extra-widget-border-radius: 1.5rem;
     --extra-widget-icon-color: var(--primary-color);
     --extra-widget-background-color: var(--secondary-color);
 

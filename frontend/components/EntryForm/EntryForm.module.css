@@ -5,12 +5,24 @@
     box-sizing: border-box;
 
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: minmax(70%, 17.5rem) auto;
 }
 
 .field-container {
-    height: 100%;
+    max-height: 100%;
+    padding: 0 1rem;
+
     overflow-y: auto;
+}
+.field-container::-webkit-scrollbar {
+    width: 10px;
+    background: transparent;
+}
+.field-container::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--secondary-color) / 0.35);
+    
+    border: 1px solid rgb(var(--secondary-color) / 0.35);
+    border-radius: 50rem;
 }
 
 .field-wrapper:first-child {
@@ -26,9 +38,14 @@
 .input-field {
     min-height: 2.5rem;
 }
+.description-field {
+    min-height: 7.5rem;
+    max-height: 12.5rem;
+}
 
 .button-container {
-    margin-bottom: 1rem;
+    padding: 0 1rem;
+    margin: 1rem 0;
 
     display: grid;
     gap: 1rem;
@@ -66,4 +83,24 @@ button.clear-button:focus {
     color: rgb(var(--light-primary));
     
     background-color: rgb(var(--warning-color));
+}
+
+@media screen and (min-width: 640px) {
+    .field-container {
+        max-width: none;
+
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+        gap: 1rem;
+    }
+
+    .description-field {
+        height: 16.5rem;
+        max-height: none;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: flex-end;
+    }
 }

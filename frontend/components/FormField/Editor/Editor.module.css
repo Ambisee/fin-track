@@ -1,3 +1,44 @@
-.editor {
+.input-label {
+    position: absolute;
+    top: 1.5rem;
+    left: var(--input-padding);
+
+    font-size: clamp(0.75rem, 3svw, 1rem);
+
+    color: rgb(var(--secondary-color));
+
+    translate: 0 -50%;
     
+    transition: 250ms ease;
+
+    pointer-events: none;
+}
+.input-label.hidden {
+    display: none;
+}
+.editor.filled + .input-label {
+    font-size: 0.6rem;
+
+    padding: 0 var(--label-filled-state-padding);
+
+    top: 0;
+    left: var(--label-filled-state-left);
+
+    background: rgb(var(--primary-color));
+}
+
+.editor {
+    height: 100%;
+    padding: 12px 1.25rem;
+
+    overflow-y: auto;
+}
+.editor::-webkit-scrollbar {
+    height: calc(100% - 4rem);
+}
+
+.tool-bar {
+    height: 1.75rem;
+    
+    background-color: black;
 }

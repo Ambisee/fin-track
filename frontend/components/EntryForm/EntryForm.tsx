@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps, useEffect } from "react"
+import { useState, KeyboardEvent, KeyboardEventHandler, HTMLProps, useEffect, useRef } from "react"
 import { FieldErrors, FieldValues, useForm } from "react-hook-form"
+import ReactQuill, { ReactQuillProps } from "react-quill"
 
 import CurrencyField from "../FormField/CurrencyField/CurrencyField"
 import TextField from "../FormField/TextField/TextField"
@@ -12,8 +13,10 @@ import { sbClient } from "@/supabase/supabase_client"
 import { DashboardDataContextObject, useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 import { Entry } from "@/supabase"
 import { User } from "@supabase/supabase-js"
+import Editor from "../FormField/Editor/Editor"
 
 import styles from "./EntryForm.module.css"
+import { Delta } from "quill/core"
 
 type EntryFormType =  {type?: "NEW_ENTRY"} | {type?: "EDIT_ENTRY", values?: Entry}
 type EntryFormProps = Pick<HTMLProps<HTMLFormElement>, "id"> & EntryFormType & {
@@ -32,7 +35,8 @@ const updateSupabaseEntry = async (data: FieldValues, id: number, sign: boolean,
             date: data.date,
             title: data.title,
             amount: data.amount,
-            amount_is_positive: !sign
+            amount_is_positive: !sign,
+            note: data.note
         })
         .eq("id", id)
         .then((value) => {
@@ -55,6 +59,7 @@ const insertSupabaseEntry = async (data: FieldValues, sign: boolean, user: User)
         date: data.date,
         title: data.title,
         amount: data.amount,
+        note: data.note,
         amount_is_positive: !sign,
         created_by: user.id
     }).then((value) => {
@@ -79,16 +84,27 @@ export default function EntryForm(props: EntryFormProps) {
     const [sign, setSign] = useState(props.type === "EDIT_ENTRY" && props.values !== undefined ? !props.values.amount_is_positive : true)
     const { user } = useDashboardData() as DashboardDataContextObject
     const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm()
+    const quillRef = useRef<ReactQuill | null>(null)
 
     useEffect(() => {
         if (props.type === "EDIT_ENTRY" && props.values !== undefined) {
+            if (props.values.note !== null) {
+                quillRef.current?.getEditor().setContents(
+                    ((props.values.note as unknown) as Delta).ops
+                )
+            } else {
+                quillRef.current?.getEditor().setText("\n")
+            }
+
             setValue("date", props.values.date)
             setValue("title", props.values.title)
             setValue("amount", (props.values.amount as string).slice(1))
+            
         }
     }, [props.type, props.values, setValue])
 
     const clearFields = () => {
+        quillRef.current?.getEditor().setText("\n")
         setValue("date", "")
         setValue("title", "")
         setValue("amount", "")
@@ -103,6 +119,14 @@ export default function EntryForm(props: EntryFormProps) {
             return
         }
 
+        if (props.values.note !== null) {
+            quillRef.current?.getEditor().setContents(
+                ((props.values.note as unknown) as Delta).ops
+            )
+        } else {
+            quillRef.current?.getEditor().setText("\n")
+        }
+
         setValue("date", props.values.date)
         setValue("title", props.values.title)
         setValue("amount", (props.values.amount as string).slice(1))
@@ -114,7 +138,9 @@ export default function EntryForm(props: EntryFormProps) {
         valueAsDate: true,
     })
 
-    const descRegisterObject = register("title")
+    const descRegisterObject = register("title", {
+        required: "Please enter a title."
+    })
     const amountRegisterObject = register("amount", {
         required: "Please enter an amount.",
         pattern: {
@@ -136,6 +162,11 @@ export default function EntryForm(props: EntryFormProps) {
                                 alert("No user signed in")
                                 return
                             }
+                            
+                            data.note = null
+                            if (quillRef.current?.getEditor().getText().trim() !== "") {
+                                data.note = quillRef.current?.getEditor().getContents()
+                            }
 
                             if (props.type === "NEW_ENTRY") {
                                 insertSupabaseEntry(data, sign, user)
@@ -152,37 +183,49 @@ export default function EntryForm(props: EntryFormProps) {
                 }}
             >
                 <div className={styles["field-container"]}>
-                    <div className={styles["field-wrapper"]}>
-                        <DateField 
-                            variant="outlined"
-                            className={styles["input-field"]}
-                            fieldDisplayName="Date"
-                            registerObject={dateRegisterObject}
-                            setValue={(val: string) => setValue("date", val)}
-                            watchedValue={watch("date")}
-                        />
+                    <div>
+                        <div className={styles["field-wrapper"]}>
+                            <DateField 
+                                variant="outlined"
+                                className={styles["input-field"]}
+                                fieldDisplayName="Date"
+                                registerObject={dateRegisterObject}
+                                setValue={(val: string) => setValue("date", val)}
+                                watchedValue={watch("date")}
+                            />
+                        </div>
+                        <div className={styles["field-wrapper"]}>
+                            <TextField
+                                variant="outlined"
+                                autoComplete="off"
+                                className={styles["input-field"]}
+                                registerObject={descRegisterObject}
+                                watchedValue={watch("title")}
+                                fieldDisplayName="Title"
+                            />
+                        </div>
+                        <div className={styles["field-wrapper"]}>
+                            <CurrencyField 
+                                variant="outlined"
+                                autoComplete="off"
+                                className={styles["input-field"]}
+                                registerObject={amountRegisterObject}
+                                watchedValue={watch("amount")}
+                                sign={sign}
+                                toggleSign={() => setSign(current => !current)}
+                                fieldDisplayName="Amount"
+                            />
+                        </div>
                     </div>
-                    <div className={styles["field-wrapper"]}>
-                        <TextField
-                            variant="outlined"
-                            autoComplete="off"
-                            className={styles["input-field"]}
-                            registerObject={descRegisterObject}
-                            watchedValue={watch("title")}
-                            fieldDisplayName="Title"
-                        />
-                    </div>
-                    <div className={styles["field-wrapper"]}>
-                        <CurrencyField 
-                            variant="outlined"
-                            autoComplete="off"
-                            className={styles["input-field"]}
-                            registerObject={amountRegisterObject}
-                            watchedValue={watch("amount")}
-                            sign={sign}
-                            toggleSign={() => setSign(current => !current)}
-                            fieldDisplayName="Amount"
-                        />
+                    <div>
+                        <div className={styles["field-wrapper"]}>
+                            <Editor
+                                ref={quillRef}
+                                variant="outlined" 
+                                className={styles["description-field"]}
+                                fieldDisplayName="Description"
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className={styles["button-container"]}>
