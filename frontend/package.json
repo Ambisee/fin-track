@@ -25,7 +25,8 @@
     "react-hook-form": "^7.45.2",
     "react-quill": "^2.0.0",
     "typescript": "5.1.6",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.16",
