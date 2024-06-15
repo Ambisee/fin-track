@@ -23,6 +23,12 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
 
     return (
         <div
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                    closeBackdrop()
+                }
+            }}
             className={`
                 ${isNavToggled && styles["show"]}
                 ${styles["nav-container"]}
