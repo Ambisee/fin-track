@@ -20,8 +20,11 @@
 }
 
 .profile-container {
+    min-width: 10rem;
+
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: clamp(0.75rem, 3svw, 1.5rem);
 
     font-size: 0.85rem;
@@ -44,18 +47,24 @@
 }
 
 .profile-dropdown {
-    width: 100%;
-    
-    position: absolute;
-    top: calc(100% + 1rem);
-    left: 0%;
-    
+    width: fit-content;
+
     background-color: rgb(var(--secondary-color));
     color: rgb(var(--primary-color));
 
-    visibility: hidden;
-
     border-radius: 0.5rem;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    position: absolute;
+    top: calc(100% + 1rem);
+    left: 50%;
+    
+    translate: -50% 0;
+
+    visibility: hidden;
 }
 .profile-dropdown.show {
     visibility: visible;
@@ -64,6 +73,7 @@
     content: "";
     
     position: absolute;
+    
     left: 50%;
     bottom: 100%;
     
@@ -72,10 +82,13 @@
     border-bottom: 10px solid rgb(var(--secondary-color));
 
     translate: -50% 0;
-
 }
 
 .profile-dropdown-list {
+    min-width: 10rem;
+
+    position: relative;
+
     list-style: none;
 }
 

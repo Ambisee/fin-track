@@ -87,6 +87,10 @@ export default function DashboardSettingsContent({
                                 showLabel={false}
                                 placeholder={user?.user_metadata.username ?? "No username"}
                                 registerObject={register("general.username", {
+                                    minLength: {
+                                        value: 8,
+                                        message: "Usernames must be at least 8 characters long."
+                                    },
                                     pattern: {
                                         value: ONLY_ALPHANUMERIC,
                                         message: "Usernames can only have alphabets and numbers."
