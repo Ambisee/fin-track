@@ -66,7 +66,7 @@ const validatePassword = (value: string) => {
 export default function RegistrationForm() {
     const router = useRouter()
     const { setIsLoading } = usePortalLoader()
-    const { register, watch, control, handleSubmit, getValues, formState: { errors, dirtyFields } } = useForm({
+    const { register, watch, handleSubmit, getValues, formState: { errors, dirtyFields } } = useForm({
         mode: "onChange"
     })
     
@@ -159,7 +159,6 @@ export default function RegistrationForm() {
                 <div>
                     <TextField
                         required 
-                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
@@ -179,7 +178,6 @@ export default function RegistrationForm() {
                 <div>
                     <TextField 
                         required
-                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Email" 
                         className={styles["input-element"]} 
@@ -199,7 +197,6 @@ export default function RegistrationForm() {
                 <div>
                     <PasswordField 
                         required
-                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Password" 
                         className={`
@@ -280,7 +277,6 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <PasswordField
-                        control={control}
                         fieldDisplayName="Confirm Password"
                         className={styles["input-element"]} 
                         registerObject={confirmPasswordRegisterObject}

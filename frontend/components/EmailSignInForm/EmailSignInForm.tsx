@@ -17,7 +17,7 @@ import styles from "./EmailSignInForm.module.css"
 export default function EmailSignInForm() {
     const router = useRouter()
     const { setIsLoading } = usePortalLoader()
-    const { register, control, handleSubmit, formState: { errors } } = useForm()
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
     const emailRegisterObject = register("email", {
         required: {value: true, message: "This field is required."}
