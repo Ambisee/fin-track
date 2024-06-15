@@ -37,6 +37,9 @@ export default function DateField({
         // Hack to turn off the autofocus behaviour of the dialog element
         if (document.activeElement == null) return
         (document.activeElement as HTMLElement).blur()
+        
+        // Put focus back on the dialog element
+        datePickerProviderRef.current.focus()
     }
 
     const hideDatePicker = () => {
@@ -77,16 +80,11 @@ export default function DateField({
                         const temp = new Date(e.target.value)
                         const d = new Date(temp.getTime() + Math.abs(temp.getTimezoneOffset() * 60000))
 
-                        if (
-                            textFieldRef.current == null ||
-                            datePickerProviderRef.current == null
-                        ) {
+                        if (textFieldRef.current == null || datePickerProviderRef.current == null) {
                             return
                         }
                         
-                        if (
-                            isNaN(d.getTime())
-                        ) {
+                        if (isNaN(d.getTime())) {
                             textFieldRef.current.value = ""
                             datePickerProviderRef.current.value = ""
                             setValue("")

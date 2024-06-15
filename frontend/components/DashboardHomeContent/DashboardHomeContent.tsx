@@ -1,40 +1,30 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import EntryList from "../EntryList/EntryList"
-import EntryForm from "../EntryForm/EntryForm"
-import CrossButton from "../CrossButton/CrossButton"
-import ActionButton from "../ActionButton/ActionButton"
-import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 import { Entry } from "@/supabase"
 
 import styles from "./DashboardHomeContent.module.css"
 import EntryFormPopup from "../EntryFormPopup/EntryFormPopup"
+import useGlobalStore from "@/hooks/useGlobalStore"
 
 export default function DashboardHomeContent() {
 	const [editValues, setEditValues] = useState<Entry | undefined>(undefined)
-	const [isEditFormVisible, setIsEditFormVisible] = useState(false)
+    const [isEditFormVisible, setIsEditFormVisible] = useState(false)
 	const { user, data } = useDashboardData()
-	const {
-		setIsEntryFormToggled,
-		setIsBackdropVisible,
-		setBackdropToggleCallbacks
-	} = useLayout()
-
-	useEffect(() => {
-		setBackdropToggleCallbacks([() => setIsEditFormVisible(false)])
-
-		return () => {
-			setBackdropToggleCallbacks([])
-		}
-	}, [setBackdropToggleCallbacks])
+	    
+    const toggleBackdrop = useGlobalStore(state => state.toggleBackdrop)
+    const closeBackdrop = useGlobalStore(state => state.closeBackdrop)
+    const addBackdropCallback = useGlobalStore(state => state.addBackdropCallback)
 
 	const toggleEntryEditForm = (data: Entry) => {
-		setEditValues(data)
-		setIsEditFormVisible(true)
-		setIsBackdropVisible(true)
+        setEditValues(data)
+		toggleBackdrop(true)
+        setIsEditFormVisible(true)
+        addBackdropCallback(() => setIsEditFormVisible(false))
+        addBackdropCallback(() => setEditValues(undefined))
 	}
 
 	return (
@@ -42,17 +32,6 @@ export default function DashboardHomeContent() {
 			<h2 className={styles["welcome-text"]}>
 				Welcome back, {user?.user_metadata.username}.
 			</h2>
-			{/* <div className={styles["action-button-container"]}>
-				<ActionButton
-					className={styles["action-button"]}
-					onClick={() => {
-						setIsEntryFormToggled(true)
-						setIsBackdropVisible(true)
-					}}
-				>
-					Add a new entry
-				</ActionButton>
-			</div> */}
 			<div className={styles["recent-entry-container"]}>
 				<EntryList
 					title="Recent entries"
@@ -63,9 +42,8 @@ export default function DashboardHomeContent() {
 			</div>
             <EntryFormPopup
                 type="EDIT_ENTRY"
-                showPopupCallback={(arg) => {
-                    setIsEditFormVisible(arg)
-                    setIsBackdropVisible(arg)
+                showPopupCallback={() => {
+                    closeBackdrop()
                 }}
                 isPopupVisible={isEditFormVisible}
                 values={editValues}

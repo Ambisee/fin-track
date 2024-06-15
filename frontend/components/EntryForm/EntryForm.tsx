@@ -83,7 +83,7 @@ const handleError = (errors: FieldErrors<FieldValues>) => {
 export default function EntryForm(props: EntryFormProps) {
     const [sign, setSign] = useState(props.type === "EDIT_ENTRY" && props.values !== undefined ? !props.values.amount_is_positive : true)
     const { user } = useDashboardData() as DashboardDataContextObject
-    const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm()
+    const { register, watch, handleSubmit, getValues, setValue } = useForm()
     const quillRef = useRef<ReactQuill | null>(null)
 
     useEffect(() => {
@@ -103,8 +103,25 @@ export default function EntryForm(props: EntryFormProps) {
         }
     }, [props.type, props.values, setValue])
 
+    const dateRegisterObject = register("date", {
+        required: "Please enter a date value.",
+        valueAsDate: true,
+    })
+
+    const descRegisterObject = register("title", {
+        required: "Please enter a title."
+    })
+    const amountRegisterObject = register("amount", {
+        required: "Please enter an amount.",
+        pattern: {
+            value: /^([1-9]\d{0,2}(,\d{3})*|\d+)(\.\d{2})?$/,
+            message: "Please enter a valid currency value. (e.g. 12.10, 0.12, 1,000.50)."
+        }
+    })
+
     const clearFields = () => {
         quillRef.current?.getEditor().setText("\n")
+        
         setValue("date", "")
         setValue("title", "")
         setValue("amount", "")
@@ -133,21 +150,6 @@ export default function EntryForm(props: EntryFormProps) {
         setSign(!props.values.amount_is_positive)
     }
 
-    const dateRegisterObject = register("date", {
-        required: "Please enter a date value.",
-        valueAsDate: true,
-    })
-
-    const descRegisterObject = register("title", {
-        required: "Please enter a title."
-    })
-    const amountRegisterObject = register("amount", {
-        required: "Please enter an amount.",
-        pattern: {
-            value: /^([1-9]\d{0,2}(,\d{3})*|\d+)(\.\d{2})?$/,
-            message: "Please enter a valid currency value. (e.g. 12.10, 0.12, 1,000.50)."
-        }
-    })
 
     return (
         <BaseFormWrapper title={props.title}>

@@ -5,7 +5,6 @@ import { User } from "@supabase/auth-helpers-nextjs"
 import ProtectedNavbar from "@/components/ProtectedNavbar/ProtectedNavbar"
 import ProtectedLayout from "@/components/ProtectedLayout/ProtectedLayout"
 import { sbServer } from "@/supabase/supabase_server"
-import ProtectedLayoutProvider from "@/components/ProtectedLayoutProvider/ProtectedLayoutProvider"
 import { cookies } from "next/headers"
 
 interface DashboardLayoutProps {
@@ -28,10 +27,8 @@ export default async function DashboardLayout(props: DashboardLayoutProps) {
     const layoutContextValue = { user, data }
 
     return (
-        <ProtectedLayoutProvider>
-            <ProtectedLayout contextValue={layoutContextValue}>
-                {props.children}
-            </ProtectedLayout>
-        </ProtectedLayoutProvider>
+        <ProtectedLayout contextValue={layoutContextValue}>
+            {props.children}
+        </ProtectedLayout>
     )
 }

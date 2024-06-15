@@ -60,7 +60,7 @@ export default function TextField({
                     onChange={(e) => {
                         registerObject?.onChange(e)
                         props?.onChange?.(e)
-                        
+
                         if (e.target.value === undefined || e.target.value === "") {
                             setFilled(false)
                         } else {
@@ -70,6 +70,12 @@ export default function TextField({
                     onBlur={(e) => {
                         registerObject?.onBlur(e)
                         props?.onBlur?.(e)
+                        
+                        if (e.target.value === undefined || e.target.value === "") {
+                            setFilled(false)
+                        } else {
+                            setFilled(true)
+                        }
                     }}
                     name={registerObject?.name}
                     ref={(e) => {

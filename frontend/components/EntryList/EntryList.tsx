@@ -131,6 +131,7 @@ export default function EntryList(props: EntryListProps) {
                             setIsSelectedList(Array(props.data.length).fill(false))
                             if (isSelectMode) {
                                 selectedIdsRef.current.clear()
+                                setIsAllSelected(false)
                             }
 
                             setIsSelectMode(c => !c)
@@ -260,7 +261,7 @@ export default function EntryList(props: EntryListProps) {
                                     alert("Successfully deleted the entries.")
                                 })
                         }}
-						editButtonCallback={() => {
+						editButtonCallback={(e) => {
 							if (props.editButtonCallback !== undefined) {
 								props.editButtonCallback(value)
 							}

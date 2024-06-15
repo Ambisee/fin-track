@@ -8,7 +8,7 @@ import { Entry } from "@/supabase"
 import styles from "./EntryFormPopup.module.css"
 
 type EntryFormPopupProps = {
-    showPopupCallback: (arg0: boolean) => void,
+    showPopupCallback: () => void,
     isPopupVisible: boolean,
 } & ({type: "EDIT_ENTRY", values?: Entry} | {type: "NEW_ENTRY"})
 
@@ -18,7 +18,6 @@ export default function EntryFormPopup({
     ...props
 }: EntryFormPopupProps) {
     let entryForm
-    
     if (props.type === "EDIT_ENTRY") {
         entryForm = (
             <EntryForm 
@@ -37,16 +36,17 @@ export default function EntryFormPopup({
             />
         )
     }
-        
+
     return (
         <div
             tabIndex={0}
             onKeyDown={(e) => {
                 if (e.key === "Escape") {
-                    showPopupCallback(false)
+                    showPopupCallback()
                 }
             }}
             className={`
+                popup
                 ${styles["entry-form-container"]}
                 ${isPopupVisible && styles["visible"]}
             `}
@@ -55,7 +55,7 @@ export default function EntryFormPopup({
                 <CrossButton
                     className={styles["entry-form-close-button"]}
                     onClick={() => {
-                        showPopupCallback(false)
+                        showPopupCallback()
                     }}
                 />
             </div>
@@ -64,7 +64,7 @@ export default function EntryFormPopup({
                 <ActionButton
                     className={styles["bottom-close-button"]}
                     onClick={() => {
-                        showPopupCallback(false)
+                        showPopupCallback()
                     }}
                 >
                     Close

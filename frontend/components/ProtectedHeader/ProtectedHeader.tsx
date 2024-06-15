@@ -9,39 +9,73 @@ import { sbClient } from "@/supabase/supabase_client";
 import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
 
 import styles from "./ProtectedHeader.module.css"
+import useGlobalStore from "@/hooks/useGlobalStore"
 
 interface ProtectedHeaderProps {
     title?: string,
-    isDropdownVisible: boolean,
-    navTogglerCallback: MouseEventHandler<HTMLButtonElement>,
-    dropdownTogglerCallback: MouseEventHandler<HTMLDivElement>,
-    dropdownTogglerRef: Ref<HTMLDivElement>,
     className?: string,
-    togglerClassName?: string,
 }
 
 export default function ProtectedHeader(props: ProtectedHeaderProps) {
     const router = useRouter()
+    const dropdownRef = useRef<HTMLDivElement | null>(null)
     const { user } = useDashboardData()
+
+    const toggleNav = useGlobalStore(state => state.toggleNav)
+    const toggleDropdown = useGlobalStore(state => state.toggleDropdown)
+    const toggleBackdrop = useGlobalStore(state => state.toggleBackdrop)
+    const addBackdropCallback = useGlobalStore(state => state.addBackdropCallback)
+    const closeBackdrop = useGlobalStore(state => state.closeBackdrop)
+
+    const isDropdownToggled = useGlobalStore((state) => state.isDropdownToggled)
     
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (e.target === null) return
+
+            if (!dropdownRef.current?.contains(e.target as Node)) {
+                toggleDropdown(false);
+            }
+        }
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && isDropdownToggled) {
+                toggleDropdown(false)
+            }
+        }
+        
+        document.addEventListener("keydown", handleKeyDown)
+        document.addEventListener("mousedown", handleOutsideClick)
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown)
+            document.removeEventListener("mousedown", handleOutsideClick)
+        }
+    }, [isDropdownToggled, toggleDropdown])
+
     return (
         <header 
             className={`
                 ${styles["header-element"]}
+                ${isDropdownToggled && styles["show"]}
                 ${props.className}
             `}
         >
             <NavTogglerButton 
-                className={`
-                    ${styles["nav-toggler-button"]}
-                    ${props.togglerClassName}
-                `}
-                onClick={props.navTogglerCallback} 
+                className={styles["nav-toggler-button"]}
+                onClick={() => {
+                    toggleNav(true)
+                    toggleBackdrop(true)
+                    addBackdropCallback(() => toggleNav(false))
+                }}
             />
             <div 
-                ref={props.dropdownTogglerRef}
+                ref={dropdownRef}
                 className={styles["profile-container"]}
-                onClick={props.dropdownTogglerCallback}
+                onClick={() => {
+                    const value = !isDropdownToggled
+                    toggleDropdown(value)
+                }}
             >
                 <span>{user?.user_metadata?.username || "No username"}</span>
                 <div className={styles["profile-icon"]} />
@@ -49,7 +83,7 @@ export default function ProtectedHeader(props: ProtectedHeaderProps) {
                 <div 
                     className={`
                         ${styles["profile-dropdown"]}
-                        ${props.isDropdownVisible && styles["show"]}
+                        ${isDropdownToggled && styles["show"]}
                     `}
                 >
                     <ul className={styles["profile-dropdown-list"]}>

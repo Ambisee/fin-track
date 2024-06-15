@@ -1,34 +1,36 @@
 "use client"
 
 import Link from "next/link"
-import { MouseEventHandler } from "react"
 
 import ThemeSwitchButton from "../ThemeSwitchButton/ThemeSwitchButton"
 import CrossButton from "../CrossButton/CrossButton"
-import NavTogglerButton from "../NavTogglerButton/NavTogglerButton"
-import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 
 import styles from "./ProtectedNavbar.module.css"
+import useGlobalStore from "@/hooks/useGlobalStore"
 
 interface ProtectedNavbarProps {
     className?: string,
     crossButtonClassName?: string,
-    crossButtonCallback: MouseEventHandler<HTMLButtonElement>
+    // crossButtonCallback: MouseEventHandler<HTMLButtonElement>
 }
 
 export default function ProtectedNavbar(props: ProtectedNavbarProps) {
-    const { setIsNavToggled, setIsBackdropVisible } = useLayout()
+    const toggleNav = useGlobalStore((state) => state.toggleNav)
+    const toggleBackdrop = useGlobalStore((state) => state.toggleBackdrop)
+    const closeBackdrop = useGlobalStore(state => state.closeBackdrop)
     
+    const isNavToggled = useGlobalStore(state => state.isNavToggled)
+
     return (
-        <div 
+        <div
             className={`
+                ${isNavToggled && styles["show"]}
                 ${styles["nav-container"]}
-                ${props.className}
             `}
         >
             <div className={styles["button-container"]}>
                 <CrossButton 
-                    onClick={props.crossButtonCallback} 
+                    onClick={closeBackdrop} 
                     className={`
                         ${styles["cross-button"]}
                         ${props.crossButtonClassName}
@@ -42,8 +44,8 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                         <Link 
                             href="/dashboard"
                             onClick={() => {
-                                setIsNavToggled(false)
-                                setIsBackdropVisible(false)
+                                toggleNav(false)
+                                toggleBackdrop(false)
                             }} 
                         >
                             Home
@@ -53,8 +55,8 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                         <Link 
                             href="/dashboard/settings"
                             onClick={() => {
-                                setIsNavToggled(false)
-                                setIsBackdropVisible(false)
+                                toggleNav(false)
+                                toggleBackdrop(false)
                             }}
                         >
                             Settings
@@ -64,8 +66,8 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                         <Link 
                             href="/dashboard/entries"
                             onClick={() => {
-                                setIsNavToggled(false)
-                                setIsBackdropVisible(false)
+                                toggleNav(false)
+                                toggleBackdrop(false)
                             }} 
                         >
                             Entries
@@ -74,8 +76,8 @@ export default function ProtectedNavbar(props: ProtectedNavbarProps) {
                     <li className={styles["nav-item"]}>
                         <Link 
                             onClick={() => {
-                                setIsNavToggled(false)
-                                setIsBackdropVisible(false)
+                                toggleNav(false)
+                                toggleBackdrop(false)
                             }} 
                             href="/dashboard/analytics"
                         >

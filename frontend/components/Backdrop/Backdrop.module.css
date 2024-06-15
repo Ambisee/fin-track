@@ -1,0 +1,60 @@
+.backdrop {
+    width: 100svw;
+    height: 100svh;
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    z-index: 75;
+
+    background: rgb(0 0 0 / 0);
+    backdrop-filter: blur(0.35rem);
+    -webkit-backdrop-filter: blur(0.35rem);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
+    transition-delay: visibility 0.35s ease;
+}
+
+.backdrop.show {
+    visibility: visible;
+    opacity: 1;
+    
+    transition: opacity 0.35s ease;
+}
+
+
+@media screen and (min-width: 640px) {
+    .backdrop {
+        width: 100svw;
+        height: 100svh;
+    
+        position: absolute;
+    
+        top: 0;
+        left: 0;
+    
+        z-index: 100;
+    
+        background: rgb(0 0 0 / 0);
+        backdrop-filter: blur(0.35rem);
+        -webkit-backdrop-filter: blur(0.35rem);
+    
+        opacity: 0;
+        visibility: hidden;
+    
+        transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
+        transition-delay: visibility 0.35s ease;
+    }
+    
+    .backdrop.show {
+        visibility: visible;
+        opacity: 1;
+        
+        transition: opacity 0.35s ease;
+    }
+}

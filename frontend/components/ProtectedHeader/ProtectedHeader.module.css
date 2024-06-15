@@ -97,3 +97,9 @@
     background-color: rgb(var(--primary-color) / 0.5);
     color: rgb(var(--secondary-color));
 }
+
+@media screen and (min-width: 640px) {
+    .nav-toggler-button {
+        visibility: hidden;
+    }
+}

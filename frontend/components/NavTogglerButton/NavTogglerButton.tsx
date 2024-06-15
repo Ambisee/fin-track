@@ -12,11 +12,12 @@ interface NavTogglerButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<H
 export default function NavTogglerButton(props: NavTogglerButtonProps) {
     return (
         <button 
+            {...props}
             onClick={props.onClick}
             className={`
                 ${styles["button-element"]} 
                 ${props.className}
-            `} 
+            `}
         >
             <div className={styles["line"]}></div>
             <div className={styles["line"]}></div>

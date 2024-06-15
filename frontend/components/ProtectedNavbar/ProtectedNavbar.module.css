@@ -10,6 +10,17 @@
     backdrop-filter: blur(0.75rem);
 
     z-index: 100;
+
+    /* Positional */
+    position: absolute;
+    
+    top: 0;
+    right: 100%;
+
+    transition: translate 0.35s ease;
+}
+.nav-container.show {
+    translate: 100% 0;
 }
 
 .button-container {
@@ -62,4 +73,23 @@
     position: absolute;
 
     z-index: 1;
+}
+
+@media screen and (min-width: 640px) {
+    .nav-container {
+        left: 0;
+        position: relative;
+
+        z-index: 75;
+
+        transition: none;
+        transition-property: translate;
+    }
+    .nav-container.show {
+        translate: 0;
+    }
+
+    .cross-button {
+        display: none;
+    }
 }

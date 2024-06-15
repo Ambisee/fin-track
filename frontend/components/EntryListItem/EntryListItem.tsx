@@ -19,8 +19,8 @@ interface EntryListItemProps {
 }
 
 export default function EntryListItem(props: EntryListItemProps) {
-
-	return (
+	
+    return (
 		<li
             onClick={(e) => {
                 if (props.isSelected) {

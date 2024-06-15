@@ -5,32 +5,34 @@ import { useState, useEffect, useMemo } from "react"
 import { Entry } from "@/supabase"
 import { sortDataByGroup } from "@/helpers/data_helper"
 import { useDashboardData } from "../DashboardDataProvider/DashboardDataProvider"
-import { useLayout } from "../ProtectedLayoutProvider/ProtectedLayoutProvider"
 import EntryList from "../EntryList/EntryList"
 
 import styles from "./DashboardEntriesContent.module.css"
 import EntryFormPopup from "../EntryFormPopup/EntryFormPopup"
+import useGlobalStore from "@/hooks/useGlobalStore"
 
 export default function DashboardEntriesContent() {
     const { data } = useDashboardData()
-    const { setIsBackdropVisible, setBackdropToggleCallbacks } = useLayout()
+    
+    const toggleBackdrop = useGlobalStore(state => state.toggleBackdrop)
+    const addBackdropCallback = useGlobalStore(state => state.addBackdropCallback)
+    const closeBackdrop = useGlobalStore(state => state.closeBackdrop)
+
     const [editValues, setEditValues] = useState<Entry | undefined>(undefined)
     const [isEditFormVisible, setIsEditFormVisible] = useState<boolean>(false)
     
     useEffect(() => {
-		setBackdropToggleCallbacks([() => setIsEditFormVisible(false)])
-
-		return () => {
-			setBackdropToggleCallbacks([])
-		}
-	}, [setBackdropToggleCallbacks])
-
+		addBackdropCallback(() => setIsEditFormVisible(false))
+	}, [addBackdropCallback])
 
     const tables = useMemo(() => {
         const toggleEntryEditForm = (data: Entry) => {
             setEditValues(data)
-            setIsBackdropVisible(true)
+            toggleBackdrop(true)
             setIsEditFormVisible(true)
+
+            addBackdropCallback(() => setEditValues(undefined))
+            addBackdropCallback(() => setIsEditFormVisible(false))
         }
 
         return sortDataByGroup(data).map((value) => {
@@ -48,7 +50,7 @@ export default function DashboardEntriesContent() {
                 </div>
             )
         })
-    }, [data, setIsBackdropVisible])
+    }, [data, toggleBackdrop, addBackdropCallback])
 
     return (
         <>
@@ -56,10 +58,7 @@ export default function DashboardEntriesContent() {
             {tables}
             <EntryFormPopup 
                 type="EDIT_ENTRY"
-                showPopupCallback={(arg) => {
-                    setIsEditFormVisible(arg)
-                    setIsBackdropVisible(arg)
-                }}
+                showPopupCallback={() => closeBackdrop()}
                 isPopupVisible={isEditFormVisible}
                 values={editValues}
             />

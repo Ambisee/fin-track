@@ -28,7 +28,7 @@
     transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
     transition-delay: visibility 0.35s ease;
 }
-.entry-form-container.visible {
+.entry-form-container.visible {    
     visibility: visible;
 
     opacity: 1;
@@ -41,6 +41,7 @@
     padding: 1rem;
     padding-top: 0;
 }
+
 
 .entry-form-header {
     display: flex;

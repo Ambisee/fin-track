@@ -6,24 +6,10 @@
     position: relative;
 }
 
-.nav-bar {
-    position: absolute;
-    
-    top: 0;
-    right: 100%;
-
-    z-index: 100;
-
-    transition: translate 0.35s ease;
-}
-
 .header {
     z-index: 50;
 }
 
-.nav-bar.show {
-    translate: 100% 0;
-}
 
 .main-element {
     max-height: 100svh;
@@ -150,94 +136,16 @@ button.bottom-close-button:focus {
     color: rgb(var(--primary-color));
 }
 
-.backdrop {
-    width: 100svw;
-    height: 100svh;
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    z-index: 75;
-
-    background: rgb(0 0 0 / 0);
-    backdrop-filter: blur(0.35rem);
-    -webkit-backdrop-filter: blur(0.35rem);
-
-    opacity: 0;
-    visibility: hidden;
-
-    transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
-    transition-delay: visibility 0.35s ease;
-}
-
-.backdrop.show {
-    visibility: visible;
-    opacity: 1;
-    
-    transition: opacity 0.35s ease;
-}
 
 @media screen and (min-width: 640px) {
     .outer-container {
         display: grid;
         grid-template-columns: auto 1fr;
-    }    
-
-    .nav-bar {
-        left: 0;
-        position: relative;
-
-        z-index: 75;
-
-        transition: none;
-        transition-property: translate;
-    }
-    .nav-bar.show {
-        translate: 0;
-    }
-
-    .cross-button {
-        display: none;
-    }
-
-    .nav-toggler-button {
-        visibility: hidden;
     }
     
     .entry-form-container {
         min-height: 32.5rem;
         z-index: 125;
-    }
-
-    .backdrop {
-        width: 100svw;
-        height: 100svh;
-    
-        position: absolute;
-    
-        top: 0;
-        left: 0;
-    
-        z-index: 100;
-    
-        background: rgb(0 0 0 / 0);
-        backdrop-filter: blur(0.35rem);
-        -webkit-backdrop-filter: blur(0.35rem);
-    
-        opacity: 0;
-        visibility: hidden;
-    
-        transition: opacity 0.35s ease, visibility 0.35s ease; /* Hack to make opacity animation visible */
-        transition-delay: visibility 0.35s ease;
-    }
-    
-    .backdrop.show {
-        visibility: visible;
-        opacity: 1;
-        
-        transition: opacity 0.35s ease;
     }
 }
 

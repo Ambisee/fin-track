@@ -66,7 +66,7 @@ const validatePassword = (value: string) => {
 export default function RegistrationForm() {
     const router = useRouter()
     const { setIsLoading } = usePortalLoader()
-    const { register, watch, handleSubmit, formState: { errors, dirtyFields } } = useForm({
+    const { register, watch, control, handleSubmit, getValues, formState: { errors, dirtyFields } } = useForm({
         mode: "onChange"
     })
     
@@ -110,7 +110,7 @@ export default function RegistrationForm() {
             message: "This field is required."
         },
         validate: {
-            passwordMatch: (value) => value === watch("password") || "The values of the passwords don't match."
+            passwordMatch: (value) => value === getValues("password") || "The values of the passwords don't match."
         }
     })
 
@@ -159,6 +159,7 @@ export default function RegistrationForm() {
                 <div>
                     <TextField
                         required 
+                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
@@ -178,6 +179,7 @@ export default function RegistrationForm() {
                 <div>
                     <TextField 
                         required
+                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Email" 
                         className={styles["input-element"]} 
@@ -197,6 +199,7 @@ export default function RegistrationForm() {
                 <div>
                     <PasswordField 
                         required
+                        control={control}
                         autoComplete="new-password"
                         fieldDisplayName="Password" 
                         className={`
@@ -276,7 +279,8 @@ export default function RegistrationForm() {
                     </div>
                 </div>
                 <div>
-                    <PasswordField  
+                    <PasswordField
+                        control={control}
                         fieldDisplayName="Confirm Password"
                         className={styles["input-element"]} 
                         registerObject={confirmPasswordRegisterObject}
