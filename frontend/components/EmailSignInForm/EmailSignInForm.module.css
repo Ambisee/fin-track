@@ -10,7 +10,7 @@
     gap: var(--grid-gap-value);
 }
 .input-field {
-    min-height: 2.5rem;
+    min-height: 3rem;
 }
 
 /* Forgot Password Link */
@@ -21,11 +21,14 @@
     position: relative;
 }
 .forgot-password-link {
-    position: absolute;
+    /* position: absolute;
     top: calc(-1 * var(--grid-gap-value) + 0.1rem);
-    right: 0;
+    right: 0; */
 
-    color: rgb(var(--tertiary-color-cyan));
+    width: fit-content;
+    margin: 0 auto;
+
+    color: rgb(var(--tertiary-color-purple));
 }
 .forgot-password-link:hover {
     text-decoration: underline;
@@ -47,7 +50,7 @@
     justify-self: center;
 }
 .register-link {
-    color: rgb(var(--tertiary-color-cyan));
+    color: rgb(var(--tertiary-color-purple));
 }
 .register-link:hover {
     text-decoration: underline;

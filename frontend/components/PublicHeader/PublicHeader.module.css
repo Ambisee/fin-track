@@ -26,7 +26,7 @@
 }
 
 .theme-switch-button {
-    max-width: 1rem;
+    max-width: 1.5rem;
 }
 
 .clickables-container {
@@ -49,13 +49,15 @@
 .page-link {
     padding: 0.1rem 0.2rem;
     
-    font-size: 0.75rem;
+    font-size: 1rem;
     
+    color: rgb(var(--tertiary-color-purple));
+
     transition:
         100ms ease
 }
 .page-link:hover {
-    color: rgb(var(--secondary-color) / 0.5);
+    color: rgb(var(--tertiary-color-purple) / 0.5);
 }
 
 .register-link {

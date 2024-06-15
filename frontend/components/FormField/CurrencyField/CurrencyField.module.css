@@ -56,8 +56,6 @@
     top: 50%;
     left: var(--input-padding);
 
-    font-size: clamp(0.75rem, 3svw, 1rem);
-
     color: rgb(var(--secondary-color));
 
     translate: 0 -50%;
@@ -72,7 +70,7 @@
 
 .input-element.filled ~ .input-label,
 .input-element:focus ~ .input-label {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
 
     padding: 0 var(--label-filled-state-padding);
 

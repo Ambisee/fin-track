@@ -10,8 +10,8 @@
 
 /* Google Sign In Button */
 .google-button {
-    width: 12.5rem;
-    height: 2.5rem;
+    width: 15rem;
+    height: 3rem;
 
     background-color: rgb(255, 255, 255);
     color: rgb(var(--dark-primary));

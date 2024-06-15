@@ -7,6 +7,7 @@
 
 .outer-container {
     width: 85%;
+    padding-bottom: 2.5rem;
     min-width: 7.5rem;
     max-width: 30rem;
 
@@ -33,17 +34,9 @@
 .to-login-link {
     text-wrap: nowrap;
 
-    color: rgb(var(--tertiary-color-cyan));
+    color: rgb(var(--tertiary-color-purple));
 }
 .to-login-link:hover {
     text-decoration: underline;
 }
 
-@media screen and (min-height: 640px) { 
-    .inner-form-container {
-        align-self: center;
-        transform: translateY(
-            calc(-1 * var(--header-min-height))
-        );
-    }
-}

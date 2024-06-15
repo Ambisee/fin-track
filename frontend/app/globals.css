@@ -10,12 +10,10 @@
 
   --tertiary-color-purple: 143 0 255;
   --tertiary-color-purple-hover: 97 0 172;
-  --tertiary-color-cyan: 0 240 255;
-  --tertiary-color-cyan-hover: 0 211 224;
 
   --theme-switch-transition: 200ms ease;
 
-  --header-min-height: 3rem;
+  --header-min-height: 4rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -106,11 +104,9 @@ input:-webkit-autofill:hover {
 [data-theme='dark-theme'] body {
     --primary-color: var(--dark-primary);
     --secondary-color: var(--dark-secondary);
-    --tertiary-color-cyan: var(--dark-tertiary-cyan);
 }
 
 [data-theme='light-theme'] body {
     --primary-color: var(--light-primary);
     --secondary-color: var(--light-secondary);
-    --tertiary-color-cyan: var(--light-tertiary-cyan);
 }

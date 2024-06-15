@@ -31,7 +31,7 @@
 .to-login-link {
     text-wrap: nowrap;
 
-    color: rgb(var(--tertiary-color-cyan));
+    color: rgb(var(--tertiary-color-purple));
 }
 .to-login-link:hover {
     text-decoration: underline;

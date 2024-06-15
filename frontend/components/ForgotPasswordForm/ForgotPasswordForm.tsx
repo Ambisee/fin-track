@@ -82,7 +82,8 @@ export default function ForgotPasswordForm() {
                     for instructions on how to reset your password.
                 </p>
                 <div className={styles["input-field"]}>
-                    <TextField 
+                    <TextField
+                        variant="outlined" 
                         registerObject={emailRegisterObject}
                         fieldDisplayName="Email"
                     />

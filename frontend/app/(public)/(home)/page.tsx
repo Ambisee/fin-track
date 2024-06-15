@@ -31,7 +31,7 @@ export default function Home() {
                     <ActionLink href={LOGIN_PAGE_URL}>
                         Get started
                     </ActionLink>
-                    <ActionLink id={styles["action-link-2"]} href="/about">
+                    <ActionLink id={styles["action-link-about"]} href="/about">
                         Learn more
                     </ActionLink>
                 </div>

@@ -3,8 +3,6 @@
     top: 1.5rem;
     left: var(--input-padding);
 
-    font-size: clamp(0.75rem, 3svw, 1rem);
-
     color: rgb(var(--secondary-color));
 
     translate: 0 -50%;
@@ -17,7 +15,7 @@
     display: none;
 }
 .editor.filled + .input-label {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
 
     padding: 0 var(--label-filled-state-padding);
 

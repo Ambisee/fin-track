@@ -4,9 +4,12 @@
 
     place-self: center;
 
+    color: rgb(var(--light-primary));
     background-color: rgb(var(--tertiary-color-purple));
 
-    color: rgb(var(--light-primary));
+    border-radius: 20rem;
+
+    font-size: 1rem;
 
     transition: var(--theme-switch-transition);
 }

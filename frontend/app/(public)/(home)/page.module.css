@@ -43,7 +43,7 @@
     max-width: 15rem;
     width: 15%;
 }
-#action-link-2 {
+#action-link-about {
     --action-button-color: var(--secondary-color);
     --action-button-hover-color: var(--primary-color);
 }

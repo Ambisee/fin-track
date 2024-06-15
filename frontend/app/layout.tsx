@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-before-interactive-script-outside-document */
 
 import { ReactNode } from "react"
-import { Raleway } from "next/font/google"
+import { Raleway, Roboto } from "next/font/google"
 
 import ThemeProvider from "@/components/ThemeProvider/ThemeProvider"
 
@@ -14,6 +14,11 @@ interface GlobalLayoutProps {
 export const raleway = Raleway({
     subsets: ["latin-ext"],
     weight: ["300", "400", "500", "700"]
+})
+
+export const roboto = Roboto({
+    subsets: ["latin-ext"],
+    weight: ["500"]
 })
 
 // Script to retrieve the theme from the localStorage first

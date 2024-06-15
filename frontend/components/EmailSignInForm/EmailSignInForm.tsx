@@ -28,7 +28,7 @@ export default function EmailSignInForm() {
     })
 
     return (
-        <BaseFormWrapper title="Sign in with an email">
+        <BaseFormWrapper>
             <form 
                 className={styles["form-element"]}
                 onSubmit={(e) => {
@@ -67,7 +67,8 @@ export default function EmailSignInForm() {
                 }}
             >
                 <div className={styles["input-field-wrapper"]}>
-                    <TextField 
+                    <TextField
+                        variant="outlined" 
                         fieldDisplayName="Email" 
                         className={styles["input-field"]}
                         registerObject={emailRegisterObject}
@@ -75,15 +76,11 @@ export default function EmailSignInForm() {
                 </div>
                 <div className={styles["input-field-wrapper"]}>
                     <PasswordField
+                        variant="outlined"
                         fieldDisplayName="Password"
                         className={styles["input-field"]}
                         registerObject={passwordRegisterObject}
                     />
-                </div>
-                <div className={styles["forgot-password-link-container"]}>
-                    <Link href={FORGOT_PASSWORD_PAGE_URL} className={styles["forgot-password-link"]}>
-                        Forgot your password? 
-                    </Link>
                 </div>
                 <ActionButton 
                     className={styles['submit-button']}
@@ -95,6 +92,13 @@ export default function EmailSignInForm() {
                     <span>
                         Don&apos;t have an account? <Link href={REGISTRATION_PAGE_URL} className={styles["register-link"]}>Create an account</Link>
                     </span>
+                </div>
+                <div className={styles["forgot-password-link-container"]}>
+                    <center>
+                        <Link href={FORGOT_PASSWORD_PAGE_URL} className={styles["forgot-password-link"]}>
+                            Forgot your password? 
+                        </Link>
+                    </center>
                 </div>
             </form>
         </BaseFormWrapper>

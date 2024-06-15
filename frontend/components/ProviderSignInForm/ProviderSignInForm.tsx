@@ -2,24 +2,19 @@
 
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Roboto } from "next/font/google"
 
+import { roboto } from "@/app/layout"
 import { sbClient } from "@/supabase/supabase_client"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import ProviderSignInButton from "../ProviderSignInButton/ProviderSignInButton"
 
 import styles from "./ProviderSignInForm.module.css"
 
-const roboto = Roboto({
-    weight: ["300", "400"],
-    subsets: ["greek"]
-})
-
 export default function ProviderSignInForm() {
     const router = useRouter()
 
     return (
-        <BaseFormWrapper title="Sign in with a provider">
+        <BaseFormWrapper>
             <div className={styles["button-container"]}>
                 <ProviderSignInButton
                     onClick={

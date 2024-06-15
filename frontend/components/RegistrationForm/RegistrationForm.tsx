@@ -298,7 +298,6 @@ export default function RegistrationForm() {
                 >
                     Create account
                 </ActionButton>
-                <span className={styles["verification-required-message"]}>*Email verification required.</span>
             </form>
         </BaseFormWrapper>
     )    
