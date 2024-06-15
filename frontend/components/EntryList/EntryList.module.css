@@ -115,7 +115,6 @@
 }
 
 .empty-list-message-container {
-    padding: 0 1rem;
     color: rgb(var(--secondary-color) / 0.5);
 }
 .empty-list-header::after {

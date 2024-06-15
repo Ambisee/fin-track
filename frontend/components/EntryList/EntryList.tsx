@@ -116,6 +116,20 @@ export default function EntryList(props: EntryListProps) {
             })
 	}
 
+    if (props.data.length === 0) {
+        return (
+            <>
+                <h3 className={styles["list-title"]}>{props.title}</h3>
+                <div className={styles["empty-list-message-container"]}>
+                    <h1 className={styles["empty-list-header"]}>Nothing here yet</h1>
+                    <p className={styles["empty-list-description"]}>
+                        The entries with the most recent date value specified will appear here.
+                    </p>
+                </div>
+            </>
+        )
+    }
+
 	return (
 		<>
             <h3 className={styles["list-title"]}>{props.title}</h3>
@@ -268,14 +282,6 @@ export default function EntryList(props: EntryListProps) {
 						}}
 					/>
 				))}
-                {props.data.length === 0 && (
-                    <div className={styles["empty-list-message-container"]}>
-                        <h1 className={styles["empty-list-header"]}>Nothing here yet</h1>
-                        <p className={styles["empty-list-description"]}>
-                            The entries with the most recent date value specified will appear here.
-                        </p>
-                    </div>
-                )}
 			</ul>
 		</>
 	)
