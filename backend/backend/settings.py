@@ -18,9 +18,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-PDFKIT_CONFIG = None
-if sys.platform == "win32":
-    PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=os.path.join(BASE_DIR, "wkhtmltox\\wkhtmltox\\bin\\wkhtmltopdf.exe"))
+DOCUMENT_ENGINE = os.getenv("DOCUMENT_ENGINE")
+if DOCUMENT_ENGINE == "pdfkit":
+    PDFKIT_CONFIG = None
+    if sys.platform == "win32":
+        PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=os.path.join(BASE_DIR, "wkhtmltox\\windows\\bin\\wkhtmltopdf.exe"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

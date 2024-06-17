@@ -6,6 +6,10 @@
 **/db*
 **/__pycache__
 **/.vscode
+**/migrations
+**/storage
 
-*/.env*
+**/.env*
 Dockerfile
+.dockerignore
+test.py

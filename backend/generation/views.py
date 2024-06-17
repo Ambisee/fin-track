@@ -3,7 +3,6 @@ from datetime import datetime
 from calendar import month_name
 from concurrent.futures import ThreadPoolExecutor
 
-from gotrue import User
 from dotenv import load_dotenv
 from django.conf import settings
 from rest_framework.views import APIView
@@ -12,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 
 from .data_retriever import DataRetriever
-from .document_engine import DocumentEngine
+from .document_engine import ReportlabEngine, PDFKitEngine
 from .delivery_engine import DeliveryEngine
 
 if settings.DEBUG:
@@ -24,10 +23,17 @@ if settings.DEBUG:
 
 class BaseAdminView(APIView):
     data_retriever = DataRetriever()
-    document_engine = DocumentEngine()
     delivery_engine = DeliveryEngine()
+    
+    if settings.DOCUMENT_ENGINE == "pdfkit":
+        document_engine = PDFKitEngine()
+    else:
+        document_engine = ReportlabEngine()
 
-    permission_classes = []
+    if settings.DEBUG:
+        permission_classes = []
+    else:
+        permission_classes = [HasAPIKey]
 
 
 class AllowReportUsersView(BaseAdminView):
@@ -66,6 +72,8 @@ class AutomatedMonthlyReportView(BaseAdminView):
 
         with ThreadPoolExecutor(max_workers=10) as executor:
             for i, d in enumerate(data):
+                # 1. Generate report with the document engine
+                # 2. Update the filepath to the document of the user
                 executor \
                     .submit(self._generate_report, d['user'], d['data']) \
                     .add_done_callback(lambda future: data[i].update(filepath=future.result()))
@@ -77,7 +85,7 @@ class AutomatedMonthlyReportView(BaseAdminView):
                 f"""
                     Hello {d['user'].user_metadata['username']},
 
-                    You have subscribed for a monthly financial report to be emailed. 
+                    You have subscribed for a monthly financial report to be emailed.
                     Attached to this email is the monthly financial report for the period: <b>{month_name[period.month]} {period.year}</b>.
                     
                     Thank you for using FinTrack.

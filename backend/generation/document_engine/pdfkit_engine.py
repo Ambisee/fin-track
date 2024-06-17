@@ -1,5 +1,3 @@
-import os
-import base64
 from datetime import datetime
 from calendar import month_name, monthrange
 
@@ -8,10 +6,10 @@ from gotrue import User
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from .. import apps
+from .base_engine import BaseDocumentEngine
 
 
-class DocumentEngine:
+class PDFKitEngine(BaseDocumentEngine):
     def __init__(self, period: tuple[int, int] = None):
         if period is None:
             return
@@ -50,26 +48,8 @@ class DocumentEngine:
         )
     
     def generate_pdf(self, user: User, entries):
-        """Generate a PDF report for the specified user and their data
-
-        Params
-        ------
-        user: User
-            A User object
-        entries: list of Entry
-            A list user's data
-
-        Returns
-        -------
-        str
-            The filepath to the generated PDF file
-        """
-
         html_str = self.generate_html(user, entries)
-        filepath = os.path.join(os.path.dirname(apps.__file__), "storage", "pdf", f"{user.id}.pdf")
-
-        if not os.path.exists(os.path.dirname(filepath)):
-            os.makedirs(os.path.dirname(filepath))
+        filepath = self.get_filepath(user)
 
         pdfkit.from_string(
             html_str,
