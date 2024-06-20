@@ -2,7 +2,7 @@
     min-height: 2.5rem;
 
     display: grid;
-    grid-template-columns: minmax(2rem, 0.01fr) 1fr;
+    grid-template-columns: auto 1fr;
 
     position: relative;
 }
@@ -12,6 +12,8 @@
 }
 
 .sign-toggler {
+    padding: 0 0.75rem;
+
     color: rgb(var(--extra-widget-icon-color));
     background-color: rgb(var(--extra-widget-background-color));
 

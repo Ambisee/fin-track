@@ -55,6 +55,7 @@ export default function DashboardEntriesContent() {
     return (
         <>
             <h2 className={styles["page-title"]}>Entries</h2>
+            
             {tables}
             <EntryFormPopup 
                 type="EDIT_ENTRY"

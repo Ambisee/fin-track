@@ -18,7 +18,7 @@ interface FormTemplateCommonProps {
 }
 
 type CommonFieldProps = 
-    Omit<React.HTMLProps<HTMLInputElement>, "children" | "type"> & 
+    Omit<React.HTMLProps<HTMLInputElement>, "children"> & 
     Omit<FormTemplateCommonProps, "children" > &  
 {
     className?: string,

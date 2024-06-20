@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 
-import TextField from "../FormField/TextField/TextField"
 import BaseFormWrapper from "../BaseFormWrapper/BaseFormWrapper"
 import ActionButton from "../ActionButton/ActionButton"
 import usePortalLoader from "@/hooks/usePortalLoader"
 import RecoveryForm from "../RecoveryForm/RecoveryForm"
+import EmailField from "../FormField/EmailField/EmailField"
 import { sbClient } from "@/supabase/supabase_client"
 import { IS_EMAIL_REGEX } from "@/helpers/input_validation"
 
@@ -82,7 +82,7 @@ export default function ForgotPasswordForm() {
                     for instructions on how to reset your password.
                 </p>
                 <div className={styles["input-field"]}>
-                    <TextField
+                    <EmailField
                         variant="outlined" 
                         registerObject={emailRegisterObject}
                         fieldDisplayName="Email"
@@ -99,6 +99,7 @@ export default function ForgotPasswordForm() {
                     </div>
                 </div>
                 <ActionButton
+                    className={styles["submit-button"]}
                     type="submit"
                 >
                     Submit

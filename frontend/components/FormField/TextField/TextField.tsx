@@ -1,11 +1,11 @@
 "use client"
 
 import { AnimationEventHandler, HTMLProps, useEffect, useRef, useState } from "react"
+import { UseFormRegisterReturn } from "react-hook-form"
 
 import FormTemplate, { CommonFieldProps, FormTemplateProps, UseHookFormFieldProps } from "../FormTemplate"
 
 import styles from "./TextField.module.css"
-import { UseFormRegisterReturn } from "react-hook-form"
 
 type TextFieldProps = CommonFieldProps & UseHookFormFieldProps
 
@@ -55,7 +55,7 @@ export default function TextField({
                 `}
             >
                 <input 
-                    type="text"
+                    type={props.type ? props.type : "text"}
                     placeholder={showLabel ? "" : props.placeholder}
                     onChange={(e) => {
                         registerObject?.onChange(e)
@@ -103,3 +103,5 @@ export default function TextField({
         </FormTemplate>
     )
 }
+
+export {type TextFieldProps}

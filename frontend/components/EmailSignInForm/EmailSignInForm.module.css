@@ -2,7 +2,7 @@
 .form-element {
     --grid-gap-value: 1rem;
 
-    width: 85%;
+    width: 90%;
     margin: 0.5rem auto;
 
     display: grid;
@@ -15,7 +15,7 @@
 
 /* Forgot Password Link */
 .forgot-password-link-container {
-    font-size: clamp(0.5rem, 2.5svw, 0.65rem);
+    font-size: 0.875rem;
     font-weight: 700;
 
     position: relative;
@@ -36,6 +36,7 @@
 
 /* Submit Button */
 .submit-button {
+    height: initial;
     padding: 1rem 0.5rem;
 }
 
@@ -44,7 +45,7 @@
     text-align: center;
     text-wrap: nowrap;
     
-    font-size: clamp(0.4rem, 2.75svw, 0.7rem);
+    font-size: 0.875rem;
     font-weight: 600;
 
     justify-self: center;

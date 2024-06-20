@@ -62,17 +62,22 @@ export default function CurrencyField({
                     ${className}
                 `}
             >
-                    <button 
-                        type="button"
-                        tabIndex={-1}
-                        className={`
-                            ${styles["sign-toggler"]}
-                            ${jetBrainsMono.className}
-                        `}
-                        onClick={() => toggleSign()}
-                    >
-                        {sign ? "\u2013" : "+"}
-                    </button>
+                <button 
+                    type="button"
+                    tabIndex={-1}
+                    className={`
+                        ${styles["sign-toggler"]}
+                        ${jetBrainsMono.className}
+                    `}
+                    onClick={() => toggleSign()}
+                >
+                    <div>
+                        {sign ? 
+                            "\u2013" : 
+                            "+"
+                        }
+                    </div>
+                </button>
                 <div className={styles["input-wrapper"]}>
                     <input 
                         type="text" 

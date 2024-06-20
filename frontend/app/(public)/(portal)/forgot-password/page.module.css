@@ -23,7 +23,7 @@
 .to-login-link-container {
     margin-top: 1rem;
     
-    font-size: clamp(0.4rem, 2.75svw, 0.7rem);
+    font-size: 0.875rem;
     font-weight: 600;
 
     text-align: center;
@@ -35,13 +35,4 @@
 }
 .to-login-link:hover {
     text-decoration: underline;
-}
-
-@media screen and ((max-width: 600px) and (min-height: 600px)) {
-    .inner-form-container {
-        align-self: center;
-        transform: translateY(
-            calc(-1 * var(--header-min-height))
-        );
-    }
 }

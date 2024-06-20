@@ -13,6 +13,7 @@ import { sbClient } from "@/supabase/supabase_client"
 import { FORGOT_PASSWORD_PAGE_URL, REGISTRATION_PAGE_URL } from "@/helpers/url_routes"
 
 import styles from "./EmailSignInForm.module.css"
+import EmailField from "../FormField/EmailField/EmailField"
 
 export default function EmailSignInForm() {
     const router = useRouter()
@@ -40,7 +41,6 @@ export default function EmailSignInForm() {
                                 email: data.email,
                                 password: data.password,
                             }).then((value) => {
-                                setIsLoading(false)
                                 if (value.data?.user) {
                                     /**
                                      * Using the Web API function
@@ -54,6 +54,7 @@ export default function EmailSignInForm() {
                                 }
 
                                 if (value?.error) {
+                                    setIsLoading(false)
                                     alert(value?.error.message)
                                 }
                             })
@@ -67,7 +68,7 @@ export default function EmailSignInForm() {
                 }}
             >
                 <div className={styles["input-field-wrapper"]}>
-                    <TextField
+                    <EmailField
                         variant="outlined" 
                         fieldDisplayName="Email" 
                         className={styles["input-field"]}

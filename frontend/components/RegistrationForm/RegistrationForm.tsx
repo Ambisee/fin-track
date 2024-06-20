@@ -22,6 +22,7 @@ import {
 } from "@/helpers/input_validation"
 
 import styles from "./RegistrationForm.module.css"
+import EmailField from "../FormField/EmailField/EmailField"
 
 const passwordRequirements = new Map<
     "minLength" | "upperCase" | "lowerCase" | "digit" | "specialChar" | "noSpace", boolean
@@ -159,6 +160,7 @@ export default function RegistrationForm() {
                 <div>
                     <TextField
                         required 
+                        variant="outlined"
                         autoComplete="new-password"
                         fieldDisplayName="Username" 
                         className={styles["input-element"]} 
@@ -176,8 +178,9 @@ export default function RegistrationForm() {
                     </div>
                 </div>
                 <div>
-                    <TextField 
+                    <EmailField 
                         required
+                        variant="outlined"
                         autoComplete="new-password"
                         fieldDisplayName="Email" 
                         className={styles["input-element"]} 
@@ -197,6 +200,7 @@ export default function RegistrationForm() {
                 <div>
                     <PasswordField 
                         required
+                        variant="outlined"
                         autoComplete="new-password"
                         fieldDisplayName="Password" 
                         className={`
@@ -277,6 +281,8 @@ export default function RegistrationForm() {
                 </div>
                 <div>
                     <PasswordField
+                        required
+                        variant="outlined"
                         fieldDisplayName="Confirm Password"
                         className={styles["input-element"]} 
                         registerObject={confirmPasswordRegisterObject}

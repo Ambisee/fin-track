@@ -1,7 +1,7 @@
 .input-label {
     position: absolute;
-    top: 1.5rem;
-    left: var(--input-padding);
+    top: 1.75rem;
+    left: calc(var(--input-padding));
 
     color: rgb(var(--secondary-color));
 
@@ -27,7 +27,7 @@
 
 .editor {
     height: 100%;
-    padding: 12px 1.25rem;
+    padding: 1rem 1.25rem;
 
     overflow-y: auto;
 }
