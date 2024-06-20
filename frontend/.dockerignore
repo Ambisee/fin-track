@@ -1,31 +1,32 @@
 ## Frontend ##
 
 # next.js
-**/.next/
-**/out/
+*/.next/
+*/out/
 
 # production
-**/build
+*/build
 
 
 # local env files
-**/.env*.local
-**/.env*.production
-**/.env*
-**/.vscode
+*/.env*.local
+*/.env*.production
+*/.env*
+*/.vscode
 
 # vercel
 .vercel
 
 # other files
-**/.prettierrc
-.gitignore
-**/*google*.json
-**/*fin-track*.json
-**/**.sh
-**/wkhtmltox
+*/.prettierrc
+*/*google*.json
+*/*fin-track*.json
+*/*.sh
+*/wkhtmltox
+*/shell_scripts
 *.pdf
 README.md
+.gitignore
 .next
 .git
 

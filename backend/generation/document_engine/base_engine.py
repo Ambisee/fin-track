@@ -32,7 +32,7 @@ class BaseDocumentEngine:
 
     def get_filepath(self, user: User):
         now = datetime.now()
-        filepath = os.path.join(os.path.dirname(apps.__file__), "storage", "pdf", f"{user.id}-{now.strftime('%d%m%Y-%H%M%S')}.pdf")
+        filepath = os.path.join(os.path.dirname(apps.__file__), "static", "documents", f"{user.id}-{now.strftime('%d%m%Y-%H%M%S')}.pdf")
 
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
