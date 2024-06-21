@@ -15,10 +15,6 @@
             font-family: "Raleway", sans-serif;
         }
 
-        html, body {
-            height: 100%;
-        }
-
         #report-title {
             font-size: 20px;
         }
@@ -51,8 +47,6 @@
         }
 
         .entry-table {
-            width: 100%;
-
             font-size: 12px;
         }
 
@@ -127,7 +121,7 @@
                 <tr class="{% cycle 'odd' 'even' %}">
                     <td style="text-align: center;">{{forloop.counter}}</td>
                     <td style="text-align: center;">{{entry.date}}</td>
-                    <td>{{entry.description}}</td>
+                    <td>{{entry.title}}</td>
                     {% if entry.amount_is_positive %}
                         <td>{{entry.amount}}</td>
                         <td>-</td>

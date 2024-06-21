@@ -2,6 +2,7 @@ import os
 import datetime
 import calendar
 
+from httpx import HTTPStatusError
 from supabase import create_client, Client
 from gotrue import User
 
@@ -38,7 +39,7 @@ class DataRetriever:
 
         return self.client.auth.admin.list_users()
 
-    def get_user(self, uid: str) -> User:
+    def get_user(self, uid: str) -> User | None:
         """Retrieve user information based on the given id
 
         Params
@@ -51,8 +52,12 @@ class DataRetriever:
         User
             The user object with the given id
         """
-        response = self.client.auth.admin.get_user_by_id(uid)
-        return response
+        try:
+            response = self.client.auth.admin.get_user_by_id(uid)
+            return response.user
+        
+        except HTTPStatusError:
+            return None
 
 
     def get_allow_report_users(self) -> list[User]:

@@ -54,7 +54,8 @@
 **/wkhtmltox
 *.pdf
 frontend/shell_scripts/*.sh
-backend/generation/static/Raleway
+backend/test.py
 
 ## Root Folder
 change_ext.py
+compose.yaml
