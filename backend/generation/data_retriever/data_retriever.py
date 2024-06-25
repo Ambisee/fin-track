@@ -1,10 +1,11 @@
-import os
 import datetime
 import calendar
 
 from httpx import HTTPStatusError
-from supabase import create_client, Client
+from supabase import Client
 from gotrue import User
+
+from ..supabase_client.supabase_client import client
 
 
 class DataRetriever:
@@ -19,10 +20,7 @@ class DataRetriever:
     """
 
     def __init__(self):
-        supabase_url = os.getenv("SUPABASE_URL")
-        secret_key = os.getenv("SUPABASE_SECRET_KEY")
-
-        self.client: Client = create_client(supabase_url, secret_key)
+        self.client: Client = client
 
     def list_users(self) -> list[User]:
         """Retrieve the list of users in the app.
@@ -36,7 +34,6 @@ class DataRetriever:
         list of User
             The list of user registered on the application
         """
-
         return self.client.auth.admin.list_users()
 
     def get_user(self, uid: str) -> User | None:
@@ -74,13 +71,15 @@ class DataRetriever:
         users = self.list_users()
         result = []
 
+        print(users[0])
         for user in users:
-            if not user.user_metadata.get("allow_report"):
+            if user.user_metadata.get("allow_report") is not True:
                 continue
 
             result.append(user)
 
         return result
+
 
     def get_period_data(self, user: User, month: int, year: int):
         last_date = calendar.monthrange(year, month)[1]

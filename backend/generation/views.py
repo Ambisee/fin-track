@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from calendar import month_name
 from concurrent.futures import ThreadPoolExecutor
@@ -10,31 +9,30 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 
+from .supabase_client.supabase_client import client
 from .data_retriever.data_retriever import DataRetriever
 from .document_engine.reportlab_engine import ReportlabEngine
 from .delivery_engine.delivery_engine import DeliveryEngine
 
-if settings.DEBUG is True:
-    from dotenv import load_dotenv
 
-    os.unsetenv("RESEND_KEY")
-    os.unsetenv("SUPABASE_KEY")
-    os.unsetenv("SUPABASE_URL")
-    load_dotenv('.env')
-
-
-class BaseAdminView(APIView):
+class BaseView(APIView):
     data_retriever = DataRetriever
     document_engine = ReportlabEngine
     delivery_engine = DeliveryEngine
 
+
+class UserView(BaseView):
+    permission_classes = []
+
+
+class AdminView(BaseView):
     if settings.DEBUG is True:
         permission_classes = []
     else:
         permission_classes = [HasAPIKey]
 
 
-class AllowReportUsersView(BaseAdminView):
+class AllowReportUsersView(AdminView):
 
     def get(self, request: Request) -> Response:
         allow_report_users = self.data_retriever().get_allow_report_users()
@@ -49,12 +47,22 @@ class AllowReportUsersView(BaseAdminView):
         })
 
 
-class GenerateReportView(BaseAdminView):
+class GenerateReportView(AdminView):
+
     def _verify_request(self, request: Request):
         data = dict(request.data)
-        if data.get("id") is None:
-            return Response({"error": "Request body doesn't contain an id value"})
-    
+        
+        # Check for the existence of the token in the payload
+        if data.get("token") is None:
+            return Response({"error": "The request doesn't have the required credentials"})
+
+        # Check if the token is valid
+        user_response = client.auth.get_user(data.get("token"))
+        if user_response is None:
+            return Response({"error": "Invalid credentials"})
+
+        # Add user into the processed data
+        data["user"] = user_response.user
         return data
 
     def post(self, request: Request):
@@ -64,9 +72,7 @@ class GenerateReportView(BaseAdminView):
             return request_data
 
         # Get the user
-        user = self.data_retriever().get_user(request_data.get("id"))
-        if user is None:
-            return Response({"error": "Unable to find the user to the corresponding"})
+        user = request_data.get("user")
 
         today = datetime.now()
         data = self.data_retriever().get_period_data(user, today.month, today.year)
@@ -81,7 +87,7 @@ class GenerateReportView(BaseAdminView):
         return response
 
 
-class AutomatedMonthlyReportView(BaseAdminView):
+class AutomatedMonthlyReportView(AdminView):
 
     def _generate_report(self, period, user, data):
         d_engine = ReportlabEngine(period.month, period.year)
