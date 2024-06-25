@@ -4,13 +4,13 @@ wkhtmltox
 # folders
 virtualenv
 db*
-*/__pycache__
+**/__pycache__
 .vscode
 migrations
 storage
 shell_scripts
 
-.env*
+**/.env*
 Dockerfile
 .dockerignore
 test.py

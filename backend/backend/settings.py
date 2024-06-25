@@ -16,7 +16,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DOCUMENT_ENGINE = os.getenv("DOCUMENT_ENGINE")
+DOCUMENT_ENGINE = "reportlab"
+if os.getenv("DOCUMENT_ENGINE") is not None:
+    DOCUMENT_ENGINE = os.getenv("DOCUMENT_ENGINE")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -25,18 +27,22 @@ DOCUMENT_ENGINE = os.getenv("DOCUMENT_ENGINE")
 SECRET_KEY = 'django-insecure-087iw2ikqyj&eqigdn8yy0)8q=n^kyqxrty3st3ap2*)%e@f6r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 debug = os.getenv("DEBUG")
 if debug is None:
     DEBUG = True
 else:
     DEBUG = False if debug.lower() == "false" else True
 
+# Allowed hosts for production environment
 if debug is not None:
-    hosts = os.getenv("ALLOWED_HOSTS").split(';')
-    
-    ALLOWED_HOSTS = []
-    for host in hosts:
-        ALLOWED_HOSTS.append(host.strip())
+    hosts = os.getenv("ALLOWED_HOSTS")
+
+    if hosts is not None:
+        hosts = hosts.split(';')
+        ALLOWED_HOSTS = []
+        for host in hosts:
+            ALLOWED_HOSTS.append(host.strip())
 
 # Application definition
 
@@ -56,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,6 +108,25 @@ DATABASES = {
     }
 }
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    }
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -137,11 +163,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
-if os.getenv("STATIC_ROOT") is not None:
-    STATIC_ROOT = os.getenv("STATIC_ROOT")
+STATIC_ROOT = BASE_DIR / "statictemp"
+STATICFILES_DIRS = [
+    BASE_DIR / "staticfiles"
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Environment variables
+if DEBUG is True:
+    from dotenv import load_dotenv
+
+    os.unsetenv("RESEND_KEY")
+    os.unsetenv("SUPABASE_KEY")
+    os.unsetenv("SUPABASE_URL")
+    load_dotenv('.env')

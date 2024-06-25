@@ -30,5 +30,13 @@ ENV ALLOWED_HOSTS ${ALLOWED_HOSTS}
 # Expose the port that Django runs on
 EXPOSE 8000
 
+RUN python manage.py collectstatic && \
+    python manage.py makemigrations && \
+    python manage.py migrate
+
+# Copy files from the STATIC_ROOT to a STATICFILES_DIRS
+# Change to an arg or 
+RUN cp -r /app/statictemp /app/staticfiles
+
 # Command to run the Django app
 CMD [ "gunicorn" ,"--bind", "0.0.0.0:8000", "backend.wsgi:application" ]
