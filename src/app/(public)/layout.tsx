@@ -1,0 +1,21 @@
+import { sbServer } from "@/lib/supabase"
+import PublicNavbar from "@/components/user/PublicNavbar"
+import { cookies } from "next/headers"
+
+interface PublicLayoutProps {
+	children: JSX.Element
+}
+
+export default async function PublicLayout(props: PublicLayoutProps) {
+	const cookieStore = cookies()
+	const supabase = sbServer(cookieStore)
+
+	const userResponse = await supabase.auth.getUser()
+
+	return (
+		<>
+			<PublicNavbar user={userResponse.data.user} />
+			<div className="min-h-[calc(100vh-80px)]">{props.children}</div>
+		</>
+	)
+}
