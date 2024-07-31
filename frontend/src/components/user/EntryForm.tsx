@@ -45,12 +45,14 @@ interface EntryFormProps {
 
 const formSchema = z.object({
 	date: z.date(),
-	title: z.string().min(1, "Please provide a title"),
+	title: z.string().min(1, "Please provide a transaction title"),
 	amount: z
 		.preprocess((arg) => (arg === "" ? NaN : Number(arg)), z.coerce.string())
 		.pipe(
 			z.coerce
-				.number()
+				.number({
+					invalid_type_error: "Please provide a valid transaction amount"
+				})
 				.nonnegative("Please provide a non-negative amount")
 				.step(0.01, "Please ensure that the value is a multiple of 0.01")
 		)
