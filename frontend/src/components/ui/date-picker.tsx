@@ -50,6 +50,7 @@ export default function DatePicker(props: DatePickerProps) {
 					<DialogTitle>Pick a date</DialogTitle>
 					<DialogDescription asChild>
 						<Calendar
+							defaultMonth={props.value}
 							mode="single"
 							selected={props.value}
 							onSelect={(e) => {

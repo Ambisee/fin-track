@@ -98,7 +98,7 @@ export default function EmailSignInForm() {
 						<FormItem>
 							<FormLabel>Email</FormLabel>
 							<FormControl>
-								<Input inputmode="email" placeholder="Email" {...field} />
+								<Input inputMode="email" placeholder="Email" {...field} />
 							</FormControl>
 						</FormItem>
 					)}

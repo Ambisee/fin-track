@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-export function cn(...inputs: ClassValue[]) {
+function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
@@ -215,7 +215,19 @@ function sortDataByDateGroup(
     return result
 }
 
+function getElementFromNode(node: Node) {
+    if (node instanceof Element) {
+        return node;
+    } else {
+        console.log('The provided node is not an element.');
+        return null;
+    }
+}
+
+
 export { 
+    cn,
     handleDataChange,
-    sortDataByDateGroup
+    sortDataByDateGroup,
+    getElementFromNode
 }

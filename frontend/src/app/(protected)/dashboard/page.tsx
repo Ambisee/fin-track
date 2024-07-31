@@ -15,43 +15,58 @@ import { Entry } from "@/types/supabase"
 
 export default function DashboardHome() {
 	const { toast } = useToast()
-	const { data: userData } = useQuery({
+	const userQuery = useQuery({
 		queryKey: ["user"],
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: false
 	})
-	const { data: entryData } = useQuery({
+	const entriesQuery = useQuery({
 		queryKey: ["entryData"],
 		queryFn: async () =>
 			sbBrowser
 				.from("entry")
 				.select("*")
-				.eq("created_by", userData?.data.user?.id as string)
+				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
 		refetchOnMount: false,
-		enabled: !!userData
+		enabled: !!userQuery.data
 	})
 
 	const renderWelcomeMessage = () => {
-		if (userData?.data.user === undefined || userData?.data.user === null) {
+		if (userQuery.isLoading) {
 			return <Skeleton className="w-full h-8"></Skeleton>
-		} else {
+		} else if (
+			userQuery.data?.data?.user !== null &&
+			userQuery.data?.data?.user !== undefined
+		) {
 			return (
 				<h1 className="text-2xl">
-					Welcome back, {userData?.data.user.user_metadata.username}
+					Welcome back, {userQuery.data?.data?.user.user_metadata.username}
 				</h1>
 			)
+		} else {
+			return <h1 className="text-2xl">ERROR</h1>
 		}
+	}
+
+	const renderRecentEntries = () => {
+		if (entriesQuery.isLoading) {
+			return <Skeleton className="w-full " />
+		}
+
+		return (
+			<div className="mt-8 mb-4">
+				<h2 className="text-xl mb-4">Recent Entries</h2>
+				<EntryList data={entriesQuery.data?.data ?? undefined} />
+			</div>
+		)
 	}
 
 	return (
 		<div>
 			{renderWelcomeMessage()}
-			<div className="mt-8 mb-4">
-				<h2 className="text-xl mb-4">Recent Entries</h2>
-				<EntryList data={entryData?.data ?? []} />
-			</div>
+			{renderRecentEntries()}
 		</div>
 	)
 }

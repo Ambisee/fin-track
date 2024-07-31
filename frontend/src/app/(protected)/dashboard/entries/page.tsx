@@ -8,40 +8,35 @@ import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 
 export default function EntriesPage() {
-	const { data: userData } = useQuery({
+	const userQuery = useQuery({
 		queryKey: ["user"],
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: false
 	})
-	const entryData = useQuery({
+	const entriesQuery = useQuery({
 		queryKey: ["entryData"],
 		queryFn: async () =>
 			sbBrowser
 				.from("entry")
 				.select("*")
-				.eq("created_by", userData?.data.user?.id as string)
+				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
 		refetchOnMount: false,
-		enabled: !!userData
+		enabled: !!userQuery.data
 	})
 
 	const dataGroups = useMemo(() => {
-		if (entryData.data === undefined || entryData.data.data === null) {
-			return undefined
+		if (entriesQuery.isLoading) {
+			return []
 		}
 
-		return sortDataByDateGroup(entryData.data.data)
-	}, [entryData.data])
+		if (entriesQuery.data === undefined || entriesQuery.data.data === null) {
+			return []
+		}
 
-	if (entryData.isLoading || dataGroups === undefined) {
-		return (
-			<>
-				<h2 className="text-xl mb-4">Entries</h2>
-				<Skeleton className="w-full h-10" />
-			</>
-		)
-	}
+		return sortDataByDateGroup(entriesQuery.data.data)
+	}, [entriesQuery.data, entriesQuery.isLoading])
 
 	return (
 		<>

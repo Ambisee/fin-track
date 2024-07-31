@@ -1,8 +1,6 @@
 "use client"
 
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
-import { sbBrowser } from "@/lib/supabase"
-import { useQuery } from "@tanstack/react-query"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -11,7 +9,10 @@ interface DashboardLayoutProps {
 export default function DashboardLayout(props: DashboardLayoutProps) {
 	return (
 		<>
-			<div className="pb-4" vaul-drawer-wrapper="">
+			<div
+				className="p-8 pb-16 min-h-screen md:w-9/12 md:ml-auto"
+				vaul-drawer-wrapper=""
+			>
 				{props.children}
 			</div>
 			<ProtectedNavbar />

@@ -1,1 +1,2 @@
+export const DESKTOP_BREAKPOINT = 768
 export const MAX_USERNAME_LENGTH = 20
