@@ -1,13 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
-
+import { type ClassValue, clsx } from "clsx"
 import { Entry } from "@/types/supabase"
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 
 interface DataGroup {
     month: string,
@@ -20,6 +14,10 @@ const months = [
     'May', 'June', 'July', 'August', 
     'September', 'October', 'November', 'December'
 ]
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 function handleDataChange(
     current: Entry[],
@@ -223,7 +221,6 @@ function getElementFromNode(node: Node) {
         return null;
     }
 }
-
 
 export { 
     cn,
