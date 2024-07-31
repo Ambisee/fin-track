@@ -11,14 +11,11 @@ import { Drawer, DrawerTrigger } from "@/components/ui/drawer"
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	return (
 		<li>
-			<Button
-				variant="ghost"
-				className="p-0 w-full md:block md:my-2 md:first:mt-0 md:last:mb-0 md:p-2"
-			>
+			<Button variant="ghost" className="p-0 w-full md:block">
 				<Link
 					href={props.href}
 					className="grid grid-flow-row justify-items-center gap-1
-                    md:flex md:gap-4"
+                    md:flex md:gap-8"
 				>
 					{props.icon}
 					<span className="text-xs md:text-base">{props.label}</span>
@@ -37,16 +34,12 @@ export default function ProtectedNavbar() {
 			disablePreventScroll={true}
 			setBackgroundColorOnScale={false}
 		>
-			<div
-				className="w-full fixed bottom-0 left-0
-                    h-16 px-6 bg-secondary text-secondary-foreground flex items-center
-                    md:w-3/12 md:fixed md:left-0 md:top-0 md:h-screen md:block md:py-4 md:items-start"
-			>
+			<div className="dashboard-navbar">
 				<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
 					FinTrack
 				</h1>
 				<nav className="w-full">
-					<ul className="list-none flex justify-between items-center w-full md:block">
+					<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-2">
 						<NavLink
 							href="/dashboard"
 							icon={<HomeIcon width={24} height={24} />}
@@ -73,7 +66,7 @@ export default function ProtectedNavbar() {
 							label="Report"
 						/>
 						<NavLink
-							href="dashboard/settings"
+							href="/dashboard/settings"
 							icon={<GearIcon width={24} height={24} />}
 							label="Settings"
 						/>
