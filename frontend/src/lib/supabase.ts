@@ -4,7 +4,7 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 import { NextRequest, NextResponse } from "next/server"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL! ?? ""
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! ?? ""
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY! ?? ""
 
 const sbBrowser = createBrowserClient<Database>(supabaseUrl, supabaseKey)
 const sbMiddleware = (request: NextRequest) => {
