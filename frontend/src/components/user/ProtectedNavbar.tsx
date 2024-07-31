@@ -82,7 +82,7 @@ export default function ProtectedNavbar() {
 								icon={<TableIcon width={24} height={24} />}
 								label="Entries"
 							/>
-							<div className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
+							<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
 								<PopoverTrigger>
 									<Button
 										variant="default"
@@ -92,7 +92,7 @@ export default function ProtectedNavbar() {
 										<PlusIcon width={24} height={24} />
 									</Button>
 								</PopoverTrigger>
-							</div>
+							</li>
 							<NavLink
 								href="/dashboard/reports"
 								icon={<FileIcon width={24} height={24} />}
