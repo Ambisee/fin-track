@@ -53,21 +53,14 @@ export default function SignUpPassword() {
 	const router = useRouter()
 	const { toast } = useToast()
 
-	const email = useGlobalStore((state) => state.email)
-	const username = useGlobalStore((state) => state.username)
-	const password = useGlobalStore((state) => state.password)
-
-	const setPassword = useGlobalStore((state) => state.setPassword)
-	const clearRegistrationInfo = useGlobalStore(
-		(state) => state.clearRegistrationInfo
-	)
-
+	const email = Cookies.get("reg-email") as string
+	const username = Cookies.get("reg-username") as string
 	const form = useForm<z.infer<typeof formSchema>>({
 		mode: "onChange",
 		resolver: zodResolver(formSchema),
 		criteriaMode: "all",
 		defaultValues: {
-			password: password ?? "",
+			password: "",
 			confirmPassword: ""
 		}
 	})
@@ -75,13 +68,12 @@ export default function SignUpPassword() {
 	return (
 		<Form {...form}>
 			<form
-				className="w-full"
+				className="w-full h-full"
 				onSubmit={(e) => {
 					e.preventDefault()
-					form.handleSubmit((formData) => {
-                        Cookies.set("reg-password", formData.password)
-						setPassword(formData.password)
-						const handleRegistration = async () => {
+					form.handleSubmit(
+						async (formData) => {
+							Cookies.set("reg-password", formData.password)
 							if (email === undefined) {
 								toast({
 									title: "Signup Error",
@@ -116,7 +108,6 @@ export default function SignUpPassword() {
 								return
 							}
 
-							clearRegistrationInfo()
 							toast({
 								title: "Signup Success",
 								description: (
@@ -127,82 +118,61 @@ export default function SignUpPassword() {
 									</p>
 								)
 							})
-						}
-						handleRegistration()
-					})()
+
+							router.push("/signin")
+						},
+						(error) => {}
+					)()
 				}}
 			>
-				<Card className="p-2 md:p-4 registration-card">
-					<CardHeader>Password</CardHeader>
-					<CardContent className="flex flex-col md:justify-start justify-end gap-4">
-						<FormField
-							control={form.control}
-							name="password"
-							render={({ field }) => (
-								<FormItem>
-									<Popover>
-										<FormDescription>
-											Enter a new password. The password must satisfy the&nbsp;
-											<PopoverTrigger asChild>
-												<Button variant="link" className="p-0 h-4">
-													Password Requirements
-												</Button>
-											</PopoverTrigger>
-											<PopoverContent className="bg-secondary">
-												Passwords must
-												<ul className="pl-4 list-disc">
-													<li>be at least 8 characters long</li>
-													<li>contain at least one uppercase letter</li>
-													<li>contain at least one lowercase letter</li>
-													<li>contain at least one number</li>
-													<li>contain at least one special character</li>
-												</ul>
-											</PopoverContent>
-											.
-										</FormDescription>
-									</Popover>
-									<FormControl>
-										<PasswordField
-											autoFocus
-											placeholder="Password"
-											{...field}
-										/>
-									</FormControl>
-									<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-										{form.formState.errors.password?.message}
-									</div>
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="confirmPassword"
-							render={({ field }) => (
-								<FormItem>
-									<FormControl>
-										<PasswordField placeholder="Confirm Password" {...field} />
-									</FormControl>
-									<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-										{form.formState.errors.confirmPassword?.message}
-									</div>
-								</FormItem>
-							)}
-						/>
-					</CardContent>
-					<CardFooter className="flex justify-between">
-						<Button
-							variant="ghost"
-							type="button"
-							className="aspect-square p-0 flex gap-2"
-							onClick={(e) => {
-								router.replace("/sign-up/username")
-							}}
-						>
-							<ArrowLeftIcon />
-						</Button>
-						<Button>Submit</Button>
-					</CardFooter>
-				</Card>
+				<CardHeader>Password</CardHeader>
+				<CardContent className="flex flex-col md:justify-start justify-end gap-4">
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<PasswordField autoFocus placeholder="Password" {...field} />
+								</FormControl>
+								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
+									{form.formState.errors.password?.message}
+								</div>
+								<FormDescription>
+									Password must be at least 8 characters and include lowercase,
+									uppercase, number, and special characters.
+								</FormDescription>
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="confirmPassword"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<PasswordField placeholder="Confirm Password" {...field} />
+								</FormControl>
+								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
+									{form.formState.errors.confirmPassword?.message}
+								</div>
+							</FormItem>
+						)}
+					/>
+				</CardContent>
+				<CardFooter className="flex justify-between footer">
+					<Button
+						variant="ghost"
+						type="button"
+						className="aspect-square p-0 flex gap-2"
+						onClick={(e) => {
+							router.replace("/signup/username")
+						}}
+					>
+						<ArrowLeftIcon />
+					</Button>
+					<Button>Submit</Button>
+				</CardFooter>
 			</form>
 		</Form>
 	)

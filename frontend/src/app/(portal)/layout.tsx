@@ -12,7 +12,6 @@ import {
 	AlertDialogTrigger,
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { useGlobalStore } from "@/lib/store"
 import { Cross1Icon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -33,7 +32,7 @@ function CloseButton(props: CloseButtonProps) {
 			<AlertDialogTrigger asChild>
 				<Button
 					variant="ghost"
-					className="absolute top-2 left-2 md:top-4 md:left-4 aspect-square h-10 p-0"
+					className="absolute top-2 right-2 md:top-4 md:right-4 aspect-square h-10 p-0"
 				>
 					{props.children}
 				</Button>
@@ -44,7 +43,7 @@ function CloseButton(props: CloseButtonProps) {
 	return (
 		<Button
 			variant="ghost"
-			className="absolute top-2 left-2 md:top-4 md:left-4 aspect-square h-10 p-0"
+			className="absolute top-2 right-2 md:top-4 md:right-4 aspect-square h-10 p-0"
 		>
 			<Link href="/">{props.children}</Link>
 		</Button>
@@ -54,22 +53,19 @@ function CloseButton(props: CloseButtonProps) {
 export default function PortalLayout(props: PortalLayoutProps) {
 	const router = useRouter()
 	const pathname = usePathname()
-	const clearRegistrationInfo = useGlobalStore(
-		(state) => state.clearRegistrationInfo
-	)
 
 	let isTrigger = false
-	if (pathname.startsWith("/sign-up")) {
-		isTrigger = true
-	}
+	// if (pathname.startsWith("/signup/")) {
+	// 	isTrigger = true
+	// }
 
 	return (
 		<AlertDialog>
-            <div>
-                <CloseButton isTrigger={isTrigger}>
-                    <Cross1Icon width={24} height={24} />
-                </CloseButton>
-            </div>
+			<div>
+				<CloseButton isTrigger={isTrigger}>
+					<Cross1Icon width={24} height={24} />
+				</CloseButton>
+			</div>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Exit Registration</AlertDialogTitle>
@@ -83,10 +79,10 @@ export default function PortalLayout(props: PortalLayoutProps) {
 					<AlertDialogAction
 						variant="destructive"
 						onClick={() => {
-							clearRegistrationInfo()
-                            Cookies.remove("reg-email")
-                            Cookies.remove("reg-username")
-							router.push("/sign-in/email")
+							Cookies.remove("reg-email")
+							Cookies.remove("reg-username")
+							Cookies.remove("reg-password")
+							router.push("/")
 						}}
 					>
 						Proceed

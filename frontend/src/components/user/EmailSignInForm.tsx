@@ -23,7 +23,7 @@ import Link from "next/link"
 import PasswordField from "./FormField/PasswordField"
 
 const formSchema = z.object({
-	email: z.string().email("Please ensure that the email address is valid"),
+	email: z.string().email("Please provide a valid email address"),
 	password: z.string()
 })
 
@@ -115,8 +115,8 @@ export default function EmailSignInForm() {
 								</div>
 							</FormControl>
 							<FormDescription className="flex justify-end">
-								<Button variant="link" className="p-0 max-h-4">
-									<Link href="/forgot-password">Forgot your password?</Link>
+								<Button variant="link" className="p-0 max-h-4 text-sm">
+									<Link href="/forgotpassword">Forgot your password?</Link>
 								</Button>
 							</FormDescription>
 						</FormItem>

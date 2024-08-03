@@ -222,9 +222,21 @@ function getElementFromNode(node: Node) {
     }
 }
 
+function getUsernameFromEmail(email: string) {
+    const atSymbol = email.indexOf("@")
+    if (atSymbol === -1) {
+        return ""
+    }
+
+    
+    let username = email.slice(0, atSymbol)
+    return username.replace(/[^a-zA-Z0-9]/g, '')
+}
+
 export { 
     cn,
     handleDataChange,
     sortDataByDateGroup,
-    getElementFromNode
+    getElementFromNode,
+    getUsernameFromEmail,
 }

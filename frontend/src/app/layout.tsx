@@ -1,19 +1,17 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { inter } from "@/app/fonts"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 
 import "./globals.css"
 import DataProvider from "@/components/user/DataProvider"
 
-const inter = Inter({ subsets: ["latin"] })
-
 export const metadata: Metadata = {
 	title: "FinTrack Prototype",
 	description: ""
 }
 
-export default async function RootLayout({
+export default function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode

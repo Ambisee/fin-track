@@ -78,7 +78,7 @@
 	}
 
 	.registration-card {
-		@apply min-h-[28rem] mx-auto w-full max-w-[375px] grid grid-rows-[auto_1fr_auto];
+		@apply h-[500px] mx-auto w-full;
 	}
 
 	.registration-description {

@@ -44,7 +44,7 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 
 	const linkObject = {
 		text: "Sign In",
-		redirectUrl: "/sign-in"
+		redirectUrl: "/signin"
 	}
 
 	if (user !== null) {

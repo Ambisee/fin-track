@@ -1,11 +1,17 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { sbBrowser } from "@/lib/supabase"
+import Image from "next/image"
 import Link from "next/link"
+
+import { roboto } from "@/app/fonts"
+import googleIcon from "../../../../../public/google-icon.svg"
+
 import { useEffect, useState } from "react"
+import { MailIcon } from "lucide-react"
 
 export default function SignIn() {
 	const [origin, setOrigin] = useState<string>(null!)
@@ -18,11 +24,12 @@ export default function SignIn() {
 			<div className="w-full max-w-container flex justify-center items-center">
 				<Card className="w-[320px]">
 					<CardHeader className="w-full text-center">
-						Sign in back to your account
+						Sign in to your account
 					</CardHeader>
 					<CardContent className="w-full grid grid-flow-row gap-4">
 						<Button
 							variant="default"
+							className={roboto.className}
 							onClick={() => {
 								sbBrowser.auth.signInWithOAuth({
 									provider: "google",
@@ -32,15 +39,29 @@ export default function SignIn() {
 								})
 							}}
 						>
+							<Image
+								src={googleIcon}
+								alt="Google Icon.svg"
+								width={20}
+								height={20}
+								className="mr-2"
+							/>
 							Sign in with Google
 						</Button>
-						<Separator
-							className="my-4 relative after:content-['OR'] after:px-4 after:absolute after:bg-background 
-                            after:top-1/2 after:left-1/2 after:translate-x-[-50%] after:translate-y-[-50%]"
-						/>
-						<Button variant="ghost">
-							<Link href="/sign-in/email">Sign in with Email</Link>
-						</Button>
+						<Link
+							href="/signin/email"
+							className={buttonVariants({ variant: "default" })}
+						>
+							<MailIcon width={20} height={20} className="mr-2" />
+							Sign in with Email
+						</Link>
+						<Separator className="mt-4 relative" />
+						<div className="text-sm w-full text-center">
+							<span className="text-muted">Don&apos;t have an account? </span>
+							<Button variant="link" className="p-0 m-0 h-fit" asChild>
+								<Link href="/signup">Create an account</Link>
+							</Button>
+						</div>
 					</CardContent>
 				</Card>
 			</div>

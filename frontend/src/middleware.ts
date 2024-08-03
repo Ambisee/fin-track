@@ -9,13 +9,13 @@ function isProtectedUrl(url: NextURL) {
 
 export async function middleware(request: NextRequest) {
     const supabase = sbMiddleware(request)
-    const {data: {user}} = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
     /**
      * Redirect unauthenticated user to the login page
      */
     if (user === null && isProtectedUrl(request.nextUrl)) {
-        return NextResponse.redirect(new URL("/sign-in", request.nextUrl.origin))
+        return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
     }
 
     
@@ -27,7 +27,7 @@ export const config = {
     matcher: [
         "/",
         "/dashboard/:path",
-        "/sign-in/:path",
-        "/sign-up/:path",
+        "/signin/:path",
+        "/signup/:path",
     ]
 }
