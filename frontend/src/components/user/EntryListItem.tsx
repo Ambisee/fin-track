@@ -87,7 +87,8 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 									}
 
 									toast({
-										description: "Successfully removed the transaction"
+										description: "Successfully removed the transaction",
+										duration: 500
 									})
 
 									queryClient.invalidateQueries({ queryKey: ["entryData"] })

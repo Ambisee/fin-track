@@ -3,27 +3,34 @@
 import { FileIcon, GearIcon, HomeIcon, TableIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import EntryForm from "./EntryForm"
-import { Button } from "../ui/button"
+import { Button, buttonVariants } from "../ui/button"
 import { PlusIcon } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { Drawer, DrawerTrigger } from "@/components/ui/drawer"
 import { useMediaQuery } from "react-responsive"
 import { DESKTOP_BREAKPOINT } from "@/lib/constants"
 import { Dialog, DialogTrigger } from "../ui/dialog"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
+	const pathname = usePathname()
+
 	return (
 		<li>
-			<Button variant="ghost" className="p-0 w-full md:block">
-				<Link
-					href={props.href}
-					className="grid grid-flow-row justify-items-center gap-1
-                    md:flex md:gap-8"
+			<Link href={props.href} className="w-full md:block">
+				<div
+					className={cn(
+						buttonVariants({
+							variant: pathname === props.href ? "default" : "ghost"
+						}),
+						"p-2 py-1 w-full h-fit grid grid-flow-row justify-items-center md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
+					)}
 				>
 					{props.icon}
 					<span className="text-xs md:text-base">{props.label}</span>
-				</Link>
-			</Button>
+				</div>
+			</Link>
 		</li>
 	)
 }
@@ -62,6 +69,7 @@ function PopoverRoot(props: { children: JSX.Element }) {
 
 export default function ProtectedNavbar() {
 	const queryClient = useQueryClient()
+	const pathname = usePathname()
 
 	return (
 		<PopoverRoot>
@@ -71,7 +79,7 @@ export default function ProtectedNavbar() {
 						FinTrack
 					</h1>
 					<nav className="w-full">
-						<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-2">
+						<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-1">
 							<NavLink
 								href="/dashboard"
 								icon={<HomeIcon width={24} height={24} />}

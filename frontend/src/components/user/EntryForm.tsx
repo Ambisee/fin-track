@@ -119,7 +119,7 @@ function DrawerEntryForm(props: EntryFormProps) {
 		mutationFn: (formData: z.infer<typeof formSchema>) => {
 			const isPositive = formData.type === "Income"
 			if (props.data?.id === undefined) {
-				toast({ description: "Invalid entry id" })
+				toast({ description: "Invalid entry id", variant: "destructive" })
 				return Promise.reject(null)
 			}
 
@@ -184,7 +184,8 @@ function DrawerEntryForm(props: EntryFormProps) {
 											}
 
 											toast({
-												description: "New entry added"
+												description: "New entry added",
+												duration: 500
 											})
 
 											form.reset()
