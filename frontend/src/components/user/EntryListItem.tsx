@@ -1,13 +1,13 @@
 "use client"
 
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
 } from "@/components/ui/card"
-import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { DESKTOP_BREAKPOINT, ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { getElementFromNode } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
@@ -15,16 +15,17 @@ import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Fragment, useState } from "react"
+import { useMediaQuery } from "react-responsive"
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
 import { Dialog } from "../ui/dialog"
@@ -107,6 +108,10 @@ function PopoverRoot(props: {
 	onOpenChange?: (open: boolean) => void | undefined
 	isAlert?: boolean
 }) {
+	const isDesktop = useMediaQuery({
+		minWidth: DESKTOP_BREAKPOINT
+	})
+
 	if (props.isAlert) {
 		return (
 			<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>

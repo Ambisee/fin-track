@@ -1,15 +1,17 @@
 "use client"
 
-import { GearIcon, TableIcon } from "@radix-ui/react-icons"
-import Link from "next/link"
-import EntryForm from "./EntryForm"
-import { Button, buttonVariants } from "../ui/button"
-import { HouseIcon, PlusIcon, BarChart3Icon } from "lucide-react"
-import { useQueryClient } from "@tanstack/react-query"
-import { ENTRY_QKEY } from "@/lib/constants"
-import { Dialog, DialogTrigger } from "../ui/dialog"
-import { usePathname } from "next/navigation"
+import { DESKTOP_BREAKPOINT, ENTRY_QKEY } from "@/lib/constants"
 import { cn } from "@/lib/utils"
+import { GearIcon, TableIcon } from "@radix-ui/react-icons"
+import { useQueryClient } from "@tanstack/react-query"
+import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useMediaQuery } from "react-responsive"
+import { Button, buttonVariants } from "../ui/button"
+import { Dialog, DialogTrigger } from "../ui/dialog"
+import { Drawer, DrawerTrigger } from "../ui/drawer"
+import EntryForm from "./EntryForm"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -37,16 +39,32 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 }
 
 function PopoverTrigger(props: { children: JSX.Element }) {
-	return <DialogTrigger asChild>{props.children}</DialogTrigger>
+	const isDesktop = useMediaQuery({
+		minWidth: DESKTOP_BREAKPOINT
+	})
+
+	if (isDesktop) {
+		return <DialogTrigger asChild>{props.children}</DialogTrigger>
+	}
+
+	return <DrawerTrigger asChild>{props.children}</DrawerTrigger>
 }
 
 function PopoverRoot(props: { children: JSX.Element }) {
-	return <Dialog>{props.children}</Dialog>
+	const isDesktop = useMediaQuery({
+		minWidth: DESKTOP_BREAKPOINT
+	})
+
+	if (isDesktop) {
+		return <Dialog>{props.children}</Dialog>
+	}
+
+	return <Drawer>{props.children}</Drawer>
 }
 
 export default function ProtectedNavbar() {
-	const queryClient = useQueryClient()
 	const pathname = usePathname()
+	const queryClient = useQueryClient()
 
 	return (
 		<PopoverRoot>

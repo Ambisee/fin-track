@@ -1,29 +1,39 @@
 "use client"
 
-import { CATEGORIES_QKEY, USER_QKEY } from "@/lib/constants"
+import { CATEGORIES_QKEY, DESKTOP_BREAKPOINT, USER_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { useMediaQuery } from "react-responsive"
+import { Drawer as VaulDrawer } from "vaul"
 import { z } from "zod"
 import { Button } from "../ui/button"
 import DatePicker from "../ui/date-picker"
 import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
 } from "../ui/dialog"
+import {
+    DrawerClose,
+    DrawerContent,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from "../ui/drawer"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
 import { Input } from "../ui/input"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { Textarea } from "../ui/textarea"
 import { useToast } from "../ui/use-toast"
@@ -78,11 +88,277 @@ function EntryFormItem(props: { label: string; children: JSX.Element }) {
 	)
 }
 
-function DialogEntryForm(props: EntryFormProps) {
+function DrawerEntryForm(props: EntryFormProps) {
 	const { toast } = useToast()
 	const isEditForm = props.data !== undefined
 	const { data: userData } = useQuery({
 		queryKey: USER_QKEY,
+		queryFn: () => sbBrowser.auth.getUser(),
+		refetchOnMount: false
+	})
+
+	const insertMutation = useMutation({
+		mutationFn: (formData: z.infer<typeof formSchema>) => {
+			const isPositive = formData.type === "Income"
+
+			return Promise.resolve(
+				sbBrowser.from("entry").insert({
+					date: formData.date.toLocaleDateString(),
+					title: formData.title,
+					created_by: userData?.data.user?.id,
+					amount_is_positive: isPositive,
+					amount: Number(formData.amount),
+					note: formData.notes
+				})
+			)
+		}
+	})
+
+	const updateMutation = useMutation({
+		mutationFn: (formData: z.infer<typeof formSchema>) => {
+			const isPositive = formData.type === "Income"
+			if (props.data?.id === undefined) {
+				toast({ description: "Invalid entry id", variant: "destructive" })
+				return Promise.reject(null)
+			}
+
+			return Promise.resolve(
+				sbBrowser
+					.from("entry")
+					.update({
+						date: formData.date.toLocaleDateString(),
+						title: formData.title,
+						amount_is_positive: isPositive,
+						amount: Number(formData.amount),
+						note: formData.notes
+					})
+					.eq("id", props.data.id)
+			)
+		}
+	})
+
+	const form = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
+		defaultValues: useMemo(() => {
+			let defaultValues: z.infer<typeof formSchema> = {
+				date: new Date(),
+				title: "",
+				amount: "",
+				type: "Income",
+				notes: ""
+			}
+
+			if (!isEditForm) {
+				return defaultValues
+			}
+
+			defaultValues.date = new Date(props.data?.date as string)
+			defaultValues.title = props.data?.title as string
+			defaultValues.type = props.data?.amount_is_positive ? "Income" : "Expense"
+			defaultValues.amount = props.data?.amount?.toFixed(2) as string
+			defaultValues.notes = (props.data?.note ?? "") as string
+
+			return defaultValues
+		}, [props, isEditForm])
+	})
+
+	return (
+		<DrawerContent>
+			<Form {...form}>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit(
+							async (formData) => {
+								let result
+
+								if (!isEditForm) {
+									result = insertMutation.mutate(formData, {
+										onSuccess: (data) => {
+											if (data.error !== null) {
+												toast({
+													description: data.error.message,
+													variant: "destructive"
+												})
+											}
+
+											toast({
+												description: "New entry added",
+												duration: 500
+											})
+
+											form.reset()
+											props.onSubmitSuccess?.(data)
+										}
+									})
+								} else {
+									result = updateMutation.mutate(formData, {
+										onSuccess: (data) => {
+											if (data.error !== null) {
+												toast({
+													description: data.error.message,
+													variant: "destructive"
+												})
+											}
+
+											toast({
+												description: "Entry updated"
+											})
+
+											props.onSubmitSuccess?.(data)
+										}
+									})
+								}
+							},
+							(errors) => {
+								toast({
+									title: "Invalid data",
+									description: <ul>{getErrors(errors)}</ul>,
+									variant: "destructive"
+								})
+							}
+						)()
+					}}
+				>
+					<DrawerHeader>
+						<DrawerTitle asChild>
+							<h1>{props.data !== undefined ? "Edit Entry" : "New Entry"}</h1>
+						</DrawerTitle>
+					</DrawerHeader>
+
+					<ScrollArea className="h-72 w-full overflow-x-visible fixed bottom-0 left-0">
+						<div className="*:text-left space-y-2">
+							<FormField
+								control={form.control}
+								name="type"
+								render={({ field }) => (
+									<EntryFormItem label="Type">
+										<div>
+											<Tabs
+												value={field.value}
+												onValueChange={field.onChange}
+												className="w-full"
+											>
+												<TabsList className="w-full">
+													<TabsTrigger className="w-1/2" value="Income">
+														Income
+													</TabsTrigger>
+													<TabsTrigger className="w-1/2" value="Expense">
+														Expense
+													</TabsTrigger>
+												</TabsList>
+											</Tabs>
+										</div>
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="date"
+								render={({ field }) => (
+									<EntryFormItem label="Date">
+										<DatePicker
+											onChange={field.onChange}
+											value={field.value}
+											closeOnSelect
+										/>
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="title"
+								render={({ field }) => (
+									<EntryFormItem label="Title">
+										<Input placeholder="Title" {...field} />
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="amount"
+								render={({ field }) => {
+									const { onChange, ...rest } = field
+
+									return (
+										<EntryFormItem label="Amount">
+											<Input
+												type="text"
+												placeholder="Amount"
+												inputMode="decimal"
+												onChange={onChange}
+												{...rest}
+											/>
+										</EntryFormItem>
+									)
+								}}
+							/>
+							<FormField
+								control={form.control}
+								name="notes"
+								render={({ field }) => (
+									<EntryFormItem label="Notes">
+										<VaulDrawer.NestedRoot>
+											<DrawerTrigger asChild>
+												<Button
+													type="button"
+													variant="secondary"
+													className="w-1/2 self-start"
+												>
+													Add notes
+												</Button>
+											</DrawerTrigger>
+											<DrawerContent className="z-[130]">
+												<DrawerHeader>
+													<DrawerTitle>Notes</DrawerTitle>
+												</DrawerHeader>
+												<Textarea
+													data-vaul-no-drag
+													className="h-96"
+													{...field}
+												/>
+												<DrawerFooter>
+													<DrawerClose asChild>
+														<Button type="button">Close</Button>
+													</DrawerClose>
+												</DrawerFooter>
+											</DrawerContent>
+										</VaulDrawer.NestedRoot>
+									</EntryFormItem>
+								)}
+							/>
+						</div>
+						<ScrollBar />
+					</ScrollArea>
+					<DrawerFooter>
+						<Button>Submit</Button>
+						{isEditForm && (
+							<Button
+								variant="secondary"
+								type="button"
+								onClick={() => form.reset()}
+							>
+								Reset
+							</Button>
+						)}
+						<DrawerClose asChild>
+							<Button type="button" variant="outline">
+								Cancel
+							</Button>
+						</DrawerClose>
+					</DrawerFooter>
+				</form>
+			</Form>
+		</DrawerContent>
+	)
+}
+
+function DialogEntryForm(props: EntryFormProps) {
+	const { toast } = useToast()
+	const isEditForm = props.data !== undefined
+	const queryClient = useQueryClient()
+	const { data: userData } = useQuery({
+		queryKey: ["user"],
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => {
@@ -363,8 +639,12 @@ function DialogEntryForm(props: EntryFormProps) {
 
 export default function EntryForm(props: EntryFormProps) {
 	const isDesktop = useMediaQuery({
-		minWidth: 768
+		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	return <DialogEntryForm {...props} />
+	if (isDesktop) {
+		return <DialogEntryForm {...props} />
+	}
+
+	return <DrawerEntryForm {...props} />
 }
