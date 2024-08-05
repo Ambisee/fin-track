@@ -78,10 +78,10 @@ export default function ProtectedNavbar() {
 								<PopoverTrigger>
 									<Button
 										variant="default"
-										className="absolute left-1/2 translate-x-[-50%] top-[-2.75rem] rounded-full aspect-square w-10 h-10 p-0
+										className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
 									>
-										<PlusIcon width={24} height={24} />
+										<PlusIcon width={30} height={30} />
 									</Button>
 								</PopoverTrigger>
 							</li>
