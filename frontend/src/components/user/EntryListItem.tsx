@@ -59,60 +59,17 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (isDesktop) {
-		return (
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Confirm Action</AlertDialogTitle>
-					<AlertDialogDescription>
-						Are you sure you want to delete this transaction?
-					</AlertDialogDescription>
-				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction
-						variant="destructive"
-						onClick={() =>
-							deleteMutation.mutate(props.data.id, {
-								onSuccess: (data) => {
-									toast({
-										description: "Loading..."
-									})
-
-									if (data.error !== null) {
-										toast({
-											description: data.error.message
-										})
-										return
-									}
-
-									toast({
-										description: "Successfully removed the transaction",
-										duration: 500
-									})
-
-									queryClient.invalidateQueries({ queryKey: ["entryData"] })
-								}
-							})
-						}
-					>
-						Delete
-					</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		)
-	}
-
 	return (
-		<DrawerContent data-handle="false">
-			<DrawerHeader>
-				<DrawerTitle>Confirm Action</DrawerTitle>
-				<DrawerDescription>
+		<AlertDialogContent>
+			<AlertDialogHeader>
+				<AlertDialogTitle>Confirm Action</AlertDialogTitle>
+				<AlertDialogDescription>
 					Are you sure you want to delete this transaction?
-				</DrawerDescription>
-			</DrawerHeader>
-			<DrawerFooter>
-				<Button
+				</AlertDialogDescription>
+			</AlertDialogHeader>
+			<AlertDialogFooter>
+				<AlertDialogCancel>Cancel</AlertDialogCancel>
+				<AlertDialogAction
 					variant="destructive"
 					onClick={() =>
 						deleteMutation.mutate(props.data.id, {
@@ -129,7 +86,8 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 								}
 
 								toast({
-									description: "Successfully removed the transaction"
+									description: "Successfully removed the transaction",
+									duration: 500
 								})
 
 								queryClient.invalidateQueries({ queryKey: ["entryData"] })
@@ -138,12 +96,9 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 					}
 				>
 					Delete
-				</Button>
-				<DrawerClose asChild>
-					<Button variant="outline">Close</Button>
-				</DrawerClose>
-			</DrawerFooter>
-		</DrawerContent>
+				</AlertDialogAction>
+			</AlertDialogFooter>
+		</AlertDialogContent>
 	)
 }
 
@@ -157,33 +112,18 @@ function PopoverRoot(props: {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (isDesktop) {
-		if (props.isAlert) {
-			return (
-				<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
-					{props.children}
-				</AlertDialog>
-			)
-		}
-
+	if (props.isAlert) {
 		return (
-			<Dialog open={props.open} onOpenChange={props.onOpenChange}>
+			<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
 				{props.children}
-			</Dialog>
+			</AlertDialog>
 		)
 	}
 
 	return (
-		<Drawer
-			open={props.open}
-			onOpenChange={props.onOpenChange}
-			shouldScaleBackground
-			disablePreventScroll={true}
-			setBackgroundColorOnScale={false}
-			dismissible={!props.isAlert}
-		>
+		<Dialog open={props.open} onOpenChange={props.onOpenChange}>
 			{props.children}
-		</Drawer>
+		</Dialog>
 	)
 }
 
@@ -192,14 +132,10 @@ function PopoverTrigger(props: { children: JSX.Element; isAlert?: boolean }) {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (isDesktop) {
-		if (props.isAlert) {
-			return <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
-		}
-		return <DialogTrigger asChild>{props.children}</DialogTrigger>
+	if (props.isAlert) {
+		return <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
 	}
-
-	return <DrawerTrigger asChild>{props.children}</DrawerTrigger>
+	return <DialogTrigger asChild>{props.children}</DialogTrigger>
 }
 
 export default function EntryListItem(props: EntryListItemProps) {
@@ -226,15 +162,15 @@ export default function EntryListItem(props: EntryListItemProps) {
 						>
 							<div className="flex justify-between items-center w-inherit">
 								<div className="grid max-w-[calc(50%-0.25rem)]">
-									<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-primary">
+									<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 										{props.data.title}
 									</CardTitle>
-									<CardDescription className="group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-primary">
+									<CardDescription className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 										{props.data.date.toString()}
 									</CardDescription>
 								</div>
 								<div className="flex gap-2">
-									<p className="group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-primary">
+									<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 										{props.data.amount_is_positive ? "+ " : "- "}
 										{props.data?.amount.toFixed(2)}
 									</p>

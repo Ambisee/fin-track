@@ -40,11 +40,7 @@ function PopoverTrigger(props: { children: JSX.Element }) {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (isDesktop) {
-		return <DialogTrigger asChild>{props.children}</DialogTrigger>
-	}
-
-	return <DrawerTrigger asChild>{props.children}</DrawerTrigger>
+	return <DialogTrigger asChild>{props.children}</DialogTrigger>
 }
 
 function PopoverRoot(props: { children: JSX.Element }) {
@@ -52,19 +48,7 @@ function PopoverRoot(props: { children: JSX.Element }) {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (isDesktop) {
-		return <Dialog>{props.children}</Dialog>
-	}
-
-	return (
-		<Drawer
-			shouldScaleBackground
-			disablePreventScroll={true}
-			setBackgroundColorOnScale={false}
-		>
-			{props.children}
-		</Drawer>
-	)
+	return <Dialog>{props.children}</Dialog>
 }
 
 export default function ProtectedNavbar() {
