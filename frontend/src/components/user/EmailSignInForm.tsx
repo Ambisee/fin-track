@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 
@@ -13,7 +14,7 @@ import {
 	FormItem,
 	FormLabel
 } from "@/components/ui/form"
-import { EyeOpenIcon } from "@radix-ui/react-icons"
+import { EyeOpenIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
@@ -30,6 +31,7 @@ const formSchema = z.object({
 export default function EmailSignInForm() {
 	const router = useRouter()
 	const { toast } = useToast()
+	const [isFormLoading, setIsFormLoading] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
 		mode: "onSubmit",
 		resolver: zodResolver(formSchema),
@@ -64,18 +66,19 @@ export default function EmailSignInForm() {
 					e.preventDefault()
 					form.handleSubmit(
 						async (formData) => {
-							toast({ description: "Loading..." })
-
+							setIsFormLoading(true)
 							const { data, error } = await sbBrowser.auth.signInWithPassword({
 								email: formData.email,
 								password: formData.password
 							})
+
 							if (data.user !== null) {
 								router.push("/dashboard")
 
 								return
 							}
 
+							setIsFormLoading(false)
 							toast({
 								title: error?.code,
 								description: error?.message,
@@ -122,8 +125,11 @@ export default function EmailSignInForm() {
 						</FormItem>
 					)}
 				/>
-				<Button variant="default" className="w-full">
-					Submit
+				<Button variant="default" disabled={isFormLoading} className="w-full">
+					{isFormLoading && (
+						<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+					)}
+					{isFormLoading ? "Loading" : "Submit"}
 				</Button>
 			</form>
 		</Form>

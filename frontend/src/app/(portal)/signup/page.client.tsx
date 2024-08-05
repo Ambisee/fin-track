@@ -50,7 +50,7 @@ export default function SignUp() {
 						</Link>
 						<Separator className="mt-4 relative" />
 						<div className="text-sm w-full text-center">
-							<span className="text-muted">Already have an account? </span>
+							<span>Already have an account? </span>
 							<br />
 							<Button variant="link" className="p-0 m-0 h-fit" asChild>
 								<Link href="/signin">Sign in</Link>

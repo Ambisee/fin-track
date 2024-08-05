@@ -83,9 +83,7 @@ export default function ForgotPassword() {
 						</Form>
 						<Separator className="w-full mt-4" />
 						<div className="text-center">
-							<span className="text-sm text-muted">
-								Remember your password?{" "}
-							</span>
+							<span className="text-sm">Remember your password?</span>
 							<br />
 							<Link
 								href="/signin/email"

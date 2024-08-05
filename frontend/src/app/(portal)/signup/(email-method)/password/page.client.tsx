@@ -16,7 +16,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowLeftIcon, InfoCircledIcon } from "@radix-ui/react-icons"
+import {
+	ArrowLeftIcon,
+	InfoCircledIcon,
+	ReloadIcon
+} from "@radix-ui/react-icons"
 import { useRouter } from "next/navigation"
 import PasswordField from "@/components/user/FormField/PasswordField"
 import { useGlobalStore } from "@/lib/store"
@@ -52,6 +56,7 @@ const formSchema = z
 export default function SignUpPassword() {
 	const router = useRouter()
 	const { toast } = useToast()
+	const [isFormLoading, setIsFormLoading] = useState(false)
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username") as string
@@ -74,6 +79,7 @@ export default function SignUpPassword() {
 					form.handleSubmit(
 						async (formData) => {
 							Cookies.set("reg-password", formData.password)
+							setIsFormLoading(true)
 							if (email === undefined) {
 								toast({
 									title: "Signup Error",
@@ -100,6 +106,7 @@ export default function SignUpPassword() {
 							})
 
 							if (error !== null) {
+								setIsFormLoading(false)
 								toast({
 									title: "Signup Error",
 									description: error.message,
@@ -171,7 +178,12 @@ export default function SignUpPassword() {
 					>
 						<ArrowLeftIcon />
 					</Button>
-					<Button>Submit</Button>
+					<Button disabled={isFormLoading}>
+						{isFormLoading && (
+							<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+						)}
+						{isFormLoading ? "Loading" : "Submit"}
+					</Button>
 				</CardFooter>
 			</form>
 		</Form>
