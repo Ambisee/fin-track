@@ -8,18 +8,8 @@ import {
 	CardTitle
 } from "@/components/ui/card"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
-import { createContext, MouseEventHandler, useState } from "react"
+import { Fragment, useState } from "react"
 import { Button } from "../ui/button"
-import {
-	Drawer,
-	DrawerContent,
-	DrawerHeader,
-	DrawerTitle,
-	DrawerDescription,
-	DrawerClose,
-	DrawerFooter,
-	DrawerTrigger
-} from "../ui/drawer"
 import { Entry } from "@/types/supabase"
 import {
 	AlertDialog,
@@ -41,10 +31,22 @@ import { Dialog } from "../ui/dialog"
 import { DESKTOP_BREAKPOINT } from "@/lib/constants"
 import { useMediaQuery } from "react-responsive"
 import { DialogTrigger } from "@radix-ui/react-dialog"
+import { ScrollArea } from "../ui/scroll-area"
 
 interface EntryListItemProps {
 	data: Entry
 	onEdit?: (data: Entry) => void
+}
+
+function NoteText(props: { className?: string; text: string }) {
+	const textWithBreaks = props.text.split("\n").map((text, index) => (
+		<Fragment key={index}>
+			{text}
+			<br />
+		</Fragment>
+	))
+
+	return <ScrollArea className={props.className}>{textWithBreaks}</ScrollArea>
 }
 
 function DeletePopover(props: Pick<EntryListItemProps, "data">) {
@@ -149,7 +151,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 				<Card
 					data-open={isItemOpen}
 					data-is-positive={props.data.amount_is_positive}
-					className="data-[open='true']:max-h-96 
+					className="data-[open='true']:max-h-none 
                     data-[open='false']:max-h-[100px] overflow-hidden group"
 				>
 					<CardHeader className="p-0 h-[100px]">
@@ -183,8 +185,14 @@ export default function EntryListItem(props: EntryListItemProps) {
 							</div>
 						</button>
 					</CardHeader>
-					<CardContent>
-						<div className="pt-6 flex gap-4">
+					<CardContent className="px-4">
+						{props.data.note !== "" && props.data.note !== null && (
+							<NoteText
+								className="text-base text-secondary-foreground font-light max-h-52 mb-4 overflow-y-auto"
+								text={props.data.note}
+							/>
+						)}
+						<div className="flex gap-4">
 							<PopoverRoot open={isFormOpen} onOpenChange={setIsFormOpen}>
 								<>
 									<PopoverTrigger>
