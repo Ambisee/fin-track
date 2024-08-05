@@ -91,7 +91,6 @@ function EntryFormItem(props: { label: string; children: JSX.Element }) {
 function DialogEntryForm(props: EntryFormProps) {
 	const { toast } = useToast()
 	const isEditForm = props.data !== undefined
-	const queryClient = useQueryClient()
 	const { data: userData } = useQuery({
 		queryKey: ["user"],
 		queryFn: () => sbBrowser.auth.getUser(),
@@ -101,6 +100,10 @@ function DialogEntryForm(props: EntryFormProps) {
 	const insertMutation = useMutation({
 		mutationFn: (formData: z.infer<typeof formSchema>) => {
 			const isPositive = formData.type === "Income"
+			let note: string | null = formData.notes
+			if (note === "") {
+				note = null
+			}
 
 			return Promise.resolve(
 				sbBrowser.from("entry").insert({
@@ -109,7 +112,7 @@ function DialogEntryForm(props: EntryFormProps) {
 					created_by: userData?.data.user?.id,
 					amount_is_positive: isPositive,
 					amount: Number(formData.amount),
-					note: formData.notes
+					note: note
 				})
 			)
 		}
@@ -123,15 +126,20 @@ function DialogEntryForm(props: EntryFormProps) {
 				return Promise.reject(null)
 			}
 
+			let note: string | null = formData.notes
+			if (note === "") {
+				note = null
+			}
+
 			return Promise.resolve(
 				sbBrowser
 					.from("entry")
 					.update({
-						date: formData.date.toLocaleDateString(),
+						date: formData.date.toDateString(),
 						title: formData.title,
 						amount_is_positive: isPositive,
 						amount: Number(formData.amount),
-						note: formData.notes
+						note: note
 					})
 					.eq("id", props.data.id)
 			)
@@ -153,7 +161,7 @@ function DialogEntryForm(props: EntryFormProps) {
 				return defaultValues
 			}
 
-			defaultValues.date = new Date(props.data?.date as string)
+			defaultValues.date = new Date(`${props.data?.date} 00:00`)
 			defaultValues.title = props.data?.title as string
 			defaultValues.type = props.data?.amount_is_positive ? "Income" : "Expense"
 			defaultValues.amount = props.data?.amount?.toFixed(2) as string
@@ -184,7 +192,8 @@ function DialogEntryForm(props: EntryFormProps) {
 											}
 
 											toast({
-												description: "New entry added"
+												description: "New entry added",
+												duration: 1500
 											})
 
 											form.reset()
@@ -202,7 +211,8 @@ function DialogEntryForm(props: EntryFormProps) {
 											}
 
 											toast({
-												description: "Entry updated"
+												description: "Entry updated",
+												duration: 1500
 											})
 
 											props.onSubmitSuccess?.(data)
@@ -297,10 +307,10 @@ function DialogEntryForm(props: EntryFormProps) {
 												<DialogTrigger asChild>
 													<Button
 														type="button"
-														variant="secondary"
-														className="w-1/2 self-start"
+														variant="default"
+														className="w-24 self-start"
 													>
-														Add notes
+														Open
 													</Button>
 												</DialogTrigger>
 												<DialogContent className="z-[130]">
@@ -310,7 +320,7 @@ function DialogEntryForm(props: EntryFormProps) {
 													<DialogDescription className="px-2">
 														<Textarea
 															data-vaul-no-drag
-															className="h-96"
+															className="min-h-28 max-h-96"
 															{...field}
 														/>
 													</DialogDescription>
