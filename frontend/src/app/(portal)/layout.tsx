@@ -45,7 +45,16 @@ function CloseButton(props: CloseButtonProps) {
 			variant="ghost"
 			className="absolute top-2 right-2 md:top-4 md:right-4 aspect-square h-10 p-0"
 		>
-			<Link href="/">{props.children}</Link>
+			<Link
+				onClick={() => {
+					Cookies.remove("reg-email")
+					Cookies.remove("reg-username")
+					Cookies.remove("reg-password")
+				}}
+				href="/"
+			>
+				{props.children}
+			</Link>
 		</Button>
 	)
 }
