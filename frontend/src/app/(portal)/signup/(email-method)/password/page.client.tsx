@@ -56,7 +56,7 @@ const formSchema = z
 export default function SignUpPassword() {
 	const router = useRouter()
 	const { toast } = useToast()
-	const [isFormLoading, setIsFormLoading] = useState(false)
+	const [isFormLoading, setIsPendingSubmit] = useState(false)
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username") as string
@@ -79,7 +79,7 @@ export default function SignUpPassword() {
 					form.handleSubmit(
 						async (formData) => {
 							Cookies.set("reg-password", formData.password)
-							setIsFormLoading(true)
+							setIsPendingSubmit(true)
 							if (email === undefined) {
 								toast({
 									title: "Signup Error",
@@ -106,7 +106,7 @@ export default function SignUpPassword() {
 							})
 
 							if (error !== null) {
-								setIsFormLoading(false)
+								setIsPendingSubmit(false)
 								toast({
 									title: "Signup Error",
 									description: error.message,
@@ -126,6 +126,10 @@ export default function SignUpPassword() {
 								)
 							})
 
+							Cookies.remove("reg-password")
+							Cookies.remove("reg-email")
+							Cookies.remove("reg-username")
+							setIsPendingSubmit(false)
 							router.push("/signin")
 						},
 						(error) => {}

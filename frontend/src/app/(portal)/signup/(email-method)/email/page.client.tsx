@@ -25,9 +25,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowRightIcon } from "@radix-ui/react-icons"
+import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { useGlobalStore } from "@/lib/store"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useToast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
@@ -35,6 +37,8 @@ const formSchema = z.object({
 
 export default function SignUpEmail() {
 	const router = useRouter()
+	const { toast } = useToast()
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const email = Cookies.get("reg-email")
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -51,10 +55,20 @@ export default function SignUpEmail() {
 				className="w-full"
 				onSubmit={(e) => {
 					e.preventDefault()
-					form.handleSubmit((formData) => {
-						Cookies.set("reg-email", formData.email)
-						router.push("/signup/username")
-					})()
+					setIsPendingSubmit(true)
+					form.handleSubmit(
+						(formData) => {
+							Cookies.set("reg-email", formData.email)
+							router.push("/signup/username")
+						},
+						(errors) => {
+							setIsPendingSubmit(false)
+							toast({
+								description: errors.email?.message,
+								variant: "destructive"
+							})
+						}
+					)()
 				}}
 			>
 				<CardHeader>Email</CardHeader>
@@ -76,9 +90,13 @@ export default function SignUpEmail() {
 				</CardContent>
 				<AlertDialog>
 					<CardFooter className="flex justify-end justify-self-end">
-						<Button>
+						<Button disabled={isPendingSubmit}>
 							Next
-							<ArrowRightIcon className="ml-2" />
+							{isPendingSubmit ? (
+								<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+							) : (
+								<ArrowRightIcon className="ml-2" />
+							)}
 						</Button>
 					</CardFooter>
 					<AlertDialogContent>

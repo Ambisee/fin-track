@@ -13,12 +13,16 @@ import {
 	FormMessage,
 	FormField
 } from "@/components/ui/form"
-import { ArrowRightIcon, ArrowLeftIcon } from "@radix-ui/react-icons"
+import {
+	ArrowRightIcon,
+	ArrowLeftIcon,
+	ReloadIcon
+} from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Cookies from "js-cookie"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
 
@@ -35,6 +39,7 @@ const formSchema = z.object({
 
 export default function SignUpUsername() {
 	const router = useRouter()
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username")
@@ -61,6 +66,7 @@ export default function SignUpUsername() {
 				className="w-full h-full"
 				onSubmit={(e) => {
 					e.preventDefault()
+					setIsPendingSubmit(true)
 					form.handleSubmit((formData) => {
 						let username = getUsernameFromEmail(email)
 						if (formData.username !== "") {
@@ -104,9 +110,13 @@ export default function SignUpUsername() {
 					>
 						<ArrowLeftIcon />
 					</Button>
-					<Button>
+					<Button disabled={isPendingSubmit}>
 						Next
-						<ArrowRightIcon className="ml-2" />
+						{isPendingSubmit ? (
+							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+						) : (
+							<ArrowRightIcon className="ml-2" />
+						)}
 					</Button>
 				</CardFooter>
 			</form>
