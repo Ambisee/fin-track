@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -29,6 +30,7 @@ const formSchema = z.object({
 })
 
 export default function ForgotPassword() {
+	const rootRef = useRef<HTMLDivElement>(null)
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -36,8 +38,26 @@ export default function ForgotPassword() {
 		}
 	})
 
+	useEffect(() => {
+		const resizeObserver = new ResizeObserver((entries) => {
+			if (rootRef.current === undefined || rootRef.current === null) {
+				return
+			}
+			rootRef.current.style.minHeight = `${window.innerHeight}px`
+		})
+
+		resizeObserver.observe(document.body)
+
+		return () => {
+			resizeObserver.disconnect()
+		}
+	}, [])
+
 	return (
-		<div className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center">
+		<div
+			ref={rootRef}
+			className="w-full min-h-screen grid grid-flow-col-dense justify-items-center"
+		>
 			<div className="w-full max-w-container flex justify-center items-center">
 				<Card className="w-[320px]">
 					<CardHeader className="w-full text-center">

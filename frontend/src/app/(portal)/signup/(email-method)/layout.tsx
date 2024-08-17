@@ -5,7 +5,8 @@ import {
 	createContext,
 	Dispatch,
 	SetStateAction,
-	useEffect
+	useEffect,
+	useRef
 } from "react"
 import { useGlobalStore } from "@/lib/store"
 import { AnimatePresence } from "framer-motion"
@@ -36,8 +37,24 @@ export const PageTransitionContext = createContext<PageTransitionContextType>(
 
 function ProgressProvider(props: SignUpLayoutProps) {
 	const pathname = usePathname()
+	const rootRef = useRef<HTMLDivElement>(null)
 	const [value, setValue] = useState(0)
 	const [prevPage, setPrevPage] = useState(0)
+
+	useEffect(() => {
+		const resizeObserver = new ResizeObserver((entries) => {
+			if (rootRef.current === undefined || rootRef.current === null) {
+				return
+			}
+			rootRef.current.style.minHeight = `${window.innerHeight}px`
+		})
+
+		resizeObserver.observe(document.body)
+
+		return () => {
+			resizeObserver.disconnect()
+		}
+	}, [])
 
 	useEffect(() => {
 		if (pathname.endsWith("/signup/email")) {
@@ -50,7 +67,10 @@ function ProgressProvider(props: SignUpLayoutProps) {
 	}, [pathname, setValue])
 
 	return (
-		<div className="w-full min-h-screen grid grid-flow-col-dense justify-items-center">
+		<div
+			ref={rootRef}
+			className="w-full grid grid-flow-col-dense justify-items-center"
+		>
 			<div className="w-full h-full max-w-container flex justify-center items-center px-2 overflow-x-hidden">
 				<div className="min-h-fit w-full max-w-[375px] px-0 md:px-0">
 					<div className="w-full px-2 mb-4">
