@@ -20,6 +20,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import ComboBox from "@/components/ui/combobox"
 
 function SettingsSection(props: { children?: JSX.Element; name?: string }) {
 	return (
@@ -30,6 +31,8 @@ function SettingsSection(props: { children?: JSX.Element; name?: string }) {
 	)
 }
 
+const supportedCurrencies = ["USD", "CAD", "GBP", "JPY", "IDR", "KRW"] as const
+const currencyZ = z.enum(supportedCurrencies).default("CAD")
 const generalSectionFormSchema = z.object({
 	username: z
 		.string()
@@ -39,7 +42,7 @@ const generalSectionFormSchema = z.object({
 		)
 		.regex(/(^$)|(^[a-zA-Z0-9]+$)/, "Must only contain alphanumeric characters")
 		.default(""),
-	currency: z.string().default("CAD")
+	currency: currencyZ
 })
 function GeneralSection() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
@@ -76,9 +79,10 @@ function GeneralSection() {
 								<FormLabel>Username</FormLabel>
 								<FormControl>
 									{userQueries.isLoading ? (
-										<Skeleton className="h-10 w-full" />
+										<Skeleton className="h-10 w-full max-w-96" />
 									) : (
 										<Input
+											className="w-full max-w-96"
 											placeholder={
 												userQueries.data?.data.user?.user_metadata["username"]
 											}
@@ -86,9 +90,15 @@ function GeneralSection() {
 										/>
 									)}
 								</FormControl>
-								<FormDescription>
-									Usernames must only contain alphanumeric characters and at
-									most {MAX_USERNAME_LENGTH} characters
+								<FormDescription className="max-w-96">
+									{userQueries.isLoading ? (
+										<Skeleton className="h-6 w-full max-w-40" />
+									) : (
+										<>
+											Usernames must only contain alphanumeric characters and at
+											most {MAX_USERNAME_LENGTH} characters
+										</>
+									)}
 								</FormDescription>
 							</FormItem>
 						)}
@@ -97,14 +107,30 @@ function GeneralSection() {
 						control={form.control}
 						name="currency"
 						render={({ field }) => (
-							<FormItem className="mt-8">
+							<FormItem className="grid mt-8">
 								<FormLabel>Currency</FormLabel>
-								<FormControl></FormControl>
+								<FormControl>
+									{userQueries.isLoading ? (
+										<Skeleton className="h-10 w-full max-w-96" />
+									) : (
+										<ComboBox
+											closeOnSelect
+											value={field.value}
+											onChange={(e) => {
+												form.setValue("currency", e as any)
+											}}
+											values={supportedCurrencies.map((val) => ({
+												value: val,
+												label: val
+											}))}
+										/>
+									)}
+								</FormControl>
 							</FormItem>
 						)}
 					/>
 					<Button
-						className="mt-4"
+						className="mt-6"
 						variant="default"
 						disabled={userQueries.isLoading || isPendingSubmit}
 					>
@@ -116,8 +142,92 @@ function GeneralSection() {
 	)
 }
 
+const emailFieldFormSchema = z.object({
+	email: z.string().email("Please provide a valid email").default("")
+})
+function EmailField() {
+	const userQueries = useQuery({
+		queryKey: ["user"],
+		queryFn: () => sbBrowser.auth.getUser(),
+		refetchOnMount: (query) => {
+			return query.state.data === undefined
+		}
+	})
+
+	const form = useForm<z.infer<typeof emailFieldFormSchema>>({
+		resolver: zodResolver(emailFieldFormSchema),
+		defaultValues: {
+			email: ""
+		}
+	})
+
+	const renderEmailMessage = () => {
+		const user = userQueries.data?.data.user
+		if (user === undefined || user === null) {
+			return <></>
+		}
+
+		if (user.app_metadata.provider === "google") {
+			return (
+				<>
+					This account was created through Google. Please enter an email that
+					ends with <i>@gmail.com</i>
+				</>
+			)
+		}
+
+		return (
+			<>
+				This account was created through email and password. Please enter a
+				valid email address
+			</>
+		)
+	}
+
+	return (
+		<Form {...form}>
+			<form>
+				<FormField
+					control={form.control}
+					name="email"
+					render={({ field }) => (
+						<FormItem className="w-full max-w-96">
+							<FormLabel>Email</FormLabel>
+							<FormControl>
+								{userQueries.isLoading ? (
+									<Skeleton className="h-10 w-full" />
+								) : (
+									<Input placeholder="Email" {...field} />
+								)}
+							</FormControl>
+							<FormDescription>
+								{userQueries.isLoading ? (
+									<Skeleton className="h-6 w-full max-w-40" />
+								) : (
+									renderEmailMessage()
+								)}
+							</FormDescription>
+						</FormItem>
+					)}
+				/>
+				<Button
+					disabled={userQueries.isLoading}
+					className="mt-6"
+					onClick={(e) => e.preventDefault()}
+				>
+					Submit
+				</Button>
+			</form>
+		</Form>
+	)
+}
+
 function AccountSection() {
-	return <SettingsSection name="Account"></SettingsSection>
+	return (
+		<SettingsSection name="Account">
+			<EmailField />
+		</SettingsSection>
+	)
 }
 
 function MiscellaneousSection() {
