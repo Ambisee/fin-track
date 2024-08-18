@@ -38,7 +38,8 @@ const generalSectionFormSchema = z.object({
 			`Must be at most ${MAX_USERNAME_LENGTH} characters`
 		)
 		.regex(/(^$)|(^[a-zA-Z0-9]+$)/, "Must only contain alphanumeric characters")
-		.default("")
+		.default(""),
+	currency: z.string().default("CAD")
 })
 function GeneralSection() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
@@ -53,7 +54,8 @@ function GeneralSection() {
 	const form = useForm<z.infer<typeof generalSectionFormSchema>>({
 		resolver: zodResolver(generalSectionFormSchema),
 		defaultValues: {
-			username: undefined
+			username: "",
+			currency: "CAD"
 		}
 	})
 
@@ -91,7 +93,16 @@ function GeneralSection() {
 							</FormItem>
 						)}
 					/>
-
+					<FormField
+						control={form.control}
+						name="currency"
+						render={({ field }) => (
+							<FormItem className="mt-8">
+								<FormLabel>Currency</FormLabel>
+								<FormControl></FormControl>
+							</FormItem>
+						)}
+					/>
 					<Button
 						className="mt-4"
 						variant="default"
