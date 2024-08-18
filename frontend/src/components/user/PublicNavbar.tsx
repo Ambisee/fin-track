@@ -24,18 +24,16 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 	const [user, setUser] = useState(props.user)
 
 	useEffect(() => {
-		const authSubscription = sbBrowser.auth.onAuthStateChange(
-			async (event, session) => {
-				if (
-					event === "SIGNED_IN" ||
-					event == "SIGNED_OUT" ||
-					event === "INITIAL_SESSION"
-				) {
-					const userResponse = await sbBrowser.auth.getUser()
-					setUser(userResponse.data.user)
-				}
+		const authSubscription = sbBrowser.auth.onAuthStateChange(async (event) => {
+			if (
+				event === "SIGNED_IN" ||
+				event == "SIGNED_OUT" ||
+				event === "INITIAL_SESSION"
+			) {
+				const userResponse = await sbBrowser.auth.getUser()
+				setUser(userResponse.data.user)
 			}
-		)
+		})
 
 		return () => {
 			authSubscription.data.subscription.unsubscribe()
