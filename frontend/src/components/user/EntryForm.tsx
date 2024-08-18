@@ -23,10 +23,9 @@ import { Textarea } from "../ui/textarea"
 import { sbBrowser } from "@/lib/supabase"
 import { useToast } from "../ui/use-toast"
 import { Entry } from "@/types/supabase"
-import { useEffect, useMemo, useState } from "react"
-import { useGlobalStore } from "@/lib/store"
-import { PostgrestSingleResponse, User } from "@supabase/supabase-js"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMemo } from "react"
+import { PostgrestSingleResponse } from "@supabase/supabase-js"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	Dialog,
 	DialogContent,
@@ -37,6 +36,7 @@ import {
 	DialogFooter,
 	DialogTrigger
 } from "../ui/dialog"
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 
 interface EntryFormProps {
 	data?: Entry
@@ -242,17 +242,20 @@ function DialogEntryForm(props: EntryFormProps) {
 									render={({ field }) => (
 										<EntryFormItem label="Type">
 											<div>
-												<ComboBox
-													closeOnSelect
-													value={field.value}
-													onChange={(e) => {
-														form.setValue("type", e as any)
-													}}
-													values={[
-														{ label: "Income", value: "Income" },
-														{ label: "Expense", value: "Expense" }
-													]}
-												/>
+												<Tabs
+													defaultValue={field.value}
+													onValueChange={field.onChange}
+													className="w-full"
+												>
+													<TabsList className="w-full">
+														<TabsTrigger className="w-1/2" value="Income">
+															Income
+														</TabsTrigger>
+														<TabsTrigger className="w-1/2" value="Expense">
+															Expense
+														</TabsTrigger>
+													</TabsList>
+												</Tabs>
 											</div>
 										</EntryFormItem>
 									)}
