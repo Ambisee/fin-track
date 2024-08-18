@@ -18,7 +18,10 @@ export default function DashboardHome() {
 	const userQuery = useQuery({
 		queryKey: ["user"],
 		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnMount: false
+		staleTime: 30000,
+		refetchOnMount: (query) => {
+			return query.state.data === undefined
+		}
 	})
 	const entriesQuery = useQuery({
 		queryKey: ["entryData"],
@@ -29,7 +32,9 @@ export default function DashboardHome() {
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
-		refetchOnMount: false,
+		refetchOnMount: (query) => {
+			return query.state.data === undefined
+		},
 		enabled: !!userQuery.data
 	})
 
