@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { inter } from "@/app/fonts"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import "./globals.css"
 import DataProvider from "@/components/user/DataProvider"
@@ -29,6 +30,7 @@ export default function RootLayout({
 						<main className="min-h-screen">{children}</main>
 						<Toaster />
 					</ThemeProvider>
+					<ReactQueryDevtools initialIsOpen={false} />
 				</body>
 			</DataProvider>
 		</html>
