@@ -145,6 +145,21 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(false)
 	const [isFormOpen, setIsFormOpen] = useState(false)
 
+	const formatAmount = (num?: number) => {
+		if (num === undefined) {
+			return num
+		}
+
+		if (!Intl.supportedValuesOf("currency").includes("CAD")) {
+			return num.toFixed(2)
+		}
+
+		return new Intl.NumberFormat("en-CA", {
+			style: "currency",
+			currency: "CAD"
+		}).format(num)
+	}
+
 	return (
 		<AlertDialog>
 			<>
@@ -174,7 +189,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 								<div className="flex gap-2">
 									<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 										{props.data.amount_is_positive ? "+ " : "- "}
-										{props.data?.amount.toFixed(2)}
+										{formatAmount(props.data.amount)}
 									</p>
 									{isItemOpen ? (
 										<ChevronUpIcon width={25} height={25} />
