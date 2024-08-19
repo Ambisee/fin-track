@@ -37,6 +37,7 @@ import {
 	DialogTrigger
 } from "../ui/dialog"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
+import { USER_QKEY } from "@/lib/constants"
 
 interface EntryFormProps {
 	data?: Entry
@@ -92,7 +93,7 @@ function DialogEntryForm(props: EntryFormProps) {
 	const { toast } = useToast()
 	const isEditForm = props.data !== undefined
 	const { data: userData } = useQuery({
-		queryKey: ["user"],
+		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: false
 	})

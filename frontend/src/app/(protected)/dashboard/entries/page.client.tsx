@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
+import { USER_QKEY, ENTRY_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { sortDataByDateGroup } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
@@ -9,12 +10,12 @@ import { useMemo } from "react"
 
 export default function DashboardEntries() {
 	const userQuery = useQuery({
-		queryKey: ["user"],
+		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: false
 	})
 	const entriesQuery = useQuery({
-		queryKey: ["entryData"],
+		queryKey: ENTRY_QKEY,
 		queryFn: async () =>
 			sbBrowser
 				.from("entry")

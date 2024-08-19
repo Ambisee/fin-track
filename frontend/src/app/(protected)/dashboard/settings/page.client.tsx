@@ -13,10 +13,21 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
-import { MAX_USERNAME_LENGTH } from "@/lib/constants"
+import {
+	MAX_USERNAME_LENGTH,
+	ENTRY_QKEY,
+	USER_QKEY,
+	USER_SETTINGS_QKEY,
+	SUPPORTED_CURRENCIES_QKEY
+} from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useQuery } from "@tanstack/react-query"
+import {
+	QueryClient,
+	useMutation,
+	useQuery,
+	useQueryClient
+} from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -31,8 +42,6 @@ function SettingsSection(props: { children?: JSX.Element; name?: string }) {
 	)
 }
 
-const supportedCurrencies = ["USD", "CAD", "GBP", "JPY", "IDR", "KRW"] as const
-const currencyZ = z.enum(supportedCurrencies).default("CAD")
 const generalSectionFormSchema = z.object({
 	username: z
 		.string()
@@ -42,23 +51,46 @@ const generalSectionFormSchema = z.object({
 		)
 		.regex(/(^$)|(^[a-zA-Z0-9]+$)/, "Must only contain alphanumeric characters")
 		.default(""),
-	currency: currencyZ
+	currency: z.string()
 })
+
 function GeneralSection() {
+	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const queryClient = useQueryClient()
 	const userQueries = useQuery({
-		queryKey: ["user"],
+		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
 		}
 	})
 
+	const supportedCurrenciesQuery = useQuery({
+		queryKey: SUPPORTED_CURRENCIES_QKEY,
+		queryFn: async () =>
+			await sbBrowser.from("supported_currencies").select("*")
+	})
+	const supportedCurrencies = supportedCurrenciesQuery.data?.data
+
+	const userSettingsQuery = useQuery({
+		queryKey: USER_SETTINGS_QKEY,
+		queryFn: async () =>
+			await sbBrowser
+				.from("user_settings")
+				.select(`*, supported_currencies (currency_name)`)
+				.limit(1)
+				.single()
+	})
+	const userSettings = userSettingsQuery.data?.data
+
 	const form = useForm<z.infer<typeof generalSectionFormSchema>>({
 		resolver: zodResolver(generalSectionFormSchema),
 		defaultValues: {
 			username: "",
-			currency: "CAD"
+			currency:
+				userSettingsQuery.data?.data?.supported_currencies?.currency_name ??
+				"USD"
 		}
 	})
 
@@ -68,7 +100,69 @@ function GeneralSection() {
 				<form
 					onSubmit={(e) => {
 						e.preventDefault()
-						form.handleSubmit((data) => {})()
+						form.handleSubmit(
+							async (data) => {
+								if (data.username !== "") {
+									const { error } = await sbBrowser.auth.updateUser({
+										data: {
+											username: data.username
+										}
+									})
+
+									if (error !== null) {
+										toast({
+											title: error.message,
+											variant: "destructive",
+											duration: 1500
+										})
+										return
+									}
+								}
+
+								if (
+									supportedCurrencies !== null &&
+									supportedCurrencies !== undefined &&
+									userSettings?.supported_currencies?.currency_name !==
+										undefined &&
+									userSettings.supported_currencies.currency_name !==
+										data.currency
+								) {
+									const newCurrencyId = supportedCurrencies.find(
+										(value) => value.currency_name === data.currency
+									)
+									if (newCurrencyId === undefined) {
+										toast({
+											description: "Invalid currency value provided",
+											variant: "destructive",
+											duration: 1500
+										})
+										return
+									}
+
+									const { error } = await sbBrowser
+										.from("user_settings")
+										.update({ currency_id: newCurrencyId.id })
+										.eq("id", userSettings.id)
+
+									if (error !== null) {
+										toast({
+											description: error.message,
+											variant: "destructive",
+											duration: 1500
+										})
+										return
+									}
+								}
+
+								queryClient.invalidateQueries({ queryKey: USER_QKEY })
+								queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+								toast({
+									description: "User settings updated",
+									duration: 1500
+								})
+							},
+							(errors) => {}
+						)()
 					}}
 				>
 					<FormField
@@ -90,16 +184,14 @@ function GeneralSection() {
 										/>
 									)}
 								</FormControl>
-								<FormDescription className="max-w-96">
-									{userQueries.isLoading ? (
-										<Skeleton className="h-6 w-full max-w-40" />
-									) : (
-										<>
-											Usernames must only contain alphanumeric characters and at
-											most {MAX_USERNAME_LENGTH} characters
-										</>
-									)}
-								</FormDescription>
+								{userQueries.isLoading ? (
+									<Skeleton className="h-6 w-full max-w-40" />
+								) : (
+									<FormDescription className="max-w-96">
+										Usernames must only contain alphanumeric characters and at
+										most {MAX_USERNAME_LENGTH} characters
+									</FormDescription>
+								)}
 							</FormItem>
 						)}
 					/>
@@ -117,12 +209,14 @@ function GeneralSection() {
 											closeOnSelect
 											value={field.value}
 											onChange={(e) => {
-												form.setValue("currency", e as any)
+												form.setValue("currency", e)
 											}}
-											values={supportedCurrencies.map((val) => ({
-												value: val,
-												label: val
-											}))}
+											values={
+												supportedCurrencies?.map((val) => ({
+													label: val.currency_name,
+													value: val.currency_name
+												})) ?? []
+											}
 										/>
 									)}
 								</FormControl>
@@ -147,7 +241,7 @@ const emailFieldFormSchema = z.object({
 })
 function EmailField() {
 	const userQueries = useQuery({
-		queryKey: ["user"],
+		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
@@ -200,13 +294,11 @@ function EmailField() {
 									<Input placeholder="Email" {...field} />
 								)}
 							</FormControl>
-							<FormDescription>
-								{userQueries.isLoading ? (
-									<Skeleton className="h-6 w-full max-w-40" />
-								) : (
-									renderEmailMessage()
-								)}
-							</FormDescription>
+							{userQueries.isLoading ? (
+								<Skeleton className="h-6 w-full max-w-40" />
+							) : (
+								<FormDescription>{renderEmailMessage()}</FormDescription>
+							)}
 						</FormItem>
 					)}
 				/>
@@ -232,6 +324,7 @@ function AccountSection() {
 
 function MiscellaneousSection() {
 	const router = useRouter()
+	const queryClient = useQueryClient()
 	const { toast } = useToast()
 
 	return (
@@ -262,6 +355,8 @@ function MiscellaneousSection() {
 								toast({ description: error.message })
 							}
 
+							queryClient.removeQueries({ queryKey: USER_QKEY })
+							queryClient.removeQueries({ queryKey: ENTRY_QKEY })
 							router.push("/")
 						}}
 					>

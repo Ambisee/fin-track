@@ -12,11 +12,12 @@ import EntryList from "@/components/user/EntryList"
 import { DataTable } from "@/components/ui/data-table"
 import { useQuery } from "@tanstack/react-query"
 import { Entry } from "@/types/supabase"
+import { ENTRY_QKEY, USER_QKEY } from "@/lib/constants"
 
 export default function DashboardHome() {
 	const { toast } = useToast()
 	const userQuery = useQuery({
-		queryKey: ["user"],
+		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
 		staleTime: 30000,
 		refetchOnMount: (query) => {
@@ -24,7 +25,7 @@ export default function DashboardHome() {
 		}
 	})
 	const entriesQuery = useQuery({
-		queryKey: ["entryData"],
+		queryKey: ENTRY_QKEY,
 		queryFn: async () =>
 			sbBrowser
 				.from("entry")

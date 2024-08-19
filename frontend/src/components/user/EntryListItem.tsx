@@ -25,11 +25,10 @@ import {
 import EntryForm from "./EntryForm"
 import { sbBrowser } from "@/lib/supabase"
 import { toast, useToast } from "../ui/use-toast"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { getElementFromNode } from "@/lib/utils"
 import { Dialog } from "../ui/dialog"
-import { DESKTOP_BREAKPOINT } from "@/lib/constants"
-import { useMediaQuery } from "react-responsive"
+import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ScrollArea } from "../ui/scroll-area"
 
@@ -56,9 +55,6 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 		mutationFn: (id: number) => {
 			return Promise.resolve(sbBrowser.from("entry").delete().eq("id", id))
 		}
-	})
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
 	})
 
 	return (
@@ -92,7 +88,7 @@ function DeletePopover(props: Pick<EntryListItemProps, "data">) {
 									duration: 500
 								})
 
-								queryClient.invalidateQueries({ queryKey: ["entryData"] })
+								queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 							}
 						})
 					}
@@ -110,10 +106,6 @@ function PopoverRoot(props: {
 	onOpenChange?: (open: boolean) => void | undefined
 	isAlert?: boolean
 }) {
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
-	})
-
 	if (props.isAlert) {
 		return (
 			<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -130,10 +122,6 @@ function PopoverRoot(props: {
 }
 
 function PopoverTrigger(props: { children: JSX.Element; isAlert?: boolean }) {
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
-	})
-
 	if (props.isAlert) {
 		return <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
 	}
@@ -145,18 +133,30 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(false)
 	const [isFormOpen, setIsFormOpen] = useState(false)
 
+	const userSettingsQuery = useQuery({
+		queryKey: USER_SETTINGS_QKEY,
+		queryFn: async () =>
+			await sbBrowser
+				.from("user_settings")
+				.select(`*, supported_currencies (currency_name)`)
+				.limit(1)
+				.single()
+	})
+
 	const formatAmount = (num?: number) => {
-		if (num === undefined) {
+		const currency =
+			userSettingsQuery?.data?.data?.supported_currencies?.currency_name
+		if (num === undefined || currency === undefined) {
 			return num
 		}
 
-		if (!Intl.supportedValuesOf("currency").includes("CAD")) {
+		if (!Intl.supportedValuesOf("currency").includes(currency)) {
 			return num.toFixed(2)
 		}
 
-		return new Intl.NumberFormat("en-CA", {
+		return new Intl.NumberFormat(navigator.language, {
 			style: "currency",
-			currency: "CAD"
+			currency: currency
 		}).format(num)
 	}
 
@@ -243,7 +243,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 																element?.getAttribute("role") === "dialog")
 														) {
 															queryClient.invalidateQueries({
-																queryKey: ["entryData"]
+																queryKey: ENTRY_QKEY
 															})
 															observer.disconnect()
 														}

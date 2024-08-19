@@ -9,7 +9,7 @@ function isProtectedUrl(url: NextURL) {
 
 export async function middleware(request: NextRequest) {
     const supabase = sbMiddleware(request)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({data: {user: null}}))
 
     /**
      * Redirect unauthenticated user to the login page

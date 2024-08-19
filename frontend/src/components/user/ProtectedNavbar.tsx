@@ -6,9 +6,7 @@ import EntryForm from "./EntryForm"
 import { Button, buttonVariants } from "../ui/button"
 import { PlusIcon } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
-import { Drawer, DrawerTrigger } from "@/components/ui/drawer"
-import { useMediaQuery } from "react-responsive"
-import { DESKTOP_BREAKPOINT } from "@/lib/constants"
+import { ENTRY_QKEY } from "@/lib/constants"
 import { Dialog, DialogTrigger } from "../ui/dialog"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -36,18 +34,10 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 }
 
 function PopoverTrigger(props: { children: JSX.Element }) {
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
-	})
-
 	return <DialogTrigger asChild>{props.children}</DialogTrigger>
 }
 
 function PopoverRoot(props: { children: JSX.Element }) {
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
-	})
-
 	return <Dialog>{props.children}</Dialog>
 }
 
@@ -100,7 +90,7 @@ export default function ProtectedNavbar() {
 				</div>
 				<EntryForm
 					onSubmitSuccess={(data) => {
-						queryClient.invalidateQueries({ queryKey: ["entryData"] })
+						queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 					}}
 				/>
 			</>
