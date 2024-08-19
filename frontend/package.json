@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen-types": "npx supabase gen types typescript --project-id 'gjniozckblfslplhhzkc' --schema public > ./supabase.d.ts"
+    "gen-types": "npx supabase gen types typescript --project-id ${PROJECT_ID} --schema public > ./supabase.d.ts"
   },
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
