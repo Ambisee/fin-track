@@ -120,10 +120,11 @@ export default function SignUpPassword() {
 								description: (
 									<p>
 										The accont has been successfully created. Please check your
-										inbox <u>{email}</u>&nbsp; for an email and click the link
-										inside to verify your account before signing in.
+										inbox and follow the verification link to verify your
+										account.
 									</p>
-								)
+								),
+								duration: 15000
 							})
 
 							Cookies.remove("reg-password")
