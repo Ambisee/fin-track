@@ -22,7 +22,7 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 						buttonVariants({
 							variant: pathname === props.href ? "default" : "ghost"
 						}),
-						"p-2 py-1 w-full h-fit grid grid-flow-row justify-items-center md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
+						"p-2 w-14 h-fit grid grid-flow-row justify-items-center md:w-full md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
 					)}
 				>
 					{props.icon}
