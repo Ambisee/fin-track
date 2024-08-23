@@ -73,7 +73,10 @@ export default function ForgotPassword() {
 										async (formData) => {
 											const { data, error } =
 												await sbBrowser.auth.resetPasswordForEmail(
-													formData.email
+													formData.email,
+													{
+														redirectTo: `${window.location.origin}/recovery`
+													}
 												)
 											if (error !== null) {
 											}
