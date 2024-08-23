@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast, useToast } from "@/components/ui/use-toast"
 import {
 	MAX_USERNAME_LENGTH,
 	ENTRY_QKEY,
@@ -35,7 +35,9 @@ import { z } from "zod"
 import ComboBox from "@/components/ui/combobox"
 import PasswordField from "@/components/user/FormField/PasswordField"
 import { cn } from "@/lib/utils"
-import { checkServerIdentity } from "tls"
+import googleIcon from "../../../../../public/google-icon.svg"
+import Image from "next/image"
+import { Provider } from "@supabase/supabase-js"
 
 function SettingsSection(props: {
 	children?: JSX.Element
@@ -255,6 +257,127 @@ function GeneralSection() {
 	)
 }
 
+function LinkedAccountChange() {
+	const queryClient = useQueryClient()
+	const userQuery = useQuery({
+		queryKey: USER_QKEY,
+		queryFn: () => sbBrowser.auth.getUser(),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
+	})
+
+	const getIdentityProviders = () => {
+		const result = new Set()
+		const identities = userQuery.data?.data.user?.identities
+		if (identities === undefined) {
+			return result
+		}
+
+		for (const identity of identities) {
+			result.add(identity.provider)
+		}
+
+		return result
+	}
+
+	const renderButton = (provider: string) => {
+		if (userQuery.data?.data.user?.identities === undefined) {
+			return undefined
+		}
+
+		const identityProviders = getIdentityProviders()
+		if (identityProviders.has(provider)) {
+			const identity = userQuery.data.data.user.identities.find(
+				(value) => value.provider === provider
+			)
+
+			if (identity === undefined) {
+				return undefined
+			}
+
+			return (
+				<Button
+					variant="outline"
+					disabled={identityProviders.size === 1}
+					onClick={async (e) => {
+						e.preventDefault()
+						const { error } = await sbBrowser.auth.unlinkIdentity(identity)
+
+						if (error !== null) {
+							toast({
+								description: error.message,
+								variant: "destructive"
+							})
+							return
+						}
+
+						queryClient.invalidateQueries({ queryKey: USER_QKEY })
+					}}
+				>
+					Unlink Account
+				</Button>
+			)
+		}
+
+		return (
+			<Button
+				variant="default"
+				onClick={async (e) => {
+					e.preventDefault()
+					const { error } = await sbBrowser.auth.linkIdentity({
+						provider: provider as Provider,
+						options: {
+							redirectTo: `${window.location.origin}/dashboard/settings`
+						}
+					})
+
+					if (error !== null) {
+						toast({
+							description: error.message,
+							variant: "destructive"
+						})
+						return
+					}
+
+					queryClient.invalidateQueries({ queryKey: USER_QKEY })
+				}}
+			>
+				Link Account
+			</Button>
+		)
+	}
+
+	return (
+		<div className="mt-2">
+			<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+				Linked Accounts
+			</span>
+			<ul className="max-w-96 mt-2 [&>li]:h-10">
+				<li className="flex justify-between">
+					<div className="flex items-center gap-3">
+						<span className="w-10 h-10 flex justify-center items-center bg-white rounded-sm">
+							<Image
+								src={googleIcon}
+								alt="Google Icon.svg"
+								width={24}
+								height={24}
+							/>
+						</span>
+						<span className="text-sm">
+							<div>Google</div>
+						</span>
+					</div>
+					{userQuery.isLoading ? (
+						<Skeleton className="w-20 h-10" />
+					) : (
+						renderButton("google")
+					)}
+				</li>
+			</ul>
+		</div>
+	)
+}
+
 const emailChangeFormSchema = z.object({
 	email: z.string().email("Please provide a valid email").default("")
 })
@@ -277,6 +400,7 @@ function EmailChange() {
 	return (
 		<Form {...form}>
 			<form
+				className="mt-8"
 				onSubmit={(e) => {
 					e.preventDefault()
 					form.handleSubmit(async (d) => {
@@ -356,6 +480,8 @@ const passwordChangeFormSchema = z
 	})
 
 function PasswordChange() {
+	const { toast } = useToast()
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
@@ -407,7 +533,16 @@ function PasswordChange() {
 						This account was created through Google. You can enable sign-in
 						through password by resetting your password.
 					</p>
-					<Button className="mt-4" type="button">
+					<Button
+						className="mt-4"
+						type="button"
+						onClick={(e) => {
+							e.preventDefault()
+							sbBrowser.auth.resetPasswordForEmail(
+								userQuery.data?.data.user?.email as string
+							)
+						}}
+					>
 						Reset Password
 					</Button>
 				</div>
@@ -470,7 +605,46 @@ function PasswordChange() {
 
 	return (
 		<Form {...form}>
-			<form className="mt-8">
+			<form
+				className="mt-8"
+				onSubmit={(e) => {
+					e.preventDefault()
+					form.handleSubmit(async (formData) => {
+						setIsPendingSubmit(true)
+						const { error: signInError } = await sbBrowser.auth.reauthenticate()
+
+						if (signInError !== null) {
+							toast({
+								description: signInError.message,
+								variant: "destructive"
+							})
+							setIsPendingSubmit(false)
+
+							return
+						}
+
+						const { error: updateError } = await sbBrowser.auth.updateUser({
+							password: formData.newPassword
+						})
+
+						if (updateError !== null) {
+							toast({
+								description: updateError.message,
+								variant: "destructive",
+								duration: 1500
+							})
+							setIsPendingSubmit(false)
+							return
+						}
+
+						setIsPendingSubmit(false)
+						toast({
+							description: "Successfully updated the account's password",
+							duration: 1500
+						})
+					})()
+				}}
+			>
 				<FormLabel>Password</FormLabel>
 				{renderFormFields()}
 			</form>
@@ -482,6 +656,7 @@ function AccountSection() {
 	return (
 		<SettingsSection name="Account">
 			<>
+				<LinkedAccountChange />
 				<EmailChange />
 				<PasswordChange />
 			</>
@@ -499,7 +674,7 @@ function MiscellaneousSection() {
 	const { toast } = useToast()
 
 	return (
-		<SettingsSection name="Miscellaneous">
+		<SettingsSection name="Miscellaneous ">
 			<>
 				<div className="mb-4">
 					<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
