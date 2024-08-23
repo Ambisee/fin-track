@@ -16,14 +16,16 @@ import { ENTRY_QKEY, USER_QKEY } from "@/lib/constants"
 
 export default function DashboardHome() {
 	const { toast } = useToast()
+
 	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
-		staleTime: 30000,
+		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
 		}
 	})
+
 	const entriesQuery = useQuery({
 		queryKey: ENTRY_QKEY,
 		queryFn: async () =>
@@ -33,6 +35,7 @@ export default function DashboardHome() {
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
+		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
 		},

@@ -95,7 +95,10 @@ function DialogEntryForm(props: EntryFormProps) {
 	const { data: userData } = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnMount: false
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => {
+			return query.state.data === undefined
+		}
 	})
 
 	const insertMutation = useMutation({

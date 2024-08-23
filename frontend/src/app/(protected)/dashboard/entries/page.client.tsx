@@ -12,7 +12,8 @@ export default function DashboardEntries() {
 	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnMount: false
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
 	})
 	const entriesQuery = useQuery({
 		queryKey: ENTRY_QKEY,
@@ -23,7 +24,8 @@ export default function DashboardEntries() {
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
-		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined,
 		enabled: !!userQuery.data
 	})
 
