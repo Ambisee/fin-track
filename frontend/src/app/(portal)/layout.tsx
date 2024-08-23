@@ -63,19 +63,16 @@ export default function PortalLayout(props: PortalLayoutProps) {
 	const router = useRouter()
 	const pathname = usePathname()
 
-	let isTrigger = false
-	// if (pathname.startsWith("/signup/")) {
-	// 	isTrigger = true
-	// }
-
 	return (
 		<AlertDialog>
-			<div>
-				<CloseButton isTrigger={isTrigger}>
-					<Cross1Icon width={24} height={24} />
-				</CloseButton>
-			</div>
-			<AlertDialogContent>
+			{!pathname.startsWith("/recovery") && (
+				<div>
+					<CloseButton isTrigger={false}>
+						<Cross1Icon width={24} height={24} />
+					</CloseButton>
+				</div>
+			)}
+			{/* <AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Exit Registration</AlertDialogTitle>
 					<AlertDialogDescription>
@@ -97,7 +94,7 @@ export default function PortalLayout(props: PortalLayoutProps) {
 						Proceed
 					</AlertDialogAction>
 				</AlertDialogFooter>
-			</AlertDialogContent>
+			</AlertDialogContent> */}
 			{props.children}
 		</AlertDialog>
 	)
