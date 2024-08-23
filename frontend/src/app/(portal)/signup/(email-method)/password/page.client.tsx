@@ -150,8 +150,8 @@ export default function SignUpPassword() {
 									{form.formState.errors.password?.message}
 								</div>
 								<FormDescription>
-									Password must be at least 8 characters and include lowercase,
-									uppercase, number, and special characters.
+									Passwords must have at least 8 characters and include
+									lowercase, uppercase, number, and special characters.
 								</FormDescription>
 							</FormItem>
 						)}
