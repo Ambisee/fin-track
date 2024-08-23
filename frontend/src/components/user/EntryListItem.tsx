@@ -31,6 +31,7 @@ import { Dialog } from "../ui/dialog"
 import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ScrollArea } from "../ui/scroll-area"
+import { Skeleton } from "../ui/skeleton"
 
 interface EntryListItemProps {
 	data: Entry
@@ -140,7 +141,11 @@ export default function EntryListItem(props: EntryListItemProps) {
 				.from("user_settings")
 				.select(`*, supported_currencies (currency_name)`)
 				.limit(1)
-				.single()
+				.single(),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => {
+			return query.state.data === undefined
+		}
 	})
 
 	const formatAmount = (num?: number) => {
@@ -187,10 +192,14 @@ export default function EntryListItem(props: EntryListItemProps) {
 									</CardDescription>
 								</div>
 								<div className="flex gap-2">
-									<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-										{props.data.amount_is_positive ? "+ " : "- "}
-										{formatAmount(props.data.amount)}
-									</p>
+									{userSettingsQuery.isLoading ? (
+										<Skeleton className="w-20 h-6" />
+									) : (
+										<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
+											{props.data.amount_is_positive ? "+ " : "- "}
+											{formatAmount(props.data.amount)}
+										</p>
+									)}
 									{isItemOpen ? (
 										<ChevronUpIcon width={25} height={25} />
 									) : (
