@@ -8,7 +8,8 @@ import {
 	FormDescription,
 	FormField,
 	FormItem,
-	FormLabel
+	FormLabel,
+	FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -32,10 +33,17 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import ComboBox from "@/components/ui/combobox"
+import PasswordField from "@/components/user/FormField/PasswordField"
+import { cn } from "@/lib/utils"
+import { checkServerIdentity } from "tls"
 
-function SettingsSection(props: { children?: JSX.Element; name?: string }) {
+function SettingsSection(props: {
+	children?: JSX.Element
+	className?: string
+	name?: string
+}) {
 	return (
-		<section className="mt-8 mb-16">
+		<section className={cn("mt-8 mb-16", props.className)}>
 			<h3 className="text-lg mb-4">{props.name}</h3>
 			{props.children}
 		</section>
@@ -58,9 +66,10 @@ function GeneralSection() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const queryClient = useQueryClient()
-	const userQueries = useQuery({
+	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
+		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
 		}
@@ -69,7 +78,9 @@ function GeneralSection() {
 	const supportedCurrenciesQuery = useQuery({
 		queryKey: SUPPORTED_CURRENCIES_QKEY,
 		queryFn: async () =>
-			await sbBrowser.from("supported_currencies").select("*")
+			await sbBrowser.from("supported_currencies").select("*"),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
 	})
 	const supportedCurrencies = supportedCurrenciesQuery.data?.data
 
@@ -80,7 +91,9 @@ function GeneralSection() {
 				.from("user_settings")
 				.select(`*, supported_currencies (currency_name)`)
 				.limit(1)
-				.single()
+				.single(),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
 	})
 	const userSettings = userSettingsQuery.data?.data
 
@@ -156,6 +169,7 @@ function GeneralSection() {
 
 								queryClient.invalidateQueries({ queryKey: USER_QKEY })
 								queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+								form.resetField("username")
 								toast({
 									description: "User settings updated",
 									duration: 1500
@@ -172,19 +186,24 @@ function GeneralSection() {
 							<FormItem>
 								<FormLabel>Username</FormLabel>
 								<FormControl>
-									{userQueries.isLoading ? (
+									{userQuery.isLoading ? (
 										<Skeleton className="h-10 w-full max-w-96" />
 									) : (
 										<Input
 											className="w-full max-w-96"
 											placeholder={
-												userQueries.data?.data.user?.user_metadata["username"]
+												userQuery.data?.data.user?.user_metadata["username"]
 											}
 											{...field}
 										/>
 									)}
 								</FormControl>
-								{userQueries.isLoading ? (
+								{form.formState.errors.username?.message && (
+									<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
+										{form.formState.errors.username.message}
+									</div>
+								)}
+								{userQuery.isLoading ? (
 									<Skeleton className="h-6 w-full max-w-40" />
 								) : (
 									<FormDescription className="max-w-96">
@@ -202,7 +221,7 @@ function GeneralSection() {
 							<FormItem className="grid mt-8">
 								<FormLabel>Currency</FormLabel>
 								<FormControl>
-									{userQueries.isLoading ? (
+									{userQuery.isLoading ? (
 										<Skeleton className="h-10 w-full max-w-96" />
 									) : (
 										<ComboBox
@@ -226,7 +245,7 @@ function GeneralSection() {
 					<Button
 						className="mt-6"
 						variant="default"
-						disabled={userQueries.isLoading || isPendingSubmit}
+						disabled={userQuery.isLoading || isPendingSubmit}
 					>
 						Update Data
 					</Button>
@@ -236,51 +255,56 @@ function GeneralSection() {
 	)
 }
 
-const emailFieldFormSchema = z.object({
+const emailChangeFormSchema = z.object({
 	email: z.string().email("Please provide a valid email").default("")
 })
-function EmailField() {
-	const userQueries = useQuery({
+function EmailChange() {
+	const { toast } = useToast()
+	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnMount: (query) => {
-			return query.state.data === undefined
-		}
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
 	})
 
-	const form = useForm<z.infer<typeof emailFieldFormSchema>>({
-		resolver: zodResolver(emailFieldFormSchema),
+	const form = useForm<z.infer<typeof emailChangeFormSchema>>({
+		resolver: zodResolver(emailChangeFormSchema),
 		defaultValues: {
 			email: ""
 		}
 	})
 
-	const renderEmailMessage = () => {
-		const user = userQueries.data?.data.user
-		if (user === undefined || user === null) {
-			return <></>
-		}
-
-		if (user.app_metadata.provider === "google") {
-			return (
-				<>
-					This account was created through Google. Please enter an email that
-					ends with <i>@gmail.com</i>
-				</>
-			)
-		}
-
-		return (
-			<>
-				This account was created through email and password. Please enter a
-				valid email address
-			</>
-		)
-	}
-
 	return (
 		<Form {...form}>
-			<form>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault()
+					form.handleSubmit(async (d) => {
+						const { data, error } = await sbBrowser.auth.updateUser(
+							{
+								email: d.email
+							},
+							{
+								emailRedirectTo: window.location.origin
+							}
+						)
+
+						if (error !== null) {
+							toast({
+								description: error.message,
+								variant: "destructive",
+								duration: 1500
+							})
+							return
+						}
+
+						toast({
+							description:
+								"Please check your previous and new email's inbox to verify the email change."
+						})
+					})()
+				}}
+			>
 				<FormField
 					control={form.control}
 					name="email"
@@ -288,27 +312,167 @@ function EmailField() {
 						<FormItem className="w-full max-w-96">
 							<FormLabel>Email</FormLabel>
 							<FormControl>
-								{userQueries.isLoading ? (
+								{userQuery.isLoading ? (
 									<Skeleton className="h-10 w-full" />
 								) : (
-									<Input placeholder="Email" {...field} />
+									<Input
+										placeholder={userQuery.data?.data.user?.email}
+										{...field}
+									/>
 								)}
 							</FormControl>
-							{userQueries.isLoading ? (
-								<Skeleton className="h-6 w-full max-w-40" />
-							) : (
-								<FormDescription>{renderEmailMessage()}</FormDescription>
+							{form.formState.errors.email && (
+								<FormMessage>{form.formState.errors.email.message}</FormMessage>
 							)}
 						</FormItem>
 					)}
 				/>
-				<Button
-					disabled={userQueries.isLoading}
-					className="mt-6"
-					onClick={(e) => e.preventDefault()}
-				>
+				<Button disabled={userQuery.isLoading} className="mt-6">
 					Submit
 				</Button>
+			</form>
+		</Form>
+	)
+}
+
+const passwordChangeFormSchema = z
+	.object({
+		oldPassword: z.string(),
+		newPassword: z
+			.string()
+			.min(8, "Must be at least 8 characters long")
+			.regex(/.*[A-Z].*/, "Must contain at least one uppercase letter")
+			.regex(/.*[a-z].*/, "Must contain at least one lowercase letter")
+			.regex(/.*[0-9].*/, "Must contain at least one digit")
+			.regex(
+				/.*[!@#\$%^&*()_+{}\[\]:;<>,.?~].*/,
+				"Must contain at least one special character"
+			),
+		confirmNewPassword: z.string()
+	})
+	.refine((data) => data.confirmNewPassword === data.newPassword, {
+		message: "New passwords do not match",
+		path: ["confirmNewPassword"]
+	})
+
+function PasswordChange() {
+	const userQuery = useQuery({
+		queryKey: USER_QKEY,
+		queryFn: () => sbBrowser.auth.getUser(),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
+	})
+
+	const form = useForm<z.infer<typeof passwordChangeFormSchema>>({
+		mode: "onChange",
+		resolver: zodResolver(passwordChangeFormSchema),
+		defaultValues: {
+			oldPassword: "",
+			newPassword: "",
+			confirmNewPassword: ""
+		}
+	})
+
+	const getUserIdentities = () => {
+		const result = new Set()
+		const identities = userQuery.data?.data.user?.identities
+		if (identities === undefined) {
+			return result
+		}
+
+		for (const identity of identities) {
+			result.add(identity.provider)
+		}
+
+		return result
+	}
+
+	const renderFormFields = () => {
+		if (userQuery.isLoading) {
+			return (
+				<>
+					<Skeleton className="h-10 mt-2 max-w-96" />
+					<Skeleton className="h-10 mt-2 max-w-96" />
+					<Skeleton className="h-16 mt-2 max-w-96" />
+					<Skeleton className="h-10 mt-2 max-w-96" />
+				</>
+			)
+		}
+
+		const identities = getUserIdentities()
+		if (!identities.has("email")) {
+			return (
+				<div className="mt-2">
+					<p className="text-sm text-muted-foreground max-w-96">
+						This account was created through Google. You can enable sign-in
+						through password by resetting your password.
+					</p>
+					<Button className="mt-4" type="button">
+						Reset Password
+					</Button>
+				</div>
+			)
+		}
+
+		return (
+			<>
+				<FormField
+					control={form.control}
+					name="oldPassword"
+					render={({ field }) => (
+						<FormItem className="max-w-96 mt-2">
+							<FormControl>
+								<PasswordField placeholder="Old password" {...field} />
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="newPassword"
+					render={({ field }) => (
+						<FormItem className="max-w-96 mt-2">
+							<FormControl>
+								<PasswordField placeholder="New password" {...field} />
+							</FormControl>
+							{form.formState.errors.newPassword && (
+								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
+									{form.formState.errors.newPassword.message}
+								</div>
+							)}
+							<FormDescription>
+								Passwords must have at least 8 characters and include lowercase,
+								uppercase, number, and special characters.
+							</FormDescription>
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="confirmNewPassword"
+					render={({ field }) => (
+						<FormItem className="max-w-96 mt-4">
+							<FormControl>
+								<PasswordField placeholder="Confirm new password" {...field} />
+							</FormControl>
+							{form.formState.errors.confirmNewPassword && (
+								<div className="text-sm font-medium text-destructive">
+									{form.formState.errors.confirmNewPassword.message}
+								</div>
+							)}
+						</FormItem>
+					)}
+				/>
+				<Button className="mt-4">Submit</Button>
+			</>
+		)
+	}
+
+	return (
+		<Form {...form}>
+			<form className="mt-8">
+				<FormLabel>Password</FormLabel>
+				{renderFormFields()}
 			</form>
 		</Form>
 	)
@@ -317,9 +481,16 @@ function EmailField() {
 function AccountSection() {
 	return (
 		<SettingsSection name="Account">
-			<EmailField />
+			<>
+				<EmailChange />
+				<PasswordChange />
+			</>
 		</SettingsSection>
 	)
+}
+
+function MailingSection() {
+	return <SettingsSection name="Mailing"></SettingsSection>
 }
 
 function MiscellaneousSection() {
@@ -374,6 +545,7 @@ export default function DashboardSettings() {
 			<h1 className="text-2xl mb-4">Settings</h1>
 			<GeneralSection />
 			<AccountSection />
+			<MailingSection />
 			<MiscellaneousSection />
 		</div>
 	)
