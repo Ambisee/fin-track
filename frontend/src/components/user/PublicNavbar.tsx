@@ -20,32 +20,23 @@ interface PublicNavbarProps {
 }
 
 export default function PublicNavbar(props: PublicNavbarProps) {
-	const { toast } = useToast()
-	const [user, setUser] = useState(props.user)
+	const [isSignedIn, setIsSignedIn] = useState(props.user !== null)
 
 	useEffect(() => {
-		const authSubscription = sbBrowser.auth.onAuthStateChange(async (event) => {
-			if (
-				event === "SIGNED_IN" ||
-				event == "SIGNED_OUT" ||
-				event === "INITIAL_SESSION"
-			) {
-				const userResponse = await sbBrowser.auth.getUser()
-				setUser(userResponse.data.user)
-			}
-		})
-
-		return () => {
-			authSubscription.data.subscription.unsubscribe()
+		const isUserSignedIn = async () => {
+			const { data } = await sbBrowser.auth.getUser()
+			setIsSignedIn(data.user !== null)
 		}
-	}, [toast])
+
+		isUserSignedIn()
+	}, [])
 
 	const linkObject = {
 		text: "Sign In",
 		redirectUrl: "/signin"
 	}
 
-	if (user !== null) {
+	if (isSignedIn) {
 		linkObject.text = "Dashboard"
 		linkObject.redirectUrl = "/dashboard"
 	}
