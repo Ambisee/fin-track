@@ -314,7 +314,7 @@ function LinkedAccountChange() {
 						queryClient.invalidateQueries({ queryKey: USER_QKEY })
 					}}
 				>
-					Unlink Account
+					Unlink
 				</Button>
 			)
 		}
@@ -352,8 +352,8 @@ function LinkedAccountChange() {
 			<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
 				Linked Accounts
 			</span>
-			<ul className="max-w-96 mt-2 [&>li]:h-10">
-				<li className="flex justify-between">
+			<ul className="max-w-96 mt-2">
+				<li className="flex justify-between rounded-md border p-4">
 					<div className="flex items-center gap-3">
 						<span className="w-10 h-10 flex justify-center items-center bg-white rounded-sm">
 							<Image
@@ -363,9 +363,7 @@ function LinkedAccountChange() {
 								height={24}
 							/>
 						</span>
-						<span className="text-sm">
-							<div>Google</div>
-						</span>
+						<div className="text-sm">Google</div>
 					</div>
 					{userQuery.isLoading ? (
 						<Skeleton className="w-20 h-10" />
@@ -539,7 +537,10 @@ function PasswordChange() {
 						onClick={(e) => {
 							e.preventDefault()
 							sbBrowser.auth.resetPasswordForEmail(
-								userQuery.data?.data.user?.email as string
+								userQuery.data?.data.user?.email as string,
+								{
+									redirectTo: `${window.location.origin}/recovery`
+								}
 							)
 						}}
 					>
