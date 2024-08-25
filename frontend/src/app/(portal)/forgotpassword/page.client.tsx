@@ -16,12 +16,13 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { useToast } from "@/components/ui/use-toast"
 import { sbBrowser } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import Image from "next/image"
+import { ReloadIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -30,7 +31,9 @@ const formSchema = z.object({
 })
 
 export default function ForgotPassword() {
+	const { toast } = useToast()
 	const rootRef = useRef<HTMLDivElement>(null)
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -71,6 +74,7 @@ export default function ForgotPassword() {
 									e.preventDefault()
 									form.handleSubmit(
 										async (formData) => {
+											setIsPendingSubmit(true)
 											const { data, error } =
 												await sbBrowser.auth.resetPasswordForEmail(
 													formData.email,
@@ -79,7 +83,19 @@ export default function ForgotPassword() {
 													}
 												)
 											if (error !== null) {
+												setIsPendingSubmit(false)
+												toast({
+													description: error?.message,
+													variant: "destructive"
+												})
+												return
 											}
+
+											setIsPendingSubmit(false)
+											toast({
+												description:
+													"Please check your inbox for a link to reset your password."
+											})
 										},
 										(errors) => {}
 									)()
@@ -101,7 +117,12 @@ export default function ForgotPassword() {
 										</FormItem>
 									)}
 								/>
-								<Button>Submit</Button>
+								<Button disabled={isPendingSubmit}>
+									{isPendingSubmit && (
+										<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+									)}
+									Submit
+								</Button>
 							</form>
 						</Form>
 						<Separator className="w-full mt-4" />
