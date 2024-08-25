@@ -9,16 +9,8 @@ function isProtectedUrl(url: NextURL) {
 }
 
 export async function middleware(request: NextRequest) {
-    const supabase = sbMiddleware(request)
-    const { data: { user } } = await supabase.auth.getUser().catch(() => ({data: {user: null}}))
-
-    
-    /**
-     * Redirect unauthenticated user to the login page when accessing the dashboard
-     */
-    if (user === null && isProtectedUrl(request.nextUrl)) {
-        return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
-    }
+    const response = NextResponse.next({ request, })
+    const supabase = sbMiddleware(request, response)
 
     /**
      * Redirect unauthorized user to the signin page when accessing the password recovery page
@@ -31,16 +23,27 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
         }
 
-        const { data, error } = await supabase.auth.verifyOtp({type: "recovery", token: token, email: email})
-        if (error !== null) {
+        const otpVerification = await supabase.auth.verifyOtp({ type: "email", token: token, email: email })
+        console.log(response.cookies)
+        console.log(request.cookies)
+        if (otpVerification.error !== null) {
             return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
         }
+        
+        return response
+    }
 
-        return NextResponse.next()
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({data: {user: null}}))
+
+    /**
+     * Redirect unauthenticated user to the login page when accessing the dashboard
+     */
+    if (user === null && isProtectedUrl(request.nextUrl)) {
+        return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
     }
 
 
-    return NextResponse.next()
+    return response
 }
 
 export const config = {
