@@ -1,7 +1,6 @@
 import { NextURL } from "next/dist/server/web/next-url";
 import { NextRequest, NextResponse } from "next/server";
 import { sbMiddleware } from "./lib/supabase";
-import { requestFormReset } from "react-dom";
 
 
 function isProtectedUrl(url: NextURL) {
@@ -16,17 +15,17 @@ export async function middleware(request: NextRequest) {
      * Redirect unauthorized user to the signin page when accessing the password recovery page
      */
     if (request.nextUrl.pathname.startsWith("/recovery")) {
-        const token = request.nextUrl.searchParams.get("token")
-        const email = request.nextUrl.searchParams.get("email")
+        const token_hash = request.nextUrl.searchParams.get("token_hash")
 
-        if (token === null || email === null) {
-            return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
+        if (token_hash === null) {
+            console.log("No token_hash")
+            return NextResponse.redirect(new URL("/", request.nextUrl.origin))
         }
 
-        const otpVerification = await supabase.auth.verifyOtp({ type: "email", token: token, email: email })
-        console.log(response.cookies)
-        console.log(request.cookies)
+        const otpVerification = await supabase.auth.verifyOtp({ type: "email", token_hash: token_hash })
         if (otpVerification.error !== null) {
+            console.log("OTP verification failed")
+            console.log("Reason:", otpVerification.error.message)
             return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
         }
         
@@ -41,7 +40,6 @@ export async function middleware(request: NextRequest) {
     if (user === null && isProtectedUrl(request.nextUrl)) {
         return NextResponse.redirect(new URL("/signin", request.nextUrl.origin))
     }
-
 
     return response
 }
