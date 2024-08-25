@@ -353,23 +353,25 @@ function LinkedAccountChange() {
 				Linked Accounts
 			</span>
 			<ul className="max-w-96 mt-2">
-				<li className="flex justify-between rounded-md border p-4">
-					<div className="flex items-center gap-3">
-						<span className="w-10 h-10 flex justify-center items-center bg-white rounded-sm">
-							<Image
-								src={googleIcon}
-								alt="Google Icon.svg"
-								width={24}
-								height={24}
-							/>
-						</span>
-						<div className="text-sm">Google</div>
+				<li className="rounded-md border p-4">
+					<div className="flex justify-between">
+						<div className="flex items-center gap-3">
+							<span className="w-10 h-10 flex justify-center items-center bg-white rounded-sm">
+								<Image
+									src={googleIcon}
+									alt="Google Icon.svg"
+									width={24}
+									height={24}
+								/>
+							</span>
+							<div className="text-sm">Google</div>
+						</div>
+						{userQuery.isLoading ? (
+							<Skeleton className="w-20 h-10" />
+						) : (
+							renderButton("google")
+						)}
 					</div>
-					{userQuery.isLoading ? (
-						<Skeleton className="w-20 h-10" />
-					) : (
-						renderButton("google")
-					)}
 				</li>
 			</ul>
 		</div>
@@ -534,14 +536,29 @@ function PasswordChange() {
 					<Button
 						className="mt-4"
 						type="button"
-						onClick={(e) => {
+						onClick={async (e) => {
 							e.preventDefault()
-							sbBrowser.auth.resetPasswordForEmail(
+							const { error } = await sbBrowser.auth.resetPasswordForEmail(
 								userQuery.data?.data.user?.email as string,
 								{
 									redirectTo: `${window.location.origin}/recovery`
 								}
 							)
+
+							if (error !== null) {
+								toast({
+									description: error.message,
+									variant: "destructive",
+									duration: 1500
+								})
+								return
+							}
+
+							toast({
+								description:
+									"Please check your inbox for a link to reset your password.",
+								duration: 1500
+							})
 						}}
 					>
 						Reset Password
