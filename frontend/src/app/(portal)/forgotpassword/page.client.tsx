@@ -86,7 +86,8 @@ export default function ForgotPassword() {
 												setIsPendingSubmit(false)
 												toast({
 													description: error?.message,
-													variant: "destructive"
+													variant: "destructive",
+													duration: 1500
 												})
 												return
 											}
@@ -94,7 +95,8 @@ export default function ForgotPassword() {
 											setIsPendingSubmit(false)
 											toast({
 												description:
-													"Please check your inbox for a link to reset your password."
+													"Please check your inbox for a link to reset your password.",
+												duration: 1500
 											})
 										},
 										(errors) => {}
