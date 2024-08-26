@@ -247,7 +247,7 @@ function DialogEntryForm(props: EntryFormProps) {
 										<EntryFormItem label="Type">
 											<div>
 												<Tabs
-													defaultValue={field.value}
+													value={field.value}
 													onValueChange={field.onChange}
 													className="w-full"
 												>
