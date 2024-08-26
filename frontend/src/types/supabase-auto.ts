@@ -106,7 +106,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_password:
+        | {
+            Args: {
+              old_password: string
+              new_password: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              old_password: string
+              new_password: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       supported_currency: "USD" | "CAD" | "IDR" | "JPY" | "KRW" | "AUD"
