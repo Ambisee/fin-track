@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
 	Form,
 	FormControl,
@@ -23,12 +23,7 @@ import {
 } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-	QueryClient,
-	useMutation,
-	useQuery,
-	useQueryClient
-} from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -38,6 +33,8 @@ import { cn } from "@/lib/utils"
 import googleIcon from "../../../../../public/google-icon.svg"
 import Image from "next/image"
 import { Provider } from "@supabase/supabase-js"
+import Link from "next/link"
+import { Switch } from "@/components/ui/switch"
 
 function SettingsSection(props: {
 	children?: JSX.Element
@@ -45,11 +42,15 @@ function SettingsSection(props: {
 	name?: string
 }) {
 	return (
-		<section className={cn("mt-8 mb-16", props.className)}>
+		<section className={cn("mt-8 mb-16 max-w-96", props.className)}>
 			<h3 className="text-lg mb-4">{props.name}</h3>
 			{props.children}
 		</section>
 	)
+}
+
+function InputSkeleton(props: { className?: string }) {
+	return <Skeleton className={cn("h-10 w-full", props.className)} />
 }
 
 const generalSectionFormSchema = z.object({
@@ -101,7 +102,7 @@ function GeneralSection() {
 
 	const form = useForm<z.infer<typeof generalSectionFormSchema>>({
 		resolver: zodResolver(generalSectionFormSchema),
-		defaultValues: {
+		values: {
 			username: "",
 			currency:
 				userSettingsQuery.data?.data?.supported_currencies?.currency_name ??
@@ -189,10 +190,10 @@ function GeneralSection() {
 								<FormLabel>Username</FormLabel>
 								<FormControl>
 									{userQuery.isLoading ? (
-										<Skeleton className="h-10 w-full max-w-96" />
+										<InputSkeleton />
 									) : (
 										<Input
-											className="w-full max-w-96"
+											className="w-full"
 											placeholder={
 												userQuery.data?.data.user?.user_metadata["username"]
 											}
@@ -208,7 +209,7 @@ function GeneralSection() {
 								{userQuery.isLoading ? (
 									<Skeleton className="h-6 w-full max-w-40" />
 								) : (
-									<FormDescription className="max-w-96">
+									<FormDescription>
 										Usernames must only contain alphanumeric characters and at
 										most {MAX_USERNAME_LENGTH} characters
 									</FormDescription>
@@ -224,7 +225,7 @@ function GeneralSection() {
 								<FormLabel>Currency</FormLabel>
 								<FormControl>
 									{userQuery.isLoading ? (
-										<Skeleton className="h-10 w-full max-w-96" />
+										<InputSkeleton />
 									) : (
 										<ComboBox
 											closeOnSelect
@@ -352,7 +353,7 @@ function LinkedAccountChange() {
 			<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
 				Linked Accounts
 			</span>
-			<ul className="max-w-96 mt-2">
+			<ul className="mt-2">
 				<li className="rounded-md border p-4">
 					<div className="flex justify-between">
 						<div className="flex items-center gap-3">
@@ -364,7 +365,7 @@ function LinkedAccountChange() {
 									height={24}
 								/>
 							</span>
-							<div className="text-sm">Google</div>
+							<p className="text-sm">Google</p>
 						</div>
 						{userQuery.isLoading ? (
 							<Skeleton className="w-20 h-10" />
@@ -433,11 +434,11 @@ function EmailChange() {
 					control={form.control}
 					name="email"
 					render={({ field }) => (
-						<FormItem className="w-full max-w-96">
+						<FormItem className="w-full">
 							<FormLabel>Email</FormLabel>
 							<FormControl>
 								{userQuery.isLoading ? (
-									<Skeleton className="h-10 w-full" />
+									<InputSkeleton />
 								) : (
 									<Input
 										placeholder={userQuery.data?.data.user?.email}
@@ -482,6 +483,7 @@ const passwordChangeFormSchema = z
 function PasswordChange() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const [isFormSubmitted, setIsFormSubmitted] = useState(false)
 	const userQuery = useQuery({
 		queryKey: USER_QKEY,
 		queryFn: () => sbBrowser.auth.getUser(),
@@ -517,10 +519,10 @@ function PasswordChange() {
 		if (userQuery.isLoading) {
 			return (
 				<>
-					<Skeleton className="h-10 mt-2 max-w-96" />
-					<Skeleton className="h-10 mt-2 max-w-96" />
-					<Skeleton className="h-16 mt-2 max-w-96" />
-					<Skeleton className="h-10 mt-2 max-w-96" />
+					<InputSkeleton className="mt-2" />
+					<InputSkeleton className="mt-2" />
+					<Skeleton className="h-16 mt-2" />
+					<InputSkeleton className="mt-2" />
 				</>
 			)
 		}
@@ -529,7 +531,7 @@ function PasswordChange() {
 		if (!identities.has("email")) {
 			return (
 				<div className="mt-2">
-					<p className="text-sm text-muted-foreground max-w-96">
+					<p className="text-sm text-muted-foreground">
 						This account was created through Google. You can enable sign-in
 						through password by resetting your password.
 					</p>
@@ -573,7 +575,7 @@ function PasswordChange() {
 					control={form.control}
 					name="oldPassword"
 					render={({ field }) => (
-						<FormItem className="max-w-96 mt-2">
+						<FormItem className="mt-2">
 							<FormControl>
 								<PasswordField placeholder="Old password" {...field} />
 							</FormControl>
@@ -584,7 +586,7 @@ function PasswordChange() {
 					control={form.control}
 					name="newPassword"
 					render={({ field }) => (
-						<FormItem className="max-w-96 mt-2">
+						<FormItem className="mt-2">
 							<FormControl>
 								<PasswordField placeholder="New password" {...field} />
 							</FormControl>
@@ -604,7 +606,7 @@ function PasswordChange() {
 					control={form.control}
 					name="confirmNewPassword"
 					render={({ field }) => (
-						<FormItem className="max-w-96 mt-4">
+						<FormItem className="mt-4">
 							<FormControl>
 								<PasswordField placeholder="Confirm new password" {...field} />
 							</FormControl>
@@ -616,7 +618,15 @@ function PasswordChange() {
 						</FormItem>
 					)}
 				/>
-				<Button className="mt-4">Submit</Button>
+				<div className="flex justify-between items-center mt-4">
+					<Button>Submit</Button>
+					<Link
+						className={cn(buttonVariants({ variant: "link" }), "h-fit p-0 m-0")}
+						href="/forgotpassword"
+					>
+						Forgot your old password?
+					</Link>
+				</div>
 			</>
 		)
 	}
@@ -629,25 +639,16 @@ function PasswordChange() {
 					e.preventDefault()
 					form.handleSubmit(async (formData) => {
 						setIsPendingSubmit(true)
-						const { error: signInError } = await sbBrowser.auth.reauthenticate()
 
-						if (signInError !== null) {
-							toast({
-								description: signInError.message,
-								variant: "destructive"
-							})
-							setIsPendingSubmit(false)
-
-							return
-						}
-
-						const { error: updateError } = await sbBrowser.auth.updateUser({
-							password: formData.newPassword
+						const { data, error } = await sbBrowser.rpc("update_password", {
+							old_password: formData.oldPassword,
+							new_password: formData.newPassword
 						})
 
-						if (updateError !== null) {
+						if (error !== null) {
+							setIsFormSubmitted(true)
 							toast({
-								description: updateError.message,
+								description: error?.message,
 								variant: "destructive",
 								duration: 1500
 							})
@@ -660,6 +661,9 @@ function PasswordChange() {
 							description: "Successfully updated the account's password",
 							duration: 1500
 						})
+
+						setIsFormSubmitted(false)
+						form.reset()
 					})()
 				}}
 			>
@@ -682,8 +686,91 @@ function AccountSection() {
 	)
 }
 
+const mailingSectionFormSchema = z.object({
+	allowReport: z.boolean()
+})
 function MailingSection() {
-	return <SettingsSection name="Mailing"></SettingsSection>
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const userSettingsQuery = useQuery({
+		queryKey: USER_SETTINGS_QKEY,
+		queryFn: async () =>
+			await sbBrowser
+				.from("user_settings")
+				.select(`*, supported_currencies (currency_name)`)
+				.limit(1)
+				.single(),
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined
+	})
+
+	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
+		resolver: zodResolver(mailingSectionFormSchema),
+		values: {
+			allowReport: userSettingsQuery.data?.data?.allow_report ?? false
+		}
+	})
+
+	return (
+		<SettingsSection name="Mailing">
+			<Form {...form}>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit(async (formData) => {
+							setIsPendingSubmit(true)
+							const { error } = await sbBrowser
+								.from("user_settings")
+								.update({ allow_report: formData.allowReport })
+								.eq("id", userSettingsQuery.data?.data?.id as number)
+
+							if (error !== null) {
+								toast({
+									description: error.message,
+									variant: "destructive",
+									duration: 1500
+								})
+								return
+							}
+
+							toast({
+								description: "New settings data saved.",
+								duration: 1500
+							})
+						})()
+					}}
+				>
+					<FormField
+						control={form.control}
+						name="allowReport"
+						render={({ field }) => (
+							<FormItem className="flex flex-row gap-4 justify-between items-center space-y-0">
+								<div>
+									<FormLabel>Monthly reports</FormLabel>
+									<FormDescription>
+										Send monthly transaction reports to the inbox.
+									</FormDescription>
+								</div>
+								<FormControl>
+									{userSettingsQuery.isLoading ? (
+										<Skeleton className="h-6 w-11 rounded-full" />
+									) : (
+										<Switch
+											className="m-0"
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
+									)}
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+					<Button className="mt-4" disabled={userSettingsQuery.isLoading}>
+						Save Settings
+					</Button>
+				</form>
+			</Form>
+		</SettingsSection>
+	)
 }
 
 function MiscellaneousSection() {
