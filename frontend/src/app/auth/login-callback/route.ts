@@ -1,45 +1,31 @@
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-import { type CookieOptions, createServerClient } from '@supabase/ssr'
-import { supabaseKey, supabaseUrl } from '@/lib/supabase'
+import { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { sbServer, supabaseKey, supabaseUrl } from '@/lib/supabase'
+import { redirect } from 'next/navigation'
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
+export async function GET(request: NextRequest) {
+    const { searchParams } = request.nextUrl
+    const code = searchParams.get('code')
 
-  if (code) {
-    const cookieStore = cookies()
-    const supabase = createServerClient(
-      supabaseUrl,
-      supabaseKey,
-      {
-        cookies: {
-            getAll() {
-                return cookieStore.getAll()
-            },
-            setAll(cookies) {
-                for (const cookie of cookies) {
-                    cookieStore.set(cookie.name, cookie.value)
-                }
+    if (code) {
+        const cookieStore = cookies()
+        const supabase = sbServer(cookieStore)
+        
+        const { data, error  } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error) {
+            if (data.user.user_metadata?.username === undefined) {
+                await supabase.auth.updateUser({
+                    data: {
+                        username: data.user.user_metadata.name
+                    },
+                })
             }
-        },
-      }
-    )
-    
-    const { data, error  } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-        if (data.user.user_metadata?.username === undefined) {
-            await supabase.auth.updateUser({
-                data: {
-                    username: data.user.user_metadata.name
-                },
-            })
+
+            redirect("/dashboard")
         }
-
-      return NextResponse.redirect(`${origin}/dashboard`)
     }
-  }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    // return the user to an error page with instructions
+    redirect("/auth/error-code")
 }
