@@ -161,7 +161,8 @@ export default function EntryListItem(props: EntryListItemProps) {
 
 		return new Intl.NumberFormat(navigator.language, {
 			style: "currency",
-			currency: currency
+			currency: currency,
+			currencyDisplay: "narrowSymbol"
 		}).format(num)
 	}
 
@@ -195,10 +196,12 @@ export default function EntryListItem(props: EntryListItemProps) {
 									{userSettingsQuery.isLoading ? (
 										<Skeleton className="w-20 h-6" />
 									) : (
-										<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-											{props.data.amount_is_positive ? "+ " : "- "}
-											{formatAmount(props.data.amount)}
-										</p>
+										<div className="max-w-[120px] whitespace-nowrap overflow-hidden md:max-w-none">
+											<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary w-full">
+												{props.data.amount_is_positive ? "+ " : "- "}
+												{formatAmount(props.data.amount)}
+											</p>
+										</div>
 									)}
 									{isItemOpen ? (
 										<ChevronUpIcon width={25} height={25} />

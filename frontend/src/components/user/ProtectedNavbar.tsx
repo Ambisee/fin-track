@@ -1,10 +1,10 @@
 "use client"
 
-import { FileIcon, GearIcon, HomeIcon, TableIcon } from "@radix-ui/react-icons"
+import { GearIcon, TableIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import EntryForm from "./EntryForm"
 import { Button, buttonVariants } from "../ui/button"
-import { PlusIcon } from "lucide-react"
+import { HouseIcon, PlusIcon, BarChart3Icon } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { ENTRY_QKEY } from "@/lib/constants"
 import { Dialog, DialogTrigger } from "../ui/dialog"
@@ -22,11 +22,14 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 						buttonVariants({
 							variant: pathname === props.href ? "default" : "ghost"
 						}),
-						"p-2 w-14 h-fit grid grid-flow-row justify-items-center md:w-full md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
+						"p-2 h-fit grid grid-flow-row justify-items-center md:w-full md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
 					)}
 				>
 					{props.icon}
-					<span className="text-xs md:text-base">{props.label}</span>
+					{/* <span className="text-xs md:text-base"> */}
+					<span className="hidden text-xs md:inline md:text-base">
+						{props.label}
+					</span>
 				</div>
 			</Link>
 		</li>
@@ -56,12 +59,12 @@ export default function ProtectedNavbar() {
 						<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-1">
 							<NavLink
 								href="/dashboard"
-								icon={<HomeIcon width={24} height={24} />}
+								icon={<HouseIcon className="block" width={20} height={20} />}
 								label="Home"
 							/>
 							<NavLink
 								href="/dashboard/entries"
-								icon={<TableIcon width={24} height={24} />}
+								icon={<TableIcon className="block" width={20} height={20} />}
 								label="Entries"
 							/>
 							<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
@@ -71,18 +74,20 @@ export default function ProtectedNavbar() {
 										className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
 									>
-										<PlusIcon width={30} height={30} />
+										<PlusIcon className="block" width={30} height={30} />
 									</Button>
 								</PopoverTrigger>
 							</li>
 							<NavLink
 								href="/dashboard/reports"
-								icon={<FileIcon width={24} height={24} />}
+								icon={
+									<BarChart3Icon className="block" width={20} height={20} />
+								}
 								label="Report"
 							/>
 							<NavLink
 								href="/dashboard/settings"
-								icon={<GearIcon width={24} height={24} />}
+								icon={<GearIcon className="block" width={20} height={20} />}
 								label="Settings"
 							/>
 						</ul>
