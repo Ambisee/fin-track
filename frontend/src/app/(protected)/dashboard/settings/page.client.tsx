@@ -35,6 +35,18 @@ import Image from "next/image"
 import { Provider } from "@supabase/supabase-js"
 import Link from "next/link"
 import { Switch } from "@/components/ui/switch"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTrigger
+} from "@/components/ui/alert-dialog"
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 
 function SettingsSection(props: {
 	children?: JSX.Element
@@ -776,44 +788,108 @@ function MailingSection() {
 function MiscellaneousSection() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
+	const [isDeleteChecked, setIsDeleteChecked] = useState(false)
 	const { toast } = useToast()
 
 	return (
 		<SettingsSection name="Miscellaneous ">
 			<>
-				<div className="mb-4">
-					<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-						Delete Account
-					</span>
-					<br />
-					<Button className="mt-2" variant="destructive">
-						Delete Account
-					</Button>
-				</div>
-				<div>
-					<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-						Log out of your account
-					</span>
-					<br />
-					<Button
-						className="mt-2"
-						variant="default"
-						onClick={async () => {
-							toast({ description: "Loading..." })
-							const { error } = await sbBrowser.auth.signOut()
+				<AlertDialog>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Warning</AlertDialogTitle>
+							<AlertDialogDescription>
+								<p>
+									This action will permanently removes all of your data from our
+									servers. You will not be able to sign in and view your entries
+									after this action is completed.
+								</p>
+								<div className="mt-4 mb-4 flex items-start gap-2 text-left md:mt-2 md:items-center">
+									<Checkbox
+										id="delete-confirmation"
+										className="mt-[0.125rem] md:mt-0"
+										checked={isDeleteChecked}
+										onCheckedChange={() => setIsDeleteChecked((c) => !c)}
+									/>
+									<label htmlFor="delete-confirmation">
+										I understand and would like to proceed with the action.
+									</label>
+								</div>
+							</AlertDialogDescription>
+							<AlertDialogFooter>
+								<AlertDialogCancel onClick={() => setIsDeleteChecked(false)}>
+									Cancel
+								</AlertDialogCancel>
+								<AlertDialogAction
+									variant="destructive"
+									disabled={!isDeleteChecked}
+									onClick={async () => {
+										toast({
+											description: "Loading..."
+										})
 
-							if (error !== null) {
-								toast({ description: error.message })
-							}
+										const response = await fetch("/auth/user", {
+											method: "DELETE"
+										})
 
-							queryClient.removeQueries({ queryKey: USER_QKEY })
-							queryClient.removeQueries({ queryKey: ENTRY_QKEY })
-							router.push("/")
-						}}
-					>
-						Logout
-					</Button>
-				</div>
+										if (response.status !== 200) {
+											toast({
+												description: (await response.json()).message,
+												variant: "destructive",
+												duration: 1500
+											})
+											return
+										}
+
+										toast({
+											description:
+												"Successfully deleted your account. Redirecting to the home page...",
+											duration: 2500
+										})
+										router.push("/")
+									}}
+								>
+									Delete account
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogHeader>
+					</AlertDialogContent>
+					<div className="mb-4">
+						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+							Account Deletion
+						</span>
+						<br />
+						<AlertDialogTrigger asChild>
+							<Button className="mt-2" variant="destructive">
+								Delete Account
+							</Button>
+						</AlertDialogTrigger>
+					</div>
+					<div>
+						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+							Log out of your account
+						</span>
+						<br />
+						<Button
+							className="mt-2"
+							variant="default"
+							onClick={async () => {
+								toast({ description: "Loading..." })
+								const { error } = await sbBrowser.auth.signOut()
+
+								if (error !== null) {
+									toast({ description: error.message })
+								}
+
+								queryClient.removeQueries({ queryKey: USER_QKEY })
+								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
+								router.push("/")
+							}}
+						>
+							Logout
+						</Button>
+					</div>
+				</AlertDialog>
 			</>
 		</SettingsSection>
 	)

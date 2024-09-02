@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL! ?? ""
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY! ?? ""
+const supabaseServerKey = process.env.NEXT_SUPABASE_SERVER_KEY! ?? ""
 
 const sbBrowser = createBrowserClient<Database>(supabaseUrl, supabaseKey)
 
@@ -27,7 +28,7 @@ const sbMiddleware = (request: NextRequest, response: NextResponse) => {
 }
 
 const sbServer = (cookieStore: ReadonlyRequestCookies) => {
-    return createServerClient(supabaseUrl, supabaseKey, {
+    return createServerClient(supabaseUrl, supabaseServerKey, {
 		cookies: {
 			getAll() {
 				return cookieStore.getAll()
