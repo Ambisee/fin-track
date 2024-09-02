@@ -28,7 +28,7 @@ import { toast, useToast } from "../ui/use-toast"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { getElementFromNode } from "@/lib/utils"
 import { Dialog } from "../ui/dialog"
-import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { ENTRY_QKEY, USER_VIEW_QKEY } from "@/lib/constants"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
@@ -134,14 +134,10 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(false)
 	const [isFormOpen, setIsFormOpen] = useState(false)
 
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
+	const userViewQuery = useQuery({
+		queryKey: USER_VIEW_QKEY,
 		queryFn: async () =>
-			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
-				.limit(1)
-				.single(),
+			await sbBrowser.from("user_view").select("*").limit(1).single(),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
@@ -149,9 +145,8 @@ export default function EntryListItem(props: EntryListItemProps) {
 	})
 
 	const formatAmount = (num?: number) => {
-		const currency =
-			userSettingsQuery?.data?.data?.supported_currencies?.currency_name
-		if (num === undefined || currency === undefined) {
+		const currency = userViewQuery.data?.data?.currency_name
+		if (num === undefined || currency === undefined || currency === null) {
 			return num
 		}
 
@@ -193,7 +188,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 									</CardDescription>
 								</div>
 								<div className="flex gap-2">
-									{userSettingsQuery.isLoading ? (
+									{userViewQuery.isLoading ? (
 										<Skeleton className="w-20 h-6" />
 									) : (
 										<div className="max-w-[120px] whitespace-nowrap overflow-hidden md:max-w-none">

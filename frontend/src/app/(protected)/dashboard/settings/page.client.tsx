@@ -18,8 +18,8 @@ import {
 	MAX_USERNAME_LENGTH,
 	ENTRY_QKEY,
 	USER_QKEY,
-	USER_SETTINGS_QKEY,
-	SUPPORTED_CURRENCIES_QKEY
+	SUPPORTED_CURRENCIES_QKEY,
+	USER_VIEW_QKEY
 } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -92,33 +92,26 @@ function GeneralSection() {
 
 	const supportedCurrenciesQuery = useQuery({
 		queryKey: SUPPORTED_CURRENCIES_QKEY,
-		queryFn: async () =>
-			await sbBrowser.from("supported_currencies").select("*"),
+		queryFn: async () => await sbBrowser.from("currencies").select("*"),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
 	const supportedCurrencies = supportedCurrenciesQuery.data?.data
 
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
+	const userViewQuery = useQuery({
+		queryKey: USER_VIEW_QKEY,
 		queryFn: async () =>
-			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
-				.limit(1)
-				.single(),
+			await sbBrowser.from("user_view").select("*").limit(1).single(),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
-	const userSettings = userSettingsQuery.data?.data
+	const userView = userViewQuery.data?.data
 
 	const form = useForm<z.infer<typeof generalSectionFormSchema>>({
 		resolver: zodResolver(generalSectionFormSchema),
 		values: {
 			username: "",
-			currency:
-				userSettingsQuery.data?.data?.supported_currencies?.currency_name ??
-				"USD"
+			currency: userViewQuery.data?.data?.currency_name ?? "USD"
 		}
 	})
 
@@ -150,10 +143,8 @@ function GeneralSection() {
 								if (
 									supportedCurrencies !== null &&
 									supportedCurrencies !== undefined &&
-									userSettings?.supported_currencies?.currency_name !==
-										undefined &&
-									userSettings.supported_currencies.currency_name !==
-										data.currency
+									userView?.currency_name !== undefined &&
+									userView?.currency_name !== data.currency
 								) {
 									const newCurrencyId = supportedCurrencies.find(
 										(value) => value.currency_name === data.currency
@@ -168,9 +159,9 @@ function GeneralSection() {
 									}
 
 									const { error } = await sbBrowser
-										.from("user_settings")
+										.from("settings")
 										.update({ currency_id: newCurrencyId.id })
-										.eq("id", userSettings.id)
+										.eq("user_id", userView.id as string)
 
 									if (error !== null) {
 										toast({
@@ -183,7 +174,7 @@ function GeneralSection() {
 								}
 
 								queryClient.invalidateQueries({ queryKey: USER_QKEY })
-								queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+								queryClient.invalidateQueries({ queryKey: USER_VIEW_QKEY })
 								form.resetField("username")
 								toast({
 									description: "User settings updated",
@@ -703,14 +694,10 @@ const mailingSectionFormSchema = z.object({
 })
 function MailingSection() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
+	const userViewQuery = useQuery({
+		queryKey: USER_VIEW_QKEY,
 		queryFn: async () =>
-			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
-				.limit(1)
-				.single(),
+			await sbBrowser.from("user_view").select("*").limit(1).single(),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
@@ -718,7 +705,7 @@ function MailingSection() {
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),
 		values: {
-			allowReport: userSettingsQuery.data?.data?.allow_report ?? false
+			allowReport: userViewQuery.data?.data?.allow_report ?? false
 		}
 	})
 
@@ -731,9 +718,9 @@ function MailingSection() {
 						form.handleSubmit(async (formData) => {
 							setIsPendingSubmit(true)
 							const { error } = await sbBrowser
-								.from("user_settings")
+								.from("settings")
 								.update({ allow_report: formData.allowReport })
-								.eq("id", userSettingsQuery.data?.data?.id as number)
+								.eq("user_id", userViewQuery.data?.data?.id as string)
 
 							if (error !== null) {
 								toast({
@@ -763,7 +750,7 @@ function MailingSection() {
 									</FormDescription>
 								</div>
 								<FormControl>
-									{userSettingsQuery.isLoading ? (
+									{userViewQuery.isLoading ? (
 										<Skeleton className="h-6 w-11 rounded-full" />
 									) : (
 										<Switch
@@ -776,7 +763,7 @@ function MailingSection() {
 							</FormItem>
 						)}
 					/>
-					<Button className="mt-4" disabled={userSettingsQuery.isLoading}>
+					<Button className="mt-4" disabled={userViewQuery.isLoading}>
 						Save Settings
 					</Button>
 				</form>
