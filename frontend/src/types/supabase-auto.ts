@@ -9,48 +9,28 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      entry: {
+      category: {
         Row: {
-          amount: number
-          amount_is_positive: boolean
-          created_at: string
-          created_by: string | null
-          date: string
           id: number
-          note: string | null
-          title: string | null
+          is_positive: boolean
+          name: string
+          user_created: boolean | null
         }
         Insert: {
-          amount: number
-          amount_is_positive: boolean
-          created_at?: string
-          created_by?: string | null
-          date?: string
           id?: number
-          note?: string | null
-          title?: string | null
+          is_positive?: boolean
+          name: string
+          user_created?: boolean | null
         }
         Update: {
-          amount?: number
-          amount_is_positive?: boolean
-          created_at?: string
-          created_by?: string | null
-          date?: string
           id?: number
-          note?: string | null
-          title?: string | null
+          is_positive?: boolean
+          name?: string
+          user_created?: boolean | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "entry_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      supported_currencies: {
+      currencies: {
         Row: {
           currency_name: string
           id: number
@@ -65,7 +45,52 @@ export type Database = {
         }
         Relationships: []
       }
-      user_settings: {
+      entry: {
+        Row: {
+          amount: number
+          amount_is_positive: boolean
+          created_by: string | null
+          date: string
+          id: number
+          note: string | null
+          title: string | null
+        }
+        Insert: {
+          amount: number
+          amount_is_positive: boolean
+          created_by?: string | null
+          date?: string
+          id?: number
+          note?: string | null
+          title?: string | null
+        }
+        Update: {
+          amount?: number
+          amount_is_positive?: boolean
+          created_by?: string | null
+          date?: string
+          id?: number
+          note?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
         Row: {
           allow_report: boolean
           currency_id: number
@@ -89,7 +114,14 @@ export type Database = {
             foreignKeyName: "user_data_currency_id_fkey"
             columns: ["currency_id"]
             isOneToOne: false
-            referencedRelation: "supported_currencies"
+            referencedRelation: "currencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_data_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_view"
             referencedColumns: ["id"]
           },
           {
@@ -101,29 +133,70 @@ export type Database = {
           },
         ]
       }
+      user_category: {
+        Row: {
+          category_id: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          category_id?: number | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          category_id?: number | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_category_link_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_category_link_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_category_link_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      user_view: {
+        Row: {
+          allow_report: boolean | null
+          currency_name: string | null
+          email: string | null
+          id: string | null
+          username: Json | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      update_password:
-        | {
-            Args: {
-              old_password: string
-              new_password: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              old_password: string
-              new_password: string
-            }
-            Returns: Json
-          }
+      update_password: {
+        Args: {
+          old_password: string
+          new_password: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      supported_currency: "USD" | "CAD" | "IDR" | "JPY" | "KRW" | "AUD"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never

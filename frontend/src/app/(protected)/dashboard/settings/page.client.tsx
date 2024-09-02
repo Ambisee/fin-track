@@ -92,8 +92,7 @@ function GeneralSection() {
 
 	const supportedCurrenciesQuery = useQuery({
 		queryKey: SUPPORTED_CURRENCIES_QKEY,
-		queryFn: async () =>
-			await sbBrowser.from("supported_currencies").select("*"),
+		queryFn: async () => await sbBrowser.from("currencies").select("*"),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
@@ -103,8 +102,8 @@ function GeneralSection() {
 		queryKey: USER_SETTINGS_QKEY,
 		queryFn: async () =>
 			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
+				.from("settings")
+				.select(`*, currencies (currency_name)`)
 				.limit(1)
 				.single(),
 		refetchOnWindowFocus: false,
@@ -116,9 +115,7 @@ function GeneralSection() {
 		resolver: zodResolver(generalSectionFormSchema),
 		values: {
 			username: "",
-			currency:
-				userSettingsQuery.data?.data?.supported_currencies?.currency_name ??
-				"USD"
+			currency: userSettingsQuery.data?.data?.currencies?.currency_name ?? "USD"
 		}
 	})
 
@@ -150,10 +147,8 @@ function GeneralSection() {
 								if (
 									supportedCurrencies !== null &&
 									supportedCurrencies !== undefined &&
-									userSettings?.supported_currencies?.currency_name !==
-										undefined &&
-									userSettings.supported_currencies.currency_name !==
-										data.currency
+									userSettings?.currencies?.currency_name !== undefined &&
+									userSettings.currencies.currency_name !== data.currency
 								) {
 									const newCurrencyId = supportedCurrencies.find(
 										(value) => value.currency_name === data.currency
@@ -168,7 +163,7 @@ function GeneralSection() {
 									}
 
 									const { error } = await sbBrowser
-										.from("user_settings")
+										.from("settings")
 										.update({ currency_id: newCurrencyId.id })
 										.eq("id", userSettings.id)
 
@@ -707,8 +702,8 @@ function MailingSection() {
 		queryKey: USER_SETTINGS_QKEY,
 		queryFn: async () =>
 			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
+				.from("settings")
+				.select(`*, currencies (currency_name)`)
 				.limit(1)
 				.single(),
 		refetchOnWindowFocus: false,
@@ -731,7 +726,7 @@ function MailingSection() {
 						form.handleSubmit(async (formData) => {
 							setIsPendingSubmit(true)
 							const { error } = await sbBrowser
-								.from("user_settings")
+								.from("settings")
 								.update({ allow_report: formData.allowReport })
 								.eq("id", userSettingsQuery.data?.data?.id as number)
 
@@ -896,6 +891,22 @@ function MiscellaneousSection() {
 }
 
 export default function DashboardSettings() {
+	const q = useQuery({
+		queryKey: ["user_view"],
+		queryFn: async () => {
+			const {
+				data: { user }
+			} = await sbBrowser.auth.getUser()
+
+			return sbBrowser
+				.from("user_view")
+				.select("*")
+				.eq("id", user?.id as string)
+				.limit(1)
+				.single()
+		}
+	})
+
 	return (
 		<div className="w-full">
 			<h1 className="text-2xl mb-4">Settings</h1>

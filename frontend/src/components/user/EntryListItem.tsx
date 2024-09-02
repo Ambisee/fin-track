@@ -138,8 +138,8 @@ export default function EntryListItem(props: EntryListItemProps) {
 		queryKey: USER_SETTINGS_QKEY,
 		queryFn: async () =>
 			await sbBrowser
-				.from("user_settings")
-				.select(`*, supported_currencies (currency_name)`)
+				.from("settings")
+				.select(`*, currencies (currency_name)`)
 				.limit(1)
 				.single(),
 		refetchOnWindowFocus: false,
@@ -149,9 +149,8 @@ export default function EntryListItem(props: EntryListItemProps) {
 	})
 
 	const formatAmount = (num?: number) => {
-		const currency =
-			userSettingsQuery?.data?.data?.supported_currencies?.currency_name
-		if (num === undefined || currency === undefined) {
+		const currency = userSettingsQuery?.data?.data?.currencies?.currency_name
+		if (num === undefined || currency === undefined || currency === null) {
 			return num
 		}
 
