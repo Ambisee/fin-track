@@ -1,0 +1,16 @@
+# folders
+virtualenv
+db*
+**/__pycache__
+.vscode
+migrations
+storage
+shell_scripts
+
+**/.env*
+Dockerfile
+.dockerignore
+test.py
+init_file.sh
+
+*apikey*

@@ -1,0 +1,15 @@
+# vscode
+.vscode
+
+# environment
+.env
+virtualenv
+
+# test db
+**/db*
+
+# api key files
+**/*apikey*
+
+# python
+**/__pycache__
