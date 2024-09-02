@@ -1,0 +1,11 @@
+# docker
+compose_copy.yaml
+
+# git
+.git
+
+# vscode
+*.code-workspace
+
+# .env
+**/.env*

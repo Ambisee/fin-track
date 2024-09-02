@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      secrets:
+        - frontend_s
+    ports:
+      # Formats as {outside-port}:{inside-port}
+      # e.g. 3000:300 -> reference port 3000 when accessing the container
+      - "192.168.18.20:3000:3000"
+
+  backend:
+    build:
+      context: ./backend
+      secrets:
+        - backend_s
+    ports:
+      - "192.168.18.20:8000:8000"
+    secrets:
+      - backend_s
+    command: >
+      sh -c 
+      "export $(grep -v '^#' /run/secrets/backend_s | xargs) && 
+      gunicorn --bind 0.0.0.0:8000 backend.wsgi:application"
+
+secrets:
+  frontend_s:
+    file: ./.env.frontend
+  backend_s:
+    file: ./.env.backend
