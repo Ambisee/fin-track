@@ -187,6 +187,15 @@ export type Database = {
       }
     }
     Functions: {
+      fetch_categories: {
+        Args: {
+          user_id: string
+        }
+        Returns: {
+          id: number
+          name: string
+        }[]
+      }
       update_password: {
         Args: {
           old_password: string
