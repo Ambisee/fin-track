@@ -1,18 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
-import { User } from "@supabase/supabase-js"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
-import { sbBrowser } from "@/lib/supabase"
-import { useGlobalStore } from "@/lib/store"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import EntryList from "@/components/user/EntryList"
-import { DataTable } from "@/components/ui/data-table"
-import { useQuery } from "@tanstack/react-query"
-import { Entry } from "@/types/supabase"
 import { ENTRY_QKEY, USER_QKEY } from "@/lib/constants"
+import { sbBrowser } from "@/lib/supabase"
+import { useQuery } from "@tanstack/react-query"
 
 export default function DashboardHome() {
 	const { toast } = useToast()

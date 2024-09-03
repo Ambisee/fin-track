@@ -10,8 +10,8 @@ import Link from "next/link"
 import { roboto } from "@/app/fonts"
 import googleIcon from "../../../../../public/google-icon.svg"
 
-import { useEffect, useState } from "react"
 import { MailIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function SignIn() {
 	const [origin, setOrigin] = useState<string>(null!)

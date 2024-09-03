@@ -1,7 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTrigger
+} from "@/components/ui/alert-dialog"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import ComboBox from "@/components/ui/combobox"
 import {
 	Form,
 	FormControl,
@@ -13,40 +24,29 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
 import { toast, useToast } from "@/components/ui/use-toast"
+import PasswordField from "@/components/user/FormField/PasswordField"
 import {
-	MAX_USERNAME_LENGTH,
+	CURRENCIES_QKEY,
 	ENTRY_QKEY,
+	MAX_USERNAME_LENGTH,
 	USER_QKEY,
-	USER_SETTINGS_QKEY,
-	SUPPORTED_CURRENCIES_QKEY
+	USER_SETTINGS_QKEY
 } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
+import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { Provider } from "@supabase/supabase-js"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import ComboBox from "@/components/ui/combobox"
-import PasswordField from "@/components/user/FormField/PasswordField"
-import { cn } from "@/lib/utils"
 import googleIcon from "../../../../../public/google-icon.svg"
-import Image from "next/image"
-import { Provider } from "@supabase/supabase-js"
-import Link from "next/link"
-import { Switch } from "@/components/ui/switch"
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTrigger
-} from "@/components/ui/alert-dialog"
-import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
-import { Checkbox } from "@/components/ui/checkbox"
 
 function SettingsSection(props: {
 	children?: JSX.Element
@@ -91,7 +91,7 @@ function GeneralSection() {
 	})
 
 	const supportedCurrenciesQuery = useQuery({
-		queryKey: SUPPORTED_CURRENCIES_QKEY,
+		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => await sbBrowser.from("currencies").select("*"),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
@@ -891,22 +891,6 @@ function MiscellaneousSection() {
 }
 
 export default function DashboardSettings() {
-	const q = useQuery({
-		queryKey: ["user_view"],
-		queryFn: async () => {
-			const {
-				data: { user }
-			} = await sbBrowser.auth.getUser()
-
-			return sbBrowser
-				.from("user_view")
-				.select("*")
-				.eq("id", user?.id as string)
-				.limit(1)
-				.single()
-		}
-	})
-
 	return (
 		<div className="w-full">
 			<h1 className="text-2xl mb-4">Settings</h1>

@@ -1,26 +1,25 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import {
 	Form,
 	FormControl,
 	FormDescription,
-	FormLabel,
-	FormItem,
-	FormField
+	FormField,
+	FormItem
 } from "@/components/ui/form"
-import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
+import PasswordField from "@/components/user/FormField/PasswordField"
+import { USER_QKEY } from "@/lib/constants"
+import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import PasswordField from "@/components/user/FormField/PasswordField"
-import { CardHeader, CardFooter, CardContent, Card } from "@/components/ui/card"
-import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
-import { sbBrowser } from "@/lib/supabase"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { USER_QKEY } from "@/lib/constants"
 
 const recoveryFormSchema = z
 	.object({

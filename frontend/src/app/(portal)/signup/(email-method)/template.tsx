@@ -4,7 +4,6 @@ import { motion, Variant } from "framer-motion"
 import { usePathname } from "next/navigation"
 import { useContext, useEffect } from "react"
 import { PageTransitionContext } from "./layout"
-import { Separator } from "@/components/ui/separator"
 
 interface SignUpTemplateProps {
 	children: JSX.Element

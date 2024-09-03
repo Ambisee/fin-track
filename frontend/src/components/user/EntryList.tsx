@@ -1,9 +1,9 @@
 "use client"
 
 import { Entry } from "@/types/supabase"
-import EntryListItem from "./EntryListItem"
-import { Skeleton } from "../ui/skeleton"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Skeleton } from "../ui/skeleton"
+import EntryListItem from "./EntryListItem"
 
 interface EntryListProps {
 	data?: Entry[]

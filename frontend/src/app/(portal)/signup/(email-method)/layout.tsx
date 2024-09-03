@@ -1,24 +1,22 @@
 "use client"
 
+import { buttonVariants } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import { AnimatePresence } from "framer-motion"
+import Cookies from "js-cookie"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import {
-	useState,
 	createContext,
 	Dispatch,
 	SetStateAction,
 	useEffect,
-	useRef
+	useRef,
+	useState
 } from "react"
-import { useGlobalStore } from "@/lib/store"
-import { AnimatePresence } from "framer-motion"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Progress } from "@/components/ui/progress"
-import Cookies from "js-cookie"
-import { usePathname, useRouter } from "next/navigation"
-import { Card } from "@/components/ui/card"
-import { Button, buttonVariants } from "@/components/ui/button"
-import { AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
 
 interface SignUpLayoutProps {
 	children: JSX.Element

@@ -5,14 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Cookies from "js-cookie"
 import { z } from "zod"
 
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem
-} from "@/components/ui/form"
+import { CardContent, CardHeader, CardFooter } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import {
 	AlertDialog,
 	AlertDialogCancel,
@@ -26,7 +20,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
-import { useGlobalStore } from "@/lib/store"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"

@@ -7,31 +7,31 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
-import { Fragment, useState } from "react"
-import { Button } from "../ui/button"
+import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { sbBrowser } from "@/lib/supabase"
+import { getElementFromNode } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
+import { DialogTrigger } from "@radix-ui/react-dialog"
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Fragment, useState } from "react"
 import {
 	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogCancel,
-	AlertDialogAction,
-	AlertDialogFooter,
 	AlertDialogTrigger
 } from "../ui/alert-dialog"
-import EntryForm from "./EntryForm"
-import { sbBrowser } from "@/lib/supabase"
-import { toast, useToast } from "../ui/use-toast"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getElementFromNode } from "@/lib/utils"
+import { Button } from "../ui/button"
 import { Dialog } from "../ui/dialog"
-import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
-import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
+import { toast, useToast } from "../ui/use-toast"
+import EntryForm from "./EntryForm"
 
 interface EntryListItemProps {
 	data: Entry

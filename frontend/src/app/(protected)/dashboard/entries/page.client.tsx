@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
-import { USER_QKEY, ENTRY_QKEY } from "@/lib/constants"
+import { ENTRY_QKEY, USER_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { sortDataByDateGroup } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
