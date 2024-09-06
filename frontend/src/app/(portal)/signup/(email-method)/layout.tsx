@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useSetElementWindowHeight } from "@/lib/hooks"
 import { AnimatePresence } from "framer-motion"
 import Cookies from "js-cookie"
 import Link from "next/link"
@@ -14,7 +15,6 @@ import {
 	Dispatch,
 	SetStateAction,
 	useEffect,
-	useRef,
 	useState
 } from "react"
 
@@ -35,24 +35,9 @@ export const PageTransitionContext = createContext<PageTransitionContextType>(
 
 function ProgressProvider(props: SignUpLayoutProps) {
 	const pathname = usePathname()
-	const rootRef = useRef<HTMLDivElement>(null)
+	const rootRef = useSetElementWindowHeight()
 	const [value, setValue] = useState(0)
 	const [prevPage, setPrevPage] = useState(0)
-
-	useEffect(() => {
-		const resizeObserver = new ResizeObserver((entries) => {
-			if (rootRef.current === undefined || rootRef.current === null) {
-				return
-			}
-			rootRef.current.style.minHeight = `${window.innerHeight}px`
-		})
-
-		resizeObserver.observe(document.body)
-
-		return () => {
-			resizeObserver.disconnect()
-		}
-	}, [])
 
 	useEffect(() => {
 		if (pathname.endsWith("/signup/email")) {

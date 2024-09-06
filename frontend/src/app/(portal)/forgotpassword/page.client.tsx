@@ -1,12 +1,7 @@
 "use client"
 
 import { Button, buttonVariants } from "@/components/ui/button"
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
 	Form,
 	FormControl,
@@ -17,12 +12,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { useSetElementWindowHeight } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -32,7 +28,7 @@ const formSchema = z.object({
 
 export default function ForgotPassword() {
 	const { toast } = useToast()
-	const rootRef = useRef<HTMLDivElement>(null)
+	const rootRef = useSetElementWindowHeight()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -40,21 +36,6 @@ export default function ForgotPassword() {
 			email: ""
 		}
 	})
-
-	useEffect(() => {
-		const resizeObserver = new ResizeObserver((entries) => {
-			if (rootRef.current === undefined || rootRef.current === null) {
-				return
-			}
-			rootRef.current.style.minHeight = `${window.innerHeight}px`
-		})
-
-		resizeObserver.observe(document.body)
-
-		return () => {
-			resizeObserver.disconnect()
-		}
-	}, [])
 
 	return (
 		<div

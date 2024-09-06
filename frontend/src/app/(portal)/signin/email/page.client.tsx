@@ -1,29 +1,14 @@
 "use client"
 
-import Link from "next/link"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import EmailSignInForm from "@/components/user/EmailSignInForm"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { useEffect, useRef } from "react"
+import EmailSignInForm from "@/components/user/EmailSignInForm"
+import { useSetElementWindowHeight } from "@/lib/hooks"
+import Link from "next/link"
 
 export default function SignInEmail() {
-	const rootRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		const resizeObserver = new ResizeObserver((entries) => {
-			if (rootRef.current === undefined || rootRef.current === null) {
-				return
-			}
-			rootRef.current.style.minHeight = `${window.innerHeight}px`
-		})
-
-		resizeObserver.observe(document.body)
-
-		return () => {
-			resizeObserver.disconnect()
-		}
-	}, [])
+	const rootRef = useSetElementWindowHeight()
 
 	return (
 		<div
