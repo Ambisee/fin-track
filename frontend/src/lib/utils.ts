@@ -1,7 +1,7 @@
-import { twMerge } from "tailwind-merge"
-import { type ClassValue, clsx } from "clsx"
 import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 interface DataGroup {
     month: string,
@@ -232,10 +232,8 @@ function getUsernameFromEmail(email: string) {
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
 
-export { 
-    cn,
-    handleDataChange,
-    sortDataByDateGroup,
-    getElementFromNode,
-    getUsernameFromEmail,
+export {
+    cn, getElementFromNode,
+    getUsernameFromEmail, handleDataChange,
+    sortDataByDateGroup
 }

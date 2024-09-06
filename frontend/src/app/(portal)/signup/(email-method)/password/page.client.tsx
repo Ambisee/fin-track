@@ -1,38 +1,26 @@
 "use client"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import {
 	Form,
 	FormControl,
 	FormDescription,
 	FormField,
-	FormItem,
-	FormMessage
+	FormItem
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import {
-	ArrowLeftIcon,
-	InfoCircledIcon,
-	ReloadIcon
-} from "@radix-ui/react-icons"
-import { useRouter } from "next/navigation"
-import PasswordField from "@/components/user/FormField/PasswordField"
-import { useGlobalStore } from "@/lib/store"
-import Cookies from "js-cookie"
-import {
-	Popover,
-	PopoverTrigger,
-	PopoverContent
-} from "@/components/ui/popover"
-import { sbBrowser } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
+import PasswordField from "@/components/user/FormField/PasswordField"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
+import { sbBrowser } from "@/lib/supabase"
+import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
+import Cookies from "js-cookie"
+import { useRouter } from "next/navigation"
 
 const formSchema = z
 	.object({

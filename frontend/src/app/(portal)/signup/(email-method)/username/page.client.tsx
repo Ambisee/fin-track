@@ -1,30 +1,22 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useGlobalStore } from "@/lib/store"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormItem,
-	FormMessage,
-	FormField
-} from "@/components/ui/form"
-import {
-	ArrowRightIcon,
-	ArrowLeftIcon,
-	ReloadIcon
-} from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
+import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Cookies from "js-cookie"
-import { useContext, useState } from "react"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+	ArrowLeftIcon,
+	ArrowRightIcon,
+	ReloadIcon
+} from "@radix-ui/react-icons"
+import Cookies from "js-cookie"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
 const formSchema = z.object({
 	username: z
