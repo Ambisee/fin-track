@@ -1,43 +1,32 @@
-import { Drawer as VaulDrawer } from "vaul"
-import { useMediaQuery } from "react-responsive"
-import {
-	Drawer,
-	DrawerContent,
-	DrawerHeader,
-	DrawerDescription,
-	DrawerTrigger,
-	DrawerFooter,
-	DrawerTitle,
-	DrawerClose
-} from "@/components/ui/drawer"
-import { Button } from "../ui/button"
-import { ScrollArea, ScrollBar } from "../ui/scroll-area"
-import { z } from "zod"
-import { FieldErrors, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
-import { Input } from "../ui/input"
-import DatePicker from "../ui/date-picker"
-import ComboBox from "../ui/combobox"
-import { Textarea } from "../ui/textarea"
+"use client"
+
+import { CATEGORIES_QKEY, USER_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
-import { useToast } from "../ui/use-toast"
 import { Entry } from "@/types/supabase"
-import { useMemo } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMemo } from "react"
+import { FieldErrors, useForm } from "react-hook-form"
+import { useMediaQuery } from "react-responsive"
+import { z } from "zod"
+import { Button } from "../ui/button"
+import DatePicker from "../ui/date-picker"
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
+	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogDescription,
-	DialogClose,
-	DialogFooter,
 	DialogTrigger
 } from "../ui/dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
+import { Input } from "../ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { USER_QKEY } from "@/lib/constants"
+import { Textarea } from "../ui/textarea"
+import { useToast } from "../ui/use-toast"
 
 interface EntryFormProps {
 	data?: Entry
@@ -99,6 +88,16 @@ function DialogEntryForm(props: EntryFormProps) {
 		refetchOnMount: (query) => {
 			return query.state.data === undefined
 		}
+	})
+
+	const { data: categoriesData } = useQuery({
+		queryKey: CATEGORIES_QKEY,
+		queryFn: async () => {
+			return await sbBrowser.rpc("fetch_categories", {
+				user_id: userData?.data.user?.id as string
+			})
+		},
+		enabled: !!userData
 	})
 
 	const insertMutation = useMutation({
