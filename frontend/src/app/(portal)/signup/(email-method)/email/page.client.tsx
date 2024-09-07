@@ -1,28 +1,28 @@
 "use client"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Cookies from "js-cookie"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { CardContent, CardHeader, CardFooter } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import {
-	AlertDialog,
-	AlertDialogCancel,
-	AlertDialogAction,
-	AlertDialogHeader,
-	AlertDialogDescription,
-	AlertDialogContent,
-	AlertDialogFooter,
-	AlertDialogTitle
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
 import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useToast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")

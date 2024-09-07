@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSetElementWindowHeight } from "@/lib/hooks"
-import { AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -18,14 +18,19 @@ import {
 	useState
 } from "react"
 
+export type EmailSignupPaths =
+	| "/signup/email"
+	| "/signup/username"
+	| "/signup/password"
+
 interface SignUpLayoutProps {
 	children: JSX.Element
 }
 
 interface PageTransitionContextType {
-	value: number
+	progressValue: number
 	prevPage: number
-	setValue: Dispatch<SetStateAction<number>>
+	setProgressValue: Dispatch<SetStateAction<number>>
 	setPrevPage: Dispatch<SetStateAction<number>>
 }
 
@@ -33,21 +38,29 @@ export const PageTransitionContext = createContext<PageTransitionContextType>(
 	null!
 )
 
+export const pageIndexMap = new Map<EmailSignupPaths, number>([
+	["/signup/email", 0],
+	["/signup/username", 1],
+	["/signup/password", 2]
+])
+
 function ProgressProvider(props: SignUpLayoutProps) {
 	const pathname = usePathname()
 	const rootRef = useSetElementWindowHeight()
-	const [value, setValue] = useState(0)
+	const [progressValue, setProgressValue] = useState(
+		pageIndexMap.get(pathname as EmailSignupPaths) ?? -1
+	)
 	const [prevPage, setPrevPage] = useState(0)
 
 	useEffect(() => {
 		if (pathname.endsWith("/signup/email")) {
-			setValue(0)
+			setProgressValue(0)
 		} else if (pathname.endsWith("/signup/username")) {
-			setValue(33.3)
+			setProgressValue(33.3)
 		} else if (pathname.endsWith("/signup/password")) {
-			setValue(66.6)
+			setProgressValue(66.6)
 		}
-	}, [pathname, setValue])
+	}, [pathname, setProgressValue])
 
 	return (
 		<div
@@ -57,13 +70,24 @@ function ProgressProvider(props: SignUpLayoutProps) {
 			<div className="w-full h-full max-w-container flex justify-center items-center px-2 overflow-x-hidden">
 				<div className="min-h-fit w-full max-w-[375px] px-0 md:px-0">
 					<div className="w-full px-2 mb-4">
-						<Progress className="h-[2px] w-full" value={value} />
+						<Progress className="h-[2px] w-full" value={progressValue} />
 					</div>
 					<PageTransitionContext.Provider
-						value={{ value, setValue, prevPage, setPrevPage }}
+						value={{
+							progressValue,
+							setProgressValue,
+							prevPage,
+							setPrevPage
+						}}
 					>
 						<Card className="flex flex-col justify-between registration-card">
-							<AnimatePresence mode="wait">{props.children}</AnimatePresence>
+							<motion.div
+								className="overflow-hidden max-w-[375px]"
+								layout
+								layoutRoot
+							>
+								<AnimatePresence>{props.children}</AnimatePresence>
+							</motion.div>
 							<div className="w-full px-6 pb-6 flex flex-col gap-6 justify-end items-center">
 								<Separator className="w-full" />
 								<div>

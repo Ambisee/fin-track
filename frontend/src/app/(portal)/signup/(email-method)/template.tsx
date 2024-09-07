@@ -3,52 +3,54 @@
 import { motion, Variant } from "framer-motion"
 import { usePathname } from "next/navigation"
 import { useContext, useEffect } from "react"
-import { PageTransitionContext } from "./layout"
+import { EmailSignupPaths, pageIndexMap, PageTransitionContext } from "./layout"
 
 interface SignUpTemplateProps {
 	children: JSX.Element
 }
 
-const pageIdMap = new Map<string, number>([
-	["/signup/email", 0],
-	["/signup/username", 1],
-	["/signup/password", 2]
-])
-
 const variants: { [key: string]: Variant } = {
-	outsideRight: { x: 10, opacity: 0, transition: { duration: 0.25 } },
-	inside: { x: 0, opacity: 1, transition: { duration: 0.25 } },
-	outsideLeft: { x: -10, opacity: 0, transition: { duration: 0.25 } }
+	outsideRight: { x: 100, opacity: 0 },
+	inside: { x: 0, opacity: 1 },
+	outsideLeft: { x: -100, opacity: 0 }
 }
 
 export default function SignUpTemplate(props: SignUpTemplateProps) {
 	const pathname = usePathname()
 	const { prevPage, setPrevPage } = useContext(PageTransitionContext)
 
-	let curPage = pageIdMap.get(pathname)
-	let initial = "outsideRight"
+	useEffect(() => {
+		let pageIndex = pageIndexMap.get(pathname as EmailSignupPaths)
+		if (pageIndex === undefined) {
+			return
+		}
 
-	if (curPage !== undefined && curPage < prevPage) {
+		setPrevPage(pageIndex)
+	}, [pathname, prevPage, setPrevPage])
+
+	// Get the initial animation state
+	let initial
+	let pageIndex = pageIndexMap.get(pathname as EmailSignupPaths)
+
+	if (
+		pageIndex === undefined ||
+		pageIndex === prevPage ||
+		prevPage < pageIndex
+	) {
+		initial = "outsideRight"
+	} else {
 		initial = "outsideLeft"
 	}
 
-	useEffect(() => {
-		if (curPage !== undefined) {
-			setPrevPage(curPage)
-		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
-
 	return (
 		<motion.div
+			layout
 			className=" w-full h-full"
 			key={pathname}
 			variants={variants}
 			initial={initial}
 			animate="inside"
-			exit={initial === "outsideLeft" ? "outsideRight" : "outsideLeft"}
-			transition={{ type: "inertia" }}
+			transition={{ type: "tween", duration: 0.25 }}
 		>
 			{props.children}
 		</motion.div>
