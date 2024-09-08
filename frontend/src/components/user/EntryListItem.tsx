@@ -1,13 +1,17 @@
 "use client"
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle
 } from "@/components/ui/card"
-import { DESKTOP_BREAKPOINT, ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import {
+	DESKTOP_BREAKPOINT,
+	ENTRY_QKEY,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { getElementFromNode } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
@@ -17,18 +21,19 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Fragment, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
 import { Dialog } from "../ui/dialog"
+import { Drawer } from "../ui/drawer"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { toast, useToast } from "../ui/use-toast"
@@ -112,18 +117,40 @@ function PopoverRoot(props: {
 		minWidth: DESKTOP_BREAKPOINT
 	})
 
-	if (props.isAlert) {
+	if (isDesktop) {
+		if (props.isAlert) {
+			return (
+				<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+					{props.children}
+				</AlertDialog>
+			)
+		}
+
 		return (
-			<AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+			<Dialog open={props.open} onOpenChange={props.onOpenChange}>
 				{props.children}
-			</AlertDialog>
+			</Dialog>
 		)
 	}
 
+	{
+		/* <Drawer
+			shouldScaleBackground={true}
+			disablePreventScroll={true}
+			preventScrollRestoration={false}
+		></Drawer> */
+	}
+
 	return (
-		<Dialog open={props.open} onOpenChange={props.onOpenChange}>
+		<Drawer
+			open={props.open}
+			onOpenChange={props.onOpenChange}
+			shouldScaleBackground={true}
+			disablePreventScroll={true}
+			dismissible={!props.isAlert}
+		>
 			{props.children}
-		</Dialog>
+		</Drawer>
 	)
 }
 

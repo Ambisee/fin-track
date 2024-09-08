@@ -58,7 +58,7 @@ export default function DashboardHome() {
 		}
 
 		return (
-			<div className="mb-4">
+			<div className="mb-4 ">
 				<h2 className="text-xl mb-4">Recent Entries</h2>
 				<EntryList data={entriesQuery.data?.data ?? undefined} />
 			</div>

@@ -14,22 +14,22 @@ import { z } from "zod"
 import { Button } from "../ui/button"
 import DatePicker from "../ui/date-picker"
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
 } from "../ui/dialog"
 import {
-    DrawerClose,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger
+	DrawerClose,
+	DrawerContent,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger
 } from "../ui/drawer"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
 import { Input } from "../ui/input"
@@ -163,7 +163,7 @@ function DrawerEntryForm(props: EntryFormProps) {
 	})
 
 	return (
-		<DrawerContent>
+		<DrawerContent className="h-[90vh]">
 			<Form {...form}>
 				<form
 					onSubmit={(e) => {

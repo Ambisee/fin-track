@@ -12,6 +12,7 @@ import { Button, buttonVariants } from "../ui/button"
 import { Dialog, DialogTrigger } from "../ui/dialog"
 import { Drawer, DrawerTrigger } from "../ui/drawer"
 import EntryForm from "./EntryForm"
+import { useEffect, useLayoutEffect, useRef } from "react"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -59,7 +60,15 @@ function PopoverRoot(props: { children: JSX.Element }) {
 		return <Dialog>{props.children}</Dialog>
 	}
 
-	return <Drawer>{props.children}</Drawer>
+	return (
+		<Drawer
+			shouldScaleBackground={true}
+			disablePreventScroll={true}
+			preventScrollRestoration={false}
+		>
+			{props.children}
+		</Drawer>
+	)
 }
 
 export default function ProtectedNavbar() {

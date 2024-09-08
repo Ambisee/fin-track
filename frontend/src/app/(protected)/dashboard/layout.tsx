@@ -8,11 +8,14 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout(props: DashboardLayoutProps) {
 	return (
-		<>
-			<div className="dashboard-content" vaul-drawer-wrapper="">
+		<div>
+			<div
+				className="dashboard-content bg-background overflow-y-auto h-screen"
+				vaul-drawer-wrapper=""
+			>
 				{props.children}
 			</div>
 			<ProtectedNavbar />
-		</>
+		</div>
 	)
 }
