@@ -133,14 +133,6 @@ function PopoverRoot(props: {
 		)
 	}
 
-	{
-		/* <Drawer
-			shouldScaleBackground={true}
-			disablePreventScroll={true}
-			preventScrollRestoration={false}
-		></Drawer> */
-	}
-
 	return (
 		<Drawer
 			open={props.open}
@@ -227,7 +219,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 									{userSettingsQuery.isLoading ? (
 										<Skeleton className="w-20 h-6" />
 									) : (
-										<div className="max-w-[120px] whitespace-nowrap overflow-hidden md:max-w-none">
+										<div className="whitespace-nowrap overflow-hidden md:max-w-none">
 											<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary w-full">
 												{props.data.amount_is_positive ? "+ " : "- "}
 												{formatAmount(props.data.amount)}

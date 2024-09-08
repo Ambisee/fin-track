@@ -6,7 +6,7 @@ import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { useMediaQuery } from "react-responsive"
 import { Drawer as VaulDrawer } from "vaul"
@@ -90,6 +90,7 @@ function EntryFormItem(props: { label: string; children: JSX.Element }) {
 
 function DrawerEntryForm(props: EntryFormProps) {
 	const { toast } = useToast()
+	const contentRef = useRef<HTMLDivElement>(null)
 	const isEditForm = props.data !== undefined
 	const { data: userData } = useQuery({
 		queryKey: USER_QKEY,
@@ -163,9 +164,15 @@ function DrawerEntryForm(props: EntryFormProps) {
 	})
 
 	return (
-		<DrawerContent className="h-[90vh]">
+		<DrawerContent ref={contentRef} className="h-[90svh]">
+			<DrawerHeader className="h-fit">
+				<DrawerTitle>
+					{props.data !== undefined ? "Edit Entry" : "New Entry"}
+				</DrawerTitle>
+			</DrawerHeader>
 			<Form {...form}>
 				<form
+					className="h-full grid grid-rows-[1fr_auto]"
 					onSubmit={(e) => {
 						e.preventDefault()
 						form.handleSubmit(
@@ -220,13 +227,7 @@ function DrawerEntryForm(props: EntryFormProps) {
 						)()
 					}}
 				>
-					<DrawerHeader>
-						<DrawerTitle asChild>
-							<h1>{props.data !== undefined ? "Edit Entry" : "New Entry"}</h1>
-						</DrawerTitle>
-					</DrawerHeader>
-
-					<ScrollArea className="h-72 w-full overflow-x-visible fixed bottom-0 left-0">
+					<ScrollArea className="w-full px-4 relative overflow-y-auto">
 						<div className="*:text-left space-y-2">
 							<FormField
 								control={form.control}
@@ -317,7 +318,7 @@ function DrawerEntryForm(props: EntryFormProps) {
 													className="h-96"
 													{...field}
 												/>
-												<DrawerFooter>
+												<DrawerFooter className="h-fit">
 													<DrawerClose asChild>
 														<Button type="button">Close</Button>
 													</DrawerClose>
