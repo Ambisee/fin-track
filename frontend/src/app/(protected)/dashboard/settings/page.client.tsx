@@ -28,18 +28,18 @@ import { Switch } from "@/components/ui/switch"
 import { toast, useToast } from "@/components/ui/use-toast"
 import PasswordField from "@/components/user/FormField/PasswordField"
 import {
-	CURRENCIES_QKEY,
 	ENTRY_QKEY,
 	MAX_USERNAME_LENGTH,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
+import { useCurrenciesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog"
 import { Provider } from "@supabase/supabase-js"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -81,34 +81,12 @@ function GeneralSection() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const queryClient = useQueryClient()
-	const userQuery = useQuery({
-		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => {
-			return query.state.data === undefined
-		}
-	})
+	const userQuery = useUserQuery()
 
-	const supportedCurrenciesQuery = useQuery({
-		queryKey: CURRENCIES_QKEY,
-		queryFn: async () => await sbBrowser.from("currencies").select("*"),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
-	const supportedCurrencies = supportedCurrenciesQuery.data?.data
+	const currenciesQuery = useCurrenciesQuery()
+	const currencies = currenciesQuery.data?.data
 
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
-		queryFn: async () =>
-			await sbBrowser
-				.from("settings")
-				.select(`*, currencies (currency_name)`)
-				.limit(1)
-				.single(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
+	const userSettingsQuery = useSettingsQuery()
 	const userSettings = userSettingsQuery.data?.data
 
 	const form = useForm<z.infer<typeof generalSectionFormSchema>>({
@@ -145,12 +123,12 @@ function GeneralSection() {
 								}
 
 								if (
-									supportedCurrencies !== null &&
-									supportedCurrencies !== undefined &&
+									currencies !== null &&
+									currencies !== undefined &&
 									userSettings?.currencies?.currency_name !== undefined &&
 									userSettings.currencies.currency_name !== data.currency
 								) {
-									const newCurrencyId = supportedCurrencies.find(
+									const newCurrencyId = currencies.find(
 										(value) => value.currency_name === data.currency
 									)
 									if (newCurrencyId === undefined) {
@@ -241,7 +219,7 @@ function GeneralSection() {
 												form.setValue("currency", e)
 											}}
 											values={
-												supportedCurrencies?.map((val) => ({
+												currencies?.map((val) => ({
 													label: val.currency_name,
 													value: val.currency_name
 												})) ?? []
@@ -267,12 +245,7 @@ function GeneralSection() {
 
 function LinkedAccountChange() {
 	const queryClient = useQueryClient()
-	const userQuery = useQuery({
-		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
+	const userQuery = useUserQuery()
 
 	const getIdentityProviders = () => {
 		const result = new Set()
@@ -391,13 +364,7 @@ const emailChangeFormSchema = z.object({
 })
 function EmailChange() {
 	const { toast } = useToast()
-	const userQuery = useQuery({
-		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
-
+	const userQuery = useUserQuery()
 	const form = useForm<z.infer<typeof emailChangeFormSchema>>({
 		resolver: zodResolver(emailChangeFormSchema),
 		defaultValues: {
@@ -491,12 +458,7 @@ function PasswordChange() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const [isFormSubmitted, setIsFormSubmitted] = useState(false)
-	const userQuery = useQuery({
-		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
+	const userQuery = useUserQuery()
 
 	const form = useForm<z.infer<typeof passwordChangeFormSchema>>({
 		mode: "onChange",
@@ -698,17 +660,7 @@ const mailingSectionFormSchema = z.object({
 })
 function MailingSection() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
-		queryFn: async () =>
-			await sbBrowser
-				.from("settings")
-				.select(`*, currencies (currency_name)`)
-				.limit(1)
-				.single(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
-	})
+	const userSettingsQuery = useSettingsQuery()
 
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),

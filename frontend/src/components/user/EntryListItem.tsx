@@ -1,30 +1,31 @@
 "use client"
 
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
 } from "@/components/ui/card"
-import { ENTRY_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { ENTRY_QKEY } from "@/lib/constants"
+import { useSettingsQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { getElementFromNode } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Fragment, useState } from "react"
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
 import { Dialog } from "../ui/dialog"
@@ -134,19 +135,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(false)
 	const [isFormOpen, setIsFormOpen] = useState(false)
 
-	const userSettingsQuery = useQuery({
-		queryKey: USER_SETTINGS_QKEY,
-		queryFn: async () =>
-			await sbBrowser
-				.from("settings")
-				.select(`*, currencies (currency_name)`)
-				.limit(1)
-				.single(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => {
-			return query.state.data === undefined
-		}
-	})
+	const userSettingsQuery = useSettingsQuery()
 
 	const formatAmount = (num?: number) => {
 		const currency = userSettingsQuery?.data?.data?.currencies?.currency_name
