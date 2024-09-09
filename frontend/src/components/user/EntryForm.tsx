@@ -1,11 +1,14 @@
 "use client"
 
-import { CATEGORIES_QKEY, USER_QKEY } from "@/lib/constants"
+import { CATEGORIES_QKEY } from "@/lib/constants"
+import { useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
+import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { X } from "lucide-react"
 import { useMemo } from "react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { useMediaQuery } from "react-responsive"
@@ -13,14 +16,12 @@ import { z } from "zod"
 import { Button } from "../ui/button"
 import DatePicker from "../ui/date-picker"
 import {
-	Dialog,
 	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
-	DialogTitle,
-	DialogTrigger
+	DialogTitle
 } from "../ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
 import { Input } from "../ui/input"
@@ -69,9 +70,18 @@ const getErrors = (
 	return result
 }
 
-function EntryFormItem(props: { label: string; children: JSX.Element }) {
+function EntryFormItem(props: {
+	className?: string
+	label: string
+	children: JSX.Element
+}) {
 	return (
-		<FormItem className="my-2 mr-4 ml-1 grid grid-cols-[minmax(75px,30%)_1fr] items-center">
+		<FormItem
+			className={cn(
+				"my-4 grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
+				props.className
+			)}
+		>
 			<FormLabel>{props.label}</FormLabel>
 			<FormControl>{props.children}</FormControl>
 		</FormItem>
@@ -81,15 +91,7 @@ function EntryFormItem(props: { label: string; children: JSX.Element }) {
 function DialogEntryForm(props: EntryFormProps) {
 	const { toast } = useToast()
 	const isEditForm = props.data !== undefined
-	const { data: userData } = useQuery({
-		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => {
-			return query.state.data === undefined
-		}
-	})
-
+	const { data: userData } = useUserQuery()
 	const { data: categoriesData } = useQuery({
 		queryKey: CATEGORIES_QKEY,
 		queryFn: async () => {
@@ -175,7 +177,10 @@ function DialogEntryForm(props: EntryFormProps) {
 	})
 
 	return (
-		<DialogContent>
+		<DialogContent
+			hideCloseButton
+			className="h-dvh max-w-none border-0 sm:border sm:h-auto sm:max-w-lg"
+		>
 			<Form {...form}>
 				<form
 					onSubmit={(e) => {
@@ -233,117 +238,106 @@ function DialogEntryForm(props: EntryFormProps) {
 						)()
 					}}
 				>
-					<DialogHeader>
+					<DialogHeader className="relative space-y-0 sm:text-center">
 						<DialogTitle asChild>
-							<h1>{props.data !== undefined ? "Edit Entry" : "New Entry"}</h1>
+							<h1 className="h-4 leading-4">
+								{props.data !== undefined ? "Edit Entry" : "New Entry"}
+							</h1>
 						</DialogTitle>
-						<DialogDescription asChild>
-							<div className="*:text-left space-y-2">
-								<FormField
-									control={form.control}
-									name="type"
-									render={({ field }) => (
-										<EntryFormItem label="Type">
-											<div>
-												<Tabs
-													value={field.value}
-													onValueChange={field.onChange}
-													className="w-full"
-												>
-													<TabsList className="w-full">
-														<TabsTrigger className="w-1/2" value="Income">
-															Income
-														</TabsTrigger>
-														<TabsTrigger className="w-1/2" value="Expense">
-															Expense
-														</TabsTrigger>
-													</TabsList>
-												</Tabs>
-											</div>
-										</EntryFormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="date"
-									render={({ field }) => (
-										<EntryFormItem label="Date">
-											<DatePicker
-												onChange={field.onChange}
+						<DialogClose
+							className="absolute block right-0 top-1/2 translate-y-[-50%]
+                            rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+						>
+							<X className="w-6 h-6" />
+						</DialogClose>
+					</DialogHeader>
+
+					<DialogDescription asChild>
+						<div className="mt-8 *:text-left">
+							<FormField
+								control={form.control}
+								name="type"
+								render={({ field }) => (
+									<EntryFormItem label="Type">
+										<div>
+											<Tabs
 												value={field.value}
-												closeOnSelect
+												onValueChange={field.onChange}
+												className="w-full"
+											>
+												<TabsList className="w-full">
+													<TabsTrigger className="w-1/2" value="Income">
+														Income
+													</TabsTrigger>
+													<TabsTrigger className="w-1/2" value="Expense">
+														Expense
+													</TabsTrigger>
+												</TabsList>
+											</Tabs>
+										</div>
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="date"
+								render={({ field }) => (
+									<EntryFormItem label="Date">
+										<DatePicker
+											onChange={field.onChange}
+											value={field.value}
+											closeOnSelect
+										/>
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="title"
+								render={({ field }) => (
+									<EntryFormItem label="Title">
+										<Input placeholder="Title" {...field} />
+									</EntryFormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="amount"
+								render={({ field }) => {
+									const { onChange, ...rest } = field
+
+									return (
+										<EntryFormItem label="Amount">
+											<Input
+												type="text"
+												placeholder="Amount"
+												inputMode="decimal"
+												onChange={onChange}
+												{...rest}
 											/>
 										</EntryFormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="title"
-									render={({ field }) => (
-										<EntryFormItem label="Title">
-											<Input placeholder="Title" {...field} />
-										</EntryFormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="amount"
-									render={({ field }) => {
-										const { onChange, ...rest } = field
+									)
+								}}
+							/>
+							<FormField
+								control={form.control}
+								name="notes"
+								render={({ field }) => (
+									<EntryFormItem
+										className="items-start [&_label]:h-10 [&_label]:align-middle [&_label]:leading-10"
+										label="Notes"
+									>
+										<Textarea
+											className="max-h-none h-36 sm:max-h-28 sm:h-auto"
+											{...field}
+										/>
+									</EntryFormItem>
+								)}
+							/>
+						</div>
+					</DialogDescription>
 
-										return (
-											<EntryFormItem label="Amount">
-												<Input
-													type="text"
-													placeholder="Amount"
-													inputMode="decimal"
-													onChange={onChange}
-													{...rest}
-												/>
-											</EntryFormItem>
-										)
-									}}
-								/>
-								<FormField
-									control={form.control}
-									name="notes"
-									render={({ field }) => (
-										<EntryFormItem label="Notes">
-											<Dialog>
-												<DialogTrigger asChild>
-													<Button
-														type="button"
-														variant="default"
-														className="w-24 self-start"
-													>
-														Open
-													</Button>
-												</DialogTrigger>
-												<DialogContent className="z-[130]">
-													<DialogHeader>
-														<DialogTitle>Notes</DialogTitle>
-													</DialogHeader>
-													<DialogDescription className="px-2">
-														<Textarea
-															data-vaul-no-drag
-															className="min-h-28 max-h-96"
-															{...field}
-														/>
-													</DialogDescription>
-													<DialogFooter>
-														<DialogClose asChild>
-															<Button type="button">Close</Button>
-														</DialogClose>
-													</DialogFooter>
-												</DialogContent>
-											</Dialog>
-										</EntryFormItem>
-									)}
-								/>
-							</div>
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter className="mt-8 gap-2 md:gap-0">
+					<DialogFooter className="h-10 mt-auto">
 						<Button>Submit</Button>
 						{isEditForm && (
 							<Button
