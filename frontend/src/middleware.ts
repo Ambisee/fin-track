@@ -1,7 +1,6 @@
 import { NextURL } from "next/dist/server/web/next-url";
 import { NextRequest, NextResponse } from "next/server";
 import { sbMiddleware } from "./lib/supabase";
-import { redirect } from "next/navigation";
 
 
 function isProtectedUrl(url: NextURL) {
@@ -20,14 +19,14 @@ export async function middleware(request: NextRequest) {
 
         if (token_hash === null) {
             console.log("No token_hash")
-            redirect("/")
+            return NextResponse.redirect(new URL("/", request.url))
         }
 
         const otpVerification = await supabase.auth.verifyOtp({ type: "email", token_hash: token_hash })
         if (otpVerification.error !== null) {
             console.log("OTP verification failed")
             console.log("Reason:", otpVerification.error.message)
-            redirect("/signin")
+            return NextResponse.redirect(new URL("/signin", request.url))
         }
         
         return response
@@ -39,7 +38,7 @@ export async function middleware(request: NextRequest) {
      * Redirect unauthenticated user to the login page when accessing the dashboard
      */
     if (user === null && isProtectedUrl(request.nextUrl)) {
-        redirect("/signin")
+        return NextResponse.redirect(new URL("/signin", request.url))
     }
 
     return response
