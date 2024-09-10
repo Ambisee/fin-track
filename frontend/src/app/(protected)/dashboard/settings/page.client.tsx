@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { toast, useToast } from "@/components/ui/use-toast"
-import PasswordField from "@/components/user/FormField/PasswordField"
+import PasswordField from "@/components/user/PasswordField"
 import {
 	ENTRY_QKEY,
 	MAX_USERNAME_LENGTH,

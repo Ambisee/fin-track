@@ -10,7 +10,7 @@ import {
 	FormItem
 } from "@/components/ui/form"
 import { useToast } from "@/components/ui/use-toast"
-import PasswordField from "@/components/user/FormField/PasswordField"
+import PasswordField from "@/components/user/PasswordField"
 import { USER_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
