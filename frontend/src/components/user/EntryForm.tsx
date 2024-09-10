@@ -179,10 +179,11 @@ function DialogEntryForm(props: EntryFormProps) {
 	return (
 		<DialogContent
 			hideCloseButton
-			className="h-dvh max-w-none border-0 sm:border sm:h-auto sm:max-w-lg"
+			className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:max-w-lg"
 		>
 			<Form {...form}>
 				<form
+					className="grid grid-rows-[1.5rem_1fr_auto] h-full"
 					onSubmit={(e) => {
 						e.preventDefault()
 						form.handleSubmit(
@@ -240,20 +241,20 @@ function DialogEntryForm(props: EntryFormProps) {
 				>
 					<DialogHeader className="relative space-y-0 sm:text-center">
 						<DialogTitle asChild>
-							<h1 className="h-4 leading-4">
+							<h1 className="h-6 leading-6">
 								{props.data !== undefined ? "Edit Entry" : "New Entry"}
 							</h1>
 						</DialogTitle>
 						<DialogClose
-							className="absolute block right-0 top-1/2 translate-y-[-50%]
+							className="absolute block left-0 top-1/2 translate-y-[-50%]
                             rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
 						>
-							<X className="w-6 h-6" />
+							<X className="w-4 h-4" />
 						</DialogClose>
 					</DialogHeader>
 
 					<DialogDescription asChild>
-						<div className="mt-8 *:text-left">
+						<div className="h-fit mt-8 *:text-left">
 							<FormField
 								control={form.control}
 								name="type"
@@ -337,7 +338,7 @@ function DialogEntryForm(props: EntryFormProps) {
 						</div>
 					</DialogDescription>
 
-					<DialogFooter className="h-10 mt-auto">
+					<DialogFooter className="h-fit gap-2">
 						<Button>Submit</Button>
 						{isEditForm && (
 							<Button
