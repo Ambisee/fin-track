@@ -1,15 +1,15 @@
 "use client"
 
-import { GearIcon, TableIcon } from "@radix-ui/react-icons"
-import Link from "next/link"
-import EntryForm from "./EntryForm"
-import { Button, buttonVariants } from "../ui/button"
-import { HouseIcon, PlusIcon, BarChart3Icon } from "lucide-react"
-import { useQueryClient } from "@tanstack/react-query"
 import { ENTRY_QKEY } from "@/lib/constants"
-import { Dialog, DialogTrigger } from "../ui/dialog"
-import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { GearIcon, TableIcon } from "@radix-ui/react-icons"
+import { useQueryClient } from "@tanstack/react-query"
+import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Button, buttonVariants } from "../ui/button"
+import { Dialog, DialogTrigger } from "../ui/dialog"
+import EntryForm from "./EntryForm/EntryForm"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -36,20 +36,12 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	)
 }
 
-function PopoverTrigger(props: { children: JSX.Element }) {
-	return <DialogTrigger asChild>{props.children}</DialogTrigger>
-}
-
-function PopoverRoot(props: { children: JSX.Element }) {
-	return <Dialog>{props.children}</Dialog>
-}
-
 export default function ProtectedNavbar() {
 	const queryClient = useQueryClient()
 	const pathname = usePathname()
 
 	return (
-		<PopoverRoot>
+		<Dialog>
 			<>
 				<div className="dashboard-navbar">
 					<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
@@ -68,7 +60,7 @@ export default function ProtectedNavbar() {
 								label="Entries"
 							/>
 							<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
-								<PopoverTrigger>
+								<DialogTrigger asChild>
 									<Button
 										variant="default"
 										className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
@@ -76,7 +68,7 @@ export default function ProtectedNavbar() {
 									>
 										<PlusIcon className="block" width={30} height={30} />
 									</Button>
-								</PopoverTrigger>
+								</DialogTrigger>
 							</li>
 							<NavLink
 								href="/dashboard/reports"
@@ -99,6 +91,6 @@ export default function ProtectedNavbar() {
 					}}
 				/>
 			</>
-		</PopoverRoot>
+		</Dialog>
 	)
 }

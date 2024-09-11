@@ -1,26 +1,24 @@
 "use client"
 
-import {
-	SetStateAction,
-	Dispatch,
-	useState,
-	ForwardRefExoticComponent
-} from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
+import {
+    Dispatch,
+    SetStateAction,
+    useState
+} from "react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogOverlay,
-	DialogTitle,
-	DialogTrigger
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
 } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 
 interface DatePickerProps {
 	value: Date
@@ -28,7 +26,7 @@ interface DatePickerProps {
 	closeOnSelect?: boolean
 }
 
-export default function DatePicker(props: DatePickerProps) {
+export function DatePicker(props: DatePickerProps) {
 	const [isOpen, setIsOpen] = useState(false)
 
 	return (

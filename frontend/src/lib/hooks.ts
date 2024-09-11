@@ -1,7 +1,7 @@
 import { UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
 
 function useSetElementWindowHeight() {
@@ -80,8 +80,18 @@ function useCurrenciesQuery() {
 }
 
 function useCategoriesQuery() {
-
+    const userData = useUserQuery()
+    
+    return useQuery({
+		queryKey: CATEGORIES_QKEY,
+		queryFn: async () => {
+			return await sbBrowser.rpc("fetch_categories", {
+				user_id: userData?.data?.data.user?.id as string
+			})
+		},
+		enabled: !!userData
+	})
 }
 
-export { useCurrenciesQuery, useEntryDataQuery, useSetElementWindowHeight, useSettingsQuery, useUserQuery };
+export { useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSetElementWindowHeight, useSettingsQuery, useUserQuery };
 
