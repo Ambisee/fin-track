@@ -19,9 +19,9 @@ import {
 } from "react"
 
 export type EmailSignupPaths =
-	| "/signup/email"
-	| "/signup/username"
-	| "/signup/password"
+	| "/sign-up/email"
+	| "/sign-up/username"
+	| "/sign-up/password"
 
 interface SignUpLayoutProps {
 	children: JSX.Element
@@ -39,9 +39,9 @@ export const PageTransitionContext = createContext<PageTransitionContextType>(
 )
 
 export const pageIndexMap = new Map<EmailSignupPaths, number>([
-	["/signup/email", 0],
-	["/signup/username", 1],
-	["/signup/password", 2]
+	["/sign-up/email", 0],
+	["/sign-up/username", 1],
+	["/sign-up/password", 2]
 ])
 
 function ProgressProvider(props: SignUpLayoutProps) {
@@ -53,11 +53,11 @@ function ProgressProvider(props: SignUpLayoutProps) {
 	const [prevPage, setPrevPage] = useState(0)
 
 	useEffect(() => {
-		if (pathname.endsWith("/signup/email")) {
+		if (pathname.endsWith("/sign-up/email")) {
 			setProgressValue(0)
-		} else if (pathname.endsWith("/signup/username")) {
+		} else if (pathname.endsWith("/sign-up/username")) {
 			setProgressValue(33.3)
-		} else if (pathname.endsWith("/signup/password")) {
+		} else if (pathname.endsWith("/sign-up/password")) {
 			setProgressValue(66.6)
 		}
 	}, [pathname, setProgressValue])
@@ -92,7 +92,7 @@ function ProgressProvider(props: SignUpLayoutProps) {
 								<Separator className="w-full" />
 								<div>
 									<Link
-										href="/signup"
+										href="/sign-up"
 										className={buttonVariants({ variant: "link" })}
 									>
 										Sign up with another method
@@ -121,7 +121,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 			!pathname.endsWith("/email") &&
 			isLoading
 		) {
-			router.replace("/signup/email")
+			router.replace("/sign-up/email")
 			return
 		}
 

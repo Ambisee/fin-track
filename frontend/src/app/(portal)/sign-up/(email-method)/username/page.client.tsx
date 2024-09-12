@@ -66,7 +66,7 @@ export default function SignUpUsername() {
 						}
 
 						Cookies.set("reg-username", username)
-						router.replace("/signup/password")
+						router.replace("/sign-up/password")
 					})()
 				}}
 			>
@@ -97,7 +97,7 @@ export default function SignUpUsername() {
 						className="aspect-square p-0 flex gap-2"
 						type="button"
 						onClick={(e) => {
-							router.replace("/signup/email")
+							router.replace("/sign-up/email")
 						}}
 					>
 						<ArrowLeftIcon />

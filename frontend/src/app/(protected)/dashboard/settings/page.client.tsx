@@ -591,7 +591,7 @@ function PasswordChange() {
 					<Button>Submit</Button>
 					<Link
 						className={cn(buttonVariants({ variant: "link" }), "h-fit p-0 m-0")}
-						href="/forgotpassword"
+						href="/forgot-password"
 					>
 						Forgot your old password?
 					</Link>

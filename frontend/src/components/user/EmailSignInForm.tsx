@@ -119,7 +119,7 @@ export default function EmailSignInForm() {
 							</FormControl>
 							<FormDescription className="flex justify-end">
 								<Button variant="link" className="p-0 max-h-4 text-sm">
-									<Link href="/forgotpassword">Forgot your password?</Link>
+									<Link href="/forgot-password">Forgot your password?</Link>
 								</Button>
 							</FormDescription>
 						</FormItem>

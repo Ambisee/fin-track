@@ -1,19 +1,17 @@
 "use client"
 
+import { User } from "@supabase/supabase-js"
 import Link from "next/link"
-import { Session, User, UserResponse } from "@supabase/supabase-js"
 
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
 	NavigationMenu,
-	NavigationMenuList,
 	NavigationMenuItem,
-	NavigationMenuLink
+	NavigationMenuList
 } from "@/components/ui/navigation-menu"
-import { useEffect, useState } from "react"
 import { sbBrowser } from "@/lib/supabase"
-import { useToast } from "../ui/use-toast"
+import { useEffect, useState } from "react"
 
 interface PublicNavbarProps {
 	user: User | null
@@ -33,7 +31,7 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 
 	const linkObject = {
 		text: "Sign In",
-		redirectUrl: "/signin"
+		redirectUrl: "/sign-in"
 	}
 
 	if (isSignedIn) {

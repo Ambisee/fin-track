@@ -23,7 +23,7 @@ export default function SignInEmail() {
 						<Separator className="mt-4 relative" />
 						<div className="text-center text-sm">
 							<Button asChild variant="link">
-								<Link href="/signin">Sign in with another method</Link>
+								<Link href="/sign-in">Sign in with another method</Link>
 							</Button>
 						</div>
 					</CardContent>

@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
         if (otpVerification.error !== null) {
             console.log("OTP verification failed")
             console.log("Reason:", otpVerification.error.message)
-            return NextResponse.redirect(new URL("/signin", request.url))
+            return NextResponse.redirect(new URL("/sign-in", request.url))
         }
         
         return response
@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
      * Redirect unauthenticated user to the login page when accessing the dashboard
      */
     if (user === null && isProtectedUrl(request.nextUrl)) {
-        return NextResponse.redirect(new URL("/signin", request.url))
+        return NextResponse.redirect(new URL("/sign-in", request.url))
     }
 
     return response
@@ -49,7 +49,7 @@ export const config = {
         "/",
         "/recovery",
         "/dashboard/:path*",
-        "/signin/:path*",
-        "/signup/:path*",
+        "/sign-in/:path*",
+        "/sign-up/:path*",
     ]
 }

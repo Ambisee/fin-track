@@ -83,7 +83,7 @@ export default function Recovery() {
 										})
 										await sbBrowser.auth.signOut()
 										queryClient.invalidateQueries({ queryKey: USER_QKEY })
-										router.push("/signin/email")
+										router.push("/sign-in/email")
 									},
 									(error) => {}
 								)()

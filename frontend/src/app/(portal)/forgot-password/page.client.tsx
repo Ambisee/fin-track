@@ -3,11 +3,11 @@
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -113,7 +113,7 @@ export default function ForgotPassword() {
 							<span className="text-sm">Remember your password?</span>
 							<br />
 							<Link
-								href="/signin/email"
+								href="/sign-in/email"
 								className={cn(buttonVariants({ variant: "link" }), "p-0 h-fit")}
 							>
 								Sign in

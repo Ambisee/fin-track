@@ -119,7 +119,7 @@ export default function SignUpPassword() {
 							Cookies.remove("reg-email")
 							Cookies.remove("reg-username")
 							setIsPendingSubmit(false)
-							router.push("/signin")
+							router.push("/sign-in")
 						},
 						(error) => {}
 					)()
@@ -166,7 +166,7 @@ export default function SignUpPassword() {
 						type="button"
 						className="aspect-square p-0 flex gap-2"
 						onClick={(e) => {
-							router.replace("/signup/username")
+							router.replace("/sign-up/username")
 						}}
 					>
 						<ArrowLeftIcon />

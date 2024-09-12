@@ -8,17 +8,24 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { roboto } from "@/app/fonts"
-import googleIcon from "../../../../public/google-icon.svg"
+import googleIcon from "../../../../../public/google-icon.svg"
 
-import { useEffect, useState } from "react"
 import { MailIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 
-export default function SignUp() {
+export default function SignIn() {
+	const [origin, setOrigin] = useState<string>(null!)
+	useEffect(() => {
+		setOrigin(window.location.origin)
+	}, [])
+
 	return (
 		<div className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center">
 			<div className="w-full max-w-container flex justify-center items-center">
 				<Card className="w-[320px]">
-					<CardHeader className="w-full text-center">Sign up</CardHeader>
+					<CardHeader className="w-full text-center">
+						Sign in to your account
+					</CardHeader>
 					<CardContent className="w-full grid grid-flow-row gap-4">
 						<Button
 							variant="default"
@@ -39,21 +46,20 @@ export default function SignUp() {
 								height={20}
 								className="mr-2"
 							/>
-							Sign up with Google
+							Sign in with Google
 						</Button>
 						<Link
-							href="/signup/email"
+							href="/sign-in/email"
 							className={buttonVariants({ variant: "default" })}
 						>
 							<MailIcon width={20} height={20} className="mr-2" />
-							Sign up with Email
+							Sign in with Email
 						</Link>
 						<Separator className="mt-4 relative" />
 						<div className="text-sm w-full text-center">
-							<span>Already have an account? </span>
-							<br />
+							<span>Don&apos;t have an account? </span>
 							<Button variant="link" className="p-0 m-0 h-fit" asChild>
-								<Link href="/signin">Sign in</Link>
+								<Link href="/sign-up">Create an account</Link>
 							</Button>
 						</div>
 					</CardContent>
