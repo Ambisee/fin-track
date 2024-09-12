@@ -4,13 +4,16 @@ import {
 	DialogClose,
 	DialogDescription,
 	DialogFooter,
-	DialogHeader
+	DialogHeader,
+	DialogTitle
 } from "@/components/ui/dialog"
 import { Form, FormField } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
+import { useUserQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
@@ -23,12 +26,6 @@ interface EntryFormPageProps {
 	data?: Entry
 	form: ReturnType<typeof useForm<FormSchema>>
 	isEditForm: boolean
-	insertMutation: ReturnType<
-		typeof useMutation<PostgrestSingleResponse<null>, Error, FormSchema>
-	>
-	updateMutation: ReturnType<
-		typeof useMutation<PostgrestSingleResponse<null>, Error, FormSchema>
-	>
 	onSubmitSuccess?: (data: PostgrestSingleResponse<null>) => void
 }
 
@@ -51,20 +48,69 @@ const getErrors = (
 }
 
 export default function EntryFormPage(props: EntryFormPageProps) {
-	const { form, insertMutation, updateMutation, data, isEditForm } = props
 	const { toast } = useToast()
+	const userData = useUserQuery()
+
+	const insertMutation = useMutation({
+		mutationFn: (formData: FormSchema) => {
+			const isPositive = formData.type === "Income"
+			let note: string | null = formData.notes
+			if (note === "") {
+				note = null
+			}
+
+			return Promise.resolve(
+				sbBrowser.from("entry").insert({
+					date: formData.date.toLocaleDateString(),
+					title: formData.title,
+					created_by: userData.data?.data.user?.id,
+					amount_is_positive: isPositive,
+					amount: Number(formData.amount),
+					note: note
+				})
+			)
+		}
+	})
+
+	const updateMutation = useMutation({
+		mutationFn: (formData: FormSchema) => {
+			const isPositive = formData.type === "Income"
+			if (props.data?.id === undefined) {
+				toast({ description: "Invalid entry id" })
+				return Promise.reject(null)
+			}
+
+			let note: string | null = formData.notes
+			if (note === "") {
+				note = null
+			}
+
+			return Promise.resolve(
+				sbBrowser
+					.from("entry")
+					.update({
+						date: formData.date.toDateString(),
+						title: formData.title,
+						amount_is_positive: isPositive,
+						amount: Number(formData.amount),
+						note: note
+					})
+					.eq("id", props.data.id)
+			)
+		}
+	})
 
 	return (
-		<Form {...form}>
+		<Form {...props.form}>
 			<form
 				className="grid grid-rows-[1.5rem_1fr_auto] h-full"
 				onSubmit={(e) => {
 					e.preventDefault()
-					form.handleSubmit(
+					props.form.handleSubmit(
 						async (formData) => {
 							let result
 
-							if (!isEditForm) {
+							if (!props.isEditForm) {
 								result = insertMutation.mutate(formData, {
 									onSuccess: (data) => {
 										if (data.error !== null) {
@@ -79,7 +125,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 											duration: 1500
 										})
 
-										form.reset()
+										props.form.reset()
 										props.onSubmitSuccess?.(data)
 									}
 								})
@@ -114,26 +160,29 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 				}}
 			>
 				<DialogHeader className="relative space-y-0 sm:text-center">
-					<h1 className="h-6 leading-6">
-						{props.data !== undefined ? "Edit Entry" : "New Entry"}
-					</h1>
+					<DialogTitle className="leading-6" asChild>
+						<h1 className="h-6 leading-6">
+							{props.data !== undefined ? "Edit Entry" : "New Entry"}
+						</h1>
+					</DialogTitle>
 					<DialogClose
-						className="absolute block left-0 top-1/2 translate-y-[-50%]
+						className="absolute block right-0 top-1/2 translate-y-[-50%]
                             rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
 					>
 						<X className="w-4 h-4" />
 					</DialogClose>
+					<DialogDescription>
+						<VisuallyHidden>
+							{props.isEditForm
+								? "Fill in the information of the transaction to insert a new entry"
+								: "Edit the information of the current transaction"}
+						</VisuallyHidden>
+					</DialogDescription>
 				</DialogHeader>
-
-				<DialogDescription>
-					<VisuallyHidden>
-						A dialog element which displays a form to insert or edit an entry.
-					</VisuallyHidden>
-				</DialogDescription>
 
 				<div className="h-fit mt-8 sm:mt-2 *:text-left">
 					<FormField
-						control={form.control}
+						control={props.form.control}
 						name="type"
 						render={({ field }) => (
 							<EntryFormItem label="Type">
@@ -157,7 +206,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						)}
 					/>
 					<FormField
-						control={form.control}
+						control={props.form.control}
 						name="date"
 						render={({ field }) => (
 							<EntryFormItem label="Date">
@@ -170,7 +219,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						)}
 					/>
 					<FormField
-						control={form.control}
+						control={props.form.control}
 						name="title"
 						render={({ field }) => (
 							<EntryFormItem label="Title">
@@ -179,7 +228,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						)}
 					/>
 					<FormField
-						control={form.control}
+						control={props.form.control}
 						name="amount"
 						render={({ field }) => {
 							const { onChange, ...rest } = field
@@ -198,7 +247,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						}}
 					/>
 					<FormField
-						control={form.control}
+						control={props.form.control}
 						name="notes"
 						render={({ field }) => (
 							<EntryFormItem
@@ -216,11 +265,11 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 
 				<DialogFooter className="h-fit gap-2">
 					<Button>Submit</Button>
-					{isEditForm && (
+					{props.isEditForm && (
 						<Button
 							variant="secondary"
 							type="button"
-							onClick={() => form.reset()}
+							onClick={() => props.form.reset()}
 						>
 							Reset
 						</Button>

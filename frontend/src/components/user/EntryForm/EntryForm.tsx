@@ -1,25 +1,34 @@
 "use client"
 
-import { useCategoriesQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
-import { useMutation } from "@tanstack/react-query"
-import { useMemo } from "react"
+import {
+	createContext,
+	Dispatch,
+	SetStateAction,
+	useMemo,
+	useState
+} from "react"
 import { useForm } from "react-hook-form"
-import { useMediaQuery } from "react-responsive"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
 import { FormControl, FormItem, FormLabel } from "../../ui/form"
-import { useToast } from "../../ui/use-toast"
 import EntryFormPage from "./EntryFormPage"
+import ChooseCategoryPage from "./ChooseCategoryPage"
 
 interface EntryFormProps {
 	data?: Entry
 	onSubmitSuccess?: (data: PostgrestSingleResponse<null>) => void
 }
+
+interface EntryFormContextObject {
+	curPage: number
+	setCurPage: Dispatch<SetStateAction<number>>
+}
+
+const EntryFormContext = createContext<EntryFormContextObject>(null!)
 
 const formSchema = z.object({
 	date: z.date(),
@@ -39,9 +48,9 @@ const formSchema = z.object({
 	notes: z.string()
 })
 
-export type FormSchema = z.infer<typeof formSchema>
+type FormSchema = z.infer<typeof formSchema>
 
-export function EntryFormItem(props: {
+function EntryFormItem(props: {
 	className?: string
 	label: string
 	children: JSX.Element
@@ -60,59 +69,8 @@ export function EntryFormItem(props: {
 }
 
 function DialogEntryForm(props: EntryFormProps) {
-	const { toast } = useToast()
+	const [curPage, setCurPage] = useState(0)
 	const isEditForm = props.data !== undefined
-	const { data: userData } = useUserQuery()
-	const { data: categoriesData } = useCategoriesQuery()
-
-	const insertMutation = useMutation({
-		mutationFn: (formData: FormSchema) => {
-			const isPositive = formData.type === "Income"
-			let note: string | null = formData.notes
-			if (note === "") {
-				note = null
-			}
-
-			return Promise.resolve(
-				sbBrowser.from("entry").insert({
-					date: formData.date.toLocaleDateString(),
-					title: formData.title,
-					created_by: userData?.data.user?.id,
-					amount_is_positive: isPositive,
-					amount: Number(formData.amount),
-					note: note
-				})
-			)
-		}
-	})
-
-	const updateMutation = useMutation({
-		mutationFn: (formData: FormSchema) => {
-			const isPositive = formData.type === "Income"
-			if (props.data?.id === undefined) {
-				toast({ description: "Invalid entry id" })
-				return Promise.reject(null)
-			}
-
-			let note: string | null = formData.notes
-			if (note === "") {
-				note = null
-			}
-
-			return Promise.resolve(
-				sbBrowser
-					.from("entry")
-					.update({
-						date: formData.date.toDateString(),
-						title: formData.title,
-						amount_is_positive: isPositive,
-						amount: Number(formData.amount),
-						note: note
-					})
-					.eq("id", props.data.id)
-			)
-		}
-	})
 
 	const form = useForm<FormSchema>({
 		resolver: zodResolver(formSchema),
@@ -140,26 +98,25 @@ function DialogEntryForm(props: EntryFormProps) {
 	})
 
 	return (
-		<DialogContent
-			hideCloseButton
-			className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:max-w-lg"
-		>
-			<EntryFormPage
-				form={form}
-                data={props.data}
-				onSubmitSuccess={props.onSubmitSuccess}
-				isEditForm={isEditForm}
-				updateMutation={updateMutation}
-				insertMutation={insertMutation}
-			/>
-		</DialogContent>
+		<EntryFormContext.Provider value={{ curPage, setCurPage }}>
+			<DialogContent
+				hideCloseButton
+				className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:min-h-[460px] sm:max-w-lg"
+			>
+				<EntryFormPage
+					form={form}
+					data={props.data}
+					isEditForm={isEditForm}
+					onSubmitSuccess={props.onSubmitSuccess}
+				/>
+			</DialogContent>
+		</EntryFormContext.Provider>
 	)
 }
 
-export default function EntryForm(props: EntryFormProps) {
-	const isDesktop = useMediaQuery({
-		minWidth: 768
-	})
-
+function EntryForm(props: EntryFormProps) {
 	return <DialogEntryForm {...props} />
 }
+
+export default EntryForm
+export { EntryFormItem, type FormSchema }
