@@ -93,7 +93,7 @@ function GeneralSection() {
 		resolver: zodResolver(generalSectionFormSchema),
 		values: {
 			username: "",
-			currency: userSettingsQuery.data?.data?.currencies?.currency_name ?? "USD"
+			currency: userSettingsQuery.data?.data?.currency?.currency_name ?? "USD"
 		}
 	})
 
@@ -125,8 +125,8 @@ function GeneralSection() {
 								if (
 									currencies !== null &&
 									currencies !== undefined &&
-									userSettings?.currencies?.currency_name !== undefined &&
-									userSettings.currencies.currency_name !== data.currency
+									userSettings?.currency?.currency_name !== undefined &&
+									userSettings.currency.currency_name !== data.currency
 								) {
 									const newCurrencyId = currencies.find(
 										(value) => value.currency_name === data.currency

@@ -13,6 +13,7 @@ import {
 	ReloadIcon
 } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
+import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -107,7 +108,7 @@ export default function SignUpUsername() {
 						{isPendingSubmit ? (
 							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 						) : (
-							<ArrowRightIcon className="ml-2" />
+							<ChevronRight className="ml-2" />
 						)}
 					</Button>
 				</CardFooter>

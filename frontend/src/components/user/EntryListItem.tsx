@@ -64,7 +64,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 	})
 
 	const formatAmount = (num?: number) => {
-		const currency = userSettingsQuery?.data?.data?.currencies?.currency_name
+		const currency = userSettingsQuery?.data?.data?.currency?.currency_name
 		if (num === undefined || currency === undefined || currency === null) {
 			return num
 		}
@@ -83,7 +83,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 	return (
 		<Card
 			data-open={isItemOpen}
-			data-is-positive={props.data.amount_is_positive}
+			data-is-positive={props.data.is_positive}
 			className="data-[open='true']:max-h-none 
                     data-[open='false']:max-h-[100px] overflow-hidden group"
 		>
@@ -98,7 +98,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 					<div className="flex justify-between items-center w-inherit">
 						<div className="grid max-w-[calc(50%-0.25rem)]">
 							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-								{props.data.title}
+								{props.data.category?.name}
 							</CardTitle>
 							<CardDescription className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 								{props.data.date.toString()}
@@ -108,9 +108,9 @@ export default function EntryListItem(props: EntryListItemProps) {
 							{userSettingsQuery.isLoading ? (
 								<Skeleton className="w-20 h-6" />
 							) : (
-								<div className="max-w-[120px] whitespace-nowrap overflow-hidden md:max-w-none">
+								<div className="whitespace-nowrap">
 									<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary w-full">
-										{props.data.amount_is_positive ? "+ " : "- "}
+										{props.data.is_positive ? "+ " : "- "}
 										{formatAmount(props.data.amount)}
 									</p>
 								</div>

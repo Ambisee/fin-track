@@ -17,6 +17,7 @@ import { DialogContent } from "../../ui/dialog"
 import { FormControl, FormItem, FormLabel } from "../../ui/form"
 import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
+import { useCategoriesQuery } from "@/lib/hooks"
 
 interface EntryFormProps {
 	data?: Entry
@@ -26,13 +27,18 @@ interface EntryFormProps {
 interface EntryFormContextObject {
 	curPage: number
 	setCurPage: Dispatch<SetStateAction<number>>
+	prevPage: number
+	setPrevPage: Dispatch<SetStateAction<number>>
 }
 
 const EntryFormContext = createContext<EntryFormContextObject>(null!)
 
 const formSchema = z.object({
 	date: z.date(),
-	title: z.string().min(1, "Please provide a transaction title"),
+	category: z.object({
+		id: z.number(),
+		name: z.string()
+	}),
 	amount: z
 		.preprocess((arg) => (arg === "" ? NaN : Number(arg)), z.coerce.string())
 		.pipe(
@@ -45,7 +51,7 @@ const formSchema = z.object({
 		)
 		.pipe(z.coerce.string()),
 	type: z.enum(["Income", "Expense"]),
-	notes: z.string()
+	note: z.string()
 })
 
 type FormSchema = z.infer<typeof formSchema>
@@ -70,45 +76,69 @@ function EntryFormItem(props: {
 
 function DialogEntryForm(props: EntryFormProps) {
 	const [curPage, setCurPage] = useState(0)
+	const [prevPage, setPrevPage] = useState(0)
 	const isEditForm = props.data !== undefined
+	const categoriesQuery = useCategoriesQuery()
 
 	const form = useForm<FormSchema>({
 		resolver: zodResolver(formSchema),
 		defaultValues: useMemo(() => {
+			const miscId = categoriesQuery.data?.data?.find(
+				(val) => val.name === "Miscellaneous"
+			)?.id as number
+
 			let defaultValues: FormSchema = {
 				date: new Date(),
-				title: "",
+				category: {
+					id: miscId,
+					name: "Miscellaneous"
+				},
 				amount: "",
 				type: "Income",
-				notes: ""
+				note: ""
 			}
 
-			if (!isEditForm) {
+			if (!isEditForm || !props.data?.category) {
 				return defaultValues
 			}
 
 			defaultValues.date = new Date(`${props.data?.date} 00:00`)
-			defaultValues.title = props.data?.title as string
-			defaultValues.type = props.data?.amount_is_positive ? "Income" : "Expense"
+			defaultValues.category = {
+				id: props.data.category_id,
+				name: props.data.category.name
+			}
+			defaultValues.type = props.data?.is_positive ? "Income" : "Expense"
 			defaultValues.amount = props.data?.amount?.toFixed(2) as string
-			defaultValues.notes = (props.data?.note ?? "") as string
+			defaultValues.note = (props.data?.note ?? "") as string
 
 			return defaultValues
-		}, [props, isEditForm])
+		}, [props, isEditForm, categoriesQuery])
 	})
 
+	const renderPage = () => {
+		const pages = [
+			<EntryFormPage
+				key="entry-form-page"
+				form={form}
+				data={props.data}
+				isEditForm={isEditForm}
+				onSubmitSuccess={props.onSubmitSuccess}
+			/>,
+			<ChooseCategoryPage form={form} key="choose-category-page" />
+		]
+
+		return pages[curPage]
+	}
+
 	return (
-		<EntryFormContext.Provider value={{ curPage, setCurPage }}>
+		<EntryFormContext.Provider
+			value={{ curPage, setCurPage, prevPage, setPrevPage }}
+		>
 			<DialogContent
 				hideCloseButton
 				className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:min-h-[460px] sm:max-w-lg"
 			>
-				<EntryFormPage
-					form={form}
-					data={props.data}
-					isEditForm={isEditForm}
-					onSubmitSuccess={props.onSubmitSuccess}
-				/>
+				{renderPage()}
 			</DialogContent>
 		</EntryFormContext.Provider>
 	)
@@ -119,4 +149,4 @@ function EntryForm(props: EntryFormProps) {
 }
 
 export default EntryForm
-export { EntryFormItem, type FormSchema }
+export { EntryFormItem, EntryFormContext, type FormSchema }

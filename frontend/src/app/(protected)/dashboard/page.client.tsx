@@ -1,9 +1,11 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import EntryList from "@/components/user/EntryList"
 import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
 
 export default function DashboardHome() {
 	const { toast } = useToast()

@@ -11,26 +11,31 @@ export type Database = {
     Tables: {
       category: {
         Row: {
+          created_by: string | null
           id: number
-          is_positive: boolean
           name: string
-          user_created: boolean | null
         }
         Insert: {
+          created_by?: string | null
           id?: number
-          is_positive?: boolean
           name: string
-          user_created?: boolean | null
         }
         Update: {
+          created_by?: string | null
           id?: number
-          is_positive?: boolean
           name?: string
-          user_created?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "category_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      currencies: {
+      currency: {
         Row: {
           currency_name: string
           id: number
@@ -48,37 +53,40 @@ export type Database = {
       entry: {
         Row: {
           amount: number
-          amount_is_positive: boolean
-          created_by: string | null
+          category_id: number
+          created_by: string
           date: string
           id: number
+          is_positive: boolean
           note: string | null
           title: string | null
         }
         Insert: {
           amount: number
-          amount_is_positive: boolean
-          created_by?: string | null
+          category_id?: number
+          created_by: string
           date?: string
           id?: number
+          is_positive: boolean
           note?: string | null
           title?: string | null
         }
         Update: {
           amount?: number
-          amount_is_positive?: boolean
-          created_by?: string | null
+          category_id?: number
+          created_by?: string
           date?: string
           id?: number
+          is_positive?: boolean
           note?: string | null
           title?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "entry_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: "entry_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "user_view"
+            referencedRelation: "category"
             referencedColumns: ["id"]
           },
           {
@@ -114,58 +122,11 @@ export type Database = {
             foreignKeyName: "user_data_currency_id_fkey"
             columns: ["currency_id"]
             isOneToOne: false
-            referencedRelation: "currencies"
+            referencedRelation: "currency"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_category: {
-        Row: {
-          category_id: number | null
-          id: number
-          user_id: string | null
-        }
-        Insert: {
-          category_id?: number | null
-          id?: number
-          user_id?: string | null
-        }
-        Update: {
-          category_id?: number | null
-          id?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_category_link_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "category"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_category_link_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_category_link_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -175,27 +136,9 @@ export type Database = {
       }
     }
     Views: {
-      user_view: {
-        Row: {
-          allow_report: boolean | null
-          currency_name: string | null
-          email: string | null
-          id: string | null
-          username: Json | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      fetch_categories: {
-        Args: {
-          user_id: string
-        }
-        Returns: {
-          id: number
-          name: string
-        }[]
-      }
       update_password: {
         Args: {
           old_password: string

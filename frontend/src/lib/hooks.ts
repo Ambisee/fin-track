@@ -1,4 +1,4 @@
-import { UserResponse } from "@supabase/supabase-js";
+import { QueryData, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
@@ -41,9 +41,9 @@ function useEntryDataQuery() {
     return useQuery({
 		queryKey: ENTRY_QKEY,
 		queryFn: async () =>
-			sbBrowser
+			await sbBrowser
 				.from("entry")
-				.select("*")
+				.select(`*,  category (name, created_by)`)
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
 				.limit(100),
@@ -60,7 +60,7 @@ function useSettingsQuery() {
 		queryFn: async () =>
 			await sbBrowser
 				.from("settings")
-				.select(`*, currencies (currency_name)`)
+				.select(`*, currency (currency_name)`)
                 .eq("user_id", userQuery.data?.data.user?.id as string)
 				.limit(1)
 				.single(),
@@ -73,7 +73,7 @@ function useSettingsQuery() {
 function useCurrenciesQuery() {
     return useQuery({
         queryKey: CURRENCIES_QKEY,
-        queryFn: async () => await sbBrowser.from("currencies").select("*"),
+        queryFn: async () => await sbBrowser.from("currency").select("*"),
         refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
     })
@@ -84,14 +84,16 @@ function useCategoriesQuery() {
     
     return useQuery({
 		queryKey: CATEGORIES_QKEY,
-		queryFn: async () => {
-			return await sbBrowser.rpc("fetch_categories", {
-				user_id: userData?.data?.data.user?.id as string
-			})
-		},
+		queryFn: async () => 
+			await sbBrowser
+                .from("category")
+                .select("*")
+                .or(`created_by.eq.${userData.data?.data.user?.id as string},created_by.is.NULL`)
+		,
 		enabled: !!userData
 	})
 }
+
 
 export { useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSetElementWindowHeight, useSettingsQuery, useUserQuery };
 

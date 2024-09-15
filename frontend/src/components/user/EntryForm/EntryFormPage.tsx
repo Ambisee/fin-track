@@ -18,9 +18,11 @@ import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { useMutation } from "@tanstack/react-query"
-import { X } from "lucide-react"
+import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useForm } from "react-hook-form"
-import { EntryFormItem, FormSchema } from "./EntryForm"
+import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
+import { useContext } from "react"
+import { format } from "path"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -29,32 +31,25 @@ interface EntryFormPageProps {
 	onSubmitSuccess?: (data: PostgrestSingleResponse<null>) => void
 }
 
-const getErrors = (
-	errors: FieldErrors<{
-		date: Date
-		title: string
-		amount: number
-		type: "Income" | "Expense"
-		notes: string
-	}>
-) => {
+const getErrors = (errors: FieldErrors<FormSchema>) => {
 	const result = []
 	result.push(<li>{errors?.date?.message}</li>)
-	result.push(<li>{errors?.title?.message}</li>)
+	result.push(<li>{errors?.category?.message}</li>)
 	result.push(<li>{errors?.amount?.message}</li>)
 	result.push(<li>{errors?.type?.message}</li>)
-	result.push(<li>{errors?.notes?.message}</li>)
+	result.push(<li>{errors?.note?.message}</li>)
 	return result
 }
 
 export default function EntryFormPage(props: EntryFormPageProps) {
 	const { toast } = useToast()
+	const { setCurPage } = useContext(EntryFormContext)
 	const userData = useUserQuery()
 
 	const insertMutation = useMutation({
 		mutationFn: (formData: FormSchema) => {
 			const isPositive = formData.type === "Income"
-			let note: string | null = formData.notes
+			let note: string | null = formData.note
 			if (note === "") {
 				note = null
 			}
@@ -62,9 +57,9 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 			return Promise.resolve(
 				sbBrowser.from("entry").insert({
 					date: formData.date.toLocaleDateString(),
-					title: formData.title,
-					created_by: userData.data?.data.user?.id,
-					amount_is_positive: isPositive,
+					category_id: formData.category.id,
+					created_by: userData.data?.data.user?.id as string,
+					is_positive: isPositive,
 					amount: Number(formData.amount),
 					note: note
 				})
@@ -80,7 +75,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 				return Promise.reject(null)
 			}
 
-			let note: string | null = formData.notes
+			let note: string | null = formData.note
 			if (note === "") {
 				note = null
 			}
@@ -90,8 +85,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					.from("entry")
 					.update({
 						date: formData.date.toDateString(),
-						title: formData.title,
-						amount_is_positive: isPositive,
+						category_id: formData.category.id,
+						is_positive: isPositive,
 						amount: Number(formData.amount),
 						note: note
 					})
@@ -218,15 +213,20 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							</EntryFormItem>
 						)}
 					/>
-					<FormField
-						control={props.form.control}
-						name="title"
-						render={({ field }) => (
-							<EntryFormItem label="Title">
-								<Input placeholder="Title" {...field} />
-							</EntryFormItem>
-						)}
-					/>
+					<div className="h-10 my-4 grid grid-cols-[minmax(75px,30%)_1fr] items-center">
+						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+							Category
+						</span>
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full justify-normal text-muted-foreground"
+							onClick={() => setCurPage(1)}
+						>
+							{props.form.getValues("category.name")}
+							<ChevronRight className="w-4 h-4 ml-auto" />
+						</Button>
+					</div>
 					<FormField
 						control={props.form.control}
 						name="amount"
@@ -248,7 +248,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					/>
 					<FormField
 						control={props.form.control}
-						name="notes"
+						name="note"
 						render={({ field }) => (
 							<EntryFormItem
 								className="items-start [&_label]:h-10 [&_label]:align-middle [&_label]:leading-10"

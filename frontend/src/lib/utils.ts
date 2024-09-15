@@ -66,7 +66,7 @@ function handleUpdate(
         title: (payload.new as Entry).title,
         date: (payload.new as Entry).date,
         created_by: (payload.new as Entry).created_by,
-        amount_is_positive: (payload.new as Entry).amount_is_positive,
+        is_positive: (payload.new as Entry).is_positive,
         note: (payload.new as Entry).note
     }
 

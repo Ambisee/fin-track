@@ -23,6 +23,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { ChevronRight } from "lucide-react"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
@@ -88,7 +89,7 @@ export default function SignUpEmail() {
 							{isPendingSubmit ? (
 								<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 							) : (
-								<ArrowRightIcon className="ml-2" />
+								<ChevronRight className="ml-2" />
 							)}
 						</Button>
 					</CardFooter>
