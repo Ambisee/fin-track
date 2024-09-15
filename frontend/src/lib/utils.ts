@@ -63,7 +63,12 @@ function handleUpdate(
     newEntries[index] = {
         id: (payload.new as Entry).id,
         amount: (payload.new as Entry).amount,
-        title: (payload.new as Entry).title,
+        title: (payload.new as  Entry).title,
+        category_id: (payload.new as Entry).category_id,
+        category: {
+            name: (payload.new as Entry).category?.name as string,
+            created_by: (payload.new as Entry).created_by
+        },
         date: (payload.new as Entry).date,
         created_by: (payload.new as Entry).created_by,
         is_positive: (payload.new as Entry).is_positive,
