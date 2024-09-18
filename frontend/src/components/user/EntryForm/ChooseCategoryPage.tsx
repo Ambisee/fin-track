@@ -5,7 +5,8 @@ import {
 	CommandGroup,
 	CommandInput,
 	CommandItem,
-	CommandList
+	CommandList,
+	CommandSeparator
 } from "@/components/ui/command"
 import {
 	DialogClose,
@@ -17,8 +18,8 @@ import {
 import { useCategoriesQuery } from "@/lib/hooks"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ChevronLeft, PlusIcon, X } from "lucide-react"
-import { useContext } from "react"
+import { CheckIcon, ChevronLeft, PlusIcon, X } from "lucide-react"
+import { useContext, useEffect } from "react"
 import { EntryFormContext, FormSchema } from "./EntryForm"
 import { UseFormReturn } from "react-hook-form"
 
@@ -30,26 +31,27 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 	const categoriesQuery = useCategoriesQuery()
 	const { setCurPage } = useContext(EntryFormContext)
 
+	useEffect(() => {
+		const cmdkInputWrapper = document.querySelector("[cmdk-input-wrapper]")
+		if (cmdkInputWrapper === null) return
+
+		cmdkInputWrapper.classList.remove("border-b")
+	}, [])
+
 	return (
-		<div>
+		<div className="relative h-full grid grid-rows-[auto_1fr] gap-4 sm:gap-8">
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
 					<h1 className="h-6 leading-6">Choose a category</h1>
 				</DialogTitle>
-				<Button
-					variant="ghost"
-					className="absolute block left-0 top-1/2 translate-y-[-50%] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+				<button
+					className="absolute block left-0 top-1/2 translate-y-[-50%]"
 					onClick={() => setCurPage(0)}
 				>
 					<ChevronLeft className="w-4 h-4" />
-				</Button>
-				<DialogClose asChild>
-					<Button
-						variant="ghost"
-						className="absolute block right-0 top-1/2 translate-y-[-50%] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-					>
-						<X className="w-4 h-4" />
-					</Button>
+				</button>
+				<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
+					<X className="w-4 h-4" />
 				</DialogClose>
 				<DialogDescription>
 					<VisuallyHidden>
@@ -57,13 +59,19 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<div className="mt-8 sm:mt-4">
-				<Command defaultValue={props.form.getValues("category.name")}>
-					<div className="grid items-center grid-cols-[1fr_auto]">
-						<CommandInput placeholder="Search for a category..." />
-						<Button variant="ghost">
-							<PlusIcon className="w-4 h-4" />
-						</Button>
+			<div className="w-full h-full">
+				<Command
+					className="rounded-lg border shadow-md"
+					defaultValue={props.form.getValues("category.name")}
+				>
+					<div className="grid items-center grid-cols-[1fr_auto] border-b">
+						<CommandInput
+							className="border-none"
+							placeholder="Search for a category..."
+						/>
+						<button className="h-full aspect-square flex focus:bg-transparent">
+							<PlusIcon className="w-4 h-4 m-auto" />
+						</button>
 					</div>
 					<CommandEmpty className="grid justify-center gap-2 py-4">
 						<span className="text-center">No category found</span>
@@ -72,23 +80,38 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 							<Button variant="outline">Reset</Button>
 						</div>
 					</CommandEmpty>
-					<CommandGroup>
+					<CommandGroup heading="Current">
+						<CommandItem
+							key={props.form.getValues("category.name")}
+							value={props.form.getValues("category.name")}
+							onSelect={(e) => {
+								setCurPage(0)
+							}}
+						>
+							<span>{props.form.getValues("category.name")}</span>
+							<CheckIcon className="w-4 h-4 ml-2" />
+						</CommandItem>
+					</CommandGroup>
+					<CommandSeparator />
+					<CommandGroup heading="Other">
 						<CommandList>
-							{categoriesQuery.data?.data?.map((val) => (
-								<CommandItem
-									key={val.name}
-									value={val.name}
-									onSelect={(e) => {
-										props.form.setValue("category", {
-											id: val.id,
-											name: val.name
-										})
-										setCurPage(0)
-									}}
-								>
-									<span>{val.name}</span>
-								</CommandItem>
-							))}
+							{categoriesQuery.data?.data?.map((val) =>
+								props.form.getValues("category.id") !== val.id ? (
+									<CommandItem
+										key={val.name}
+										value={val.name}
+										onSelect={(e) => {
+											props.form.setValue("category", {
+												id: val.id,
+												name: val.name
+											})
+											setCurPage(0)
+										}}
+									>
+										<span>{val.name}</span>
+									</CommandItem>
+								) : undefined
+							)}
 						</CommandList>
 					</CommandGroup>
 				</Command>
