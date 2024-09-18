@@ -160,10 +160,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							{props.data !== undefined ? "Edit Entry" : "New Entry"}
 						</h1>
 					</DialogTitle>
-					<DialogClose
-						className="absolute block right-0 top-1/2 translate-y-[-50%]
-                            rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-					>
+					<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
 						<X className="w-4 h-4" />
 					</DialogClose>
 					<DialogDescription>
@@ -187,13 +184,29 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 										onValueChange={field.onChange}
 										className="w-full"
 									>
-										<TabsList className="w-full">
-											<TabsTrigger className="w-1/2" value="Income">
-												Income
-											</TabsTrigger>
-											<TabsTrigger className="w-1/2" value="Expense">
+										<TabsList className="w-full relative">
+											<TabsTrigger
+												className="peer/expense w-1/2 z-50
+                                                data-[state=active]:bg-transparent
+                                                "
+												value="Expense"
+											>
 												Expense
 											</TabsTrigger>
+											<TabsTrigger
+												className="peer/income w-1/2 z-50
+                                                data-[state=active]:bg-transparent
+                                                "
+												value="Income"
+											>
+												Income
+											</TabsTrigger>
+											<div
+												className="
+                                                items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background 
+                                                absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] peer-data-[state=active]/income:translate-x-full peer-data-[state=active]/expense:translate-x-0
+                                                duration-300"
+											></div>
 										</TabsList>
 									</Tabs>
 								</div>
