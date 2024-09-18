@@ -235,7 +235,7 @@ function GeneralSection() {
 						variant="default"
 						disabled={userQuery.isLoading || isPendingSubmit}
 					>
-						Update Data
+						Save Settings
 					</Button>
 				</form>
 			</Form>
