@@ -46,6 +46,7 @@ function useEntryDataQuery() {
 				.select(`*,  category (name, created_by)`)
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
+                .order("category (name)")
 				.limit(100),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
@@ -87,7 +88,7 @@ function useCategoriesQuery() {
 		queryFn: async () => {
             const userId = userData.data?.data.user?.id
             if (!userId) {
-                return await sbBrowser.from("category").select("*").eq("id", -1)
+                return await sbBrowser.from("category").select("*").eq("id", -1).order("id")
             }
 
             return await sbBrowser
