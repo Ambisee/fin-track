@@ -90,11 +90,11 @@ function DialogEntryForm(props: EntryFormProps) {
 			let defaultValues: FormSchema = {
 				date: new Date(),
 				category: {
-					id: miscId,
+					id: miscId ?? 12,
 					name: "Miscellaneous"
 				},
 				amount: "",
-				type: "Income",
+				type: "Expense",
 				note: ""
 			}
 
@@ -149,4 +149,5 @@ function EntryForm(props: EntryFormProps) {
 }
 
 export default EntryForm
-export { EntryFormItem, EntryFormContext, type FormSchema }
+export { type FormSchema }
+export { EntryFormItem, EntryFormContext }
