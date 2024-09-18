@@ -1,7 +1,7 @@
 import { PostgrestSingleResponse, QueryData } from "@supabase/supabase-js"
 import { Database } from "./supabase-auto"
-import { useEntryDataQuery } from "@/lib/hooks"
-import { DefinedQueryObserverResult, UseQueryResult } from "@tanstack/react-query"
+import { useCategoriesQuery, useEntryDataQuery } from "@/lib/hooks"
+import { DefinedQueryObserverResult } from "@tanstack/react-query"
 
 
 type InferQueryType<T> = T extends DefinedQueryObserverResult<PostgrestSingleResponse<infer U>> ? 
@@ -9,10 +9,12 @@ type InferQueryType<T> = T extends DefinedQueryObserverResult<PostgrestSingleRes
     never
 
 type Entry = InferQueryType<ReturnType<typeof useEntryDataQuery>>
+type Category = InferQueryType<ReturnType<typeof useCategoriesQuery>>
 type UserSettings = Database["public"]["Tables"]["settings"]["Row"]
 
 export {
     type Database,
     type Entry,
+    type Category,
     type UserSettings,
 }
