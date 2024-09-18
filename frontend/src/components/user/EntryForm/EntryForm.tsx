@@ -18,6 +18,7 @@ import { FormControl, FormItem, FormLabel } from "../../ui/form"
 import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
 import { useCategoriesQuery } from "@/lib/hooks"
+import CategoryPage from "./CategoryPage"
 
 interface EntryFormProps {
 	data?: Entry
@@ -124,7 +125,8 @@ function DialogEntryForm(props: EntryFormProps) {
 				isEditForm={isEditForm}
 				onSubmitSuccess={props.onSubmitSuccess}
 			/>,
-			<ChooseCategoryPage form={form} key="choose-category-page" />
+			<ChooseCategoryPage form={form} key="choose-category-page" />,
+			<CategoryPage form={form} key="create-category-page" />
 		]
 
 		return pages[curPage]

@@ -233,7 +233,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						<Button
 							type="button"
 							variant="outline"
-							className="w-full justify-normal text-muted-foreground"
+							className="w-full text-base justify-normal text-muted-foreground"
 							onClick={() => setCurPage(1)}
 						>
 							{props.form.getValues("category.name")}

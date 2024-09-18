@@ -2,21 +2,17 @@
 
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
-import {
-    Dispatch,
-    SetStateAction,
-    useState
-} from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
@@ -35,7 +31,7 @@ export function DatePicker(props: DatePickerProps) {
 				<Button
 					variant={"outline"}
 					className={cn(
-						"w-full justify-start text-left font-normal",
+						"w-full justify-start text-left font-normal text-base",
 						!props.value && "text-muted-foreground"
 					)}
 				>

@@ -39,7 +39,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 	}, [])
 
 	return (
-		<div className="relative h-full grid grid-rows-[auto_1fr] gap-4 sm:gap-8">
+		<div className="relative h-full grid grid-rows-[auto_1fr] gap-8 sm:gap-4">
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
 					<h1 className="h-6 leading-6">Choose a category</h1>
@@ -60,17 +60,19 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 				</DialogDescription>
 			</DialogHeader>
 			<div className="w-full h-full">
-				<Command
-					className="rounded-lg border shadow-md"
-					defaultValue={props.form.getValues("category.name")}
-				>
+				<Command defaultValue={props.form.getValues("category.name")}>
 					<div className="grid items-center grid-cols-[1fr_auto] border-b">
 						<CommandInput
-							className="border-none"
+							className="text-base border-none"
 							placeholder="Search for a category..."
 						/>
-						<button className="h-full aspect-square flex focus:bg-transparent">
-							<PlusIcon className="w-4 h-4 m-auto" />
+						<button
+							onClick={() => {
+								setCurPage(2)
+							}}
+							className="flex w-11 h-11 items-center justify-center focus:bg-transparent"
+						>
+							<PlusIcon className="w-4 h-4" />
 						</button>
 					</div>
 					<CommandEmpty className="grid justify-center gap-2 py-4">
@@ -80,7 +82,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 							<Button variant="outline">Reset</Button>
 						</div>
 					</CommandEmpty>
-					<CommandGroup heading="Current">
+					<CommandGroup className="*:text-sm" heading="Current">
 						<CommandItem
 							key={props.form.getValues("category.name")}
 							value={props.form.getValues("category.name")}
@@ -92,7 +94,6 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 							<CheckIcon className="w-4 h-4 ml-2" />
 						</CommandItem>
 					</CommandGroup>
-					<CommandSeparator />
 					<CommandGroup heading="Other">
 						<CommandList>
 							{categoriesQuery.data?.data?.map((val) =>
