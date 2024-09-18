@@ -84,14 +84,19 @@ function useCategoriesQuery() {
     
     return useQuery({
 		queryKey: CATEGORIES_QKEY,
-		queryFn: async () => 
-			await sbBrowser
+		queryFn: async () => {
+            const userId = userData.data?.data.user?.id
+            if (!userId) {
+                return await sbBrowser.from("category").select("*").eq("id", -1)
+            }
+
+            return await sbBrowser
                 .from("category")
                 .select("*")
-                .or(`created_by.eq.${userData.data?.data.user?.id as string},created_by.is.NULL`)
-		,
+                .or(`created_by.eq.${userId},created_by.is.null`)
+        },
 		enabled: !!userData
-	})
+    })
 }
 
 
