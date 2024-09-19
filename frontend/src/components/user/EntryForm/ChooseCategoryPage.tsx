@@ -57,12 +57,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 			const miscellaneousId = categoriesQuery.data.data.find(
 				(val) => val.name === "Miscellaneous"
 			)?.id
-			await sbBrowser.from("category").delete().eq("id", data.id).select()
-			return await sbBrowser
-				.from("entry")
-				.update({ category_id: miscellaneousId })
-				.eq("category_id", data.id)
-				.eq("created_by", userQuery.data.data.user.id)
+			return await sbBrowser.from("category").delete().eq("id", data.id)
 		}
 	})
 
@@ -75,7 +70,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 
 	return (
 		<AlertDialog>
-			<AlertDialogContent>
+			<AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Delete category</AlertDialogTitle>
 					<AlertDialogDescription>
@@ -91,11 +86,28 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 								{
 									onSuccess: (data) => {
 										toast({
-											description: "Category deleted"
+											description: "Category deleted",
+											duration: 1500
 										})
 
-										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-										queryClient.invalidateQueries({ queryKey: CATEGORIES_QKEY })
+										if (!categoriesQuery.data?.data) return
+										const misc = categoriesQuery.data.data.find(
+											(val) => val.name === "Miscellaneous"
+										)
+
+										props.form.setValue("category", {
+											name: misc?.name as string,
+											id: misc?.id as number,
+											is_default: misc?.created_by === null
+										})
+
+										// props.form.reset({
+										// 	category: {
+										// 		name: misc?.name,
+										// 		id: misc?.id,
+										// 		is_default: misc?.created_by === null
+										// 	}
+										// })
 									}
 								}
 							)
@@ -151,21 +163,21 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 						</CommandEmpty>
 						<CommandGroup className="*:text-sm" heading="Current">
 							<CommandItem
-								key={props.form.getValues("category.name")}
-								value={props.form.getValues("category.name")}
+								key={props.form.watch("category.name")}
+								value={props.form.watch("category.name")}
 								onSelect={(e) => {
 									setCurPage(0)
 								}}
 							>
-								<span>{props.form.getValues("category.name")}</span>
-								{!props.form.getValues("category.is_default") && (
+								<span>{props.form.watch("category.name")}</span>
+								{!props.form.watch("category.is_default") && (
 									<AlertDialogTrigger asChild>
 										<button
 											type="button"
 											className="ml-auto"
 											onClick={(e) => {
 												e.stopPropagation()
-												setDeleteCategoryId(props.form.getValues("category.id"))
+												setDeleteCategoryId(props.form.watch("category.id"))
 											}}
 										>
 											<Trash2Icon className="w-4 h-4" />
@@ -175,12 +187,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 							</CommandItem>
 						</CommandGroup>
 						<CommandGroup heading="Other category">
-							<CommandList
-								style={{
-									scrollbarWidth: "thin",
-									scrollbarGutter: "stable"
-								}}
-							>
+							<CommandList>
 								{categoriesQuery.data?.data?.map((val) =>
 									props.form.getValues("category.id") !== val.id ? (
 										<CommandItem

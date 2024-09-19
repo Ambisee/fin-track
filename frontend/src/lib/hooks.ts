@@ -95,6 +95,7 @@ function useCategoriesQuery() {
                 .from("category")
                 .select("*")
                 .or(`created_by.eq.${userId},created_by.is.null`)
+                .order("id")
         },
 		enabled: !!userData
     })
