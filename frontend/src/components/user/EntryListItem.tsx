@@ -155,27 +155,6 @@ export default function EntryListItem(props: EntryListItemProps) {
 										return
 									}
 
-									const observer = new MutationObserver((mutationsList) => {
-										for (const mutation of mutationsList) {
-											if (mutation.removedNodes.length > 0) {
-												const element = getElementFromNode(
-													mutation.removedNodes[0]
-												)
-												if (
-													element !== null &&
-													(element.getAttribute("vaul-drawer") !== null ||
-														element?.getAttribute("role") === "dialog")
-												) {
-													queryClient.invalidateQueries({
-														queryKey: ENTRY_QKEY
-													})
-													observer.disconnect()
-												}
-											}
-										}
-									})
-
-									observer.observe(document.body, { childList: true })
 									setIsFormOpen(false)
 								}}
 							/>
