@@ -7,7 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { ChevronLeft, X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { z } from "zod"
@@ -15,6 +15,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useCategoriesQuery, useUserQuery } from "@/lib/hooks"
+import { useToast } from "@/components/ui/use-toast"
+import { useMutation } from "@tanstack/react-query"
+import { CATEGORIES_QKEY } from "@/lib/constants"
+import { sbBrowser } from "@/lib/supabase"
 
 interface CategoryPageProps {
 	form: UseFormReturn<FormSchema>
@@ -25,7 +30,12 @@ const formSchema = z.object({
 })
 
 export default function CategoryPage(props: CategoryPageProps) {
+	const { toast } = useToast()
 	const { setCurPage } = useContext(EntryFormContext)
+	const [isFormLoading, setIsFormLoading] = useState(false)
+	const userQuery = useUserQuery()
+	const categoriesQuery = useCategoriesQuery()
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -33,11 +43,28 @@ export default function CategoryPage(props: CategoryPageProps) {
 		}
 	})
 
+	const addCategoryMutation = useMutation({
+		mutationKey: CATEGORIES_QKEY,
+		mutationFn: async (data: z.infer<typeof formSchema>) => {
+			if (!userQuery.data?.data || !userQuery.data.data.user) {
+				return null
+			}
+
+			return await sbBrowser
+				.from("category")
+				.insert({
+					created_by: userQuery.data.data.user.id,
+					name: data.name
+				})
+				.select()
+		}
+	})
+
 	return (
-		<div className="grid grid-rows-[auto_1fr_auto]">
+		<div className="grid grid-rows-[auto_1fr]">
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
-					<h1 className="h-6 leading-6">Create category</h1>
+					<h1 className="h-6 leading-6">Create a new category</h1>
 				</DialogTitle>
 				<button
 					className="absolute block left-0 top-1/2 translate-y-[-50%]"
@@ -49,16 +76,64 @@ export default function CategoryPage(props: CategoryPageProps) {
 					<X className="w-4 h-4" />
 				</DialogClose>
 				<DialogDescription>
-					<VisuallyHidden>Create a new category</VisuallyHidden>
+					<VisuallyHidden>
+						Create a new category and apply it to the current entry
+					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<div>
+			<div className="flex flex-col h-full">
 				<p className="text-sm text-muted-foreground mt-8">
 					Enter the name of the new category. Please note that no two categories
 					may share the same name.
 				</p>
 				<Form {...form}>
-					<form>
+					<form
+						className="h-full grid grid-rows-[1fr_auto]"
+						onSubmit={(e) => {
+							e.preventDefault()
+							form.handleSubmit((data) => {
+								if (!userQuery.data?.data) {
+									return
+								}
+
+								if (!categoriesQuery.data?.data) {
+									toast({
+										description:
+											"The category name has been used. Please enter another name",
+										variant: "destructive"
+									})
+									return
+								}
+
+								addCategoryMutation.mutate(
+									{ name: data.name },
+									{
+										onSuccess: (data) => {
+											if (!data || !data?.data) {
+												toast({
+													description: "No user data found",
+													variant: "destructive"
+												})
+												return
+											}
+
+											toast({
+												description: "New category created"
+											})
+
+											props.form.setValue("category.id", data.data[0].id)
+											props.form.setValue("category.name", data.data[0].name)
+											props.form.setValue(
+												"category.is_default",
+												data.data[0].created_by === null
+											)
+											setCurPage(0)
+										}
+									}
+								)
+							})()
+						}}
+					>
 						<FormField
 							control={form.control}
 							name="name"
@@ -70,12 +145,12 @@ export default function CategoryPage(props: CategoryPageProps) {
 								</FormItem>
 							)}
 						/>
+						<DialogFooter>
+							<Button>Create category</Button>
+						</DialogFooter>
 					</form>
 				</Form>
 			</div>
-			<DialogFooter>
-				<Button>Create category</Button>
-			</DialogFooter>
 		</div>
 	)
 }

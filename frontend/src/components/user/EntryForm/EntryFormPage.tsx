@@ -22,7 +22,6 @@ import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useForm } from "react-hook-form"
 import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
 import { useContext } from "react"
-import { format } from "path"
 
 interface EntryFormPageProps {
 	data?: Entry
