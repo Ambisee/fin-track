@@ -95,19 +95,9 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 											(val) => val.name === "Miscellaneous"
 										)
 
-										props.form.setValue("category", {
-											name: misc?.name as string,
-											id: misc?.id as number,
-											is_default: misc?.created_by === null
-										})
-
-										// props.form.reset({
-										// 	category: {
-										// 		name: misc?.name,
-										// 		id: misc?.id,
-										// 		is_default: misc?.created_by === null
-										// 	}
-										// })
+										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+										queryClient.invalidateQueries({ queryKey: CATEGORIES_QKEY })
+										props.form.reset()
 									}
 								}
 							)

@@ -116,7 +116,7 @@ function DialogEntryForm(props: EntryFormProps) {
 			defaultValues.note = (props.data?.note ?? "") as string
 
 			return defaultValues
-		}, [props, isEditForm, categoriesQuery])
+		}, [props.data, isEditForm, categoriesQuery])
 	})
 
 	const renderPage = () => {

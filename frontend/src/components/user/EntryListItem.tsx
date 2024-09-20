@@ -155,6 +155,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 										return
 									}
 
+									queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 									setIsFormOpen(false)
 								}}
 							/>
