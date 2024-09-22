@@ -18,7 +18,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useContext, useEffect, useState } from "react"
 import { EntryFormContext, FormSchema } from "./EntryForm"
-import { UseFormReturn } from "react-hook-form"
+import { useFormContext } from "react-hook-form"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -35,15 +35,14 @@ import { CATEGORIES_QKEY, ENTRY_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
 
-interface ChooseCategoryPageProps {
-	form: UseFormReturn<FormSchema>
-}
+interface ChooseCategoryPageProps {}
 
 export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 	const { setCurPage } = useContext(EntryFormContext)
 	const [deleteCategoryId, setDeleteCategoryId] = useState(-1)
 
 	const { toast } = useToast()
+	const form = useFormContext<FormSchema>()
 	const queryClient = useQueryClient()
 
 	const userQuery = useUserQuery()
@@ -74,7 +73,9 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 				<AlertDialogHeader>
 					<AlertDialogTitle>Delete category</AlertDialogTitle>
 					<AlertDialogDescription>
-						Are you sure that you want to delete this category.
+						Are you sure that you want to delete this category. Any entries
+						under this category will revert to the &apos;Miscellaneous&apos;
+						category
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
@@ -97,7 +98,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 
 										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 										queryClient.invalidateQueries({ queryKey: CATEGORIES_QKEY })
-										props.form.reset()
+										form.reset()
 									}
 								}
 							)
@@ -129,7 +130,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<div className="w-full h-full">
-					<Command defaultValue={props.form.getValues("category.name")}>
+					<Command defaultValue={form.getValues("category.name")}>
 						<div className="grid items-center grid-cols-[1fr_auto] border-b">
 							<CommandInput
 								className="text-base border-none"
@@ -153,21 +154,21 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 						</CommandEmpty>
 						<CommandGroup className="*:text-sm" heading="Current">
 							<CommandItem
-								key={props.form.watch("category.name")}
-								value={props.form.watch("category.name")}
+								key={form.watch("category.name")}
+								value={form.watch("category.name")}
 								onSelect={(e) => {
 									setCurPage(0)
 								}}
 							>
-								<span>{props.form.watch("category.name")}</span>
-								{!props.form.watch("category.is_default") && (
+								<span>{form.watch("category.name")}</span>
+								{!form.watch("category.is_default") && (
 									<AlertDialogTrigger asChild>
 										<button
 											type="button"
 											className="ml-auto"
 											onClick={(e) => {
 												e.stopPropagation()
-												setDeleteCategoryId(props.form.watch("category.id"))
+												setDeleteCategoryId(form.watch("category.id"))
 											}}
 										>
 											<Trash2Icon className="w-4 h-4" />
@@ -179,12 +180,12 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 						<CommandGroup heading="Other category">
 							<CommandList>
 								{categoriesQuery.data?.data?.map((val) =>
-									props.form.getValues("category.id") !== val.id ? (
+									form.getValues("category.id") !== val.id ? (
 										<CommandItem
 											key={val.name}
 											value={val.name}
 											onSelect={(e) => {
-												props.form.setValue("category", {
+												form.setValue("category", {
 													id: val.id,
 													name: val.name,
 													is_default: val.created_by === null
