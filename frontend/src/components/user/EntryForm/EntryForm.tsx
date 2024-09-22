@@ -11,10 +11,10 @@ import {
 	useMemo,
 	useState
 } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
-import { FormControl, FormItem, FormLabel } from "../../ui/form"
+import { Form, FormControl, FormItem, FormLabel } from "../../ui/form"
 import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
 import { useCategoriesQuery } from "@/lib/hooks"
@@ -82,75 +82,82 @@ function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
 	const categoriesQuery = useCategoriesQuery()
 
+	const formDefaultValues = useMemo(() => {
+		const miscId = categoriesQuery.data?.data?.find(
+			(val) => val.name === "Miscellaneous"
+		)?.id as number
+
+		let defaultValues: FormSchema = {
+			date: new Date(),
+			category: {
+				id: miscId ?? 12,
+				name: "Miscellaneous",
+				is_default: true
+			},
+			amount: "",
+			type: "Expense",
+			note: ""
+		}
+
+		if (!isEditForm || !props.data?.category) {
+			return defaultValues
+		}
+
+		defaultValues.date = new Date(`${props.data?.date} 00:00`)
+		defaultValues.category = {
+			id: props.data.category_id,
+			name: props.data.category.name,
+			is_default: props.data.category.created_by === null
+		}
+		defaultValues.type = props.data?.is_positive ? "Income" : "Expense"
+		defaultValues.amount = props.data?.amount?.toFixed(2) as string
+		defaultValues.note = (props.data?.note ?? "") as string
+
+		return defaultValues
+	}, [props.data, isEditForm, categoriesQuery])
+
 	const form = useForm<FormSchema>({
 		resolver: zodResolver(formSchema),
-		defaultValues: useMemo(() => {
-			const miscId = categoriesQuery.data?.data?.find(
-				(val) => val.name === "Miscellaneous"
-			)?.id as number
-
-			let defaultValues: FormSchema = {
-				date: new Date(),
-				category: {
-					id: miscId ?? 12,
-					name: "Miscellaneous",
-					is_default: true
-				},
-				amount: "",
-				type: "Expense",
-				note: ""
-			}
-
-			if (!isEditForm || !props.data?.category) {
-				return defaultValues
-			}
-
-			defaultValues.date = new Date(`${props.data?.date} 00:00`)
-			defaultValues.category = {
-				id: props.data.category_id,
-				name: props.data.category.name,
-				is_default: props.data.category.created_by === null
-			}
-			defaultValues.type = props.data?.is_positive ? "Income" : "Expense"
-			defaultValues.amount = props.data?.amount?.toFixed(2) as string
-			defaultValues.note = (props.data?.note ?? "") as string
-
-			return defaultValues
-		}, [props, isEditForm, categoriesQuery])
+		defaultValues: formDefaultValues
 	})
 
-	const renderPage = () => {
-		const pages = [
-			<EntryFormPage
-				key="entry-form-page"
-				form={form}
-				data={props.data}
-				isEditForm={isEditForm}
-				onSubmitSuccess={props.onSubmitSuccess}
-			/>,
-			<ChooseCategoryPage form={form} key="choose-category-page" />,
-			<CategoryPage form={form} key="create-category-page" />
-		]
+	const renderPage = (form: UseFormReturn<FormSchema>) => {
+		if (curPage === 0) {
+			return (
+				<EntryFormPage
+					key="entry-form-page"
+					data={props.data}
+					isEditForm={isEditForm}
+					onSubmitSuccess={props.onSubmitSuccess}
+				/>
+			)
+		}
 
-		return pages[curPage]
+		if (curPage === 1) {
+			return <ChooseCategoryPage key="choose-category-page" />
+		}
+
+		return <CategoryPage key="create-category-page" />
 	}
 
 	return (
 		<EntryFormContext.Provider
 			value={{ curPage, setCurPage, prevPage, setPrevPage }}
 		>
-			<DialogContent
-				hideCloseButton
-				className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:min-h-[460px] sm:max-w-lg"
-			>
-				{renderPage()}
-			</DialogContent>
+			<Form {...form}>
+				<DialogContent
+					hideCloseButton
+					className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:min-h-[460px] sm:max-w-lg"
+				>
+					{renderPage(form)}
+				</DialogContent>
+			</Form>
 		</EntryFormContext.Provider>
 	)
 }
 
 function EntryForm(props: EntryFormProps) {
-	return <DialogEntryForm {...props} />
+	return <DialogEntryForm key={props.data?.id} {...props} />
 }
 
 export default EntryForm

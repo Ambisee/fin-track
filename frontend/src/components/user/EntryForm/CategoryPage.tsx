@@ -1,4 +1,4 @@
-import { useForm, UseFormReturn } from "react-hook-form"
+import { useForm, useFormContext, UseFormReturn } from "react-hook-form"
 import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
 import {
 	DialogClose,
@@ -21,22 +21,23 @@ import { useMutation } from "@tanstack/react-query"
 import { CATEGORIES_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 
-interface CategoryPageProps {
-	form: UseFormReturn<FormSchema>
-}
+interface CategoryPageProps {}
 
 const formSchema = z.object({
 	name: z.string()
 })
 
 export default function CategoryPage(props: CategoryPageProps) {
-	const { toast } = useToast()
 	const { setCurPage } = useContext(EntryFormContext)
 	const [isFormLoading, setIsFormLoading] = useState(false)
+
+	const form = useFormContext<FormSchema>()
+	const { toast } = useToast()
+
 	const userQuery = useUserQuery()
 	const categoriesQuery = useCategoriesQuery()
 
-	const form = useForm<z.infer<typeof formSchema>>({
+	const nameForm = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: ""
@@ -86,12 +87,12 @@ export default function CategoryPage(props: CategoryPageProps) {
 					Enter the name of the new category. Please note that no two categories
 					may share the same name.
 				</p>
-				<Form {...form}>
+				<Form {...nameForm}>
 					<form
 						className="h-full grid grid-rows-[1fr_auto]"
 						onSubmit={(e) => {
 							e.preventDefault()
-							form.handleSubmit((data) => {
+							nameForm.handleSubmit((formData) => {
 								if (!userQuery.data?.data) {
 									return
 								}
@@ -106,10 +107,10 @@ export default function CategoryPage(props: CategoryPageProps) {
 								}
 
 								addCategoryMutation.mutate(
-									{ name: data.name },
+									{ name: formData.name },
 									{
-										onSuccess: (data) => {
-											if (!data || !data?.data) {
+										onSuccess: (successData) => {
+											if (!successData || !successData.data) {
 												toast({
 													description: "No user data found",
 													variant: "destructive"
@@ -121,11 +122,11 @@ export default function CategoryPage(props: CategoryPageProps) {
 												description: "New category created"
 											})
 
-											props.form.setValue("category.id", data.data[0].id)
-											props.form.setValue("category.name", data.data[0].name)
-											props.form.setValue(
+											form.setValue("category.id", successData.data[0].id)
+											form.setValue("category.name", successData.data[0].name)
+											form.setValue(
 												"category.is_default",
-												data.data[0].created_by === null
+												successData.data[0].created_by === null
 											)
 											setCurPage(0)
 										}
@@ -135,7 +136,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 						}}
 					>
 						<FormField
-							control={form.control}
+							control={nameForm.control}
 							name="name"
 							render={({ field }) => (
 								<FormItem className="mt-2">

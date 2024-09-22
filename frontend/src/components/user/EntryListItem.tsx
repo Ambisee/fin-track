@@ -33,6 +33,7 @@ import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { useToast } from "../ui/use-toast"
 import EntryForm from "./EntryForm/EntryForm"
+import useGlobalStore from "@/lib/store"
 
 interface EntryListItemProps {
 	data: Entry
@@ -51,10 +52,14 @@ function NoteText(props: { className?: string; text: string }) {
 }
 
 export default function EntryListItem(props: EntryListItemProps) {
+	const [isItemOpen, setIsItemOpen] = useState(false)
+
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
-	const [isItemOpen, setIsItemOpen] = useState(false)
-	const [isFormOpen, setIsFormOpen] = useState(false)
+
+	const setOpen = useGlobalStore((state) => state.setOpen)
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const userSettingsQuery = useSettingsQuery()
 	const deleteMutation = useMutation({
@@ -132,34 +137,33 @@ export default function EntryListItem(props: EntryListItemProps) {
 					/>
 				)}
 				<div className="flex gap-4">
-					<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-						<>
-							<DialogTrigger asChild>
-								<Button
-									className="min-w-24"
-									type="button"
-									onFocus={() => setIsItemOpen(true)}
-									variant="default"
-								>
-									Edit
-								</Button>
-							</DialogTrigger>
-							<EntryForm
-								data={props.data}
-								onSubmitSuccess={(data) => {
-									if (data.error !== null) {
-										toast({
-											description: data.error.message,
-											variant: "destructive"
-										})
-										return
-									}
+					<>
+						<DialogTrigger asChild>
+							<Button
+								className="min-w-24"
+								type="button"
+								onClick={() => {
+									setData(props.data)
+									setOnSubmitSuccess((data) => {
+										if (data.error !== null) {
+											toast({
+												description: data.error.message,
+												variant: "destructive"
+											})
+											return
+										}
 
-									setIsFormOpen(false)
+										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+										setOpen(false)
+									})
 								}}
-							/>
-						</>
-					</Dialog>
+								onFocus={() => setIsItemOpen(true)}
+								variant="default"
+							>
+								Edit
+							</Button>
+						</DialogTrigger>
+					</>
 					<AlertDialog>
 						<>
 							<AlertDialogTrigger asChild>

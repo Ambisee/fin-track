@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { Dialog, DialogTrigger } from "../ui/dialog"
 import EntryForm from "./EntryForm/EntryForm"
+import useGlobalStore from "@/lib/store"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -37,60 +38,61 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 }
 
 export default function ProtectedNavbar() {
-	const queryClient = useQueryClient()
 	const pathname = usePathname()
+	const queryClient = useQueryClient()
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	return (
-		<Dialog>
-			<>
-				<div className="dashboard-navbar">
-					<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
-						FinTrack
-					</h1>
-					<nav className="w-full">
-						<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-1">
-							<NavLink
-								href="/dashboard"
-								icon={<HouseIcon className="block" width={20} height={20} />}
-								label="Home"
-							/>
-							<NavLink
-								href="/dashboard/entries"
-								icon={<TableIcon className="block" width={20} height={20} />}
-								label="Entries"
-							/>
-							<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
-								<DialogTrigger asChild>
-									<Button
-										variant="default"
-										className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
+		<>
+			<div className="dashboard-navbar">
+				<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
+					FinTrack
+				</h1>
+				<nav className="w-full">
+					<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-1">
+						<NavLink
+							href="/dashboard"
+							icon={<HouseIcon className="block" width={20} height={20} />}
+							label="Home"
+						/>
+						<NavLink
+							href="/dashboard/entries"
+							icon={<TableIcon className="block" width={20} height={20} />}
+							label="Entries"
+						/>
+						<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
+							<DialogTrigger
+								onClick={() => {
+									setData(undefined)
+									setOnSubmitSuccess((data) => {
+										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+									})
+								}}
+								asChild
+							>
+								<Button
+									variant="default"
+									className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
-									>
-										<PlusIcon className="block" width={30} height={30} />
-									</Button>
-								</DialogTrigger>
-							</li>
-							<NavLink
-								href="/dashboard/reports"
-								icon={
-									<BarChart3Icon className="block" width={20} height={20} />
-								}
-								label="Report"
-							/>
-							<NavLink
-								href="/dashboard/settings"
-								icon={<GearIcon className="block" width={20} height={20} />}
-								label="Settings"
-							/>
-						</ul>
-					</nav>
-				</div>
-				<EntryForm
-					onSubmitSuccess={(data) => {
-						queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-					}}
-				/>
-			</>
-		</Dialog>
+								>
+									<PlusIcon className="block" width={30} height={30} />
+								</Button>
+							</DialogTrigger>
+						</li>
+						<NavLink
+							href="/dashboard/reports"
+							icon={<BarChart3Icon className="block" width={20} height={20} />}
+							label="Report"
+						/>
+						<NavLink
+							href="/dashboard/settings"
+							icon={<GearIcon className="block" width={20} height={20} />}
+							label="Settings"
+						/>
+					</ul>
+				</nav>
+			</div>
+		</>
 	)
 }
