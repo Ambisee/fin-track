@@ -22,6 +22,7 @@ import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useFormContext } from "react-hook-form"
 import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
 import { useContext } from "react"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -154,6 +155,15 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 			}}
 		>
 			<DialogHeader className="relative space-y-0 sm:text-center">
+				{props.isEditForm && (
+					<button
+						type="button"
+						className="absolute block left-0 top-1/2 translate-y-[-50%]"
+						onClick={() => form.reset()}
+					>
+						<ReloadIcon />
+					</button>
+				)}
 				<DialogTitle className="leading-6" asChild>
 					<h1 className="h-6 leading-6">
 						{props.isEditForm ? "Edit Entry" : "New Entry"}
@@ -277,15 +287,6 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 
 			<DialogFooter className="h-fit gap-2">
 				<Button>Submit</Button>
-				{props.isEditForm && (
-					<Button
-						variant="secondary"
-						type="button"
-						onClick={() => form.reset()}
-					>
-						Reset
-					</Button>
-				)}
 			</DialogFooter>
 		</form>
 	)
