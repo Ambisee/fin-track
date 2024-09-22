@@ -16,7 +16,7 @@ import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -34,6 +34,7 @@ import { Skeleton } from "../ui/skeleton"
 import { useToast } from "../ui/use-toast"
 import EntryForm from "./EntryForm/EntryForm"
 import useGlobalStore from "@/lib/store"
+import { Store } from "lucide-react"
 
 interface EntryListItemProps {
 	data: Entry
@@ -57,6 +58,8 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
 
+	const open = useGlobalStore((state) => state.open)
+	const data = useGlobalStore((state) => state.data)
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
@@ -67,6 +70,11 @@ export default function EntryListItem(props: EntryListItemProps) {
 			return Promise.resolve(sbBrowser.from("entry").delete().eq("id", id))
 		}
 	})
+
+	useEffect(() => {
+		if (!open || props.data.id !== data?.id) return
+		setData(props.data)
+	}, [props.data, open, data, setData])
 
 	const formatAmount = (num?: number) => {
 		const currency = userSettingsQuery?.data?.data?.currency?.currency_name

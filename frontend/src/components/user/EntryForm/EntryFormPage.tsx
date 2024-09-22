@@ -156,7 +156,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
 					<h1 className="h-6 leading-6">
-						{props.data !== undefined ? "Edit Entry" : "New Entry"}
+						{props.isEditForm ? "Edit Entry" : "New Entry"}
 					</h1>
 				</DialogTitle>
 				<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">

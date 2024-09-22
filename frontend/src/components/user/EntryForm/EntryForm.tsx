@@ -8,6 +8,8 @@ import {
 	createContext,
 	Dispatch,
 	SetStateAction,
+	useCallback,
+	useEffect,
 	useMemo,
 	useState
 } from "react"
@@ -121,11 +123,16 @@ function DialogEntryForm(props: EntryFormProps) {
 		defaultValues: formDefaultValues
 	})
 
+	useEffect(() => {
+		form.reset(formDefaultValues)
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.data, form])
+
 	const renderPage = (form: UseFormReturn<FormSchema>) => {
 		if (curPage === 0) {
 			return (
 				<EntryFormPage
-					key="entry-form-page"
 					data={props.data}
 					isEditForm={isEditForm}
 					onSubmitSuccess={props.onSubmitSuccess}
@@ -134,10 +141,10 @@ function DialogEntryForm(props: EntryFormProps) {
 		}
 
 		if (curPage === 1) {
-			return <ChooseCategoryPage key="choose-category-page" />
+			return <ChooseCategoryPage />
 		}
 
-		return <CategoryPage key="create-category-page" />
+		return <CategoryPage />
 	}
 
 	return (
@@ -157,7 +164,7 @@ function DialogEntryForm(props: EntryFormProps) {
 }
 
 function EntryForm(props: EntryFormProps) {
-	return <DialogEntryForm key={props.data?.id} {...props} />
+	return <DialogEntryForm {...props} />
 }
 
 export default EntryForm

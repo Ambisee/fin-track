@@ -20,6 +20,9 @@ import { useToast } from "@/components/ui/use-toast"
 import { useMutation } from "@tanstack/react-query"
 import { CATEGORIES_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
+import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js"
+import { Category } from "@/types/supabase"
+import { PostgrestResponseSuccess } from "@supabase/postgrest-js"
 
 interface CategoryPageProps {}
 
@@ -51,13 +54,15 @@ export default function CategoryPage(props: CategoryPageProps) {
 				return null
 			}
 
-			return await sbBrowser
+			const result = await sbBrowser
 				.from("category")
 				.insert({
 					created_by: userQuery.data.data.user.id,
 					name: data.name
 				})
 				.select()
+
+			return result
 		}
 	})
 
@@ -110,9 +115,11 @@ export default function CategoryPage(props: CategoryPageProps) {
 									{ name: formData.name },
 									{
 										onSuccess: (successData) => {
-											if (!successData || !successData.data) {
+											if (!successData) return
+											if (successData?.error?.code === "23505") {
 												toast({
-													description: "No user data found",
+													description:
+														"The category name has been used. Please enter another one",
 													variant: "destructive"
 												})
 												return
@@ -122,13 +129,15 @@ export default function CategoryPage(props: CategoryPageProps) {
 												description: "New category created"
 											})
 
+											setCurPage(0)
+											if (!successData.data) return
+
 											form.setValue("category.id", successData.data[0].id)
 											form.setValue("category.name", successData.data[0].name)
 											form.setValue(
 												"category.is_default",
 												successData.data[0].created_by === null
 											)
-											setCurPage(0)
 										}
 									}
 								)

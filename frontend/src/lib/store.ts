@@ -17,9 +17,6 @@ interface EntryFormState {
     // For the category page
     isCategoryEdit: boolean
     setIsCategoryEdit: Dispatch<SetStateAction<boolean>>
-    
-    currentPage: number
-    setCurrentPage: Dispatch<SetStateAction<number>>
 }
 
 type GlobalState = EntryFormState
@@ -35,7 +32,6 @@ const initialEntryFormState = {
     data: undefined,
     onSubmitSuccess: undefined,
     isCategoryEdit: false,
-    currentPage: 0,
 }
 const createEntryFormState: StateCreator<GlobalState, [], [], EntryFormState> = (set, get) => {
     sliceResetFns.add(() => set(initialEntryFormState))
@@ -45,7 +41,6 @@ const createEntryFormState: StateCreator<GlobalState, [], [], EntryFormState> = 
         setData: (value) => set((state) => ({data: isFunction(value) ? value(state.data) : value })),
         setOnSubmitSuccess: (value) => set((state) => ({onSubmitSuccess: value})),
         setIsCategoryEdit: (value) => set((state) => ({isCategoryEdit: isFunction(value) ? value(state.isCategoryEdit) : value})),
-        setCurrentPage: (value) => set((state) => ({currentPage: isFunction(value) ? value(state.currentPage) : value})),
     }
 }
 

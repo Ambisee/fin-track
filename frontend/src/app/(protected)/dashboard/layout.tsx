@@ -35,7 +35,7 @@ export default function DashboardLayout(props: DashboardLayoutProps) {
 					{props.children}
 				</div>
 				<ProtectedNavbar />
-                <LayoutEntryForm />
+				<LayoutEntryForm />
 			</>
 		</LayoutDialog>
 	)

@@ -30,7 +30,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
-import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CATEGORIES_QKEY, ENTRY_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
@@ -53,9 +53,6 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 		mutationFn: async (data: { id: number }) => {
 			if (!categoriesQuery.data?.data || !userQuery.data?.data.user) return
 
-			const miscellaneousId = categoriesQuery.data.data.find(
-				(val) => val.name === "Miscellaneous"
-			)?.id
 			return await sbBrowser.from("category").delete().eq("id", data.id)
 		}
 	})
@@ -85,20 +82,18 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 							deleteCategoryMutation.mutate(
 								{ id: deleteCategoryId },
 								{
-									onSuccess: (data) => {
+									onSuccess: async (data) => {
 										toast({
 											description: "Category deleted",
 											duration: 1500
 										})
 
-										if (!categoriesQuery.data?.data) return
-										const misc = categoriesQuery.data.data.find(
-											(val) => val.name === "Miscellaneous"
-										)
-
-										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-										queryClient.invalidateQueries({ queryKey: CATEGORIES_QKEY })
-										form.reset()
+										await queryClient.invalidateQueries({
+											queryKey: ENTRY_QKEY
+										})
+										await queryClient.invalidateQueries({
+											queryKey: CATEGORIES_QKEY
+										})
 									}
 								}
 							)
