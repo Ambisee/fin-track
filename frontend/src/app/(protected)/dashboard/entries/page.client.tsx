@@ -18,7 +18,6 @@ export default function DashboardEntries() {
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
 	const { search } = useContext(DashboardContext)
 
-	const userQuery = useUserQuery()
 	const entryQuery = useEntryDataQuery()
 
 	const dataGroups = useMemo(() => {
@@ -55,25 +54,7 @@ export default function DashboardEntries() {
 	}
 
 	const renderEntries = () => {
-		let index = curIndex
-		let isIndexInitialized = true
-		if (index == -1) {
-			if (dataGroups.length > 0) {
-				const today = new Date()
-				const firstPeriod = new Date(
-					`${dataGroups[0].month}-${dataGroups[0].year}`
-				)
-				const index =
-					12 * (today.getFullYear() - firstPeriod.getFullYear()) +
-					(today.getMonth() - firstPeriod.getMonth())
-
-				setCurIndex(index)
-			}
-
-			isIndexInitialized = false
-		}
-
-		if (entryQuery.isLoading || !isIndexInitialized) {
+		if (curIndex === -1 || entryQuery.isLoading || !entryQuery.data?.data) {
 			return (
 				<>
 					<div className="mb-8">
@@ -87,6 +68,11 @@ export default function DashboardEntries() {
 					</div>
 				</>
 			)
+		}
+
+		const currentGroup = dataGroups[curIndex]
+		if (!currentGroup) {
+			return <div>No entries available for this period. {curIndex}</div>
 		}
 
 		return (
@@ -104,7 +90,7 @@ export default function DashboardEntries() {
 					</Button>
 					<Button variant="ghost" className="text-lg" asChild>
 						<h3 className="text-lg hover:cursor-pointer">
-							{dataGroups[curIndex].month} {dataGroups[curIndex].year}
+							{dataGroups?.[curIndex]?.month} {dataGroups?.[curIndex]?.year}
 						</h3>
 					</Button>
 					<Button
@@ -120,6 +106,21 @@ export default function DashboardEntries() {
 			</div>
 		)
 	}
+
+	useEffect(() => {
+		if (dataGroups.length > 0 && curIndex === -1) {
+			const today = new Date()
+			const firstPeriod = new Date(
+				`01-${dataGroups[0].month}-${dataGroups[0].year}`
+			)
+			const idx =
+				12 * (today.getFullYear() - firstPeriod.getFullYear()) +
+				(today.getMonth() - firstPeriod.getMonth())
+
+			alert(`${firstPeriod} ${today}`)
+			setCurIndex(Math.min(idx, dataGroups.length - 1))
+		}
+	}, [curIndex, dataGroups])
 
 	return (
 		<>
