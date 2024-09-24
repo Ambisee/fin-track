@@ -58,7 +58,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 			return Promise.resolve(
 				sbBrowser.from("entry").insert({
 					date: formData.date.toLocaleDateString(),
-					category_id: formData.category.id,
+					category: formData.category,
 					created_by: userData.data?.data.user?.id as string,
 					is_positive: isPositive,
 					amount: Number(formData.amount),
@@ -86,7 +86,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					.from("entry")
 					.update({
 						date: formData.date.toDateString(),
-						category_id: formData.category.id,
+						category: formData.category,
 						is_positive: isPositive,
 						amount: Number(formData.amount),
 						note: note
@@ -245,7 +245,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						className="w-full text-base justify-normal text-muted-foreground"
 						onClick={() => setCurPage(1)}
 					>
-						{form.getValues("category.name")}
+						{form.getValues("category")}
 						<ChevronRight className="w-4 h-4 ml-auto" />
 					</Button>
 				</div>

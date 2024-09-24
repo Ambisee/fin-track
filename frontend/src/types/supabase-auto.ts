@@ -53,42 +53,32 @@ export type Database = {
       entry: {
         Row: {
           amount: number
-          category_id: number
+          category: string
           created_by: string
           date: string
           id: number
           is_positive: boolean
           note: string | null
-          title: string | null
         }
         Insert: {
           amount: number
-          category_id?: number
+          category: string
           created_by: string
           date?: string
           id?: number
           is_positive: boolean
           note?: string | null
-          title?: string | null
         }
         Update: {
           amount?: number
-          category_id?: number
+          category?: string
           created_by?: string
           date?: string
           id?: number
           is_positive?: boolean
           note?: string | null
-          title?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "entry_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "category"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "entry_created_by_fkey"
             columns: ["created_by"]
@@ -102,19 +92,16 @@ export type Database = {
         Row: {
           allow_report: boolean
           currency_id: number
-          id: number
           user_id: string
         }
         Insert: {
           allow_report?: boolean
           currency_id?: number
-          id?: number
           user_id: string
         }
         Update: {
           allow_report?: boolean
           currency_id?: number
-          id?: number
           user_id?: string
         }
         Relationships: [
@@ -128,7 +115,7 @@ export type Database = {
           {
             foreignKeyName: "user_data_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },

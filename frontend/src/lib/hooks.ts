@@ -43,10 +43,10 @@ function useEntryDataQuery() {
 		queryFn: async () =>
 			await sbBrowser
 				.from("entry")
-				.select(`*,  category (name, created_by)`)
+				.select(`*`)
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
 				.order("date", { ascending: false })
-                .order("category (name)")
+                .order("category")
 				.limit(100),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,

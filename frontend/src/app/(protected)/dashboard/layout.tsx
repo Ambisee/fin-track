@@ -40,14 +40,9 @@ function LayoutEntryForm() {
 function DashboardContextProvider(props: { children: JSX.Element }) {
 	const searchRef = useRef(
 		new MiniSearch({
-			fields: ["index", "amount", "date", "category.name", "note"],
+			fields: ["index", "amount", "date", "category", "note"],
 			storeFields: ["index"],
-			idField: "index",
-			extractField: (document, fieldName) => {
-				return fieldName
-					.split(".")
-					.reduce((doc, key) => doc && doc[key], document)
-			}
+			idField: "index"
 		})
 	)
 	const entryQuery = useEntryDataQuery()

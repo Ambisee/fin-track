@@ -34,6 +34,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CATEGORIES_QKEY, ENTRY_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { useToast } from "@/components/ui/use-toast"
+import { getElementFromNode } from "@/lib/utils"
 
 interface ChooseCategoryPageProps {}
 
@@ -59,9 +60,11 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 
 	useEffect(() => {
 		const cmdkInputWrapper = document.querySelector("[cmdk-input-wrapper]")
-		if (cmdkInputWrapper === null) return
+		const cmdkGroupWrapper = document.querySelector("[cmdk-group-items]")
+		if (cmdkInputWrapper === null || cmdkGroupWrapper === null) return
 
 		cmdkInputWrapper.classList.remove("border-b")
+		cmdkGroupWrapper.classList.add("h-full")
 	}, [])
 
 	return (
@@ -88,9 +91,6 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 											duration: 1500
 										})
 
-										await queryClient.invalidateQueries({
-											queryKey: ENTRY_QKEY
-										})
 										await queryClient.invalidateQueries({
 											queryKey: CATEGORIES_QKEY
 										})
@@ -125,7 +125,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<div className="w-full h-full">
-					<Command defaultValue={form.getValues("category.name")}>
+					<Command defaultValue={form.getValues("category")}>
 						<div className="grid items-center grid-cols-[1fr_auto] border-b">
 							<CommandInput
 								className="text-base border-none"
@@ -147,65 +147,32 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 								<Button variant="outline">Reset</Button>
 							</div>
 						</CommandEmpty>
-						<CommandGroup className="*:text-sm" heading="Current">
-							<CommandItem
-								key={form.watch("category.name")}
-								value={form.watch("category.name")}
-								onSelect={(e) => {
-									setCurPage(0)
-								}}
-							>
-								<span>{form.watch("category.name")}</span>
-								{!form.watch("category.is_default") && (
-									<AlertDialogTrigger asChild>
-										<button
-											type="button"
-											className="ml-auto"
-											onClick={(e) => {
-												e.stopPropagation()
-												setDeleteCategoryId(form.watch("category.id"))
-											}}
-										>
-											<Trash2Icon className="w-4 h-4" />
-										</button>
-									</AlertDialogTrigger>
-								)}
-							</CommandItem>
-						</CommandGroup>
-						<CommandGroup heading="Other category">
-							<CommandList>
-								{categoriesQuery.data?.data?.map((val) =>
-									form.getValues("category.id") !== val.id ? (
-										<CommandItem
-											key={val.name}
-											value={val.name}
-											onSelect={(e) => {
-												form.setValue("category", {
-													id: val.id,
-													name: val.name,
-													is_default: val.created_by === null
-												})
-												setCurPage(0)
-											}}
-										>
-											<span>{val.name}</span>
-											{!(val.created_by === null) && (
-												<AlertDialogTrigger asChild>
-													<button
-														type="button"
-														className="ml-auto"
-														onClick={(e) => {
-															e.stopPropagation()
-															setDeleteCategoryId(val.id)
-														}}
-													>
-														<Trash2Icon className="w-4 h-4" />
-													</button>
-												</AlertDialogTrigger>
-											)}
-										</CommandItem>
-									) : undefined
-								)}
+						<CommandGroup>
+							<CommandList className="max-h-none h-full">
+								{categoriesQuery.data?.data?.map((val) => (
+									<CommandItem
+										key={val.name}
+										value={val.name}
+										onSelect={(e) => {
+											form.setValue("category", val.name)
+											setCurPage(0)
+										}}
+									>
+										<span>{val.name}</span>
+										<AlertDialogTrigger asChild>
+											<button
+												type="button"
+												className="ml-auto"
+												onClick={(e) => {
+													e.stopPropagation()
+													setDeleteCategoryId(val.id)
+												}}
+											>
+												<Trash2Icon className="w-4 h-4" />
+											</button>
+										</AlertDialogTrigger>
+									</CommandItem>
+								))}
 							</CommandList>
 						</CommandGroup>
 					</Command>

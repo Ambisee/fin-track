@@ -38,11 +38,7 @@ const EntryFormContext = createContext<EntryFormContextObject>(null!)
 
 const formSchema = z.object({
 	date: z.date(),
-	category: z.object({
-		id: z.number(),
-		name: z.string(),
-		is_default: z.boolean()
-	}),
+	category: z.string(),
 	amount: z
 		.preprocess((arg) => (arg === "" ? NaN : Number(arg)), z.coerce.string())
 		.pipe(
@@ -91,29 +87,21 @@ function DialogEntryForm(props: EntryFormProps) {
 
 		let defaultValues: FormSchema = {
 			date: new Date(),
-			category: {
-				id: miscId ?? 12,
-				name: "Miscellaneous",
-				is_default: true
-			},
+			category: "Miscellaneous",
 			amount: "",
 			type: "Expense",
 			note: ""
 		}
 
-		if (!isEditForm || !props.data?.category) {
+		if (!isEditForm || !props.data) {
 			return defaultValues
 		}
 
 		defaultValues.date = new Date(`${props.data?.date} 00:00`)
-		defaultValues.category = {
-			id: props.data.category_id,
-			name: props.data.category.name,
-			is_default: props.data.category.created_by === null
-		}
-		defaultValues.type = props.data?.is_positive ? "Income" : "Expense"
-		defaultValues.amount = props.data?.amount?.toFixed(2) as string
-		defaultValues.note = (props.data?.note ?? "") as string
+		defaultValues.category = props.data.category
+		defaultValues.type = props.data.is_positive ? "Income" : "Expense"
+		defaultValues.amount = props.data.amount.toFixed(2)
+		defaultValues.note = props.data.note ?? ""
 
 		return defaultValues
 	}, [props.data, isEditForm, categoriesQuery])

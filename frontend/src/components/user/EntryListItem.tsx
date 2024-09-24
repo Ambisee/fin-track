@@ -71,11 +71,6 @@ export default function EntryListItem(props: EntryListItemProps) {
 		}
 	})
 
-	useEffect(() => {
-		if (!open || props.data.id !== data?.id) return
-		setData(props.data)
-	}, [props.data, open, data, setData])
-
 	const formatAmount = (num?: number) => {
 		const currency = userSettingsQuery?.data?.data?.currency?.currency_name
 		if (num === undefined || currency === undefined || currency === null) {
@@ -111,7 +106,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 					<div className="flex justify-between items-center w-inherit">
 						<div className="grid max-w-[calc(50%-0.25rem)]">
 							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-								{props.data.category?.name}
+								{props.data.category}
 							</CardTitle>
 							<CardDescription className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
 								{props.data.date.toString()}
