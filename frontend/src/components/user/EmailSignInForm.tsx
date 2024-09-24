@@ -22,6 +22,7 @@ import { sbBrowser } from "@/lib/supabase"
 import Link from "next/link"
 import { useToast } from "../ui/use-toast"
 import PasswordField from "./PasswordField"
+import { getElementFromNode } from "@/lib/utils"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address"),
@@ -79,11 +80,43 @@ export default function EmailSignInForm() {
 							}
 
 							setIsFormLoading(false)
-							toast({
-								title: error?.code,
-								description: error?.message,
-								variant: "destructive"
-							})
+							if (error?.code === "email_not_confirmed") {
+								toast({
+									title: "You are unverified",
+									description: (
+										<>
+											<p>
+												Your account has not been verified. Please verify your
+												account before signing in.
+											</p>
+											<p>
+												<Button
+													variant="link"
+													className="w-fit h-fit p-0 m-0"
+													onClick={async (e) => {
+														toast({
+															description: "Loading..."
+														})
+
+														await sbBrowser.auth.resend({
+															type: "signup",
+															email: formData.email
+														})
+
+														toast({
+															description:
+																"The verification email has been sent. Please check your inbox to complete the verification process."
+														})
+													}}
+												>
+													Click here to resend the verification email
+												</Button>
+											</p>
+										</>
+									),
+									variant: "destructive"
+								})
+							}
 						},
 						(error) => {
 							toast({
