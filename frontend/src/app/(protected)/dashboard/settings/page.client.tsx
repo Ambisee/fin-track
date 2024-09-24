@@ -143,7 +143,7 @@ function GeneralSection() {
 									const { error } = await sbBrowser
 										.from("settings")
 										.update({ currency_id: newCurrencyId.id })
-										.eq("id", userSettings.id)
+										.eq("id", userSettings.user_id)
 
 									if (error !== null) {
 										toast({
@@ -680,7 +680,7 @@ function MailingSection() {
 							const { error } = await sbBrowser
 								.from("settings")
 								.update({ allow_report: formData.allowReport })
-								.eq("id", userSettingsQuery.data?.data?.id as number)
+								.eq("user_id", userSettingsQuery.data?.data?.user_id as string)
 
 							if (error !== null) {
 								toast({
