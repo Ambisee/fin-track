@@ -117,7 +117,6 @@ export default function DashboardEntries() {
 				12 * (today.getFullYear() - firstPeriod.getFullYear()) +
 				(today.getMonth() - firstPeriod.getMonth())
 
-			alert(`${firstPeriod} ${today}`)
 			setCurIndex(Math.min(idx, dataGroups.length - 1))
 		}
 	}, [curIndex, dataGroups])
