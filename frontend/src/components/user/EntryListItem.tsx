@@ -109,7 +109,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 								{props.data.category}
 							</CardTitle>
 							<CardDescription className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-								{props.data.date.toString()}
+								{props.data.date}
 							</CardDescription>
 						</div>
 						<div className="flex gap-2">

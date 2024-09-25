@@ -1,21 +1,47 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
-import { sortDataByDateGroup } from "@/lib/utils"
+import { getPeriodFromIndex, sortDataByDateGroup } from "@/lib/utils"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useContext, useEffect, useMemo, useRef, useState } from "react"
+import {
+	Suspense,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useTransition
+} from "react"
 import { DashboardContext } from "../layout"
 import { SearchResult } from "minisearch"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select"
+import { MONTHS } from "@/lib/constants"
 
 export default function DashboardEntries() {
 	const [curIndex, setCurIndex] = useState(-1)
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
+	const [isPending, startTransition] = useTransition()
 	const { search } = useContext(DashboardContext)
 
 	const entryQuery = useEntryDataQuery()
@@ -72,38 +98,88 @@ export default function DashboardEntries() {
 
 		const currentGroup = dataGroups[curIndex]
 		if (!currentGroup) {
-			return <div>No entries available for this period. {curIndex}</div>
+			return <div>No entries available for this period.</div>
 		}
 
+		const firstPeriod = new Date(
+			`01-${dataGroups[0].month}-${dataGroups[0].year}`
+		)
+		const [month, year] = getPeriodFromIndex(curIndex, firstPeriod)
 		return (
-			<div className="mb-8">
-				<div className="flex justify-between items-center pb-4 bg-background">
-					<Button
-						className="w-fit h-fit p-0 hover:bg-background"
-						variant="ghost"
-						disabled={curIndex === dataGroups.length - 1}
-						onClick={() =>
-							setCurIndex((c) => Math.min(dataGroups.length - 1, c + 1))
-						}
-					>
-						<ChevronLeft className="w-4 h-4" />
-					</Button>
-					<Button variant="ghost" className="text-lg" asChild>
-						<h3 className="text-lg hover:cursor-pointer">
-							{dataGroups?.[curIndex]?.month} {dataGroups?.[curIndex]?.year}
-						</h3>
-					</Button>
-					<Button
-						className="w-fit h-fit p-0 hover:bg-background"
-						variant="ghost"
-						disabled={curIndex === 0}
-						onClick={() => setCurIndex((c) => Math.max(0, c - 1))}
-					>
-						<ChevronRight className="w-4 h-4" />
-					</Button>
+			<Dialog>
+				<DialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+					<DialogHeader>
+						<DialogTitle>Select a period</DialogTitle>
+						<DialogDescription>
+							<VisuallyHidden>
+								Select the month/year period that you wish to view
+							</VisuallyHidden>
+						</DialogDescription>
+					</DialogHeader>
+					<div className="flex items-center justify-around gap-4">
+						<Select>
+							<SelectTrigger>
+								<SelectValue placeholder={MONTHS[month]} />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									{MONTHS.map((value, index) => (
+										<SelectItem key={value} value={index.toString()}>
+											{value}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+						<Select>
+							<SelectTrigger>
+								<SelectValue placeholder={year} />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									{Array(50)
+										.map((_, index) => firstPeriod.getFullYear() - 25 + index)
+										.map((value) => (
+											<SelectItem key={value} value={value.toString()}>
+												{value}
+											</SelectItem>
+										))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
+				</DialogContent>
+				<div className="mb-8">
+					<div className="flex justify-between items-center px-1 py-1 mb-4">
+						<Button
+							className="h-full aspect-square rounded-full"
+							variant="ghost"
+							disabled={curIndex === 0}
+							onClick={() => setCurIndex((c) => Math.max(0, c - 1))}
+						>
+							<ChevronLeft className="w-4 h-4" />
+						</Button>
+						<DialogTrigger asChild>
+							<Button variant="ghost" className="text-lg" asChild>
+								<h3 className="text-lg hover:cursor-pointer h-full">
+									{dataGroups?.[curIndex]?.month} {dataGroups?.[curIndex]?.year}
+								</h3>
+							</Button>
+						</DialogTrigger>
+						<Button
+							className="h-full aspect-square rounded-full"
+							variant="ghost"
+							disabled={curIndex === dataGroups.length - 1}
+							onClick={() =>
+								setCurIndex((c) => Math.min(dataGroups.length - 1, c + 1))
+							}
+						>
+							<ChevronRight className="w-4 h-4" />
+						</Button>
+					</div>
+					<EntryList data={dataGroups[curIndex].data} />
 				</div>
-				<EntryList data={dataGroups[curIndex].data} />
-			</div>
+			</Dialog>
 		)
 	}
 
@@ -135,7 +211,9 @@ export default function DashboardEntries() {
 							return
 						}
 
-						setSearchResult(search.search(e.target.value, { prefix: true }))
+						startTransition(() => {
+							setSearchResult(search.search(e.target.value, { prefix: true }))
+						})
 					}}
 				/>
 			</div>

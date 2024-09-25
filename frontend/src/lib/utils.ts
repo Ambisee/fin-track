@@ -2,6 +2,7 @@ import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MONTHS } from "./constants"
 
 interface DataGroup {
     month: string,
@@ -9,11 +10,7 @@ interface DataGroup {
     data: Entry[]
 }
 
-const months = [
-    'January', 'February', 'March', 'April', 
-    'May', 'June', 'July', 'August', 
-    'September', 'October', 'November', 'December'
-]
+
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -202,7 +199,7 @@ function sortDataByDateGroup(
         
         const d = new Date((map.get(key) as Entry[])[0].date)
         
-        group.month = months[d.getUTCMonth()]
+        group.month = MONTHS[d.getUTCMonth()]
         group.year = d.getUTCFullYear()
         group.data = map.get(key) as Entry[]
 
@@ -232,8 +229,37 @@ function getUsernameFromEmail(email: string) {
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
 
+
+/**
+ * Calculate the period from the given index
+ * and starting period
+ * 
+ * cI = curIndex
+ * cY = curYear
+ * cM = curMonth
+ * sY = startYear
+ * sM = startMonth
+ * 
+ * Formula to get curIndex:
+ *      cI = 12*(cY - sY) + cM - sM
+ * Formula to reverse this operation:
+ *      cY =  sY + (floor(sY + cI) % 12)
+ *      cM = (sM + cI) % 12
+ * 
+ * 
+ * @param curIndex 
+ * @param startPeriod 
+ * @returns {number[]} the period in the format of [month, year]
+ */
+function getPeriodFromIndex(curIndex: number, startPeriod: Date): number[] {
+    const year = startPeriod.getFullYear() + Math.floor((startPeriod.getMonth() + curIndex) / 12)
+    const month = (startPeriod.getMonth() + curIndex) % 12
+
+    return [month, year]
+}
+
 export {
     cn, getElementFromNode,
-    getUsernameFromEmail, handleDataChange,
-    sortDataByDateGroup
+    getUsernameFromEmail, getPeriodFromIndex, 
+    handleDataChange, sortDataByDateGroup
 }

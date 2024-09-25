@@ -45,7 +45,7 @@ function useEntryDataQuery() {
 				.from("entry")
 				.select(`*`)
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
-				.order("date", { ascending: false })
+				.order("date")
                 .order("category")
 				.limit(100),
 		refetchOnWindowFocus: false,
