@@ -3,7 +3,6 @@ import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { MONTHS } from "./constants"
-import { MONTHS } from "./constants"
 
 interface DataGroup {
     month: string,

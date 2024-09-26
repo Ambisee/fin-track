@@ -72,9 +72,9 @@ export default function DashboardEntries() {
 				<>
 					<div className="mb-8">
 						<div className="w-full flex justify-between items-center mb-4 pb-4">
-							<Skeleton className="w-8 h-8" />
-							<Skeleton className="w-36 h-8" />
-							<Skeleton className="w-8 h-8" />
+							<Skeleton className="w-14 h-14" />
+							<Skeleton className="w-36 h-14" />
+							<Skeleton className="w-14 h-14" />
 						</div>
 						<Skeleton className="w-full h-[6.25rem] mb-4" />
 						<Skeleton className="w-full h-[6.25rem] mb-4" />
