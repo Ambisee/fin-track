@@ -2,6 +2,7 @@ import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MONTHS } from "./constants"
 
 interface DataGroup {
     month: string,
@@ -9,11 +10,7 @@ interface DataGroup {
     data: Entry[]
 }
 
-const months = [
-    'January', 'February', 'March', 'April', 
-    'May', 'June', 'July', 'August', 
-    'September', 'October', 'November', 'December'
-]
+
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -202,7 +199,7 @@ function sortDataByDateGroup(
         
         const d = new Date((map.get(key) as Entry[])[0].date)
         
-        group.month = months[d.getUTCMonth()]
+        group.month = MONTHS[d.getUTCMonth()]
         group.year = d.getUTCFullYear()
         group.data = map.get(key) as Entry[]
 
@@ -233,7 +230,6 @@ function getUsernameFromEmail(email: string) {
 }
 
 export {
-    cn, getElementFromNode,
-    getUsernameFromEmail, handleDataChange,
-    sortDataByDateGroup
+    cn, getElementFromNode, getUsernameFromEmail, 
+    handleDataChange, sortDataByDateGroup
 }
