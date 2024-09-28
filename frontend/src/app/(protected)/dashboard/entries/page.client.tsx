@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { useEntryDataQuery } from "@/lib/hooks"
-import { sortDataByDateGroup } from "@/lib/utils"
+import { getDataGroup, sortDataByDateGroup } from "@/lib/utils"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useContext, useEffect, useMemo, useState, useTransition } from "react"
 import { DashboardContext } from "../layout"
@@ -13,7 +13,7 @@ import { SearchResult } from "minisearch"
 import { MONTHS } from "@/lib/constants"
 
 export default function DashboardEntries() {
-	const [curIndex, setCurIndex] = useState(-1)
+	const [curPeriod, setCurPeriod] = useState<number[] | undefined>(undefined)
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
 	const [isPending, startTransition] = useTransition()
@@ -67,55 +67,72 @@ export default function DashboardEntries() {
 	}
 
 	const renderEntries = () => {
-		if (curIndex === -1 || entryQuery.isLoading || !entryQuery.data?.data) {
+		if (
+			curPeriod === undefined ||
+			entryQuery.isLoading ||
+			!entryQuery.data?.data
+		) {
 			return (
-				<>
-					<div className="mb-8">
-						<div className="w-full flex justify-between items-center mb-4 pb-4">
-							<Skeleton className="w-14 h-14" />
-							<Skeleton className="w-36 h-14" />
-							<Skeleton className="w-14 h-14" />
-						</div>
-						<Skeleton className="w-full h-[6.25rem] mb-4" />
-						<Skeleton className="w-full h-[6.25rem] mb-4" />
+				<div className="mb-8">
+					<div className="w-full flex justify-between items-center mb-4 pb-4">
+						<Skeleton className="w-14 h-14" />
+						<Skeleton className="w-36 h-14" />
+						<Skeleton className="w-14 h-14" />
 					</div>
-				</>
+					<Skeleton className="w-full h-[6.25rem] mb-4" />
+					<Skeleton className="w-full h-[6.25rem] mb-4" />
+				</div>
 			)
 		}
 
-		const currentGroup = dataGroups[curIndex]
-		if (!currentGroup) {
-			return
-		}
+		const currentGroup = getDataGroup(curPeriod[0], curPeriod[1], dataGroups)
 
 		return (
 			<div className="mb-8">
 				<div className="flex justify-between items-center pb-4 bg-background">
 					<Button
-						className="w-fit h-fit p-0 hover:bg-background"
+						className="w-12 h-12 rounded-full"
 						variant="ghost"
-						disabled={curIndex === dataGroups.length - 1}
 						onClick={() =>
-							setCurIndex((c) => Math.min(dataGroups.length - 1, c + 1))
+							setCurPeriod((c) => {
+								if (c === undefined) return
+
+								const result = [c[0] - 1, c[1]]
+								if (result[0] < 0) {
+									result[0] = 11
+									result[1] -= 1
+								}
+
+								return result
+							})
 						}
 					>
 						<ChevronLeft className="w-4 h-4" />
 					</Button>
 					<Button variant="ghost" className="text-lg" asChild>
 						<h3 className="text-lg hover:cursor-pointer">
-							{dataGroups?.[curIndex]?.month} {dataGroups?.[curIndex]?.year}
+							{currentGroup.month} {currentGroup.year}
 						</h3>
 					</Button>
 					<Button
-						className="w-fit h-fit p-0 hover:bg-background"
+						className="h-12 w-12 rounded-full"
 						variant="ghost"
-						disabled={curIndex === 0}
-						onClick={() => setCurIndex((c) => Math.max(0, c - 1))}
+						onClick={() =>
+							setCurPeriod((c) => {
+								if (c === undefined) return
+
+								const result = [c[0] + 1, c[1]]
+								result[1] += Math.floor(result[0] / 12)
+								result[0] = result[0] % 12
+
+								return result
+							})
+						}
 					>
 						<ChevronRight className="w-4 h-4" />
 					</Button>
 				</div>
-				{!currentGroup ? (
+				{currentGroup.data.length === 0 ? (
 					<div>No entries available for this period.</div>
 				) : (
 					<EntryList data={currentGroup.data} />
@@ -125,39 +142,11 @@ export default function DashboardEntries() {
 	}
 
 	useEffect(() => {
-		if (curIndex !== -1) return
-
-		// Use binary search to lookup the current month's DataGroup
-		const today = new Date()
-
-		let l = 0
-		let r = dataGroups.length - 1
-		let mid = l + Math.floor((r - l) / 2)
-
-		while (l < r) {
-			mid = l + Math.floor((r - l) / 2)
-			const cur = new Date(
-				dataGroups[mid].year,
-				MONTHS.indexOf(dataGroups[mid].month)
-			)
-
-			if (
-				cur.getMonth() === today.getMonth() &&
-				cur.getFullYear() === today.getFullYear()
-			) {
-				setCurIndex(Math.min(mid, dataGroups.length - 1))
-				return
-			}
-
-			if (cur < today) {
-				l = mid + 1
-			} else {
-				r = mid - 1
-			}
+		if (curPeriod === undefined) {
+			const today = new Date()
+			setCurPeriod([today.getMonth(), today.getFullYear()])
 		}
-
-		setCurIndex(Math.min(l, dataGroups.length - 1))
-	}, [curIndex, dataGroups])
+	}, [curPeriod])
 
 	return (
 		<>

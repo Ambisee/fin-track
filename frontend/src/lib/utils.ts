@@ -229,7 +229,36 @@ function getUsernameFromEmail(email: string) {
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
 
+function getDataGroup(month: number, year: number, dataGroups: DataGroup[]) {
+    const today = new Date(year, month)
+    
+    let l = 0
+    let r = dataGroups.length - 1
+    let mid = l + Math.floor((r - l) / 2)
+
+    while (l <=  r) {
+        mid = l + Math.floor((r - l) / 2)
+        const cur = new Date(dataGroups[mid].year, MONTHS.indexOf(dataGroups[mid].month))
+    
+        if (today.getMonth() === cur.getMonth() && today.getFullYear() === cur.getFullYear()) {
+            return dataGroups[mid]
+        }
+
+        if (cur < today) {
+            l = mid + 1
+        } else {
+            r = mid - 1
+        }
+    }
+
+    return {
+        month: MONTHS[today.getMonth()],
+        year: today.getFullYear(),
+        data: []
+    }    
+}
+
 export {
-    cn, getElementFromNode, getUsernameFromEmail, 
+    cn, getElementFromNode, getUsernameFromEmail, getDataGroup,
     handleDataChange, sortDataByDateGroup
 }
