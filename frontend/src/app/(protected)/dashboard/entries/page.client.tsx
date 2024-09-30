@@ -92,7 +92,7 @@ function MonthPicker(props: MonthPickerProps) {
 						<DialogHeader>
 							<DialogTitle>Select a month</DialogTitle>
 							<DialogDescription>
-								Please choose the month to view the month&apos;s data
+								Specify a month to view its data
 							</DialogDescription>
 						</DialogHeader>
 						<div className="w-full my-4 flex items-center justify-between gap-4">
