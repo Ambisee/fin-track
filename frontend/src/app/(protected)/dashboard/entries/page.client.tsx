@@ -247,13 +247,16 @@ export default function DashboardEntries() {
 					>
 						<ChevronLeft className="w-4 h-4" />
 					</Button>
-					<MonthPicker
+					{/* <MonthPicker
 						key={`${curPeriod[0]}-${curPeriod[1]}`}
 						value={curPeriod}
 						onValueChange={(value) => {
 							setCurPeriod(value)
 						}}
-					/>
+					/> */}
+					<h3 className="text-lg hover:cursor-pointer">
+						{MONTHS[curPeriod[0]]} {curPeriod[1]}
+					</h3>
 					<Button
 						className="h-12 w-12 rounded-full"
 						variant="ghost"
