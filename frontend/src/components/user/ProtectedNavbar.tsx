@@ -62,19 +62,17 @@ export default function ProtectedNavbar() {
 							label="Entries"
 						/>
 						<li className="relative w-8 md:absolute md:w-full md:bottom-0 md:left-0">
-							<DialogTrigger
-								onClick={() => {
-									setData(undefined)
-									setOnSubmitSuccess((data) => {
-										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-									})
-								}}
-								asChild
-							>
+							<DialogTrigger asChild>
 								<Button
 									variant="default"
 									className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
+									onClick={() => {
+										setData(undefined)
+										setOnSubmitSuccess((data) => {
+											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+										})
+									}}
 								>
 									<PlusIcon className="block" width={30} height={30} />
 								</Button>
