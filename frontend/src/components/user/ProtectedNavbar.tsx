@@ -68,10 +68,12 @@ export default function ProtectedNavbar() {
 									className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
 									onClick={() => {
+										alert("before")
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
 											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 										})
+										alert("clicked")
 									}}
 								>
 									<PlusIcon className="block" width={30} height={30} />
