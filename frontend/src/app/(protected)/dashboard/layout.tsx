@@ -34,7 +34,13 @@ function LayoutEntryForm() {
 	const data = useGlobalStore((state) => state.data)
 	const onSubmitSuccess = useGlobalStore((state) => state.onSubmitSuccess)
 
-	return <EntryForm data={data} onSubmitSuccess={onSubmitSuccess} />
+	return (
+		<EntryForm
+			key={data?.toString()}
+			data={data}
+			onSubmitSuccess={onSubmitSuccess}
+		/>
+	)
 }
 
 function DashboardContextProvider(props: { children: JSX.Element }) {

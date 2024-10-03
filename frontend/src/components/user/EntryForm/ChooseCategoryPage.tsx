@@ -60,16 +60,14 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 
 	useEffect(() => {
 		const cmdkInputWrapper = document.querySelector("[cmdk-input-wrapper]")
-		const cmdkGroupWrapper = document.querySelector("[cmdk-group-items]")
-		if (cmdkInputWrapper === null || cmdkGroupWrapper === null) return
+		if (cmdkInputWrapper === null) return
 
 		cmdkInputWrapper.classList.remove("border-b")
-		cmdkGroupWrapper.classList.add("h-full")
 	}, [])
 
 	return (
-		<AlertDialog>
-			<AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+		<div className="max-h-full relative grid grid-rows-[auto_1fr] gap-4">
+			{/* <AlertDialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Delete category</AlertDialogTitle>
 					<AlertDialogDescription>
@@ -103,81 +101,69 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 						Delete
 					</AlertDialogAction>
 				</AlertDialogFooter>
-			</AlertDialogContent>
-			<div className="relative h-full grid grid-rows-[auto_1fr] gap-8 sm:gap-4">
-				<DialogHeader className="relative space-y-0 sm:text-center">
-					<DialogTitle className="leading-6" asChild>
-						<h1 className="h-6 leading-6">Choose a category</h1>
-					</DialogTitle>
+			</AlertDialogContent> */}
+			<DialogHeader className="relative space-y-0 sm:text-center h-fit">
+				<DialogTitle className="leading-6" asChild>
+					<h1 className="h-6 leading-6">Choose a category</h1>
+				</DialogTitle>
+				<button
+					className="absolute block left-0 top-1/2 translate-y-[-50%]"
+					onClick={() => setCurPage(0)}
+				>
+					<ChevronLeft className="w-4 h-4" />
+				</button>
+				<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
+					<X className="w-4 h-4" />
+				</DialogClose>
+				<DialogDescription>
+					<VisuallyHidden>
+						Choose the category that will be associated with the current entry
+					</VisuallyHidden>
+				</DialogDescription>
+			</DialogHeader>
+			<Command
+				className="h-full w-full gap-4"
+				defaultValue={form.getValues("category")}
+			>
+				<div className="grid items-center grid-cols-[1fr_auto] border-b">
+					<CommandInput
+						className="text-base border-none"
+						placeholder="Search for a category..."
+					/>
 					<button
-						className="absolute block left-0 top-1/2 translate-y-[-50%]"
-						onClick={() => setCurPage(0)}
+						onClick={() => {
+							setCurPage(2)
+						}}
+						className="flex w-11 h-11 items-center justify-center focus:bg-transparent"
 					>
-						<ChevronLeft className="w-4 h-4" />
+						<PlusIcon className="w-4 h-4" />
 					</button>
-					<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
-						<X className="w-4 h-4" />
-					</DialogClose>
-					<DialogDescription>
-						<VisuallyHidden>
-							Choose the category that will be associated with the current entry
-						</VisuallyHidden>
-					</DialogDescription>
-				</DialogHeader>
-				<div className="w-full h-full">
-					<Command defaultValue={form.getValues("category")}>
-						<div className="grid items-center grid-cols-[1fr_auto] border-b">
-							<CommandInput
-								className="text-base border-none"
-								placeholder="Search for a category..."
-							/>
-							<button
-								onClick={() => {
-									setCurPage(2)
-								}}
-								className="flex w-11 h-11 items-center justify-center focus:bg-transparent"
-							>
-								<PlusIcon className="w-4 h-4" />
-							</button>
-						</div>
-						<CommandEmpty className="grid justify-center gap-2 py-4">
-							<span className="text-center">No category found</span>
-							<div className="flex gap-2">
-								<Button>Create a category</Button>
-								<Button variant="outline">Reset</Button>
-							</div>
-						</CommandEmpty>
-						<CommandGroup>
-							<CommandList className="max-h-none h-full">
-								{categoriesQuery.data?.data?.map((val) => (
-									<CommandItem
-										key={val.name}
-										value={val.name}
-										onSelect={(e) => {
-											form.setValue("category", val.name)
-											setCurPage(0)
-										}}
-									>
-										<span>{val.name}</span>
-										<AlertDialogTrigger asChild>
-											<button
-												type="button"
-												className="ml-auto"
-												onClick={(e) => {
-													e.stopPropagation()
-													setDeleteCategoryId(val.id)
-												}}
-											>
-												<Trash2Icon className="w-4 h-4" />
-											</button>
-										</AlertDialogTrigger>
-									</CommandItem>
-								))}
-							</CommandList>
-						</CommandGroup>
-					</Command>
 				</div>
-			</div>
-		</AlertDialog>
+				<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
+					<span className="text-center">No category found</span>
+					<div className="flex gap-2">
+						<Button>Create a category</Button>
+						<Button variant="outline">Reset</Button>
+					</div>
+				</CommandEmpty>
+				<CommandList className="max-h-none overflow-y-auto flex-1 px-1">
+					<CommandGroup className="*:grid *:gap-2 *:grid-cols-[repeat(auto-fill,minmax(125px,1fr))] *:grid-flow-row *:auto-rows-[150px]">
+						{categoriesQuery.data?.data?.map((val) => (
+							<CommandItem
+								className="border rounded-md break-words cursor-pointer"
+								key={val.name}
+								value={val.name}
+								onSelect={(e) => {
+									form.setValue("category", val.name)
+									setCurPage(0)
+								}}
+							>
+								<p className="w-full text-sm text-center">{val.name}</p>
+							</CommandItem>
+						))}
+					</CommandGroup>
+				</CommandList>
+			</Command>
+		</div>
 	)
 }

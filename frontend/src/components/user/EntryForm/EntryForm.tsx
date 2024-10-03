@@ -142,7 +142,7 @@ function DialogEntryForm(props: EntryFormProps) {
 			<Form {...form}>
 				<DialogContent
 					hideCloseButton
-					className="h-dvh max-w-none duration-0 border-0 sm:border sm:h-auto sm:min-h-[460px] sm:max-w-lg"
+					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 				>
 					{renderPage(form)}
 				</DialogContent>
