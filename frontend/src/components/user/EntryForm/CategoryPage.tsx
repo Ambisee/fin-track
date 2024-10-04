@@ -60,9 +60,8 @@ export default function CategoryPage(props: CategoryPageProps) {
 			const result = await sbBrowser
 				.from("category")
 				.update({ name: data.name })
-				.eq("created_by", userQuery.data.data.user.id)
 				.eq("id", categoryToEdit.id)
-                .select()
+				.select()
 
 			return result
 		}
@@ -139,7 +138,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 									return
 								}
 
-								const isUpdate = !categoryToEdit
+								const isUpdate = categoryToEdit !== undefined
 								const mutation = isUpdate
 									? updateCategoryMutation
 									: insertCategoryMutation
@@ -192,7 +191,9 @@ export default function CategoryPage(props: CategoryPageProps) {
 							)}
 						/>
 						<DialogFooter>
-							<Button>Create category</Button>
+							<Button>
+								{!categoryToEdit ? "Create category" : "Update category"}
+							</Button>
 						</DialogFooter>
 					</form>
 				</Form>

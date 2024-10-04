@@ -212,7 +212,7 @@ export default function DashboardEntries() {
 		) {
 			return (
 				<div className="mb-8">
-					<div className="w-full flex justify-between items-center mb-4">
+					<div className="w-full flex justify-between items-center pt-2 pb-4">
 						<Skeleton className="w-12 h-12 rounded-full" />
 						<Skeleton className="w-36 h-12" />
 						<Skeleton className="w-12 h-12 rounded-full" />
@@ -227,7 +227,7 @@ export default function DashboardEntries() {
 
 		return (
 			<div className="mb-8">
-				<div className="flex justify-between items-center pb-4 bg-background">
+				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
 					<Button
 						className="w-12 h-12 rounded-full"
 						variant="ghost"
