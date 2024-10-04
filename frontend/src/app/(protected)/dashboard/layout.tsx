@@ -36,7 +36,7 @@ function LayoutEntryForm() {
 
 	return (
 		<EntryForm
-			key={data?.toString()}
+			key={JSON.stringify(data)}
 			data={data}
 			onSubmitSuccess={onSubmitSuccess}
 		/>

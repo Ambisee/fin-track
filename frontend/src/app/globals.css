@@ -93,4 +93,10 @@
 		@apply w-full fixed bottom-0 left-0 h-16 px-6 bg-secondary text-secondary-foreground flex items-center
         md:w-3/12 md:max-w-52 md:fixed md:left-0 md:top-0 md:h-screen md:block md:py-4 md:items-start;
 	}
+
+    .cmdk-input-no-border {
+        & [cmdk-input-wrapper] {
+            @apply border-none
+        }
+    }
 }

@@ -258,7 +258,10 @@ function getDataGroup(month: number, year: number, dataGroups: DataGroup[]) {
     }    
 }
 
+function isFunction(value: any): value is Function { return typeof value === "function"}
+
+
 export {
-    cn, getElementFromNode, getUsernameFromEmail, getDataGroup,
+    cn, getElementFromNode, getUsernameFromEmail, getDataGroup, isFunction,
     handleDataChange, sortDataByDateGroup
 }

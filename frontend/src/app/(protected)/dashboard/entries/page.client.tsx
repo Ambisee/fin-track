@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { useEntryDataQuery } from "@/lib/hooks"
 import { getDataGroup, sortDataByDateGroup } from "@/lib/utils"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, SearchIcon, X } from "lucide-react"
 import { useContext, useEffect, useMemo, useState, useTransition } from "react"
 import { DashboardContext } from "../layout"
 import { SearchResult } from "minisearch"
@@ -212,7 +212,7 @@ export default function DashboardEntries() {
 		) {
 			return (
 				<div className="mb-8">
-					<div className="w-full flex justify-between items-center mb-4 pb-4">
+					<div className="w-full flex justify-between items-center mb-4">
 						<Skeleton className="w-12 h-12 rounded-full" />
 						<Skeleton className="w-36 h-12" />
 						<Skeleton className="w-12 h-12 rounded-full" />
@@ -292,7 +292,10 @@ export default function DashboardEntries() {
 		<div>
 			<h1 className="text-2xl">Entries</h1>
 			<div className="sticky top-0 py-4 bg-background">
+				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input
+					type="search"
+					className="pl-10"
 					placeholder="Search for an entry..."
 					value={searchQuery}
 					onChange={(e) => {

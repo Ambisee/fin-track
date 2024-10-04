@@ -20,8 +20,9 @@ import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { useMutation } from "@tanstack/react-query"
 import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useFormContext } from "react-hook-form"
-import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
-import { useContext } from "react"
+import { EntryFormItem, FormSchema } from "./EntryForm"
+import { useEntryFormStore } from "./EntryFormProvider"
+
 import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface EntryFormPageProps {
@@ -42,7 +43,7 @@ const getErrors = (errors: FieldErrors<FormSchema>) => {
 
 export default function EntryFormPage(props: EntryFormPageProps) {
 	const { toast } = useToast()
-	const { setCurPage } = useContext(EntryFormContext)
+	const setCurPage = useEntryFormStore()((state) => state.setCurPage)
 
 	const form = useFormContext<FormSchema>()
 	const userData = useUserQuery()
@@ -98,7 +99,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 
 	return (
 		<form
-			className="grid grid-rows-[1.5rem_1fr_auto] h-full"
+			className="grid grid-rows-[1.5rem_1fr_auto] gap-4 h-full"
 			onSubmit={(e) => {
 				e.preventDefault()
 				form.handleSubmit(
@@ -180,8 +181,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-
-			<div className="h-fit mt-8 sm:mt-2 *:text-left">
+			<div className="h-fit *:text-left grid gap-4">
 				<FormField
 					control={form.control}
 					name="type"
@@ -235,7 +235,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						</EntryFormItem>
 					)}
 				/>
-				<div className="h-10 my-4 grid grid-cols-[minmax(75px,30%)_1fr] items-center">
+				<div className="h-10 grid grid-cols-[minmax(75px,30%)_1fr] items-center">
 					<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
 						Category
 					</span>
@@ -243,7 +243,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						type="button"
 						variant="outline"
 						className="w-full text-base justify-normal text-muted-foreground"
-						onClick={() => setCurPage(1)}
+						onClick={() => setCurPage((c) => c + 1)}
 					>
 						{form.getValues("category")}
 						<ChevronRight className="w-4 h-4 ml-auto" />
@@ -284,7 +284,6 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					)}
 				/>
 			</div>
-
 			<DialogFooter className="h-fit gap-2">
 				<Button>Submit</Button>
 			</DialogFooter>

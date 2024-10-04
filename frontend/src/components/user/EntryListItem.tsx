@@ -10,13 +10,12 @@ import {
 import { ENTRY_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
-import { getElementFromNode } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, useState } from "react"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -28,13 +27,10 @@ import {
 	AlertDialogTitle
 } from "../ui/alert-dialog"
 import { Button } from "../ui/button"
-import { Dialog } from "../ui/dialog"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { useToast } from "../ui/use-toast"
-import EntryForm from "./EntryForm/EntryForm"
 import useGlobalStore from "@/lib/store"
-import { Store } from "lucide-react"
 
 interface EntryListItemProps {
 	data: Entry
@@ -58,8 +54,6 @@ export default function EntryListItem(props: EntryListItemProps) {
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
 
-	const open = useGlobalStore((state) => state.open)
-	const data = useGlobalStore((state) => state.data)
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)

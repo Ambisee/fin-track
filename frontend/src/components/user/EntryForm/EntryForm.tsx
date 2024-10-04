@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
+import { Category, Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import {
@@ -21,20 +21,13 @@ import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
 import { useCategoriesQuery } from "@/lib/hooks"
 import CategoryPage from "./CategoryPage"
+import EditCategoryPage from "./EditCategoryPage"
+import EntryFormProvider, { useEntryFormStore } from "./EntryFormProvider"
 
 interface EntryFormProps {
 	data?: Entry
 	onSubmitSuccess?: (data: PostgrestSingleResponse<null>) => void
 }
-
-interface EntryFormContextObject {
-	curPage: number
-	setCurPage: Dispatch<SetStateAction<number>>
-	prevPage: number
-	setPrevPage: Dispatch<SetStateAction<number>>
-}
-
-const EntryFormContext = createContext<EntryFormContextObject>(null!)
 
 const formSchema = z.object({
 	date: z.date(),
@@ -53,7 +46,6 @@ const formSchema = z.object({
 	type: z.enum(["Income", "Expense"]),
 	note: z.string()
 })
-
 type FormSchema = z.infer<typeof formSchema>
 
 function EntryFormItem(props: {
@@ -64,7 +56,7 @@ function EntryFormItem(props: {
 	return (
 		<FormItem
 			className={cn(
-				"my-4 grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
+				"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
 				props.className
 			)}
 		>
@@ -75,10 +67,9 @@ function EntryFormItem(props: {
 }
 
 function DialogEntryForm(props: EntryFormProps) {
-	const [curPage, setCurPage] = useState(0)
-	const [prevPage, setPrevPage] = useState(0)
 	const isEditForm = props.data !== undefined
 	const categoriesQuery = useCategoriesQuery()
+	const curPage = useEntryFormStore()((state) => state.curPage)
 
 	const formDefaultValues = useMemo(() => {
 		const miscId = categoriesQuery.data?.data?.find(
@@ -118,43 +109,43 @@ function DialogEntryForm(props: EntryFormProps) {
 	}, [props.data, form])
 
 	const renderPage = (form: UseFormReturn<FormSchema>) => {
-		if (curPage === 0) {
-			return (
-				<EntryFormPage
-					data={props.data}
-					isEditForm={isEditForm}
-					onSubmitSuccess={props.onSubmitSuccess}
-				/>
-			)
-		}
+		const pages = [
+			EntryFormPage,
+			ChooseCategoryPage,
+			EditCategoryPage,
+			CategoryPage
+		]
+		const CurrentPage = pages[curPage]
 
-		if (curPage === 1) {
-			return <ChooseCategoryPage />
-		}
-
-		return <CategoryPage />
+		return (
+			<CurrentPage
+				data={props.data}
+				isEditForm={isEditForm}
+				onSubmitSuccess={props.onSubmitSuccess}
+			/>
+		)
 	}
 
 	return (
-		<EntryFormContext.Provider
-			value={{ curPage, setCurPage, prevPage, setPrevPage }}
-		>
-			<Form {...form}>
-				<DialogContent
-					hideCloseButton
-					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
-				>
-					{renderPage(form)}
-				</DialogContent>
-			</Form>
-		</EntryFormContext.Provider>
+		<Form {...form}>
+			<DialogContent
+				hideCloseButton
+				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+			>
+				{renderPage(form)}
+			</DialogContent>
+		</Form>
 	)
 }
 
 function EntryForm(props: EntryFormProps) {
-	return <DialogEntryForm {...props} />
+	return (
+		<EntryFormProvider>
+			<DialogEntryForm {...props} />
+		</EntryFormProvider>
+	)
 }
 
 export default EntryForm
 export { type FormSchema }
-export { EntryFormItem, EntryFormContext }
+export { EntryFormItem }

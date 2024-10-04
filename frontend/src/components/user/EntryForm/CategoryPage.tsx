@@ -1,5 +1,5 @@
 import { useForm, useFormContext, UseFormReturn } from "react-hook-form"
-import { EntryFormContext, EntryFormItem, FormSchema } from "./EntryForm"
+import { EntryFormItem, FormSchema } from "./EntryForm"
 import {
 	DialogClose,
 	DialogDescription,
@@ -7,7 +7,8 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { useContext, useState } from "react"
+import { useState } from "react"
+import { useEntryFormStore } from "./EntryFormProvider"
 import { ChevronLeft, X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { z } from "zod"
@@ -20,9 +21,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { useMutation } from "@tanstack/react-query"
 import { CATEGORIES_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
-import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js"
-import { Category } from "@/types/supabase"
-import { PostgrestResponseSuccess } from "@supabase/postgrest-js"
 
 interface CategoryPageProps {}
 
@@ -31,11 +29,12 @@ const formSchema = z.object({
 })
 
 export default function CategoryPage(props: CategoryPageProps) {
-	const { setCurPage } = useContext(EntryFormContext)
 	const [isFormLoading, setIsFormLoading] = useState(false)
 
-	const form = useFormContext<FormSchema>()
 	const { toast } = useToast()
+	const form = useFormContext<FormSchema>()
+	const setCurPage = useEntryFormStore()((state) => state.setCurPage)
+	const categoryToEdit = useEntryFormStore()((state) => state.categoryToEdit)
 
 	const userQuery = useUserQuery()
 	const categoriesQuery = useCategoriesQuery()
@@ -47,7 +46,28 @@ export default function CategoryPage(props: CategoryPageProps) {
 		}
 	})
 
-	const addCategoryMutation = useMutation({
+	const updateCategoryMutation = useMutation({
+		mutationKey: CATEGORIES_QKEY,
+		mutationFn: async (data: z.infer<typeof formSchema>) => {
+			if (
+				!userQuery.data?.data ||
+				!userQuery.data.data.user ||
+				!categoryToEdit
+			) {
+				return null
+			}
+
+			const result = await sbBrowser
+				.from("category")
+				.update({ name: data.name })
+				.eq("created_by", userQuery.data.data.user.id)
+				.eq("id", categoryToEdit.id)
+
+			return result
+		}
+	})
+
+	const insertCategoryMutation = useMutation({
 		mutationKey: CATEGORIES_QKEY,
 		mutationFn: async (data: z.infer<typeof formSchema>) => {
 			if (!userQuery.data?.data || !userQuery.data.data.user) {
@@ -70,11 +90,15 @@ export default function CategoryPage(props: CategoryPageProps) {
 		<div className="grid grid-rows-[auto_1fr]">
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
-					<h1 className="h-6 leading-6">Create a new category</h1>
+					<h1 className="h-6 leading-6">
+						{categoryToEdit
+							? `Edit category - ${categoryToEdit.name}`
+							: "Create a new category"}
+					</h1>
 				</DialogTitle>
 				<button
 					className="absolute block left-0 top-1/2 translate-y-[-50%]"
-					onClick={() => setCurPage(1)}
+					onClick={() => setCurPage((c) => c - 1)}
 				>
 					<ChevronLeft className="w-4 h-4" />
 				</button>
@@ -83,20 +107,23 @@ export default function CategoryPage(props: CategoryPageProps) {
 				</DialogClose>
 				<DialogDescription>
 					<VisuallyHidden>
-						Create a new category and apply it to the current entry
+						{categoryToEdit
+							? "Edit the specified category"
+							: "Create a new category and apply it to the current entry"}
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
 			<div className="flex flex-col h-full">
 				<p className="text-sm text-muted-foreground mt-8">
-					Enter the name of the new category. Please note that no two categories
-					may share the same name.
+					Enter the name of the {!categoryToEdit && "new"} category. Please note
+					that no two categories may share the same name.
 				</p>
 				<Form {...nameForm}>
 					<form
 						className="h-full grid grid-rows-[1fr_auto]"
 						onSubmit={(e) => {
 							e.preventDefault()
+							setIsFormLoading(true)
 							nameForm.handleSubmit((formData) => {
 								if (!userQuery.data?.data) {
 									return
@@ -111,7 +138,12 @@ export default function CategoryPage(props: CategoryPageProps) {
 									return
 								}
 
-								addCategoryMutation.mutate(
+								const isUpdate = !categoryToEdit
+								const mutation = isUpdate
+									? updateCategoryMutation
+									: insertCategoryMutation
+
+								mutation.mutate(
 									{ name: formData.name },
 									{
 										onSuccess: (successData) => {
@@ -122,17 +154,25 @@ export default function CategoryPage(props: CategoryPageProps) {
 														"The category name has been used. Please enter another one",
 													variant: "destructive"
 												})
+												setIsFormLoading(false)
 												return
 											}
 
 											toast({
-												description: "New category created"
+												description: isUpdate
+													? "Category updated"
+													: "New category created"
 											})
 
-											setCurPage(0)
-											if (!successData.data) return
+											setIsFormLoading(false)
+											if (isUpdate) {
+												setCurPage((c) => c - 1)
+												return
+											}
 
-											form.setValue("category", successData.data[0].name)
+											setCurPage(0)
+											if (successData.data)
+												form.setValue("category", successData.data[0].name)
 										}
 									}
 								)

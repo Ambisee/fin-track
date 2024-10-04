@@ -1,6 +1,6 @@
 import { Entry } from "@/types/supabase"
 import { PostgrestSingleResponse } from "@supabase/supabase-js"
-import { Session } from "inspector"
+import { isFunction } from "./utils"
 import { Dispatch, SetStateAction } from "react"
 import { create, StateCreator } from "zustand"
 
@@ -22,7 +22,6 @@ interface EntryFormState {
 type GlobalState = EntryFormState
 
 const sliceResetFns = new Set<() => void>()
-const isFunction = (value: any): value is Function => (typeof value === "function")
 const resetGlobalStore = () => {
     sliceResetFns.forEach((resetFn) => resetFn())
 }
