@@ -62,6 +62,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 				.update({ name: data.name })
 				.eq("created_by", userQuery.data.data.user.id)
 				.eq("id", categoryToEdit.id)
+                .select()
 
 			return result
 		}
