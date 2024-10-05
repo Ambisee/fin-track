@@ -13,29 +13,12 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { useCategoriesQuery, useUserQuery } from "@/lib/hooks"
+import { useCategoriesQuery } from "@/lib/hooks"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useContext, useEffect, useState } from "react"
-import { useEntryFormStore } from "./EntryFormProvider"
-import { FormSchema } from "./EntryForm"
+import { ChevronLeft, PencilIcon, X } from "lucide-react"
 import { useFormContext } from "react-hook-form"
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger
-} from "@/components/ui/alert-dialog"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { CATEGORIES_QKEY, ENTRY_QKEY } from "@/lib/constants"
-import { sbBrowser } from "@/lib/supabase"
-import { useToast } from "@/components/ui/use-toast"
-import { getElementFromNode } from "@/lib/utils"
+import { FormSchema } from "./EntryForm"
+import { useEntryFormStore } from "./EntryFormProvider"
 
 interface ChooseCategoryPageProps {}
 

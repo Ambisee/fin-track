@@ -209,15 +209,6 @@ function sortDataByDateGroup(
     return result
 }
 
-function getElementFromNode(node: Node) {
-    if (node instanceof Element) {
-        return node;
-    } else {
-        console.log('The provided node is not an element.');
-        return null;
-    }
-}
-
 function getUsernameFromEmail(email: string) {
     const atSymbol = email.indexOf("@")
     if (atSymbol === -1) {
@@ -260,8 +251,7 @@ function getDataGroup(month: number, year: number, dataGroups: DataGroup[]) {
 
 function isFunction(value: any): value is Function { return typeof value === "function"}
 
-
 export {
-    cn, getElementFromNode, getUsernameFromEmail, getDataGroup, isFunction,
+    cn, getUsernameFromEmail, getDataGroup, isFunction,
     handleDataChange, sortDataByDateGroup
 }

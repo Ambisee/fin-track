@@ -22,7 +22,6 @@ import { sbBrowser } from "@/lib/supabase"
 import Link from "next/link"
 import { useToast } from "../ui/use-toast"
 import PasswordField from "./PasswordField"
-import { getElementFromNode } from "@/lib/utils"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address"),
