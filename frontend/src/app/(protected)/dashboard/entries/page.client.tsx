@@ -1,19 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import EntryList from "@/components/user/EntryList"
-import { useEntryDataQuery } from "@/lib/hooks"
-import { getDataGroup, sortDataByDateGroup } from "@/lib/utils"
-import { ChevronLeft, ChevronRight, SearchIcon, X } from "lucide-react"
-import { useContext, useEffect, useMemo, useState, useTransition } from "react"
-import { DashboardContext } from "../layout"
-import { SearchResult } from "minisearch"
-import { MONTHS } from "@/lib/constants"
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
@@ -21,6 +10,8 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "@/components/ui/dialog"
+import { Form, FormControl, FormField } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
 	Select,
 	SelectContent,
@@ -29,12 +20,21 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/components/ui/use-toast"
+import EntryList from "@/components/user/EntryList"
+import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
+import { useEntryDataQuery } from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
+import { getDataGroup, sortDataByDateGroup } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useQueryClient } from "@tanstack/react-query"
+import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
+import { SearchResult } from "minisearch"
+import { useContext, useEffect, useMemo, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { DashboardContext } from "../layout"
 
 interface MonthPickerProps {
 	value: number[]
@@ -151,11 +151,15 @@ function MonthPicker(props: MonthPickerProps) {
 }
 
 export default function DashboardEntries() {
+	const { search } = useContext(DashboardContext)
 	const [curPeriod, setCurPeriod] = useState<number[] | undefined>(undefined)
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
 	const [isPending, startTransition] = useTransition()
-	const { search } = useContext(DashboardContext)
+
+	const queryClient = useQueryClient()
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const entryQuery = useEntryDataQuery()
 
@@ -199,7 +203,13 @@ export default function DashboardEntries() {
 
 		return (
 			<div className="mt-14">
-				<EntryList data={data} />
+				{data.length > 0 ? (
+					<EntryList data={data} />
+				) : (
+					<div className="h-full grid gap-4 items-center justify-center">
+						<p>No matching entries found.</p>
+					</div>
+				)}
 			</div>
 		)
 	}
@@ -273,7 +283,19 @@ export default function DashboardEntries() {
 					</Button>
 				</div>
 				{currentGroup.data.length === 0 ? (
-					<div>No entries available for this period.</div>
+					<div className="h-full grid gap-4 items-center justify-center">
+						<p>No entries available for this period yet.</p>
+						<DialogTrigger
+							onClick={() => {
+								setData(undefined)
+								setOnSubmitSuccess((data) => {
+									queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+								})
+							}}
+						>
+							<Button>Add an entry</Button>
+						</DialogTrigger>
+					</div>
 				) : (
 					<EntryList data={currentGroup.data} />
 				)}
