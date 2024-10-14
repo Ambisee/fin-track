@@ -80,9 +80,9 @@ export default function ProtectedNavbar() {
 							</DialogTrigger>
 						</li>
 						<NavLink
-							href="/dashboard/reports"
+							href="/dashboard/statistics"
 							icon={<BarChart3Icon className="block" width={20} height={20} />}
-							label="Report"
+							label="Statistics"
 						/>
 						<NavLink
 							href="/dashboard/settings"
