@@ -36,7 +36,7 @@ export default function DashboardHome() {
 		}
 
 		return (
-			<div className="mb-4">
+			<div>
 				<h2 className="text-xl mb-4">Recent Entries</h2>
 				<EntryList data={entriesQuery.data?.data?.toReversed() ?? undefined} />
 			</div>
