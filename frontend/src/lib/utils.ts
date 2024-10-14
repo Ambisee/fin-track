@@ -4,13 +4,17 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { MONTHS } from "./constants"
 
-interface DataGroup {
+interface MonthGroup {
     month: string,
     year: number,
     data: Entry[]
 }
 
-
+interface MonthGroupV2 {
+    month: string,
+    year: number,
+    data: number[]
+}
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -167,17 +171,42 @@ function handleInsert(
     newEntries.splice(index, 0, newEntry as Entry)
 }
 
+function groupData(data: Entry[]) {
+    const result: {month: string, year: number, range: number[]}[] = []
+    if (data.length < 1) {
+        return result
+    }
+
+    const firstDate = new Date(data[0].date)
+    result.push({month: MONTHS[firstDate.getMonth()], year: firstDate.getFullYear(), range: [0, 0]})
+
+    for (let i = 1; i < data.length; i++) {
+        const d = new Date(data[i].date)
+        const lastGroup = result[result.length - 1]
+
+        if (d.getMonth() === MONTHS.indexOf(lastGroup?.month) && d.getFullYear() === lastGroup.year) {
+            continue
+        }
+
+        lastGroup.range[1] = i
+        result.push({month: MONTHS[d.getMonth()], year: d.getFullYear(), range: [i, 0]})
+    }
+
+    result[result.length - 1].range[1] = data.length
+    return result
+}
+
 /**
  * Group the entry data by each entry's months and years
  * 
  * @param data the entry data array
- * @returns {DataGroup[]} the array of data groups
+ * @returns {MonthGroup[]} the array of data groups
  */
-function sortDataByDateGroup(
+function groupDataByMonth(
     data: Entry[]
 ) {
     const map: Map<string, Entry[]> = new Map()
-    const result: DataGroup[] = []
+    const result: MonthGroup[] = []
 
     for (let i = 0; i < data.length; i++) {
         const row_date = new Date(data[i].date)
@@ -191,7 +220,7 @@ function sortDataByDateGroup(
     }
 
     Array.from(map.keys()).forEach(key => {
-        let group: DataGroup = {month: '', year: 0, data: []}
+        let group: MonthGroup = {month: '', year: 0, data: []}
         
         if (map.get(key) === undefined) {
             return
@@ -220,7 +249,8 @@ function getUsernameFromEmail(email: string) {
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
 
-function getDataGroup(month: number, year: number, dataGroups: DataGroup[]) {
+
+function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) {
     const today = new Date(year, month)
     
     let l = 0
@@ -251,7 +281,8 @@ function getDataGroup(month: number, year: number, dataGroups: DataGroup[]) {
 
 function isFunction(value: any): value is Function { return typeof value === "function"}
 
+export type {MonthGroup}
 export {
-    cn, getUsernameFromEmail, getDataGroup, isFunction,
-    handleDataChange, sortDataByDateGroup
+    cn, getUsernameFromEmail, filterDataGroup, isFunction,
+    handleDataChange, groupDataByMonth, groupData
 }

@@ -26,7 +26,7 @@ import EntryList from "@/components/user/EntryList"
 import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
 import { useEntryDataQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { getDataGroup, sortDataByDateGroup } from "@/lib/utils"
+import { filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
@@ -155,7 +155,7 @@ export default function DashboardEntries() {
 	const [curPeriod, setCurPeriod] = useState<number[] | undefined>(undefined)
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
-	const [isPending, startTransition] = useTransition()
+	const [_, startTransition] = useTransition()
 
 	const queryClient = useQueryClient()
 	const setData = useGlobalStore((state) => state.setData)
@@ -172,7 +172,7 @@ export default function DashboardEntries() {
 			return []
 		}
 
-		const result = sortDataByDateGroup(entryQuery.data.data)
+		const result = groupDataByMonth(entryQuery.data.data)
 		if (result.length < 1) {
 			const d = new Date()
 			return [
@@ -233,7 +233,7 @@ export default function DashboardEntries() {
 			)
 		}
 
-		const currentGroup = getDataGroup(curPeriod[0], curPeriod[1], dataGroups)
+		const currentGroup = filterDataGroup(curPeriod[0], curPeriod[1], dataGroups)
 
 		return (
 			<div className="mb-8">

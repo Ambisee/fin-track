@@ -28,6 +28,56 @@ const formSchema = z.object({
 	password: z.string()
 })
 
+function UnverifiedMesssage(props: { formData: z.infer<typeof formSchema> }) {
+	const { toast } = useToast()
+
+	return (
+		<>
+			<p>
+				Your account has not been verified. Please verify your account before
+				signing in.
+			</p>
+			<p>
+				<Button
+					variant="link"
+					className="w-fit h-fit p-0 m-0"
+					onClick={async (e) => {
+						toast({
+							description: "Loading..."
+						})
+
+						await sbBrowser.auth.resend({
+							type: "signup",
+							email: props.formData.email
+						})
+
+						toast({
+							description:
+								"The verification email has been sent. Please check your inbox to complete the verification process."
+						})
+					}}
+				>
+					Click here to resend the verification email
+				</Button>
+			</p>
+		</>
+	)
+}
+
+function InvalidCredentialsMessage() {
+	return (
+		<p>
+			Invalid credentials. Please make sure that you have the correct email and
+			password.
+		</p>
+	)
+}
+
+const messageComponents = new Map([
+	["email_not_confirmed", UnverifiedMesssage],
+	["invalid_credentials", InvalidCredentialsMessage]
+])
+
 export default function EmailSignInForm() {
 	const router = useRouter()
 	const { toast } = useToast()
@@ -79,43 +129,24 @@ export default function EmailSignInForm() {
 							}
 
 							setIsFormLoading(false)
-							if (error?.code === "email_not_confirmed") {
-								toast({
-									title: "You are unverified",
-									description: (
-										<>
-											<p>
-												Your account has not been verified. Please verify your
-												account before signing in.
-											</p>
-											<p>
-												<Button
-													variant="link"
-													className="w-fit h-fit p-0 m-0"
-													onClick={async (e) => {
-														toast({
-															description: "Loading..."
-														})
+							let Message
 
-														await sbBrowser.auth.resend({
-															type: "signup",
-															email: formData.email
-														})
-
-														toast({
-															description:
-																"The verification email has been sent. Please check your inbox to complete the verification process."
-														})
-													}}
-												>
-													Click here to resend the verification email
-												</Button>
-											</p>
-										</>
-									),
-									variant: "destructive"
-								})
+							if (error?.code) {
+								Message =
+									messageComponents.get(error.code) ??
+									function () {
+										return <p>{error.code}</p>
+									}
+							} else {
+								Message = function Message() {
+									return <p>Unknown error occured. Please try again later.</p>
+								}
 							}
+
+							toast({
+								description: <Message formData={formData} />,
+								variant: "destructive"
+							})
 						},
 						(error) => {
 							toast({

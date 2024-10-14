@@ -8,7 +8,7 @@ import {
 	CardTitle
 } from "@/components/ui/card"
 import { ENTRY_QKEY } from "@/lib/constants"
-import { useSettingsQuery } from "@/lib/hooks"
+import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
@@ -35,6 +35,7 @@ import useGlobalStore from "@/lib/store"
 interface EntryListItemProps {
 	data: Entry
 	onEdit?: (data: Entry) => void
+	showButtons?: boolean
 }
 
 function NoteText(props: { className?: string; text: string }) {
@@ -65,22 +66,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 		}
 	})
 
-	const formatAmount = (num?: number) => {
-		const currency = userSettingsQuery?.data?.data?.currency?.currency_name
-		if (num === undefined || currency === undefined || currency === null) {
-			return num
-		}
-
-		if (!Intl.supportedValuesOf("currency").includes(currency)) {
-			return num.toFixed(2)
-		}
-
-		return new Intl.NumberFormat(navigator.language, {
-			style: "currency",
-			currency: currency,
-			currencyDisplay: "narrowSymbol"
-		}).format(num)
-	}
+	const formatAmount = useAmountFormatter()
 
 	return (
 		<Card
@@ -98,20 +84,18 @@ export default function EntryListItem(props: EntryListItemProps) {
 					}}
 				>
 					<div className="flex justify-between items-center w-inherit">
-						<div className="grid max-w-[calc(50%-0.25rem)]">
-							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
+						<div className="grid max-w-[calc(50%-0.25rem)] text-entry-item">
+							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis">
 								{props.data.category}
 							</CardTitle>
-							<CardDescription className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary">
-								{props.data.date}
-							</CardDescription>
+							<CardDescription>{props.data.date}</CardDescription>
 						</div>
-						<div className="flex gap-2">
+						<div className="flex gap-2 items-center">
 							{userSettingsQuery.isLoading ? (
 								<Skeleton className="w-20 h-6" />
 							) : (
 								<div className="whitespace-nowrap">
-									<p className="group-data-[is-positive='true']:text-green-600 group-data-[is-positive='false']:text-primary w-full">
+									<p className="w-full align-baseline text-entry-item">
 										{props.data.is_positive ? "+ " : "- "}
 										{formatAmount(props.data.amount)}
 									</p>
@@ -133,90 +117,93 @@ export default function EntryListItem(props: EntryListItemProps) {
 						text={props.data.note}
 					/>
 				)}
-				<div className="flex gap-4">
-					<>
-						<DialogTrigger asChild>
-							<Button
-								className="min-w-24"
-								type="button"
-								onClick={() => {
-									setData(props.data)
-									setOnSubmitSuccess((data) => {
-										if (data.error !== null) {
-											toast({
-												description: data.error.message,
-												variant: "destructive"
-											})
-											return
-										}
-
-										queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-										setOpen(false)
-									})
-								}}
-								onFocus={() => setIsItemOpen(true)}
-								variant="default"
-							>
-								Edit
-							</Button>
-						</DialogTrigger>
-					</>
-					<AlertDialog>
+				{props.showButtons && (
+					<div className="flex gap-4">
 						<>
-							<AlertDialogTrigger asChild>
+							<DialogTrigger asChild>
 								<Button
 									className="min-w-24"
 									type="button"
+									onClick={() => {
+										setData(props.data)
+										setOnSubmitSuccess((data) => {
+											if (data.error !== null) {
+												toast({
+													description: data.error.message,
+													variant: "destructive"
+												})
+												return
+											}
+
+											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+											setOpen(false)
+										})
+									}}
 									onFocus={() => setIsItemOpen(true)}
-									variant="destructive"
+									variant="default"
 								>
-									Delete
+									Edit
 								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent>
-								<AlertDialogHeader>
-									<AlertDialogTitle>Confirm Action</AlertDialogTitle>
-									<AlertDialogDescription>
-										Are you sure you want to delete this transaction?
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
-									<AlertDialogAction
+							</DialogTrigger>
+						</>
+						<AlertDialog>
+							<>
+								<AlertDialogTrigger asChild>
+									<Button
+										className="min-w-24"
+										type="button"
+										onFocus={() => setIsItemOpen(true)}
 										variant="destructive"
-										onClick={() =>
-											deleteMutation.mutate(props.data.id, {
-												onSuccess: (data) => {
-													toast({
-														description: "Loading..."
-													})
-
-													if (data.error !== null) {
-														toast({
-															description: data.error.message
-														})
-														return
-													}
-
-													toast({
-														description: "Successfully removed the transaction",
-														duration: 500
-													})
-
-													queryClient.invalidateQueries({
-														queryKey: ENTRY_QKEY
-													})
-												}
-											})
-										}
 									>
 										Delete
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</>
-					</AlertDialog>
-				</div>
+									</Button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Confirm Action</AlertDialogTitle>
+										<AlertDialogDescription>
+											Are you sure you want to delete this transaction?
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction
+											variant="destructive"
+											onClick={() =>
+												deleteMutation.mutate(props.data.id, {
+													onSuccess: (data) => {
+														toast({
+															description: "Loading..."
+														})
+
+														if (data.error !== null) {
+															toast({
+																description: data.error.message
+															})
+															return
+														}
+
+														toast({
+															description:
+																"Successfully removed the transaction",
+															duration: 500
+														})
+
+														queryClient.invalidateQueries({
+															queryKey: ENTRY_QKEY
+														})
+													}
+												})
+											}
+										>
+											Delete
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</>
+						</AlertDialog>
+					</div>
+				)}
 			</CardContent>
 		</Card>
 	)

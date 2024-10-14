@@ -1,30 +1,8 @@
 import { QueryData, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
-
-function useSetElementWindowHeight() {
-    const elementRef = useRef<HTMLDivElement>(null!)
-
-    useEffect(() => {
-            const resizeObserver = new ResizeObserver((entries) => {
-                if (elementRef.current === undefined || elementRef.current === null) {
-                    return
-                }
-    
-                elementRef.current.style.minHeight = `${window.innerHeight}px`
-            })
-    
-            resizeObserver.observe(document.body)
-    
-            return () => {
-                resizeObserver.disconnect()
-            }
-    }, [elementRef])
-
-    return elementRef
-}
 
 function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error, UserResponse, string[]>) {
     return useQuery({
@@ -101,6 +79,53 @@ function useCategoriesQuery() {
     })
 }
 
+function useSetElementWindowHeight() {
+    const elementRef = useRef<HTMLDivElement>(null!)
 
-export { useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSetElementWindowHeight, useSettingsQuery, useUserQuery };
+    useEffect(() => {
+            const resizeObserver = new ResizeObserver((entries) => {
+                if (elementRef.current === undefined || elementRef.current === null) {
+                    return
+                }
+    
+                elementRef.current.style.minHeight = `${window.innerHeight}px`
+            })
+    
+            resizeObserver.observe(document.body)
+    
+            return () => {
+                resizeObserver.disconnect()
+            }
+    }, [elementRef])
+
+    return elementRef
+}
+
+function useAmountFormatter() {
+    const userSettingsQuery = useSettingsQuery()
+
+    const formatAmount = useCallback((num?: number) => {
+		const currency = userSettingsQuery?.data?.data?.currency?.currency_name
+		if (num === undefined || currency === undefined || currency === null) {
+			return num
+		}
+
+		if (!Intl.supportedValuesOf("currency").includes(currency)) {
+			return num.toFixed(2)
+		}
+
+		return new Intl.NumberFormat(navigator.language, {
+			style: "currency",
+			currency: currency,
+			currencyDisplay: "narrowSymbol"
+		}).format(num)
+	}, [userSettingsQuery])
+
+    return formatAmount
+}
+
+export { 
+    useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery,
+    useSetElementWindowHeight, useAmountFormatter
+};
 
