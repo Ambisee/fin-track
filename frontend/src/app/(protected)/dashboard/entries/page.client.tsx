@@ -316,6 +316,11 @@ export default function DashboardEntries() {
 			<div className="sticky top-0 py-4 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input
+					disabled={
+						curPeriod === undefined ||
+						entryQuery.isLoading ||
+						!entryQuery.data?.data
+					}
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."

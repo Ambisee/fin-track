@@ -49,7 +49,10 @@ function NoteText(props: { className?: string; text: string }) {
 	return <ScrollArea className={props.className}>{textWithBreaks}</ScrollArea>
 }
 
-export default function EntryListItem(props: EntryListItemProps) {
+export default function EntryListItem({
+	showButtons = true,
+	...props
+}: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(false)
 
 	const { toast } = useToast()
@@ -117,7 +120,7 @@ export default function EntryListItem(props: EntryListItemProps) {
 						text={props.data.note}
 					/>
 				)}
-				{props.showButtons && (
+				{showButtons && (
 					<div className="flex gap-4">
 						<>
 							<DialogTrigger asChild>

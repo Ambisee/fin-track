@@ -31,10 +31,6 @@ export default function DashboardHome() {
 	}
 
 	const renderRecentEntries = () => {
-		if (entriesQuery.isLoading) {
-			return <Skeleton className="w-full" />
-		}
-
 		return (
 			<div>
 				<h2 className="text-xl mb-4">Recent Entries</h2>

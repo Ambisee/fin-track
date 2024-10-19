@@ -7,19 +7,14 @@ import EntryListItem from "./EntryListItem"
 
 interface EntryListProps {
 	data?: Entry[]
-	showStats?: boolean
+	showButtons?: boolean
 	onEditItem?: (data: Entry) => void
 }
 
-export default function EntryList(props: EntryListProps) {
-	const renderStats = () => {
-		if (props.showStats === undefined || props.showStats === false) {
-			return undefined
-		}
-
-		return <></>
-	}
-
+export default function EntryList({
+	showButtons = true,
+	...props
+}: EntryListProps) {
 	const renderData = () => {
 		if (props.data === undefined) {
 			return undefined
@@ -41,7 +36,12 @@ export default function EntryList(props: EntryListProps) {
 		return (
 			<div className="grid gap-4">
 				{props.data.map((val) => (
-					<EntryListItem key={val.id} data={val} onEdit={props.onEditItem} />
+					<EntryListItem
+						showButtons={showButtons}
+						key={val.id}
+						data={val}
+						onEdit={props.onEditItem}
+					/>
 				))}
 			</div>
 		)
@@ -57,10 +57,5 @@ export default function EntryList(props: EntryListProps) {
 		)
 	}
 
-	return (
-		<div>
-			{renderData()}
-			{renderStats()}
-		</div>
-	)
+	return <div>{renderData()}</div>
 }
