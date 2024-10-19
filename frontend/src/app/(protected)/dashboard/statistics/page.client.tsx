@@ -1,54 +1,49 @@
 "use client"
 
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
 	ChartConfig,
 	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent
 } from "@/components/ui/chart"
-import { useMediaQuery } from "react-responsive"
-import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
 import {
-	useAmountFormatter,
-	useEntryDataQuery,
-	useSettingsQuery
-} from "@/lib/hooks"
-import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
-import {
-	Bar,
-	BarChart,
-	CartesianGrid,
-	Cell,
-	Label,
-	Pie,
-	PieChart,
-	Sector,
-	XAxis
-} from "recharts"
-import { useEffect, useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { MonthPicker } from "@/components/user/MonthPicker"
-import { Entry } from "@/types/supabase"
-import { PieSectorDataItem } from "recharts/types/polar/Pie"
-import { DialogTrigger } from "@/components/ui/dialog"
-import { useQueryClient } from "@tanstack/react-query"
-import useGlobalStore from "@/lib/store"
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import EntryList from "@/components/user/EntryList"
+import { MonthPicker } from "@/components/user/MonthPicker"
+import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
+import { useAmountFormatter, useEntryDataQuery } from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
+import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
+import { Entry } from "@/types/supabase"
+import { useQueryClient } from "@tanstack/react-query"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { useMediaQuery } from "react-responsive"
+import { Cell, Pie, PieChart } from "recharts"
+import { Payload } from "recharts/types/component/DefaultTooltipContent"
+
+interface Group {
+	name: string
+	income: number
+	expense: number
+	incomePercentage: number
+	expensePercentage: number
+	data: Entry[]
+	fill: string
+}
 
 interface Statistics {
 	totalIncome: number
 	totalExpense: number
-	groupByCategory: {
-		name: string
-		income: number
-		expense: number
-		data: Entry[]
-		fill: string
-	}[]
+	groupByCategory: Group[]
 }
 
 interface StatsUIProps {
@@ -68,6 +63,8 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const formatAmount = useAmountFormatter()
+	const percentageKey = props.dataKey + "Percentage"
+
 	const data = useMemo(() => {
 		if (!props.data) {
 			return []
@@ -109,7 +106,19 @@ function ChartDisplay(props: ChartDisplayProps) {
 						content={
 							<ChartTooltipContent
 								formatterOverride={false}
-								formatter={(value) => formatAmount(value as number)}
+								formatter={(value, name, item, index, payload: any) => {
+									let result = formatAmount(value as number)
+									if (
+										percentageKey !== "incomePercentage" &&
+										percentageKey !== "expensePercentage"
+									) {
+										return result
+									}
+
+									return (
+										result + ` (${(payload[percentageKey] * 100).toFixed(2)}%)`
+									)
+								}}
 							/>
 						}
 					/>
@@ -123,26 +132,40 @@ function ChartDisplay(props: ChartDisplayProps) {
 					</Pie>
 				</PieChart>
 			</ChartContainer>
-			<ul>
-				{props.data.map((value) => {
-					if (value[props.dataKey] === 0) {
-						return undefined
-					}
+			<ul className="grid gap-1.5">
+				{props.data
+					.toSorted((a, b) => b[percentageKey] - a[percentageKey])
+					.map((value) => {
+						if (value[props.dataKey] === 0) {
+							return undefined
+						}
 
-					return (
-						<li className="flex items-center py-2 gap-2.5" key={value.name}>
-							<div
-								style={{ background: value.fill }}
-								className={`w-6 aspect-square rounded-sm`}
-							/>
-							<span>{value.name}</span>
-							<span className="flex-1 border-dotted border-b-2" />
-							<span className="text-right">
-								{formatAmount(value[props.dataKey])}
-							</span>
-						</li>
-					)
-				})}
+						return (
+							<li key={value.name}>
+								<button
+									className={cn(
+										buttonVariants({ variant: "ghost" }),
+										"w-full flex items-center  py-2 gap-2.5 text-md"
+									)}
+								>
+									<div
+										style={{ background: value.fill }}
+										className={`w-6 aspect-square rounded-sm`}
+									/>
+									<span>
+										{value.name}{" "}
+										<span className="opacity-55">
+											({(value[props.dataKey + "Percentage"] * 100).toFixed(2)}
+											%)
+										</span>
+									</span>
+									<span className="flex-1 text-right">
+										{formatAmount(value[props.dataKey])}
+									</span>
+								</button>
+							</li>
+						)
+					})}
 			</ul>
 		</div>
 	)
@@ -319,6 +342,8 @@ export default function DashboardStatistics() {
 					name: entry.category,
 					income: 0,
 					expense: 0,
+					incomePercentage: 0,
+					expensePercentage: 0,
 					data: [],
 					fill: `hsl(var(--chart-${colorIndex}))`
 				})
@@ -337,6 +362,11 @@ export default function DashboardStatistics() {
 				result.totalExpense += entry.amount
 				entryGroup.expense += entry.amount
 			}
+		}
+
+		for (const group of result.groupByCategory) {
+			group.expensePercentage = group.expense / result.totalExpense
+			group.incomePercentage = group.income / result.totalIncome
 		}
 
 		return result

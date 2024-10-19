@@ -228,6 +228,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					render={({ field }) => (
 						<EntryFormItem label="Date">
 							<DatePicker
+								required
 								onChange={field.onChange}
 								value={field.value}
 								closeOnSelect

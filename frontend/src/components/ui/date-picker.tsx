@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 
 interface DatePickerProps {
 	value: Date
+	required?: boolean
 	onChange: Dispatch<SetStateAction<Date | undefined>>
 	closeOnSelect?: boolean
 }
@@ -44,6 +45,7 @@ export function DatePicker(props: DatePickerProps) {
 					<DialogTitle>Pick a date</DialogTitle>
 					<DialogDescription asChild>
 						<Calendar
+							required={props.required ?? false}
 							defaultMonth={props.value}
 							mode="single"
 							selected={props.value}
