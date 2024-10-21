@@ -28,9 +28,7 @@ interface SignUpLayoutProps {
 }
 
 interface PageTransitionContextType {
-	progressValue: number
 	prevPage: number
-	setProgressValue: Dispatch<SetStateAction<number>>
 	setPrevPage: Dispatch<SetStateAction<number>>
 }
 
@@ -47,20 +45,18 @@ export const pageIndexMap = new Map<EmailSignupPaths, number>([
 function ProgressProvider(props: SignUpLayoutProps) {
 	const pathname = usePathname()
 	const rootRef = useSetElementWindowHeight()
-	const [progressValue, setProgressValue] = useState(
+	const [prevPage, setPrevPage] = useState(
 		pageIndexMap.get(pathname as EmailSignupPaths) ?? -1
 	)
-	const [prevPage, setPrevPage] = useState(0)
 
-	useEffect(() => {
-		if (pathname.endsWith("/sign-up/email")) {
-			setProgressValue(0)
-		} else if (pathname.endsWith("/sign-up/username")) {
-			setProgressValue(33.3)
-		} else if (pathname.endsWith("/sign-up/password")) {
-			setProgressValue(66.6)
-		}
-	}, [pathname, setProgressValue])
+	let progressValue = pageIndexMap.get(pathname as EmailSignupPaths) ?? -1
+	if (pathname.endsWith("/sign-up/email")) {
+		progressValue = 0
+	} else if (pathname.endsWith("/sign-up/username")) {
+		progressValue = 33.3
+	} else if (pathname.endsWith("/sign-up/password")) {
+		progressValue = 66.6
+	}
 
 	return (
 		<div
@@ -74,8 +70,6 @@ function ProgressProvider(props: SignUpLayoutProps) {
 					</div>
 					<PageTransitionContext.Provider
 						value={{
-							progressValue,
-							setProgressValue,
 							prevPage,
 							setPrevPage
 						}}
