@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/chart"
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
@@ -24,11 +25,16 @@ import useGlobalStore from "@/lib/store"
 import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import {
+	createContext,
+	experimental_useEffectEvent,
+	useContext,
+	useMemo,
+	useState
+} from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
-import { Payload } from "recharts/types/component/DefaultTooltipContent"
 
 interface Group {
 	name: string
@@ -57,8 +63,11 @@ interface ChartDisplayProps {
 	dataKey: string
 }
 
+const StatisticsPageContext = createContext<{ period: number[] }>(null!)
+
 function ChartDisplay(props: ChartDisplayProps) {
 	const queryClient = useQueryClient()
+	const { period } = useContext(StatisticsPageContext)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
@@ -135,34 +144,70 @@ function ChartDisplay(props: ChartDisplayProps) {
 			<ul className="grid gap-1.5">
 				{props.data
 					.toSorted((a, b) => b[percentageKey] - a[percentageKey])
-					.map((value) => {
-						if (value[props.dataKey] === 0) {
+					.map((value: Group) => {
+						if (value[props.dataKey as keyof Group] === 0) {
 							return undefined
 						}
 
+						const percentageKey = props.dataKey.concat("Percentage")
+						const entryData = value.data.filter(
+							(entry) =>
+								(props.dataKey === "income" && entry.is_positive) ||
+								(props.dataKey === "expense" && !entry.is_positive)
+						)
+						const dialogTitle = `${value.name} ${props.dataKey}s for ${
+							MONTHS[period[0]]
+						} ${period[1]}`
+
 						return (
 							<li key={value.name}>
-								<button
-									className={cn(
-										buttonVariants({ variant: "ghost" }),
-										"w-full flex items-center  py-2 gap-2.5 text-md"
-									)}
-								>
-									<div
-										style={{ background: value.fill }}
-										className={`w-6 aspect-square rounded-sm`}
-									/>
-									<span>
-										{value.name}{" "}
-										<span className="opacity-55">
-											({(value[props.dataKey + "Percentage"] * 100).toFixed(2)}
-											%)
-										</span>
-									</span>
-									<span className="flex-1 text-right">
-										{formatAmount(value[props.dataKey])}
-									</span>
-								</button>
+								<Dialog>
+									<DialogTrigger asChild>
+										<button
+											className={cn(
+												buttonVariants({ variant: "ghost" }),
+												"w-full flex items-center  py-2 gap-2.5 text-md"
+											)}
+										>
+											<div
+												style={{ background: value.fill }}
+												className={`w-6 aspect-square rounded-sm`}
+											/>
+											<span>
+												{value.name}{" "}
+												<span className="opacity-55">
+													(
+													{(
+														(value[percentageKey as keyof Group] as number) *
+														100
+													).toFixed(2)}
+													%)
+												</span>
+											</span>
+											<span className="flex-1 text-right">
+												{formatAmount(
+													value[props.dataKey as keyof Group] as number
+												)}
+											</span>
+										</button>
+									</DialogTrigger>
+									<DialogContent
+										hideCloseButton
+										className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+									>
+										<DialogHeader className="relative space-y-0 sm:text-center">
+											<DialogTitle className="leading-6" asChild>
+												<h1 className="h-6 leading-6">{dialogTitle}</h1>
+											</DialogTitle>
+											<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
+												<X className="w-4 h-4" />
+											</DialogClose>
+										</DialogHeader>
+										<div className="overflow-y-auto pr-1">
+											<EntryList data={entryData} showButtons={false} />
+										</div>
+									</DialogContent>
+								</Dialog>
 							</li>
 						)
 					})}
@@ -241,7 +286,6 @@ function MobileStatsUI(props: StatsUIProps) {
 
 function DesktopStatsUI(props: StatsUIProps) {
 	const formatAmount = useAmountFormatter()
-	const entryDataQuery = useEntryDataQuery()
 
 	return (
 		<div className="flex py-4 w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-sm">
@@ -253,7 +297,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 				<ChartDisplay
 					chartConfig={props.chartConfig}
 					data={
-						entryDataQuery.data === undefined
+						props.stats.groupByCategory === undefined
 							? undefined
 							: props.stats.groupByCategory
 					}
@@ -268,7 +312,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 				<ChartDisplay
 					chartConfig={props.chartConfig}
 					data={
-						entryDataQuery.data === undefined
+						props.stats.groupByCategory === undefined
 							? undefined
 							: props.stats.groupByCategory
 					}
@@ -280,12 +324,6 @@ function DesktopStatsUI(props: StatsUIProps) {
 }
 
 export default function DashboardStatistics() {
-	const [stats, setStats] = useState<Statistics>({
-		totalIncome: 0,
-		totalExpense: 0,
-		groupByCategory: []
-	})
-	const [chartConfig, setChartConfig] = useState<ChartConfig>({})
 	const [curPeriod, setCurPeriod] = useState<number[]>(() => {
 		const today = new Date()
 		return [today.getMonth(), today.getFullYear()]
@@ -388,11 +426,22 @@ export default function DashboardStatistics() {
 			)
 		}
 
-		return isDesktop ? (
-			<DesktopStatsUI stats={stats} chartConfig={chartConfig} />
-		) : (
-			<MobileStatsUI stats={stats} chartConfig={chartConfig} />
+		const stats = calculateStats(
+			filterDataGroup(curPeriod[0], curPeriod[1], dataGroups)
 		)
+
+		const chartConfig: ChartConfig = {}
+		const keys = Object.keys(stats.groupByCategory)
+
+		for (let i = 0; i < keys.length; i++) {
+			chartConfig[keys[i]] = {
+				label: keys[i]
+			}
+		}
+
+		const StatsUI = isDesktop ? DesktopStatsUI : MobileStatsUI
+
+		return <StatsUI chartConfig={chartConfig} stats={stats} />
 	}
 
 	const renderMonthPicker = () => {
@@ -451,32 +500,14 @@ export default function DashboardStatistics() {
 		)
 	}
 
-	useEffect(() => {
-		const newStats = calculateStats(
-			filterDataGroup(curPeriod[0], curPeriod[1], dataGroups)
-		)
-
-		setStats(newStats)
-		setChartConfig(() => {
-			const result: ChartConfig = {}
-			const keys = Object.keys(newStats.groupByCategory)
-
-			for (let i = 0; i < keys.length; i++) {
-				result[keys[i]] = {
-					label: keys[i]
-				}
-			}
-
-			return result
-		})
-	}, [curPeriod, dataGroups])
-
 	return (
-		<div className="w-full h-full pb-8 md:pb-0">
-			<h1 className="text-2xl">Statistics</h1>
-			{renderMonthPicker()}
+		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
+			<div className="w-full h-full pb-8 md:pb-0">
+				<h1 className="text-2xl">Statistics</h1>
+				{renderMonthPicker()}
 
-			{renderStatsUI()}
-		</div>
+				{renderStatsUI()}
+			</div>
+		</StatisticsPageContext.Provider>
 	)
 }

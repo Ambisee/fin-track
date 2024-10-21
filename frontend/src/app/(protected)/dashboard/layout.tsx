@@ -6,7 +6,7 @@ import { Dialog } from "@/components/ui/dialog"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
 import useGlobalStore from "@/lib/store"
-import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
+import { useEntryDataQuery } from "@/lib/hooks"
 import { createContext, useEffect, useRef } from "react"
 
 interface DashboardLayoutProps {
@@ -46,7 +46,7 @@ function LayoutEntryForm() {
 function DashboardContextProvider(props: { children: JSX.Element }) {
 	const searchRef = useRef(
 		new MiniSearch({
-			fields: ["index", "amount", "date", "category", "note"],
+			fields: ["index", "amount", "category", "note"],
 			storeFields: ["index"],
 			idField: "index"
 		})

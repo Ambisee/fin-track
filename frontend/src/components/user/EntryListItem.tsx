@@ -39,11 +39,15 @@ interface EntryListItemProps {
 }
 
 function NoteText(props: { className?: string; text: string }) {
+	if (props.text === "") {
+		return <p className="text-muted">No notes here.</p>
+	}
+
 	const textWithBreaks = props.text.split("\n").map((text, index) => (
-		<Fragment key={index}>
+		<p key={index}>
 			{text}
 			<br />
-		</Fragment>
+		</p>
 	))
 
 	return <ScrollArea className={props.className}>{textWithBreaks}</ScrollArea>
@@ -114,12 +118,10 @@ export default function EntryListItem({
 				</button>
 			</CardHeader>
 			<CardContent className="px-4">
-				{props.data.note !== "" && props.data.note !== null && (
-					<NoteText
-						className="text-base text-secondary-foreground font-light max-h-52 mb-4 overflow-y-auto"
-						text={props.data.note}
-					/>
-				)}
+				<NoteText
+					className="text-base text-secondary-foreground font-light max-h-52 overflow-y-auto"
+					text={props.data.note ?? ""}
+				/>
 				{showButtons && (
 					<div className="flex gap-4">
 						<>
