@@ -174,20 +174,6 @@ export default function PasswordChange() {
 						</FormItem>
 					)}
 				/>
-				<div className="flex justify-between items-center mt-4">
-					<Button disabled={isPendingSubmit}>
-						Submit
-						{isPendingSubmit && (
-							<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-						)}
-					</Button>
-					<Link
-						className={cn(buttonVariants({ variant: "link" }), "h-fit p-0 m-0")}
-						href="/forgot-password"
-					>
-						Forgot your old password?
-					</Link>
-				</div>
 			</>
 		)
 	}
@@ -199,35 +185,54 @@ export default function PasswordChange() {
 				onSubmit={(e) => {
 					e.preventDefault()
 					setIsPendingSubmit(true)
-					form.handleSubmit(async (formData) => {
-						const { data, error } = await sbBrowser.rpc("update_password", {
-							old_password: formData.oldPassword,
-							new_password: formData.newPassword
-						})
+					form.handleSubmit(
+						async (formData) => {
+							const { data, error } = await sbBrowser.rpc("update_password", {
+								old_password: formData.oldPassword,
+								new_password: formData.newPassword
+							})
 
-						if (error !== null) {
+							if (error !== null) {
+								setIsPendingSubmit(false)
+								toast({
+									description: error?.message,
+									variant: "destructive",
+									duration: 1500
+								})
+								return
+							}
+
 							setIsPendingSubmit(false)
+
 							toast({
-								description: error?.message,
-								variant: "destructive",
+								description: "Successfully updated the account's password",
 								duration: 1500
 							})
-							return
+
+							form.reset()
+						},
+						(errors) => {
+							setIsPendingSubmit(false)
 						}
-
-						setIsPendingSubmit(false)
-
-						toast({
-							description: "Successfully updated the account's password",
-							duration: 1500
-						})
-
-						form.reset()
-					})()
+					)()
 				}}
 			>
 				<FormLabel>Password</FormLabel>
 				{renderFormFields()}
+				<div className="flex justify-between items-center mt-4">
+					<Button disabled={userQuery.isLoading || isPendingSubmit}>
+						Submit
+						{isPendingSubmit && (
+							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+						)}
+					</Button>
+					<Link
+						className={cn(buttonVariants({ variant: "link" }), "h-fit p-0 m-0")}
+						href="/forgot-password"
+					>
+						Forgot your old password?
+					</Link>
+				</div>
 			</form>
 		</Form>
 	)

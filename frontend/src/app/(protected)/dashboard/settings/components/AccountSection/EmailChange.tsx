@@ -41,32 +41,37 @@ export default function EmailChange() {
 				onSubmit={(e) => {
 					e.preventDefault()
 					setIsPendingSubmit(true)
-					form.handleSubmit(async (d) => {
-						const { data, error } = await sbBrowser.auth.updateUser(
-							{
-								email: d.email
-							},
-							{
-								emailRedirectTo: window.location.origin
+					form.handleSubmit(
+						async (d) => {
+							const { data, error } = await sbBrowser.auth.updateUser(
+								{
+									email: d.email
+								},
+								{
+									emailRedirectTo: window.location.origin
+								}
+							)
+
+							if (error !== null) {
+								toast({
+									description: error.message,
+									variant: "destructive",
+									duration: 1500
+								})
+								setIsPendingSubmit(false)
+								return
 							}
-						)
 
-						if (error !== null) {
-							toast({
-								description: error.message,
-								variant: "destructive",
-								duration: 1500
-							})
 							setIsPendingSubmit(false)
-							return
+							toast({
+								description:
+									"Please check your previous and new email's inbox to verify the email change."
+							})
+						},
+						(errors) => {
+							setIsPendingSubmit(false)
 						}
-
-						setIsPendingSubmit(false)
-						toast({
-							description:
-								"Please check your previous and new email's inbox to verify the email change."
-						})
-					})()
+					)()
 				}}
 			>
 				<FormField
@@ -97,7 +102,7 @@ export default function EmailChange() {
 				>
 					Submit
 					{isPendingSubmit && (
-						<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 					)}
 				</Button>
 			</form>

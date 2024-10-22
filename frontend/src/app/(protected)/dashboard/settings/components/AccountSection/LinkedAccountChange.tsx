@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import Image from "next/image"
 
 import googleIcon from "../../../../../../../public/google-icon.svg"
+import { Label } from "@/components/ui/label"
 
 export default function LinkedAccountChange() {
 	const { toast } = useToast()
@@ -99,9 +100,7 @@ export default function LinkedAccountChange() {
 
 	return (
 		<div className="mt-2">
-			<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-				Linked Accounts
-			</span>
+			<Label>Linked Accounts</Label>
 			<ul className="mt-2">
 				<li className="rounded-md border p-4">
 					<div className="flex justify-between">
