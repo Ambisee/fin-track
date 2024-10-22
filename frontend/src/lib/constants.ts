@@ -1,4 +1,4 @@
-export const DESKTOP_BREAKPOINT = 768
+export const DESKTOP_BREAKPOINT = 1024
 export const MAX_USERNAME_LENGTH = 20
 
 export const USER_QKEY = ["user"]
