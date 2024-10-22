@@ -18,6 +18,33 @@ import { DownloadIcon } from "@radix-ui/react-icons"
 export default function Documents() {
 	const { dataGroups } = useContext(DashboardContext)
 
+	const renderDownloadList = () => {
+		const result = []
+
+		for (let i = dataGroups.length - 1; i >= 0; i--) {
+			const value = dataGroups[i]
+
+			result.push(
+				<li className="px-1" key={`${value.month} ${value.year}`}>
+					<Button
+						onClick={() => {
+							// TODO: Implement download report functionalities
+						}}
+						className="p-4 w-full h-full flex justify-between"
+						variant="ghost"
+					>
+						<span>
+							{value.month} {value.year}
+						</span>
+						<DownloadIcon />
+					</Button>
+				</li>
+			)
+		}
+
+		return result
+	}
+
 	return (
 		<Dialog>
 			<div className="mt-8">
@@ -52,26 +79,7 @@ export default function Documents() {
 						</VisuallyHidden>
 					</DialogDescription>
 				</DialogHeader>
-				<ul className="overflow-y-auto grid gap-1.5">
-					{dataGroups.toReversed().map((value) => {
-						return (
-							<li className="px-1" key={`${value.month} ${value.year}`}>
-								<Button
-									onClick={() => {
-										// TODO: Implement download report functionalities
-									}}
-									className="p-4 w-full h-full flex justify-between"
-									variant="ghost"
-								>
-									<span>
-										{value.month} {value.year}
-									</span>
-									<DownloadIcon />
-								</Button>
-							</li>
-						)
-					})}
-				</ul>
+				<ul className="overflow-y-auto grid gap-1.5">{renderDownloadList()}</ul>
 			</DialogContent>
 		</Dialog>
 	)
