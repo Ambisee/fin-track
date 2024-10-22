@@ -7,7 +7,9 @@ import EntryForm from "@/components/user/EntryForm/EntryForm"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
 import useGlobalStore from "@/lib/store"
 import { useEntryDataQuery } from "@/lib/hooks"
-import { createContext, useEffect, useRef } from "react"
+import { createContext, useEffect, useMemo, useRef } from "react"
+import { groupDataByMonth, MonthGroup } from "@/lib/utils"
+import { MONTHS } from "@/lib/constants"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -15,6 +17,7 @@ interface DashboardLayoutProps {
 
 interface DashboardContextObject {
 	search: MiniSearch
+	dataGroups: MonthGroup[]
 }
 
 const DashboardContext = createContext<DashboardContextObject>(null!)
@@ -44,6 +47,32 @@ function LayoutEntryForm() {
 }
 
 function DashboardContextProvider(props: { children: JSX.Element }) {
+	const entryQuery = useEntryDataQuery()
+
+	const dataGroups = useMemo(() => {
+		if (entryQuery.isLoading) {
+			return []
+		}
+
+		if (entryQuery.data === undefined || entryQuery.data.data === null) {
+			return []
+		}
+
+		const result = groupDataByMonth(entryQuery.data.data)
+		if (result.length < 1) {
+			const d = new Date()
+			return [
+				{
+					month: MONTHS[d.getMonth()],
+					year: d.getFullYear(),
+					data: []
+				}
+			]
+		}
+
+		return result
+	}, [entryQuery.data, entryQuery.isLoading])
+
 	const searchRef = useRef(
 		new MiniSearch({
 			fields: ["index", "amount", "category", "note"],
@@ -51,7 +80,6 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 			idField: "index"
 		})
 	)
-	const entryQuery = useEntryDataQuery()
 
 	useEffect(() => {
 		if (!entryQuery.data?.data) {
@@ -65,7 +93,9 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 	}, [entryQuery])
 
 	return (
-		<DashboardContext.Provider value={{ search: searchRef.current }}>
+		<DashboardContext.Provider
+			value={{ dataGroups: dataGroups, search: searchRef.current }}
+		>
 			{props.children}
 		</DashboardContext.Provider>
 	)

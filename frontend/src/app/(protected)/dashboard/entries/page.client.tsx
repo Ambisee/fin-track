@@ -159,36 +159,13 @@ export default function DashboardEntries() {
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
 	const [_, startTransition] = useTransition()
+	const { dataGroups } = useContext(DashboardContext)
 
 	const queryClient = useQueryClient()
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const entryQuery = useEntryDataQuery()
-
-	const dataGroups = useMemo(() => {
-		if (entryQuery.isLoading) {
-			return []
-		}
-
-		if (entryQuery.data === undefined || entryQuery.data.data === null) {
-			return []
-		}
-
-		const result = groupDataByMonth(entryQuery.data.data)
-		if (result.length < 1) {
-			const d = new Date()
-			return [
-				{
-					month: MONTHS[d.getMonth()],
-					year: d.getFullYear(),
-					data: []
-				}
-			]
-		}
-
-		return result
-	}, [entryQuery.data, entryQuery.isLoading])
 
 	const renderSearchResult = () => {
 		if (

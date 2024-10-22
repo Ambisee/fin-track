@@ -29,6 +29,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createContext, useContext, useMemo, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
+import { DashboardContext } from "../layout"
 
 interface Group {
 	name: string
@@ -160,7 +161,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 										<button
 											className={cn(
 												buttonVariants({ variant: "ghost" }),
-												"w-full flex items-center  py-2 gap-2.5 text-md"
+												"w-full flex items-center py-2 gap-2.5 text-md"
 											)}
 										>
 											<div
@@ -318,36 +319,10 @@ export default function DashboardStatistics() {
 	})
 
 	const entryDataQuery = useEntryDataQuery()
+	const { dataGroups } = useContext(DashboardContext)
 	const isDesktop = useMediaQuery({
 		minWidth: DESKTOP_BREAKPOINT
 	})
-
-	const dataGroups = useMemo(() => {
-		if (entryDataQuery.isLoading) {
-			return []
-		}
-
-		if (
-			entryDataQuery.data === undefined ||
-			entryDataQuery.data.data === null
-		) {
-			return []
-		}
-
-		const result = groupDataByMonth(entryDataQuery.data.data)
-		if (result.length < 1) {
-			const d = new Date()
-			return [
-				{
-					month: MONTHS[d.getMonth()],
-					year: d.getFullYear(),
-					data: []
-				}
-			]
-		}
-
-		return result
-	}, [entryDataQuery.data, entryDataQuery.isLoading])
 
 	const calculateStats = (group: MonthGroup | undefined) => {
 		const result: Statistics = {
