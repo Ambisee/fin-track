@@ -189,10 +189,10 @@ export default function EmailSignInForm() {
 					)}
 				/>
 				<Button variant="default" disabled={isFormLoading} className="w-full">
-					{isFormLoading && (
-						<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-					)}
 					{isFormLoading ? "Loading" : "Submit"}
+					{isFormLoading && (
+						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+					)}
 				</Button>
 			</form>
 		</Form>

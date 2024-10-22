@@ -123,7 +123,7 @@ export default function EntryListItem({
 					text={props.data.note ?? ""}
 				/>
 				{showButtons && (
-					<div className="flex gap-4">
+					<div className="flex mt-4 gap-4">
 						<>
 							<DialogTrigger asChild>
 								<Button

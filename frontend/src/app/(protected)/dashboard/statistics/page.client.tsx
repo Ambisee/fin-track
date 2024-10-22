@@ -26,13 +26,7 @@ import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import {
-	createContext,
-	experimental_useEffectEvent,
-	useContext,
-	useMemo,
-	useState
-} from "react"
+import { createContext, useContext, useMemo, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 
@@ -60,19 +54,20 @@ interface StatsUIProps {
 interface ChartDisplayProps {
 	data?: any[]
 	chartConfig: ChartConfig
-	dataKey: string
+	dataKey: "income" | "expense"
 }
 
 const StatisticsPageContext = createContext<{ period: number[] }>(null!)
 
 function ChartDisplay(props: ChartDisplayProps) {
-	const queryClient = useQueryClient()
 	const { period } = useContext(StatisticsPageContext)
+
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
+	const queryClient = useQueryClient()
 	const formatAmount = useAmountFormatter()
-	const percentageKey = props.dataKey + "Percentage"
+	const percentageKey = props.dataKey.concat("Percentage") as keyof Group
 
 	const data = useMemo(() => {
 		if (!props.data) {
@@ -145,11 +140,10 @@ function ChartDisplay(props: ChartDisplayProps) {
 				{props.data
 					.toSorted((a, b) => b[percentageKey] - a[percentageKey])
 					.map((value: Group) => {
-						if (value[props.dataKey as keyof Group] === 0) {
+						if (value[props.dataKey] === 0) {
 							return undefined
 						}
 
-						const percentageKey = props.dataKey.concat("Percentage")
 						const entryData = value.data.filter(
 							(entry) =>
 								(props.dataKey === "income" && entry.is_positive) ||
@@ -176,18 +170,12 @@ function ChartDisplay(props: ChartDisplayProps) {
 											<span>
 												{value.name}{" "}
 												<span className="opacity-55">
-													(
-													{(
-														(value[percentageKey as keyof Group] as number) *
-														100
-													).toFixed(2)}
+													({((value[percentageKey] as number) * 100).toFixed(2)}
 													%)
 												</span>
 											</span>
 											<span className="flex-1 text-right">
-												{formatAmount(
-													value[props.dataKey as keyof Group] as number
-												)}
+												{formatAmount(value[props.dataKey] as number)}
 											</span>
 										</button>
 									</DialogTrigger>
@@ -505,7 +493,6 @@ export default function DashboardStatistics() {
 			<div className="w-full h-full pb-8 md:pb-0">
 				<h1 className="text-2xl">Statistics</h1>
 				{renderMonthPicker()}
-
 				{renderStatsUI()}
 			</div>
 		</StatisticsPageContext.Provider>

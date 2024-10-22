@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import EntryList from "@/components/user/EntryList"
 import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import { useEntryDataQuery } from "@/lib/hooks"
+import { useEntryDataQuery, useGroupEntryDataQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -152,7 +152,10 @@ function MonthPicker(props: MonthPickerProps) {
 
 export default function DashboardEntries() {
 	const { search } = useContext(DashboardContext)
-	const [curPeriod, setCurPeriod] = useState<number[] | undefined>(undefined)
+	const [curPeriod, setCurPeriod] = useState<number[]>(() => {
+		const today = new Date()
+		return [today.getMonth(), today.getFullYear()]
+	})
 	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null)
 	const [_, startTransition] = useTransition()
@@ -215,11 +218,7 @@ export default function DashboardEntries() {
 	}
 
 	const renderEntries = () => {
-		if (
-			curPeriod === undefined ||
-			entryQuery.isLoading ||
-			!entryQuery.data?.data
-		) {
+		if (entryQuery.isLoading || !entryQuery.data?.data) {
 			return (
 				<div className="mb-8">
 					<div className="w-full flex justify-between items-center pt-2 pb-4">
@@ -243,8 +242,6 @@ export default function DashboardEntries() {
 						variant="ghost"
 						onClick={() =>
 							setCurPeriod((c) => {
-								if (c === undefined) return
-
 								const result = [c[0] - 1, c[1]]
 								if (result[0] < 0) {
 									result[0] = 11
@@ -269,8 +266,6 @@ export default function DashboardEntries() {
 						variant="ghost"
 						onClick={() =>
 							setCurPeriod((c) => {
-								if (c === undefined) return
-
 								const result = [c[0] + 1, c[1]]
 								result[1] += Math.floor(result[0] / 12)
 								result[0] = result[0] % 12
@@ -303,24 +298,13 @@ export default function DashboardEntries() {
 		)
 	}
 
-	useEffect(() => {
-		if (curPeriod === undefined) {
-			const today = new Date()
-			setCurPeriod([today.getMonth(), today.getFullYear()])
-		}
-	}, [curPeriod])
-
 	return (
 		<div>
 			<h1 className="text-2xl">Entries</h1>
 			<div className="sticky top-0 py-4 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input
-					disabled={
-						curPeriod === undefined ||
-						entryQuery.isLoading ||
-						!entryQuery.data?.data
-					}
+					disabled={entryQuery.isLoading || !entryQuery.data?.data}
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."

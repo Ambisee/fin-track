@@ -30,6 +30,17 @@ export default function DashboardHome() {
 		}
 	}
 
+	const renderThisMonthEntries = () => {
+		const today = new Date()
+
+		return (
+			<div>
+				<h2 className="text-xl mb-4"></h2>
+				<EntryList data={entriesQuery.data?.data?.toReversed() ?? undefined} />
+			</div>
+		)
+	}
+
 	const renderRecentEntries = () => {
 		return (
 			<div>
