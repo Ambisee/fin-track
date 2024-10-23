@@ -60,12 +60,12 @@ export default function Documents() {
 			</div>
 			<DialogContent
 				hideCloseButton
-				className=" h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+				className="h-dvh grid-rows-[auto_1fr] max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 			>
-				<DialogHeader>
-					<div className="relative space-y-0 sm:text-center">
-						<DialogTitle className="leading-6" asChild>
-							<h1 className="h-6 leading-6">
+				<DialogHeader className="space-y-0">
+					<div className="w-full relative space-y-0 sm:text-center">
+						<DialogTitle asChild>
+							<h1 className="w-2/3 mx-auto sm:w-full leading-6">
 								Select a month to download a report PDF
 							</h1>
 						</DialogTitle>
@@ -79,7 +79,9 @@ export default function Documents() {
 						</VisuallyHidden>
 					</DialogDescription>
 				</DialogHeader>
-				<ul className="overflow-y-auto grid gap-1.5">{renderDownloadList()}</ul>
+				<ul className="h-full overflow-y-auto grid gap-1.5">
+					{renderDownloadList()}
+				</ul>
 			</DialogContent>
 		</Dialog>
 	)
