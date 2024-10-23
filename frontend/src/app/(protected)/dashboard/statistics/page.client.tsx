@@ -26,7 +26,14 @@ import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { createContext, useContext, useMemo, useState } from "react"
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState
+} from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 import { DashboardContext } from "../layout"
@@ -87,6 +94,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 			<div className="h-[250px] flex items-center justify-center flex-col gap-2">
 				<h1>No {props.dataKey} data entered for this period.</h1>
 				<DialogTrigger
+					asChild
 					onClick={() => {
 						setData(undefined)
 						setOnSubmitSuccess((data) => {
@@ -221,45 +229,70 @@ function ChartDisplay(props: ChartDisplayProps) {
 function MobileStatsUI(props: StatsUIProps) {
 	const [curTab, setCurTab] = useState<string>("expense")
 
+	const incomeValRef = useRef<HTMLHeadingElement>(null!)
+	const expenseValRef = useRef<HTMLHeadingElement>(null!)
+
+	const resizeFontUntilFit = (el: HTMLHeadingElement) => {
+		const parentBB = el.parentElement?.getBoundingClientRect()
+		if (parentBB === undefined || el.textContent === null) {
+			return
+		}
+
+		el.style.removeProperty("font-size")
+
+		let fontSize = 30 // equals to 1.875rem as defined in the text-3xl TW class
+		while (el.getBoundingClientRect().width > parentBB.width) {
+			fontSize--
+			el.style.fontSize = `${fontSize}px`
+		}
+	}
+
+	useEffect(() => {
+		resizeFontUntilFit(incomeValRef.current)
+		resizeFontUntilFit(expenseValRef.current)
+	}, [props.stats.totalIncome, props.stats.totalExpense])
+
 	const formatAmount = useAmountFormatter()
 	const entryDataQuery = useEntryDataQuery()
 
 	return (
 		<Tabs value={curTab} onValueChange={setCurTab}>
-			<TabsList className="w-full mb-4">
-				<TabsTrigger className="w-full" value="expense">
-					Expense
-				</TabsTrigger>
-				<TabsTrigger className="w-full" value="income">
-					Income
-				</TabsTrigger>
-			</TabsList>
-			<div className="w-full flex py-4 lg:m-auto rounded-lg border bg-card text-card-foreground shadow-sm">
-				<div
-					className="flex-1 px-4 border-r group"
+			<TabsList className="w-full h-full mb-4 bg-background border rounded-sm">
+				<TabsTrigger
+					value="expense"
+					className="w-1/2 text-left bg-background data-[state=active]:bg-muted group"
 					data-is-positive="false"
 					data-curtab={curTab}
 				>
-					<h2 className="text-md group-data-[curtab='income']:opacity-55">
-						Total expense
-					</h2>
-					<h1 className="text-3xl text-entry-item group-data-[curtab='income']:text-opacity-55">
-						{formatAmount(props.stats?.totalExpense)}
-					</h1>
-				</div>
-				<div
-					className="flex-1 px-4 group"
+					<div className="w-full">
+						<h2 className="text-md group-data-[curtab='income']:opacity-55">
+							Total expense
+						</h2>
+						<h1 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='income']:text-opacity-55">
+							<span ref={expenseValRef}>
+								{formatAmount(props.stats?.totalExpense)}
+							</span>
+						</h1>
+					</div>
+				</TabsTrigger>
+				<TabsTrigger
+					value="income"
+					className="w-1/2 text-left bg-background data-[state=active]:bg-muted group"
 					data-curtab={curTab}
 					data-is-positive="true"
 				>
-					<h2 className="text-md group-data-[curtab='expense']:opacity-55">
-						Total income
-					</h2>
-					<h1 className="text-3xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
-						{formatAmount(props.stats?.totalIncome)}
-					</h1>
-				</div>
-			</div>
+					<div className="w-full">
+						<h2 className="text-md group-data-[curtab='expense']:opacity-55">
+							Total income
+						</h2>
+						<h1 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
+							<span ref={incomeValRef}>
+								{formatAmount(props.stats?.totalIncome)}
+							</span>
+						</h1>
+					</div>
+				</TabsTrigger>
+			</TabsList>
 			<TabsContent value="expense">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
