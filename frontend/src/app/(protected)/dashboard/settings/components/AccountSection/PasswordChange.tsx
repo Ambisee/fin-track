@@ -184,37 +184,32 @@ export default function PasswordChange() {
 				className="mt-8"
 				onSubmit={(e) => {
 					e.preventDefault()
-					setIsPendingSubmit(true)
-					form.handleSubmit(
-						async (formData) => {
-							const { data, error } = await sbBrowser.rpc("update_password", {
-								old_password: formData.oldPassword,
-								new_password: formData.newPassword
-							})
+					form.handleSubmit(async (formData) => {
+						setIsPendingSubmit(true)
+						const { data, error } = await sbBrowser.rpc("update_password", {
+							old_password: formData.oldPassword,
+							new_password: formData.newPassword
+						})
 
-							if (error !== null) {
-								setIsPendingSubmit(false)
-								toast({
-									description: error?.message,
-									variant: "destructive",
-									duration: 1500
-								})
-								return
-							}
-
+						if (error !== null) {
 							setIsPendingSubmit(false)
-
 							toast({
-								description: "Successfully updated the account's password",
+								description: error?.message,
+								variant: "destructive",
 								duration: 1500
 							})
-
-							form.reset()
-						},
-						(errors) => {
-							setIsPendingSubmit(false)
+							return
 						}
-					)()
+
+						setIsPendingSubmit(false)
+
+						toast({
+							description: "Successfully updated the account's password",
+							duration: 1500
+						})
+
+						form.reset()
+					})()
 				}}
 			>
 				<FormLabel>Password</FormLabel>
@@ -226,12 +221,39 @@ export default function PasswordChange() {
 							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 						)}
 					</Button>
-					<Link
-						className={cn(buttonVariants({ variant: "link" }), "h-fit p-0 m-0")}
-						href="/forgot-password"
+					<Button
+						onClick={async () => {
+							if (userQuery.data?.data.user?.email === undefined) {
+								return
+							}
+
+							const { data, error } =
+								await sbBrowser.auth.resetPasswordForEmail(
+									userQuery.data.data.user.email
+								)
+
+							if (error !== null) {
+								toast({
+									description: error?.message,
+									variant: "destructive",
+									duration: 1500
+								})
+								return
+							}
+
+							toast({
+								description:
+									"Please check your inbox and follow the instructions to reset your password.",
+								duration: 1500
+							})
+							return
+						}}
+						variant="link"
+						type="button"
+						className="h-fit p-0 m-0"
 					>
-						Forgot your old password?
-					</Link>
+						Request a password reset link
+					</Button>
 				</div>
 			</form>
 		</Form>
