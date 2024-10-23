@@ -150,9 +150,19 @@ function ChartDisplay(props: ChartDisplayProps) {
 								(props.dataKey === "income" && entry.is_positive) ||
 								(props.dataKey === "expense" && !entry.is_positive)
 						)
-						const dialogTitle = `${value.name} ${props.dataKey}s for ${
-							MONTHS[period[0]]
-						} ${period[1]}`
+						// const dialogTitle = `${value.name} ${props.dataKey}s (${
+						// 	MONTHS[period[0]]
+						// } ${period[1]})`
+						const dialogTitle = (
+							<>
+								<span className="whitespace-nowrap">
+									{value.name} {props.dataKey}
+								</span>{" "}
+								<span className="whitespace-nowrap">
+									({MONTHS[period[0]]} {period[1]})
+								</span>
+							</>
+						)
 
 						return (
 							<li key={value.name}>
@@ -185,8 +195,11 @@ function ChartDisplay(props: ChartDisplayProps) {
 										className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 									>
 										<DialogHeader className="relative space-y-0 sm:text-center">
-											<DialogTitle className="leading-6" asChild>
-												<h1 className="h-6 leading-6">{dialogTitle}</h1>
+											<DialogTitle
+												className="mx-auto w-2/3 leading-6 lg:w-full"
+												asChild
+											>
+												<h1 className="leading-6">{dialogTitle}</h1>
 											</DialogTitle>
 											<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
 												<X className="w-4 h-4" />
