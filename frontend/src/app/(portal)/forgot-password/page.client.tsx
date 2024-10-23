@@ -3,11 +3,11 @@
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -76,7 +76,7 @@ export default function ForgotPassword() {
 											setIsPendingSubmit(false)
 											toast({
 												description:
-													"Please check your inbox for a link to reset your password.",
+													"Please check your inbox and follow the instructions to reset your password.",
 												duration: 1500
 											})
 										},
