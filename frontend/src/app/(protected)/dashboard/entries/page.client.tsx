@@ -67,7 +67,6 @@ function MonthPicker(props: MonthPickerProps) {
 							e.preventDefault()
 							form.handleSubmit(
 								(formData) => {
-									console.log("suc")
 									props.onValueChange([
 										MONTHS.indexOf(formData.month),
 										formData.year
@@ -75,7 +74,6 @@ function MonthPicker(props: MonthPickerProps) {
 									setOpen(false)
 								},
 								(error) => {
-									console.log("err")
 									toast({
 										variant: "destructive",
 										description: (
