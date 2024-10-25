@@ -66,8 +66,8 @@ export default function SignUpPassword() {
 					e.preventDefault()
 					form.handleSubmit(
 						async (formData) => {
-							Cookies.set("reg-password", formData.password)
 							setIsPendingSubmit(true)
+							Cookies.set("reg-password", formData.password)
 							if (email === undefined) {
 								toast({
 									title: "Signup Error",

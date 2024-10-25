@@ -49,7 +49,7 @@ export default function SignUpEmail() {
 				className="w-full"
 				onSubmit={(e) => {
 					e.preventDefault()
-					setIsPendingSubmit(true)
+                    setIsPendingSubmit(true)
 					form.handleSubmit(
 						(formData) => {
 							Cookies.set("reg-email", formData.email)

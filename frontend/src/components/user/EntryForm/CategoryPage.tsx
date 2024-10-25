@@ -123,8 +123,8 @@ export default function CategoryPage(props: CategoryPageProps) {
 						className="h-full grid grid-rows-[1fr_auto]"
 						onSubmit={(e) => {
 							e.preventDefault()
-							setIsFormLoading(true)
 							nameForm.handleSubmit((formData) => {
+								setIsFormLoading(true)
 								if (!userQuery.data?.data) {
 									return
 								}
@@ -135,6 +135,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 											"The category name has been used. Please enter another name",
 										variant: "destructive"
 									})
+									setIsFormLoading(false)
 									return
 								}
 

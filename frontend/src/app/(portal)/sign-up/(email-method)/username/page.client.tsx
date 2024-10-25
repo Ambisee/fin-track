@@ -59,8 +59,8 @@ export default function SignUpUsername() {
 				className="w-full h-full"
 				onSubmit={(e) => {
 					e.preventDefault()
-					setIsPendingSubmit(true)
 					form.handleSubmit((formData) => {
+                        setIsPendingSubmit(true)
 						let username = getUsernameFromEmail(email)
 						if (formData.username !== "") {
 							username = formData.username

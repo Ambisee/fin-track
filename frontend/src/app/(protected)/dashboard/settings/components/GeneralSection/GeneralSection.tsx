@@ -65,9 +65,9 @@ export default function GeneralSection() {
 				<form
 					onSubmit={(e) => {
 						e.preventDefault()
-						setIsPendingSubmit(true)
 						form.handleSubmit(
 							async (data) => {
+								setIsPendingSubmit(true)
 								if (data.username !== "") {
 									const { error } = await sbBrowser.auth.updateUser({
 										data: {
