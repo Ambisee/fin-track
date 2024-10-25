@@ -53,20 +53,49 @@ class AllowReportUsersView(AdminView):
 
 class GenerateReportView(UserView):
 
-    def _verify_request(self, request: Request):
-        data = dict(request.data)
-        
+    def _verify_user(self, data: dict):
         # Check for the existence of the token in the payload
         if data.get("token") is None:
-            return Response({"error": "The request doesn't have the required credentials"})
+            return Response({"error": "The request doesn't have the required credentials"}, 400)
 
         # Check if the token is valid
         user_response = client.auth.get_user(data.get("token"))
         if user_response is None:
-            return Response({"error": "Invalid credentials"})
+            return Response({"error": "Invalid credentials"}, 400)
 
         # Add user into the processed data
         data["uid"] = user_response.user.id
+        return data
+
+    def _verify_payload(self, data: dict):
+        month = data.get("month")
+        year = data.get("year")
+
+        # Check for the existence of the month and year values
+        if month is None:
+            return Response({"error": "No month specified"}, 400)
+        if year is None:
+            return Response({"error": "No year specified"}, 400)
+
+        # Check if the month and year values are ints
+        if not isinstance(month, int) or (month < 1 or month > 12):
+            return Response({"error": "Expected month to be an integer between 1 and 12"}, 400)
+        if not isinstance(year, int):
+            return Response({"error": "Expected year to be an integer"}, 400)
+            
+        return data
+
+    def _verify_request(self, request: Request):
+        data = dict(request.data)
+        
+        user_verification = self._verify_user(data)
+        if not isinstance(user_verification, dict):
+            return user_verification
+    
+        payload_verification = self._verify_payload(data)
+        if not isinstance(payload_verification, dict):
+            return payload_verification
+    
         return data
 
     def post(self, request: Request):
@@ -78,12 +107,13 @@ class GenerateReportView(UserView):
         # Get the user
         fetcher = self.fetcher()
 
-        today = datetime.now()
+        period = datetime.now()
+
         user_view = fetcher.get_user(request_data.get("uid"))
-        data = fetcher.get_period_data(user_view.id, today.month, today.year)
+        data = fetcher.get_period_data(user_view.id, period.month, period.year)
 
         d_engine = self.document_engine()
-        d_engine.set_period(today.month, today.year)
+        d_engine.set_period(period.month, period.year)
         filepath = d_engine.generate_pdf(user_view, data)
 
         response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")

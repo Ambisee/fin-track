@@ -3,7 +3,6 @@ import pydantic
 
 # Pydantic models
 class UserViewModel(pydantic.BaseModel):
-    id: str
     email: str
     username: str
     allow_report: bool

@@ -39,12 +39,14 @@ class DataFetcher:
             Otherwise None if no user is found.
         """
         try:
-            response = self.client.table("user_view").select("*").eq("id", uid).execute()
-            if response.count != 1:
+            user_response = self.client.auth.admin.get_user_by_id(uid)
+            settings_response = self.client.table("settings").select("allow_report, currency(currency_name)").eq("user_id", uid).execute()
+
+            if settings_response.count != 1 or not user_response.user:
                 raise HTTPStatusError()
         
             adapter = TypeAdapter(UserViewModel)
-            return adapter.validate_python(response.data[0])
+            return adapter.validate_python({**settings_response, 'username': user_response.user.user_metadata.get("username"), 'email': user_response.user.email})
         
         except HTTPStatusError:
             return None
