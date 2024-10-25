@@ -13,3 +13,6 @@ virtualenv
 
 # python
 **/__pycache__
+
+# dev scripts
+*.dev.sh

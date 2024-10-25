@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime
 from calendar import monthrange, month_name
 
+from babel.numbers import format_currency
 from django.contrib.staticfiles import finders
 
 from reportlab.lib import colors
@@ -76,13 +77,14 @@ class ReportlabEngine(BaseDocumentEngine):
 
         for i, entry in enumerate(entries):
             row = [str(i + 1) + ".", entry.date, entry.category]
+            amount = format_currency(entry.amount, user.currency_name)
 
             if entry.is_positive:
-                row.append(entry.amount)
+                row.append(amount)
                 row.append("-")
             else:
                 row.append("-")
-                row.append(entry.amount)
+                row.append(amount)
 
             data.append(row)
 
