@@ -1,5 +1,8 @@
+"use client"
+
 import { Label } from "@/components/ui/label"
 import { useContext } from "react"
+import Cookies from "js-cookie"
 import { DashboardContext } from "../../../layout"
 import {
 	Dialog,
@@ -14,9 +17,12 @@ import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { DownloadIcon } from "@radix-ui/react-icons"
+import { MONTHS } from "@/lib/constants"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function Documents() {
 	const { dataGroups } = useContext(DashboardContext)
+	const { toast } = useToast()
 
 	const renderDownloadList = () => {
 		const result = []
@@ -27,8 +33,27 @@ export default function Documents() {
 			result.push(
 				<li className="px-1" key={`${value.month} ${value.year}`}>
 					<Button
-						onClick={() => {
-							// TODO: Implement download report functionalities
+						type="button"
+						onClick={async (e) => {
+							e.preventDefault()
+							const { dismiss, update } = toast({
+								description: "Fetching document. Please wait..."
+							})
+							const response = await fetch("/api/documents", {
+								method: "POST",
+								body: JSON.stringify({
+									month: MONTHS.indexOf(value.month) + 1,
+									year: value.year
+								})
+							})
+
+							dismiss()
+
+							const blob = await response.blob()
+							const url = window.URL.createObjectURL(blob)
+							window.open(url, "_blank")
+
+							setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 						}}
 						className="p-4 w-full h-full flex justify-between"
 						variant="ghost"
