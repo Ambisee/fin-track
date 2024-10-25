@@ -110,7 +110,7 @@ export default function GeneralSection() {
 									const { error } = await sbBrowser
 										.from("settings")
 										.update({ currency_id: newCurrencyId.id })
-										.eq("id", userSettings.user_id)
+										.eq("user_id", userSettings.user_id)
 
 									if (error !== null) {
 										toast({
