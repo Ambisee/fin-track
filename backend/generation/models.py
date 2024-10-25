@@ -3,6 +3,7 @@ import pydantic
 
 # Pydantic models
 class UserViewModel(pydantic.BaseModel):
+    id: str
     email: str
     username: str
     allow_report: bool
@@ -11,10 +12,9 @@ class UserViewModel(pydantic.BaseModel):
 
 class EntryModel(pydantic.BaseModel):
     amount: float
-    amount_is_positive: bool
-    created_at: str
+    is_positive: bool
     created_by: str
     date: str
     id: int
     note: str | None
-    title: str | None
+    category: str

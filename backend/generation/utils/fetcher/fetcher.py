@@ -3,7 +3,6 @@ import calendar
 from typing import List
 from pydantic import TypeAdapter
 
-from httpx import HTTPStatusError
 from supabase import Client
 
 from ...supabase import client
@@ -24,7 +23,7 @@ class DataFetcher:
     def __init__(self):
         self.client: Client = client
 
-    def get_user(self, uid: str) -> UserViewModel | None:
+    def get_user(self, uid: str) -> UserViewModel | str:
         """Retrieve user information based on the given id
 
         Params
@@ -34,22 +33,26 @@ class DataFetcher:
 
         Returns
         -------
-        UserViewModel | None
+        UserViewModel | str
             A user object with the given id if a user is found.
-            Otherwise None if no user is found.
+            Otherwise a string detailing the cause of error if no user is found.
         """
-        try:
-            user_response = self.client.auth.admin.get_user_by_id(uid)
-            settings_response = self.client.table("settings").select("allow_report, currency(currency_name)").eq("user_id", uid).execute()
+        user_response = self.client.auth.admin.get_user_by_id(uid)
+        if not user_response.user:
+            return "Unable to find the user with the given user id"
 
-            if settings_response.count != 1 or not user_response.user:
-                raise HTTPStatusError()
-        
-            adapter = TypeAdapter(UserViewModel)
-            return adapter.validate_python({**settings_response, 'username': user_response.user.user_metadata.get("username"), 'email': user_response.user.email})
-        
-        except HTTPStatusError:
-            return None
+        settings_response = self.client.table("settings").select("allow_report, currency(currency_name)").eq("user_id", uid).single().execute()
+        if not settings_response.data:
+            return "Unable to retrieve the user's data"
+    
+        adapter = TypeAdapter(UserViewModel)
+        return adapter.validate_python({
+            'id': user_response.user.id,
+            'currency_name': settings_response.data['currency']['currency_name'],
+            'allow_report': settings_response.data['allow_report'],
+            'username': user_response.user.user_metadata.get("username"),
+            'email': user_response.user.email
+        })
 
 
     def get_allow_report_users(self) -> List[UserViewModel]:

@@ -1,5 +1,5 @@
-from datetime import datetime
 from typing import List
+from datetime import datetime
 from calendar import monthrange, month_name
 
 from django.contrib.staticfiles import finders
@@ -19,6 +19,7 @@ from ...models import UserViewModel, EntryModel
 
 
 class ReportlabEngine(BaseDocumentEngine):
+    
     def __init__(self, period: tuple[int, int] = None):
         super().__init__(period)
         
@@ -51,10 +52,10 @@ class ReportlabEngine(BaseDocumentEngine):
         return Paragraph(f"Monthly Report - {month_name[self.month]} {self.year}", stylesheet["Heading2"])
 
     def _create_report_info(self, user: UserViewModel):
-        start_dd, end_dd = monthrange(self.year, self.month)
+        _, end_dd = monthrange(self.year, self.month)
         
-        format = "%Y-%m-%d"
-        s_date = datetime(self.year, self.month, start_dd).strftime(format)
+        format = "%d %B %Y"
+        s_date = datetime(self.year, self.month, 1).strftime(format)
         e_date = datetime(self.year, self.month, end_dd).strftime(format)
         
         fields = [
@@ -68,14 +69,15 @@ class ReportlabEngine(BaseDocumentEngine):
             fields, style=[("LEFTPADDING", (0, 0), (-1, -1), 0)], hAlign="LEFT"
         )
 
-    def _create_entry_table(self, entries: List[EntryModel]):
+    def _create_entry_table(self, user: UserViewModel, entries: List[EntryModel]):
         data = [
-            ["No.", "Date", "Title", "Debit", "Credit"]
+            ["No.", "Date", "Category", "Debit", "Credit"]
         ]
 
         for i, entry in enumerate(entries):
-            row = [str(i + 1) + ".", entry.date, entry.title]
-            if entry.amount_is_positive:
+            row = [str(i + 1) + ".", entry.date, entry.category]
+
+            if entry.is_positive:
                 row.append(entry.amount)
                 row.append("-")
             else:
@@ -105,12 +107,12 @@ class ReportlabEngine(BaseDocumentEngine):
 
     def generate_pdf(self, user: UserViewModel, entries: List[EntryModel]):
         filepath = self.get_filepath(user)
-        document: SimpleDocTemplate = self.create_document(filepath)
+        document: SimpleDocTemplate = self._create_document(filepath)
         flowables = []
 
         flowables.append(self._create_header())
         flowables.append(self._create_report_info(user))
-        flowables.append(self._create_entry_table(entries))
+        flowables.append(self._create_entry_table(user, entries))
 
         document.build(flowables)
 

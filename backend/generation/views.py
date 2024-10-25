@@ -60,8 +60,8 @@ class GenerateReportView(UserView):
 
         # Check if the token is valid
         user_response = client.auth.get_user(data.get("token"))
-        if user_response is None:
-            return Response({"error": "Invalid credentials"}, 400)
+        if isinstance(user_response, str):
+            return Response({"error": user_response}, 400)
 
         # Add user into the processed data
         data["uid"] = user_response.user.id
@@ -107,14 +107,17 @@ class GenerateReportView(UserView):
         # Get the user
         fetcher = self.fetcher()
 
-        period = datetime.now()
+        period = datetime(request_data.get("year"), request_data.get("month"), 1)
 
-        user_view = fetcher.get_user(request_data.get("uid"))
-        data = fetcher.get_period_data(user_view.id, period.month, period.year)
+        user = fetcher.get_user(request_data.get("uid"))
+        if isinstance(user, str):
+            return Response({'error': user}, status=400)
+
+        data = fetcher.get_period_data(user.id, period.month, period.year)
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
-        filepath = d_engine.generate_pdf(user_view, data)
+        filepath = d_engine.generate_pdf(user, data)
 
         response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
         response["Content-Disposition"] = "inline; filename=report.pdf"
