@@ -1,4 +1,5 @@
 import os
+import logging
 import shutil
 from datetime import datetime
 from calendar import month_name
@@ -117,6 +118,13 @@ class GenerateReportView(UserView):
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
+
+        filepath = d_engine.get_filepath(user)
+        
+        if len(os.listdir(os.path.dirname(filepath))) > 10:
+            shutil.rmtree(os.path.dirname(filepath))
+            logging.warning("Cleared out the PDF storage directory")
+
         filepath = d_engine.generate_pdf(user, data)
 
         response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
