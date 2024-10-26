@@ -34,26 +34,30 @@ export default function Documents() {
 				<li className="px-1" key={`${value.month} ${value.year}`}>
 					<Button
 						type="button"
-						onClick={async (e) => {
+						onClick={(e) => {
 							e.preventDefault()
+
 							const { dismiss, update } = toast({
 								description: "Fetching document. Please wait..."
 							})
-							const response = await fetch("/api/documents", {
+
+							fetch("/api/documents", {
 								method: "POST",
 								body: JSON.stringify({
 									month: MONTHS.indexOf(value.month) + 1,
 									year: value.year
 								})
 							})
+								.then((resp) => {
+									dismiss()
+									return resp.blob()
+								})
+								.then((value) => {
+									const url = window.URL.createObjectURL(value)
 
-							dismiss()
-
-							const blob = await response.blob()
-							const url = window.URL.createObjectURL(blob)
-							window.open(url, "_blank")
-
-							setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+									setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+									window.location.assign(url)
+								})
 						}}
 						className="p-4 w-full h-full flex justify-between"
 						variant="ghost"
