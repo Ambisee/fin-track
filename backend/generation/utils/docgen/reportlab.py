@@ -12,6 +12,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus.paragraph import Paragraph
+from reportlab.graphics.shapes import String
 from reportlab.platypus.tables import Table
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.piecharts import Pie
@@ -53,7 +54,10 @@ class ReportlabEngine(BaseDocumentEngine):
 
     def _create_header(self) -> Paragraph:
         stylesheet = getSampleStyleSheet()
-        return Paragraph(f"Monthly Report - {month_name[self.month]} {self.year}", stylesheet["Heading1"])
+        style = stylesheet["Heading1"]
+        style.fontName = "RalewayBd"
+
+        return Paragraph(f"Monthly Report - {month_name[self.month]} {self.year}", style)
 
     def _create_report_info(self, user: UserViewModel) -> Table:
         _, end_dd = monthrange(self.year, self.month)
@@ -70,7 +74,12 @@ class ReportlabEngine(BaseDocumentEngine):
         ]
 
         return Table(
-            fields, style=[("LEFTPADDING", (0, 0), (-1, -1), 0)], hAlign="LEFT"
+            fields,
+            hAlign="LEFT",
+            style=[
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("FONT", (0, 0), (-1, -1), "Raleway")
+            ],
         )
 
     def _create_entry_table(self, user: UserViewModel, entries: List[EntryModel]) -> Table:
@@ -109,6 +118,7 @@ class ReportlabEngine(BaseDocumentEngine):
             spaceBefore=cm,
             repeatRows=1,
             style=[
+                ("FONT", (0, 0), (-1, -1), "Raleway"),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                 ("BACKGROUND", (0, 0), (-1, 0), colors.black),
@@ -124,11 +134,47 @@ class ReportlabEngine(BaseDocumentEngine):
             ]
         )
 
+    def _create_pie_chart(self, drawing: Drawing, labels: List[str], values: List[str]):
+        if len(values) < 1:
+            drawing.add(String(drawing.width / 2, drawing.height / 2, "No entry data", fontSize=18, fontName="RalewayBd", textAnchor="middle"), '')
+            return drawing
+        
+        pc = Pie()
+        pc.x = drawing.width / 2 - 0.5 * pc.width
+        pc.y = drawing.height / 2 - 0.5 * pc.height
+        pc.labels = labels
+        pc.data = values
+        pc.slices.fontName = "Raleway"
+        pc.slices.strokeWidth = 0.5
+        pc.simpleLabels = 0
+        pc.sideLabels = 1
+        
+        drawing.add(pc, '')
+        return drawing
+
+    def _create_category_section(self, entrylist: List[List[str]]):
+        if len(entrylist) < 1:
+            return Paragraph("")
+    
+        aW = self.pagesize[0] - 2 * self.margin
+        return Table(
+            entrylist,
+            colWidths=[0.25 * aW, 0.25 * aW],
+            style=[
+                ("FONT", (0, 0), (-1, -1), "Raleway"),
+                ("ALIGNMENT", (1, 0), (1, -1), "RIGHT"),
+                ("LEFTPADDING", (0, 0), (0, -1), 24),
+                ("RIGHTPADDING", (1, 0), (1, -1), 24),
+            ])
+
+
     def _create_statistics(self, user: UserViewModel, entries: List[EntryModel]):
         incomes = {}
         expenses = {}
+        
         total_income = 0
         total_expense = 0
+        
         aW = self.pagesize[0] - 2 * self.margin
         styles = getSampleStyleSheet()
 
@@ -147,68 +193,39 @@ class ReportlabEngine(BaseDocumentEngine):
 
         income_d, expense_d = Drawing(0.5 * aW, 150), Drawing(0.5 * aW, 150)
         income_list, expense_list = [], []
-        if len(incomes) >= 1:
-            income_labels, income_values = map(list, zip(*incomes.items()))
 
-            income_pc = Pie()
-            income_pc.x = 0.25 * aW - 0.5 * income_pc.width
-            income_pc.y = 75 - 0.5 * income_pc.height
-            income_pc.labels = income_labels
-            income_pc.data = income_values
-            income_pc.slices.strokeWidth = 0.5
-            income_pc.simpleLabels = 0
-            income_pc.sideLabels = 1
+        # Process income values
+        income_labels, income_values = [], []
+        for k in incomes:
+            income_labels.append(k)
+            income_values.append(incomes[k])
+
+        income_d = self._create_pie_chart(income_d, income_labels, income_values)
+
+        for inc in incomes:
+            income_list.append([
+                f'{inc} ({round(100 * incomes[inc] / total_income, 2)}%)',
+                format_currency(incomes[inc], user.currency_name)
+            ])
+
+        # Process expense values
+        expense_labels, expense_values = [], []
+        for k in expenses:
+            expense_labels.append(k)
+            expense_values.append(expenses[k])
+
+        expense_d = self._create_pie_chart(expense_d, expense_labels, expense_values)
+
+        for exp in expenses:
+            expense_list.append([
+                f'{exp} ({round(100 * expenses[exp] / total_expense, 2)}%)',
+                format_currency(expenses[exp], user.currency_name)
+            ])
             
-            income_d.add(income_pc, '')
-
-            for inc in incomes:
-                income_list.append([
-                    f'{inc} ({round(100 * incomes[inc] / total_income, 2)}%)',
-                    format_currency(incomes[inc], user.currency_name)
-                ])
-
-        if len(expenses) >= 1:
-            expense_labels, expense_values = map(list, zip(*expenses.items()))
-
-            expense_pc = Pie()
-            expense_pc.x = 0.25 * aW - 0.5 * expense_pc.width
-            expense_pc.y = 75 - 0.5 * expense_pc.height
-            expense_pc.labels = expense_labels
-            expense_pc.data = expense_values
-            expense_pc.slices.strokeWidth = 0.5
-            expense_pc.simpleLabels = 0
-            expense_pc.sideLabels = 1
-            
-            expense_d.add(expense_pc, '')
-
-            for exp in expenses:
-                expense_list.append([
-                    f'{exp} ({round(100 * expenses[exp] / total_expense, 2)}%)',
-                    format_currency(expenses[exp], user.currency_name)
-                ])
-            
-        
         data = [
             [Paragraph("Income", styles["Heading2"]), Paragraph("Expense", styles["Heading2"])],
             [income_d, expense_d],
-            [
-                Table(
-                    income_list,
-                    colWidths=[0.25 * aW, 0.25 * aW],
-                    style=[
-                        ("ALIGNMENT", (1, 0), (1, -1), "RIGHT"),
-                        ("LEFTPADDING", (0, 0), (0, -1), 24),
-                        ("RIGHTPADDING", (1, 0), (1, -1), 24),
-                    ]),
-                Table(
-                    expense_list,
-                    colWidths=[0.25 * aW, 0.25 * aW],
-                    style=[
-                        ("ALIGNMENT", (1, 0), (1, -1), "RIGHT"),
-                        ("LEFTPADDING", (0, 0), (0, -1), 24),
-                        ("RIGHTPADDING", (1, 0), (1, -1), 24),
-                    ]),
-            ]
+            [self._create_category_section(income_list), self._create_category_section(expense_list)]
         ]
         
         return Table(
