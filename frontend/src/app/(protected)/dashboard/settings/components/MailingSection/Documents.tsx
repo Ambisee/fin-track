@@ -37,8 +37,9 @@ export default function Documents() {
 						onClick={(e) => {
 							e.preventDefault()
 
-							const { dismiss, update } = toast({
-								description: "Fetching document. Please wait..."
+							const { dismiss, id, update } = toast({
+								description: "Fetching document. Please wait...",
+								duration: Infinity
 							})
 
 							fetch("/api/documents", {
@@ -52,7 +53,19 @@ export default function Documents() {
 									dismiss()
 									return resp.blob()
 								})
+								.catch((err) => {
+									update({
+										id: id,
+										description: err,
+										variant: "destructive"
+									})
+									return undefined
+								})
 								.then((value) => {
+									if (value === undefined) {
+										return
+									}
+
 									const url = window.URL.createObjectURL(value)
 
 									setTimeout(() => window.URL.revokeObjectURL(url), 1000)
