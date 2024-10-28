@@ -267,7 +267,7 @@ export default function DashboardEntries() {
 						</DialogTrigger>
 					</div>
 				) : (
-					<EntryList data={currentGroup.data} />
+					<EntryList data={currentGroup.data.toReversed()} />
 				)}
 			</div>
 		)
