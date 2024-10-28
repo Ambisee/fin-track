@@ -225,7 +225,7 @@ class ReportlabEngine(BaseDocumentEngine):
         data = [
             [Paragraph("Income", styles["Heading2"]), Paragraph("Expense", styles["Heading2"])],
             [income_d, expense_d],
-            [self._create_category_section(income_list), self._create_category_section(expense_list)]
+            [self._create_category_section(expense_list), self._create_category_section(income_list)]
         ]
         
         return Table(
