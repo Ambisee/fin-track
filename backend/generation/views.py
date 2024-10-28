@@ -56,11 +56,13 @@ class GenerateReportView(UserView):
 
     def _verify_user(self, data: dict):
         # Check for the existence of the token in the payload
-        if data.get("token") is None:
+        if data.get("Authorization") is None:
             return Response({"error": "The request doesn't have the required credentials"}, 400)
 
         # Check if the token is valid
-        user_response = client.auth.get_user(data.get("token"))
+        auth_token = data.get("Authorization").split(" ")
+
+        user_response = client.auth.get_user(auth_token)
         if isinstance(user_response, str):
             return Response({"error": user_response}, 400)
 
@@ -88,8 +90,9 @@ class GenerateReportView(UserView):
 
     def _verify_request(self, request: Request):
         data = dict(request.data)
+        headers = dict(request._request.headers)
         
-        user_verification = self._verify_user(data)
+        user_verification = self._verify_user(headers)
         if not isinstance(user_verification, dict):
             return user_verification
     

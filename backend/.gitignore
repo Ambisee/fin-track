@@ -16,3 +16,6 @@ virtualenv
 
 # dev scripts
 *.dev.sh
+
+# other
+generation/storage

@@ -16,11 +16,11 @@ export async function POST(request: NextRequest) {
     const response = await fetch(`${process.env.NEXT_GENERATE_DOCUMENT_URL}`, {
         method: "POST",
         body: JSON.stringify({
-            token: session.data.session?.access_token,
             month: payload?.month,
             year: payload?.year
         }),
         headers: {
+            "Authorization": `Bearer ${session.data.session?.access_token}`,
             "Content-Type": "application/json",
         }
     })
