@@ -174,46 +174,6 @@ export default function PasswordChange() {
 						</FormItem>
 					)}
 				/>
-			</>
-		)
-	}
-
-	return (
-		<Form {...form}>
-			<form
-				className="mt-8"
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit(async (formData) => {
-						setIsPendingSubmit(true)
-						const { data, error } = await sbBrowser.rpc("update_password", {
-							old_password: formData.oldPassword,
-							new_password: formData.newPassword
-						})
-
-						if (error !== null) {
-							setIsPendingSubmit(false)
-							toast({
-								description: error?.message,
-								variant: "destructive",
-								duration: 1500
-							})
-							return
-						}
-
-						setIsPendingSubmit(false)
-
-						toast({
-							description: "Successfully updated the account's password",
-							duration: 1500
-						})
-
-						form.reset()
-					})()
-				}}
-			>
-				<FormLabel>Password</FormLabel>
-				{renderFormFields()}
 				<div className="flex justify-between items-center mt-4">
 					<Button disabled={userQuery.isLoading || isPendingSubmit}>
 						Submit
@@ -255,6 +215,46 @@ export default function PasswordChange() {
 						Request a password reset link
 					</Button>
 				</div>
+			</>
+		)
+	}
+
+	return (
+		<Form {...form}>
+			<form
+				className="mt-8"
+				onSubmit={(e) => {
+					e.preventDefault()
+					form.handleSubmit(async (formData) => {
+						setIsPendingSubmit(true)
+						const { data, error } = await sbBrowser.rpc("update_password", {
+							old_password: formData.oldPassword,
+							new_password: formData.newPassword
+						})
+
+						if (error !== null) {
+							setIsPendingSubmit(false)
+							toast({
+								description: error?.message,
+								variant: "destructive",
+								duration: 1500
+							})
+							return
+						}
+
+						setIsPendingSubmit(false)
+
+						toast({
+							description: "Successfully updated the account's password",
+							duration: 1500
+						})
+
+						form.reset()
+					})()
+				}}
+			>
+				<FormLabel>Password</FormLabel>
+				{renderFormFields()}
 			</form>
 		</Form>
 	)
