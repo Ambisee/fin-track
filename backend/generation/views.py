@@ -54,13 +54,16 @@ class AllowReportUsersView(AdminView):
 
 class GenerateReportView(UserView):
 
-    def _verify_user(self, data: dict):
+    def _verify_user(self, request: Request):
+        data = request.data
+        headers = request._request.headers
+
         # Check for the existence of the token in the payload
-        if data.get("Authorization") is None:
+        if headers.get("Authorization") is None:
             return Response({"error": "The request doesn't have the required credentials"}, 400)
 
         # Check if the token is valid
-        auth_token = data.get("Authorization").split(" ")
+        _, auth_token = headers.get("Authorization").split(" ")
 
         user_response = client.auth.get_user(auth_token)
         if isinstance(user_response, str):
@@ -68,9 +71,10 @@ class GenerateReportView(UserView):
 
         # Add user into the processed data
         data["uid"] = user_response.user.id
-        return data
+        return request
 
-    def _verify_payload(self, data: dict):
+    def _verify_payload(self, request: Request):
+        data = request.data
         month = data.get("month")
         year = data.get("year")
 
@@ -86,29 +90,27 @@ class GenerateReportView(UserView):
         if not isinstance(year, int):
             return Response({"error": "Expected year to be an integer"}, 400)
             
-        return data
+        return request
 
     def _verify_request(self, request: Request):
-        data = dict(request.data)
-        headers = dict(request._request.headers)
-        
-        user_verification = self._verify_user(headers)
+        user_verification = self._verify_user(request)
         if not isinstance(user_verification, dict):
             return user_verification
     
-        payload_verification = self._verify_payload(data)
+        payload_verification = self._verify_payload(request)
         if not isinstance(payload_verification, dict):
             return payload_verification
     
-        return data
+        return request
 
     def post(self, request: Request):
         # Check if the request body has the required data
         request_data = self._verify_request(request)
-        if type(request_data) is not dict:
+        if not isinstance(request_data, Request):
             return request_data
 
         # Get the user
+        request_data = request_data.data
         fetcher = self.fetcher()
 
         period = datetime(request_data.get("year"), request_data.get("month"), 1)
