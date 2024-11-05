@@ -21,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast"
 
 export default function MiscellaneousSection() {
 	const router = useRouter()
-	const { toast } = useToast()
+	const { toast, dismiss } = useToast()
 	const queryClient = useQueryClient()
 	const [isDeleteChecked, setIsDeleteChecked] = useState(false)
 
@@ -118,6 +118,7 @@ export default function MiscellaneousSection() {
 								queryClient.removeQueries({ queryKey: USER_QKEY })
 								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
 								router.push("/")
+								dismiss()
 							}}
 						>
 							Logout
