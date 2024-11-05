@@ -1,9 +1,6 @@
 "use client"
 
-import { Label } from "@/components/ui/label"
-import { useContext } from "react"
-import Cookies from "js-cookie"
-import { DashboardContext } from "../../../layout"
+import { Button } from "@/components/ui/button"
 import {
 	Dialog,
 	DialogClose,
@@ -13,16 +10,22 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { DownloadIcon } from "@radix-ui/react-icons"
-import { MONTHS } from "@/lib/constants"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { MONTHS } from "@/lib/constants"
+import { useUserQuery } from "@/lib/hooks"
+import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { X } from "lucide-react"
+import { useContext, useState } from "react"
+import { DashboardContext } from "../../../layout"
 
 export default function Documents() {
-	const { dataGroups } = useContext(DashboardContext)
 	const { toast } = useToast()
+	const { dataGroups } = useContext(DashboardContext)
+	const [isPendingIndex, setIsPendingIndex] = useState(-1)
+
+	const userQuery = useUserQuery()
 
 	const renderDownloadList = () => {
 		const result = []
@@ -34,14 +37,17 @@ export default function Documents() {
 				<li className="px-1" key={`${value.month} ${value.year}`}>
 					<Button
 						type="button"
+						disabled={isPendingIndex !== -1}
 						onClick={(e) => {
 							e.preventDefault()
 
+							setIsPendingIndex(i)
 							const { dismiss, id, update } = toast({
 								description: "Fetching document. Please wait...",
 								duration: Infinity
 							})
 
+							// Using fetch to handle redirection on iOS
 							fetch("/api/documents", {
 								method: "POST",
 								body: JSON.stringify({
@@ -71,14 +77,21 @@ export default function Documents() {
 									setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 									window.location.assign(url)
 								})
+								.finally(() => {
+									setIsPendingIndex(-1)
+								})
 						}}
-						className="p-4 w-full h-full flex justify-between"
+						className="p-4 w-full h-full flex justify-between items-center"
 						variant="ghost"
 					>
 						<span>
 							{value.month} {value.year}
 						</span>
-						<DownloadIcon />
+						{isPendingIndex === -1 || isPendingIndex !== i ? (
+							<DownloadIcon className="m-0" />
+						) : (
+							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+						)}
 					</Button>
 				</li>
 			)
@@ -97,7 +110,9 @@ export default function Documents() {
 					</p>
 				</div>
 				<DialogTrigger asChild>
-					<Button className="mt-4">Download a report</Button>
+					<Button disabled={userQuery.isLoading} className="mt-4">
+						Download a report
+					</Button>
 				</DialogTrigger>
 			</div>
 			<DialogContent
@@ -121,7 +136,7 @@ export default function Documents() {
 						</VisuallyHidden>
 					</DialogDescription>
 				</DialogHeader>
-				<ul className="h-full overflow-y-auto grid gap-1.5">
+				<ul className="max-h-full overflow-y-auto [&_:not(:first-child)]:mt-1.5">
 					{renderDownloadList()}
 				</ul>
 			</DialogContent>
