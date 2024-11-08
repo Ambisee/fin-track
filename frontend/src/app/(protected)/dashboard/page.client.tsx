@@ -14,12 +14,9 @@ export default function DashboardHome() {
 	const entriesQuery = useEntryDataQuery()
 
 	const renderWelcomeMessage = () => {
-		if (userQuery.isLoading) {
+		if (userQuery.isLoading || userQuery.data?.data?.user === undefined) {
 			return <Skeleton className="w-full h-8 mb-8" />
-		} else if (
-			userQuery.data?.data?.user !== null &&
-			userQuery.data?.data?.user !== undefined
-		) {
+		} else if (userQuery.data?.data?.user !== null) {
 			return (
 				<h1 className="text-2xl mb-8">
 					Welcome back, {userQuery.data?.data?.user.user_metadata.username}

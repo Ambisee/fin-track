@@ -1,7 +1,7 @@
 import { QueryData, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
-import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, GROUP_ENTRY_QKYE, MONTHS, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, GROUP_ENTRY_QKYE, MONTHS, USER_QKEY, USER_SETTINGS_QKEY, USER_STALE_TIME } from "./constants";
 import { sbBrowser } from "./supabase";
 import { groupDataByMonth } from "./utils";
 
@@ -10,13 +10,14 @@ function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error,
         queryKey: USER_QKEY,
         queryFn: () => sbBrowser.auth.getUser(),
         refetchOnWindowFocus: false,
-        refetchOnMount: (query) => query.state.data === undefined,
+        refetchOnMount: (query) => query.state.data?.data.user === undefined || query.state.data.data.user === null,
         ...options
     })
 }
 
 function useEntryDataQuery() {
     const userQuery = useUserQuery()
+    
     return useQuery({
 		queryKey: ENTRY_QKEY,
 		queryFn: async () =>
@@ -29,7 +30,7 @@ function useEntryDataQuery() {
 				.limit(100),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
-		enabled: !!userQuery.data
+		enabled: !!userQuery.data?.data.user
 	})
 }
 
@@ -78,7 +79,7 @@ function useSettingsQuery() {
 				.limit(1)
 				.single(),
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
+		refetchOnMount: (query) => query.state.data === undefined || query.state.data.data === null,
         enabled: !!userQuery.data
 	})
 }
