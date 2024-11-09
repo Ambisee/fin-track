@@ -39,6 +39,8 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 export default function ProtectedNavbar() {
 	const pathname = usePathname()
 	const queryClient = useQueryClient()
+
+	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
@@ -69,6 +71,7 @@ export default function ProtectedNavbar() {
 										setOnSubmitSuccess((data) => {
 											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 										})
+										setOpen(true)
 									}}
 									className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
