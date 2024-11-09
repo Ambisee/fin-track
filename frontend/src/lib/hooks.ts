@@ -1,7 +1,7 @@
 import { QueryData, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
-import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, GROUP_ENTRY_QKYE, MONTHS, USER_QKEY, USER_SETTINGS_QKEY, USER_STALE_TIME } from "./constants";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, GROUP_ENTRY_QKYE, MONTHS, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
 import { groupDataByMonth } from "./utils";
 
