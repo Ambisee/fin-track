@@ -16,7 +16,7 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 
 	return (
 		<li>
-			<Link href={props.href} className="w-full md:block">
+			<Link prefetch href={props.href} className="w-full md:block">
 				<div
 					className={cn(
 						buttonVariants({
