@@ -1,9 +1,8 @@
-import { QueryData, UserResponse } from "@supabase/supabase-js";
+import { UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
-import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, GROUP_ENTRY_QKYE, MONTHS, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
+import { useCallback, useEffect, useRef } from "react";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
-import { groupDataByMonth } from "./utils";
 
 function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error, UserResponse, string[]>) {
     return useQuery({
@@ -32,39 +31,6 @@ function useEntryDataQuery() {
 		refetchOnMount: (query) => query.state.data === undefined,
 		enabled: !!userQuery.data?.data.user
 	})
-}
-
-function useGroupEntryDataQuery() {
-    const entryDataQuery = useEntryDataQuery()
-    return useQuery({
-        queryKey: GROUP_ENTRY_QKYE,
-        queryFn: async () => {
-            if (entryDataQuery.isLoading) {
-                return []
-            }
-    
-            if (entryDataQuery.data === undefined || entryDataQuery.data.data === null) {
-                return []
-            }
-    
-            const result = groupDataByMonth(entryDataQuery.data.data)
-            if (result.length < 1) {
-                const d = new Date()
-                return [
-                    {
-                        month: MONTHS[d.getMonth()],
-                        year: d.getFullYear(),
-                        data: []
-                    }
-                ]
-            }
-    
-            return result
-        },
-        refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
-        enabled: !!entryDataQuery.data
-    })
 }
 
 function useSettingsQuery() {
@@ -161,6 +127,6 @@ function useAmountFormatter() {
 
 export { 
     useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery,
-    useSetElementWindowHeight, useAmountFormatter, useGroupEntryDataQuery
+    useSetElementWindowHeight, useAmountFormatter
 };
 
