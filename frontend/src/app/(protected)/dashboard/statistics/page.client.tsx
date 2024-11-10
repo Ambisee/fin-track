@@ -19,7 +19,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
 import { MonthPicker } from "@/components/user/MonthPicker"
-import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
+import {
+	DESKTOP_BREAKPOINT,
+	ENTRY_QKEY,
+	MONTHS
+} from "@/lib/constants"
 import { useAmountFormatter, useEntryDataQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
@@ -512,7 +516,7 @@ export default function DashboardStatistics() {
 	return (
 		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
 			<div className="w-full h-full pb-8 md:pb-0">
-				<h1 className="text-2xl">Statistics</h1>
+				<h1 className="text-3xl">Statistics</h1>
 				{renderMonthPicker()}
 				{renderStatsUI()}
 			</div>

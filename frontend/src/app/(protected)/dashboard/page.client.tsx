@@ -1,48 +1,72 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
 import EntryList from "@/components/user/EntryList"
 import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { filterDataGroup } from "@/lib/utils"
+import { useContext } from "react"
+import { DashboardContext } from "./layout"
+import { DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 export default function DashboardHome() {
-	const { toast } = useToast()
+	const { dataGroups } = useContext(DashboardContext)
 
 	const userQuery = useUserQuery()
-	const entriesQuery = useEntryDataQuery()
+	const entryDataQuery = useEntryDataQuery()
 
 	const renderWelcomeMessage = () => {
 		if (userQuery.isLoading || userQuery.data?.data?.user === undefined) {
-			return <Skeleton className="w-full h-8 mb-8" />
+			return (
+				<div className="mb-8">
+					<Skeleton className="w-24 h-9" />
+					<Skeleton className="min-w-36 w-3/4 h-8 mt-4" />
+				</div>
+			)
 		} else if (userQuery.data?.data?.user !== null) {
 			return (
-				<h1 className="text-2xl mb-8">
-					Welcome back, {userQuery.data?.data?.user.user_metadata.username}
-				</h1>
+				<div className="mb-8">
+					<h1 className="text-3xl">Home</h1>
+					<h3 className="text-2xl mt-4">
+						Welcome back, {userQuery.data?.data?.user.user_metadata.username}
+					</h3>
+				</div>
 			)
 		} else {
-			return <h1 className="text-2xl mb-8">ERROR</h1>
+			return (
+				<div className="mb-8">
+					<h1 className="text-2xl">Home</h1>
+					<h3 className="text-lg">ERROR</h3>
+				</div>
+			)
 		}
 	}
 
 	const renderThisMonthEntries = () => {
+		if (entryDataQuery.isLoading || userQuery.isLoading) {
+			return (
+				<div>
+					<Skeleton className="w-56 h-6 mb-4" />
+					<div className="grid gap-4">
+						<Skeleton className="w-full h-[6.25rem]" />
+						<Skeleton className="w-full h-[6.25rem]" />
+						<Skeleton className="w-full h-[6.25rem]" />
+					</div>
+				</div>
+			)
+		}
+
 		const today = new Date()
+		const group = filterDataGroup(
+			today.getMonth(),
+			today.getFullYear(),
+			dataGroups
+		).data
 
 		return (
 			<div>
-				<h2 className="text-xl mb-4"></h2>
-				<EntryList data={entriesQuery.data?.data?.toReversed() ?? undefined} />
-			</div>
-		)
-	}
-
-	const renderRecentEntries = () => {
-		return (
-			<div>
-				<h2 className="text-xl mb-4">Recent Entries</h2>
-				<EntryList data={entriesQuery.data?.data?.toReversed() ?? undefined} />
+				<h2 className="text-xl mb-4">This month&apos;s transactions</h2>
+				<EntryList data={group} />
 			</div>
 		)
 	}
@@ -50,7 +74,7 @@ export default function DashboardHome() {
 	return (
 		<div>
 			{renderWelcomeMessage()}
-			{renderRecentEntries()}
+			{renderThisMonthEntries()}
 		</div>
 	)
 }

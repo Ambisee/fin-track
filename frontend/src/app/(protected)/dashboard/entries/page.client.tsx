@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import EntryList from "@/components/user/EntryList"
 import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import { useEntryDataQuery, useGroupEntryDataQuery } from "@/lib/hooks"
+import { useEntryDataQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { filterDataGroup, groupDataByMonth } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -252,30 +252,14 @@ export default function DashboardEntries() {
 						<ChevronRight className="w-4 h-4" />
 					</Button>
 				</div>
-				{currentGroup.data.length === 0 ? (
-					<div className="h-full grid gap-4 items-center justify-center">
-						<p>No entries available for this period yet.</p>
-						<DialogTrigger
-							onClick={() => {
-								setData(undefined)
-								setOnSubmitSuccess((data) => {
-									queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-								})
-							}}
-						>
-							<Button>Add an entry</Button>
-						</DialogTrigger>
-					</div>
-				) : (
-					<EntryList data={currentGroup.data.toReversed()} />
-				)}
+				<EntryList data={currentGroup.data.toReversed()} />
 			</div>
 		)
 	}
 
 	return (
 		<div>
-			<h1 className="text-2xl">Entries</h1>
+			<h1 className="text-3xl">Entries</h1>
 			<div className="sticky top-0 py-4 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input

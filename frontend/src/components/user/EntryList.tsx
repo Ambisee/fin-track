@@ -1,9 +1,13 @@
 "use client"
 
 import { Entry } from "@/types/supabase"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Skeleton } from "../ui/skeleton"
 import EntryListItem from "./EntryListItem"
+import { DialogTrigger } from "../ui/dialog"
+import { Button } from "../ui/button"
+import { useQueryClient } from "@tanstack/react-query"
+import useGlobalStore from "@/lib/store"
+import { ENTRY_QKEY } from "@/lib/constants"
 
 interface EntryListProps {
 	data?: Entry[]
@@ -15,6 +19,10 @@ export default function EntryList({
 	showButtons = true,
 	...props
 }: EntryListProps) {
+	const queryClient = useQueryClient()
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
+
 	const renderData = () => {
 		if (props.data === undefined) {
 			return undefined
@@ -22,14 +30,24 @@ export default function EntryList({
 
 		if (props.data.length < 1) {
 			return (
-				<Card>
-					<CardHeader>
-						<CardTitle>No data provided</CardTitle>
-					</CardHeader>
-					<CardContent>
-						Your transaction entries will be displayed here.
-					</CardContent>
-				</Card>
+				<div className="px-0 py-12 grid gap-2 items-center justify-center">
+					<p className="text-center">
+						No entry data available for this period.
+					</p>
+					<DialogTrigger asChild>
+						<Button
+							className="w-fit justify-self-center"
+							onClick={() => {
+								setData(undefined)
+								setOnSubmitSuccess((data) => {
+									queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+								})
+							}}
+						>
+							Add an entry
+						</Button>
+					</DialogTrigger>
+				</div>
 			)
 		}
 
