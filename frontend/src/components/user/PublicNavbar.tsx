@@ -41,7 +41,7 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 
 	return (
 		<div
-			className="w-full h-header grid grid-flow-col-dense 
+			className="w-full h-public-header grid grid-flow-col-dense 
             justify-items-center"
 		>
 			<div

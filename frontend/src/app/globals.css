@@ -79,7 +79,7 @@
 }
 
 @layer components {
-	.h-header {
+	.h-public-header {
 		@apply h-20;
 	}
 
@@ -106,10 +106,6 @@
 
     .text-entry-item {
         @apply group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-violet-600
-    }
-
-    .fill-entry-item {
-        @apply fill-primary
     }
 
     .cmdk-input-no-border {
