@@ -19,14 +19,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
 import { MonthPicker } from "@/components/user/MonthPicker"
-import {
-	DESKTOP_BREAKPOINT,
-	ENTRY_QKEY,
-	MONTHS
-} from "@/lib/constants"
+import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
 import { useAmountFormatter, useEntryDataQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { MonthGroup, cn, filterDataGroup, groupDataByMonth } from "@/lib/utils"
+import { MonthGroup, cn, filterDataGroup } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
@@ -162,9 +158,6 @@ function ChartDisplay(props: ChartDisplayProps) {
 								(props.dataKey === "income" && entry.is_positive) ||
 								(props.dataKey === "expense" && !entry.is_positive)
 						)
-						// const dialogTitle = `${value.name} ${props.dataKey}s (${
-						// 	MONTHS[period[0]]
-						// } ${period[1]})`
 						const dialogTitle = (
 							<>
 								<span className="whitespace-nowrap">

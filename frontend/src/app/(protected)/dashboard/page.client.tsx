@@ -65,7 +65,7 @@ export default function DashboardHome() {
 
 		return (
 			<div>
-				<h2 className="text-xl mb-4">This month&apos;s transactions</h2>
+				<h2 className="text-xl mb-4">Transactions in November 2024</h2>
 				<EntryList data={group} />
 			</div>
 		)
