@@ -34,6 +34,9 @@ function CategoriesContent() {
 					<Button>Open category editor</Button>
 				)}
 			</DialogTrigger>
+			<p className="mt-2 text-muted-foreground text-sm">
+				All categories created will be available for all ledgers.
+			</p>
 			<DialogContent
 				hideCloseButton
 				onSubmit={(e) => e.stopPropagation()}
