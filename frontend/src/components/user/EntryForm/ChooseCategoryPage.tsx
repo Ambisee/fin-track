@@ -19,6 +19,7 @@ import { ChevronLeft, PencilIcon, X } from "lucide-react"
 import { useFormContext } from "react-hook-form"
 import { FormSchema } from "./EntryForm"
 import { useFormDialog } from "./FormDialogProvider"
+import { useDialogPages } from "../DialogPagesProvider"
 
 interface ChooseCategoryPageProps {
 	showBackButton?: boolean
@@ -27,7 +28,7 @@ interface ChooseCategoryPageProps {
 export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 	const form = useFormContext<FormSchema>()
 	const categoriesQuery = useCategoriesQuery()
-	const setCurPage = useFormDialog()((state) => state.setCurPage)
+	const { setCurPage } = useDialogPages()
 
 	const showBackButton = props.showBackButton ?? true
 
@@ -86,7 +87,7 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 				<CommandList className="max-h-none overflow-y-auto flex-1 px-1">
 					<CommandGroup className="*:grid *:gap-2 *:grid-cols-[repeat(auto-fill,minmax(125px,1fr))] *:grid-flow-row *:auto-rows-[150px]">
 						{categoriesQuery.data?.data?.map((val) => (
-                            <CommandItem
+							<CommandItem
 								className="border rounded-md break-words cursor-pointer"
 								key={val.name}
 								value={val.name}

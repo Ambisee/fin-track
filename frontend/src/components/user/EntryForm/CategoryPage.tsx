@@ -8,7 +8,6 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog"
 import { useState } from "react"
-import { useFormDialog } from "./FormDialogProvider"
 import { ChevronLeft, X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { z } from "zod"
@@ -21,6 +20,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { useMutation } from "@tanstack/react-query"
 import { CATEGORIES_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
+import { useDialogPages } from "../DialogPagesProvider"
+import { useCategoryToEdit } from "./CategoryProvider"
 
 interface CategoryPageProps {}
 
@@ -33,8 +34,8 @@ export default function CategoryPage(props: CategoryPageProps) {
 
 	const { toast } = useToast()
 	const form = useFormContext<FormSchema>()
-	const setCurPage = useFormDialog()((state) => state.setCurPage)
-	const categoryToEdit = useFormDialog()((state) => state.categoryToEdit)
+	const { setCurPage } = useDialogPages()
+	const { categoryToEdit } = useCategoryToEdit()
 
 	const userQuery = useUserQuery()
 	const categoriesQuery = useCategoriesQuery()

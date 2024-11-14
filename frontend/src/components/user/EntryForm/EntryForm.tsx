@@ -21,7 +21,8 @@ import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
 import CategoryPage from "./CategoryPage"
 import EditCategoryPage from "./EditCategoryPage"
-import FormDialogProvider, { useFormDialog } from "./FormDialogProvider"
+import CategoryToEditProvider from "./CategoryProvider"
+import DialogPagesProvider, { useDialogPages } from "../DialogPagesProvider"
 
 interface EntryFormProps {
 	data?: Entry
@@ -67,7 +68,7 @@ function EntryFormItem(props: {
 
 function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
-	const curPage = useFormDialog()((state) => state.curPage)
+	const { curPage, setCurPage } = useDialogPages()
 
 	const formDefaultValues = useMemo(() => {
 		let defaultValues: FormSchema = {
@@ -124,6 +125,10 @@ function DialogEntryForm(props: EntryFormProps) {
 		<Form {...form}>
 			<DialogContent
 				hideCloseButton
+				onOpenAutoFocus={() => {
+					form.reset()
+					setCurPage(0)
+				}}
 				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 			>
 				{renderPage(form)}
@@ -134,9 +139,11 @@ function DialogEntryForm(props: EntryFormProps) {
 
 function EntryForm(props: EntryFormProps) {
 	return (
-		<FormDialogProvider>
-			<DialogEntryForm {...props} />
-		</FormDialogProvider>
+		<DialogPagesProvider>
+			<CategoryToEditProvider>
+				<DialogEntryForm {...props} />
+			</CategoryToEditProvider>
+		</DialogPagesProvider>
 	)
 }
 

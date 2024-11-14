@@ -1,50 +1,41 @@
 import {
-	DialogHeader,
-	DialogTitle,
+	DialogClose,
 	DialogDescription,
-	DialogClose
+	DialogHeader,
+	DialogTitle
 } from "@/components/ui/dialog"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { FormSchema } from "./EntryForm"
-import { useFormDialog } from "./FormDialogProvider"
 
 import {
-	X,
-	ChevronLeft,
-	PencilIcon,
-	Trash2Icon,
-	SearchIcon,
-	Search,
-	PlusIcon
-} from "lucide-react"
-import { useFormContext, UseFormReturn } from "react-hook-form"
-import { useState } from "react"
-import {
 	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogCancel,
 	AlertDialogAction,
-	AlertDialogTitle,
-	AlertDialogHeader,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
 	AlertDialogFooter,
-	AlertDialogDescription
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
-import { useCategoriesQuery, useUserQuery } from "@/lib/hooks"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { CATEGORIES_QKEY } from "@/lib/constants"
-import { useToast } from "@/components/ui/use-toast"
-import { sbBrowser } from "@/lib/supabase"
-import { Category } from "@/types/supabase"
+import { Button } from "@/components/ui/button"
 import {
 	Command,
-	CommandInput,
-	CommandList,
+	CommandEmpty,
 	CommandGroup,
+	CommandInput,
 	CommandItem,
-	CommandEmpty
+	CommandList
 } from "@/components/ui/command"
-import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
+import { CATEGORIES_QKEY } from "@/lib/constants"
+import { useCategoriesQuery, useUserQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
+import { Category } from "@/types/supabase"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { ChevronLeft, PlusIcon, Trash2Icon, X } from "lucide-react"
+import { useState } from "react"
+import { useFormContext } from "react-hook-form"
+import { useDialogPages } from "../DialogPagesProvider"
+import { useCategoryToEdit } from "./CategoryProvider"
 
 interface EditCategoryPageProps {
 	showBackButton?: boolean
@@ -54,8 +45,8 @@ export default function EditCategoryPage(props: EditCategoryPageProps) {
 	const { toast } = useToast()
 	const form = useFormContext()
 	const queryClient = useQueryClient()
-	const setCurPage = useFormDialog()((state) => state.setCurPage)
-	const setCategoryToEdit = useFormDialog()((state) => state.setCategoryToEdit)
+	const { setCurPage } = useDialogPages()
+	const { setCategoryToEdit } = useCategoryToEdit()
 	const [categoryToBeDelete, setCategoryToBeDelete] = useState<
 		Category | undefined
 	>(undefined)

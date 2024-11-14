@@ -2,16 +2,17 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import DialogPagesProvider, {
+	useDialogPages
+} from "@/components/user/DialogPagesProvider"
 import CategoryPage from "@/components/user/EntryForm/CategoryPage"
+import CategoryToEditProvider from "@/components/user/EntryForm/CategoryProvider"
 import EditCategoryPage from "@/components/user/EntryForm/EditCategoryPage"
-import FormDialogProvider, {
-	useFormDialog
-} from "@/components/user/EntryForm/FormDialogProvider"
+
 import { useCategoriesQuery } from "@/lib/hooks"
-import { useState } from "react"
 
 function CategoriesContent() {
-	const curPage = useFormDialog()((state) => state.curPage)
+	const { curPage, setCurPage } = useDialogPages()
 
 	const categoriesQuery = useCategoriesQuery()
 
@@ -26,7 +27,7 @@ function CategoriesContent() {
 
 	return (
 		<Dialog>
-			<Label>Categories</Label>
+			<Label className="text-sm">Categories</Label>
 			<DialogTrigger className="mt-2" asChild>
 				{categoriesQuery.isLoading ? (
 					<Skeleton className="w-full h-10" />
@@ -39,7 +40,12 @@ function CategoriesContent() {
 			</p>
 			<DialogContent
 				hideCloseButton
-				onSubmit={(e) => e.stopPropagation()}
+				onOpenAutoFocus={() => {
+					setCurPage(0)
+				}}
+				onSubmit={(e) => {
+					e.stopPropagation()
+				}}
 				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 			>
 				{renderPage()}
@@ -50,8 +56,10 @@ function CategoriesContent() {
 
 export default function CategoriesEditor() {
 	return (
-		<FormDialogProvider initialValues={{ curPage: 0 }}>
-			<CategoriesContent />
-		</FormDialogProvider>
+		<DialogPagesProvider initialValues={{ curPage: 0 }}>
+			<CategoryToEditProvider>
+				<CategoriesContent />
+			</CategoryToEditProvider>
+		</DialogPagesProvider>
 	)
 }

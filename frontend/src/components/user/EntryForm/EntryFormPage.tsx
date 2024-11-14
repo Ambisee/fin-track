@@ -21,9 +21,9 @@ import { useMutation } from "@tanstack/react-query"
 import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useFormContext } from "react-hook-form"
 import { EntryFormItem, FormSchema } from "./EntryForm"
-import { useFormDialog } from "./FormDialogProvider"
 
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { useDialogPages } from "../DialogPagesProvider"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -43,7 +43,7 @@ const getErrors = (errors: FieldErrors<FormSchema>) => {
 
 export default function EntryFormPage(props: EntryFormPageProps) {
 	const { toast } = useToast()
-	const setCurPage = useFormDialog()((state) => state.setCurPage)
+	const { setCurPage } = useDialogPages()
 
 	const form = useFormContext<FormSchema>()
 	const userData = useUserQuery()
