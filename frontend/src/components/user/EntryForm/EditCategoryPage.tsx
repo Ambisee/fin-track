@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { FormSchema } from "./EntryForm"
-import { useEntryFormStore } from "./EntryFormProvider"
+import { useFormDialog } from "./FormDialogProvider"
 
 import {
 	X,
@@ -46,22 +46,24 @@ import {
 } from "@/components/ui/command"
 import { Button } from "@/components/ui/button"
 
-interface EditCategoryPageProps {}
+interface EditCategoryPageProps {
+	showBackButton?: boolean
+}
 
 export default function EditCategoryPage(props: EditCategoryPageProps) {
 	const { toast } = useToast()
 	const form = useFormContext()
 	const queryClient = useQueryClient()
-	const setCurPage = useEntryFormStore()((state) => state.setCurPage)
-	const setCategoryToEdit = useEntryFormStore()(
-		(state) => state.setCategoryToEdit
-	)
+	const setCurPage = useFormDialog()((state) => state.setCurPage)
+	const setCategoryToEdit = useFormDialog()((state) => state.setCategoryToEdit)
 	const [categoryToBeDelete, setCategoryToBeDelete] = useState<
 		Category | undefined
 	>(undefined)
 
 	const userQuery = useUserQuery()
 	const categoriesQuery = useCategoriesQuery()
+
+	const showBackButton = props.showBackButton ?? true
 
 	const deleteCategoryMutation = useMutation({
 		mutationKey: CATEGORIES_QKEY,
@@ -79,12 +81,14 @@ export default function EditCategoryPage(props: EditCategoryPageProps) {
 					<DialogTitle className="leading-6" asChild>
 						<h1 className="h-6 leading-6">Edit categories</h1>
 					</DialogTitle>
-					<button
-						className="absolute block left-0 top-1/2 translate-y-[-50%]"
-						onClick={() => setCurPage(1)}
-					>
-						<ChevronLeft className="w-4 h-4" />
-					</button>
+					{showBackButton && (
+						<button
+							className="absolute block left-0 top-1/2 translate-y-[-50%]"
+							onClick={() => setCurPage((c) => c - 1)}
+						>
+							<ChevronLeft className="w-4 h-4" />
+						</button>
+					)}
 					<div className="absolute flex gap-6 right-0 top-1/2 translate-y-[-50%]">
 						<button
 							onClick={() => {

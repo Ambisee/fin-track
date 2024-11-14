@@ -18,14 +18,18 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, PencilIcon, X } from "lucide-react"
 import { useFormContext } from "react-hook-form"
 import { FormSchema } from "./EntryForm"
-import { useEntryFormStore } from "./EntryFormProvider"
+import { useFormDialog } from "./FormDialogProvider"
 
-interface ChooseCategoryPageProps {}
+interface ChooseCategoryPageProps {
+	showBackButton?: boolean
+}
 
 export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 	const form = useFormContext<FormSchema>()
 	const categoriesQuery = useCategoriesQuery()
-	const setCurPage = useEntryFormStore()((state) => state.setCurPage)
+	const setCurPage = useFormDialog()((state) => state.setCurPage)
+
+	const showBackButton = props.showBackButton ?? true
 
 	return (
 		<div className="max-h-full relative grid grid-rows-[auto_1fr] gap-4">
@@ -34,12 +38,14 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					<DialogTitle className="leading-6" asChild>
 						<h1 className="h-6 leading-6">Choose a category</h1>
 					</DialogTitle>
-					<button
-						className="absolute block left-0 top-1/2 translate-y-[-50%]"
-						onClick={() => setCurPage((c) => c - 1)}
-					>
-						<ChevronLeft className="w-4 h-4" />
-					</button>
+					{showBackButton && (
+						<button
+							className="absolute block left-0 top-1/2 translate-y-[-50%]"
+							onClick={() => setCurPage((c) => c - 1)}
+						>
+							<ChevronLeft className="w-4 h-4" />
+						</button>
+					)}
 					<div className="absolute flex items-center gap-6 right-0 top-1/2 translate-y-[-50%]">
 						<button
 							className="h-full aspect-square"

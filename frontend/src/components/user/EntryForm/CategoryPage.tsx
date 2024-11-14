@@ -8,7 +8,7 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog"
 import { useState } from "react"
-import { useEntryFormStore } from "./EntryFormProvider"
+import { useFormDialog } from "./FormDialogProvider"
 import { ChevronLeft, X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { z } from "zod"
@@ -33,8 +33,8 @@ export default function CategoryPage(props: CategoryPageProps) {
 
 	const { toast } = useToast()
 	const form = useFormContext<FormSchema>()
-	const setCurPage = useEntryFormStore()((state) => state.setCurPage)
-	const categoryToEdit = useEntryFormStore()((state) => state.categoryToEdit)
+	const setCurPage = useFormDialog()((state) => state.setCurPage)
+	const categoryToEdit = useFormDialog()((state) => state.categoryToEdit)
 
 	const userQuery = useUserQuery()
 	const categoriesQuery = useCategoriesQuery()

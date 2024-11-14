@@ -26,6 +26,8 @@ import { z } from "zod"
 import InputSkeleton from "../InputSkeleton"
 import SettingsSection from "../SettingsSection"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { Label } from "@/components/ui/label"
+import Categories from "./Categories"
 
 const generalSectionFormSchema = z.object({
 	username: z
@@ -200,6 +202,9 @@ export default function GeneralSection() {
 							</FormItem>
 						)}
 					/>
+					<div className="grid mt-8">
+						<Categories />
+					</div>
 					<Button
 						className="mt-6"
 						variant="default"

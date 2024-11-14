@@ -22,7 +22,7 @@ import ChooseCategoryPage from "./ChooseCategoryPage"
 import { useCategoriesQuery } from "@/lib/hooks"
 import CategoryPage from "./CategoryPage"
 import EditCategoryPage from "./EditCategoryPage"
-import EntryFormProvider, { useEntryFormStore } from "./EntryFormProvider"
+import FormDialogProvider, { useFormDialog } from "./FormDialogProvider"
 
 interface EntryFormProps {
 	data?: Entry
@@ -69,13 +69,9 @@ function EntryFormItem(props: {
 function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
 	const categoriesQuery = useCategoriesQuery()
-	const curPage = useEntryFormStore()((state) => state.curPage)
+	const curPage = useFormDialog()((state) => state.curPage)
 
 	const formDefaultValues = useMemo(() => {
-		const miscId = categoriesQuery.data?.data?.find(
-			(val) => val.name === "Miscellaneous"
-		)?.id as number
-
 		let defaultValues: FormSchema = {
 			date: new Date(),
 			category: "Miscellaneous",
@@ -95,7 +91,7 @@ function DialogEntryForm(props: EntryFormProps) {
 		defaultValues.note = props.data.note ?? ""
 
 		return defaultValues
-	}, [props.data, isEditForm, categoriesQuery])
+	}, [props.data, isEditForm])
 
 	const form = useForm<FormSchema>({
 		resolver: zodResolver(formSchema),
@@ -140,9 +136,9 @@ function DialogEntryForm(props: EntryFormProps) {
 
 function EntryForm(props: EntryFormProps) {
 	return (
-		<EntryFormProvider>
+		<FormDialogProvider>
 			<DialogEntryForm {...props} />
-		</EntryFormProvider>
+		</FormDialogProvider>
 	)
 }
 
