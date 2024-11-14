@@ -68,7 +68,8 @@ function handleUpdate(
         date: (payload.new as Entry).date,
         created_by: (payload.new as Entry).created_by,
         is_positive: (payload.new as Entry).is_positive,
-        note: (payload.new as Entry).note
+        note: (payload.new as Entry).note,
+        ledger: (payload.new as Entry).ledger
     }
 
     const newEntry = newEntries.splice(index, 1)[0]
