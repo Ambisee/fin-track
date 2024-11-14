@@ -35,8 +35,8 @@ export default function MiscellaneousSection() {
 							<AlertDialogDescription>
 								<p>
 									This action will permanently removes all of your data from our
-									servers. You will not be able to sign in and view your entries
-									after this action is completed.
+									servers. You will not be able to sign in and view your
+									transaction records after this action is completed.
 								</p>
 								<div className="mt-4 mb-4 flex items-start gap-2 text-left md:mt-2 md:items-center">
 									<Checkbox
