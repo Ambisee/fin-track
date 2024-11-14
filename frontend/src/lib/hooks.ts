@@ -1,7 +1,7 @@
 import { UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
-import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, LEDGER_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
 
 function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error, UserResponse, string[]>) {
@@ -16,6 +16,7 @@ function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error,
 
 function useEntryDataQuery() {
     const userQuery = useUserQuery()
+    const settingsQuery = useSettingsQuery()
     
     return useQuery({
 		queryKey: ENTRY_QKEY,
@@ -24,12 +25,13 @@ function useEntryDataQuery() {
 				.from("entry")
 				.select(`*`)
 				.eq("created_by", userQuery?.data?.data.user?.id as string)
+                .eq("ledger", settingsQuery.data?.data?.current_ledger as number)
 				.order("date")
                 .order("category")
 				.limit(100),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
-		enabled: !!userQuery.data?.data.user
+		enabled: !!userQuery.data?.data.user && !!settingsQuery.data?.data
 	})
 }
 
@@ -40,7 +42,7 @@ function useSettingsQuery() {
 		queryFn: async () =>
 			await sbBrowser
 				.from("settings")
-				.select(`*, currency (currency_name)`)
+				.select(`*, currency (currency_name), ledger (*, currency (currency_name))`)
                 .eq("user_id", userQuery.data?.data.user?.id as string)
 				.limit(1)
 				.single(),
@@ -73,10 +75,31 @@ function useCategoriesQuery() {
             return await sbBrowser
                 .from("category")
                 .select("*")
-                .or(`created_by.eq.${userId},created_by.is.null`)
-                .order("id")
+                .eq('created_by', userId)
+                .order('name')
         },
 		enabled: !!userData
+    })
+}
+
+function useLedgersQuery() {
+    const userData = useUserQuery()
+    
+    return useQuery({
+        queryKey: LEDGER_QKEY,
+        queryFn: async () => {
+            const userId = userData.data?.data.user?.id
+            if (!userId) {
+                return await sbBrowser.from("ledger").select("*").eq("id", -1)
+            }
+
+            return await sbBrowser
+                .from("ledger")
+                .select("*")
+                .eq('created_by', userId)
+                .order('name')
+        },
+        enabled: !!userData
     })
 }
 
@@ -106,7 +129,7 @@ function useAmountFormatter() {
     const userSettingsQuery = useSettingsQuery()
 
     const formatAmount = useCallback((num?: number) => {
-		const currency = userSettingsQuery?.data?.data?.currency?.currency_name
+		const currency = userSettingsQuery?.data?.data?.ledger?.currency?.currency_name
 		if (num === undefined || currency === undefined || currency === null) {
 			return num
 		}
@@ -126,7 +149,7 @@ function useAmountFormatter() {
 }
 
 export { 
-    useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery,
+    useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery, useLedgersQuery,
     useSetElementWindowHeight, useAmountFormatter
 };
 

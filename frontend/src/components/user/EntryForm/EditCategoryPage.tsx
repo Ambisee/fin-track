@@ -67,10 +67,14 @@ export default function EditCategoryPage(props: EditCategoryPageProps) {
 
 	const deleteCategoryMutation = useMutation({
 		mutationKey: CATEGORIES_QKEY,
-		mutationFn: async (data: { id: number }) => {
+		mutationFn: async (data: { created_by: string; name: string }) => {
 			if (!categoriesQuery.data?.data || !userQuery.data?.data.user) return
 
-			return await sbBrowser.from("category").delete().eq("id", data.id)
+			return await sbBrowser
+				.from("category")
+				.delete()
+				.eq("created_by", data.created_by)
+				.eq("name", data.name)
 		}
 	})
 
@@ -169,7 +173,10 @@ export default function EditCategoryPage(props: EditCategoryPageProps) {
 								}
 
 								deleteCategoryMutation.mutate(
-									{ id: categoryToBeDelete.id },
+									{
+										created_by: categoryToBeDelete.created_by as string,
+										name: categoryToBeDelete.name
+									},
 									{
 										onSuccess: async (data) => {
 											toast({

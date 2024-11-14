@@ -60,7 +60,8 @@ export default function CategoryPage(props: CategoryPageProps) {
 			const result = await sbBrowser
 				.from("category")
 				.update({ name: data.name })
-				.eq("id", categoryToEdit.id)
+				.eq("name", categoryToEdit.name)
+				.eq("created_by", categoryToEdit.created_by)
 				.select()
 
 			return result
@@ -132,7 +133,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 								if (!categoriesQuery.data?.data) {
 									toast({
 										description:
-											"The category name has been used. Please enter another name",
+											"The category name has been used. Please enter a different name.",
 										variant: "destructive"
 									})
 									setIsFormLoading(false)

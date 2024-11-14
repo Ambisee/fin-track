@@ -27,7 +27,7 @@ import InputSkeleton from "../InputSkeleton"
 import SettingsSection from "../SettingsSection"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { Label } from "@/components/ui/label"
-import Categories from "./Categories"
+import CategoriesEditor from "./CategoriesEditor"
 
 const generalSectionFormSchema = z.object({
 	username: z
@@ -38,7 +38,7 @@ const generalSectionFormSchema = z.object({
 		)
 		.regex(/(^$)|(^[a-zA-Z0-9]+$)/, "Must only contain alphanumeric characters")
 		.default(""),
-	currency: z.string()
+	default_currency: z.string()
 })
 
 export default function GeneralSection() {
@@ -57,7 +57,8 @@ export default function GeneralSection() {
 		resolver: zodResolver(generalSectionFormSchema),
 		values: {
 			username: "",
-			currency: userSettingsQuery.data?.data?.currency?.currency_name ?? "USD"
+			default_currency:
+				userSettingsQuery.data?.data?.currency?.currency_name ?? "USD"
 		}
 	})
 
@@ -93,10 +94,10 @@ export default function GeneralSection() {
 									currencies !== null &&
 									currencies !== undefined &&
 									userSettings?.currency?.currency_name !== undefined &&
-									userSettings.currency.currency_name !== data.currency
+									userSettings.currency.currency_name !== data.default_currency
 								) {
 									const newCurrencyId = currencies.find(
-										(value) => value.currency_name === data.currency
+										(value) => value.currency_name === data.default_currency
 									)
 									if (newCurrencyId === undefined) {
 										toast({
@@ -111,7 +112,7 @@ export default function GeneralSection() {
 
 									const { error } = await sbBrowser
 										.from("settings")
-										.update({ currency_id: newCurrencyId.id })
+										.update({ default_currency: newCurrencyId.id })
 										.eq("user_id", userSettings.user_id)
 
 									if (error !== null) {
@@ -176,10 +177,10 @@ export default function GeneralSection() {
 					/>
 					<FormField
 						control={form.control}
-						name="currency"
+						name="default_currency"
 						render={({ field }) => (
 							<FormItem className="grid mt-8">
-								<FormLabel>Currency</FormLabel>
+								<FormLabel>Default Currency</FormLabel>
 								<FormControl>
 									{userQuery.isLoading ? (
 										<InputSkeleton />
@@ -188,7 +189,7 @@ export default function GeneralSection() {
 											closeOnSelect
 											value={field.value}
 											onChange={(e) => {
-												form.setValue("currency", e)
+												form.setValue("default_currency", e)
 											}}
 											values={
 												currencies?.map((val) => ({
@@ -203,7 +204,7 @@ export default function GeneralSection() {
 						)}
 					/>
 					<div className="grid mt-8">
-						<Categories />
+						<CategoriesEditor />
 					</div>
 					<Button
 						className="mt-6"

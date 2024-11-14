@@ -19,7 +19,6 @@ import { DialogContent } from "../../ui/dialog"
 import { Form, FormControl, FormItem, FormLabel } from "../../ui/form"
 import EntryFormPage from "./EntryFormPage"
 import ChooseCategoryPage from "./ChooseCategoryPage"
-import { useCategoriesQuery } from "@/lib/hooks"
 import CategoryPage from "./CategoryPage"
 import EditCategoryPage from "./EditCategoryPage"
 import FormDialogProvider, { useFormDialog } from "./FormDialogProvider"
@@ -68,7 +67,6 @@ function EntryFormItem(props: {
 
 function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
-	const categoriesQuery = useCategoriesQuery()
 	const curPage = useFormDialog()((state) => state.curPage)
 
 	const formDefaultValues = useMemo(() => {

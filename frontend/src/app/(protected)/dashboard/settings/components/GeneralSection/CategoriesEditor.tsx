@@ -45,7 +45,7 @@ function CategoriesContent() {
 	)
 }
 
-export default function Categories() {
+export default function CategoriesEditor() {
 	return (
 		<FormDialogProvider initialValues={{ curPage: 0 }}>
 			<CategoriesContent />

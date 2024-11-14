@@ -11,29 +11,18 @@ export type Database = {
     Tables: {
       category: {
         Row: {
-          created_by: string | null
-          id: number
+          created_by: string
           name: string
         }
         Insert: {
-          created_by?: string | null
-          id?: number
+          created_by: string
           name: string
         }
         Update: {
-          created_by?: string | null
-          id?: number
+          created_by?: string
           name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "category_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       currency: {
         Row: {
@@ -50,6 +39,21 @@ export type Database = {
         }
         Relationships: []
       }
+      default_category: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: number
+          name: string
+        }
+        Update: {
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       entry: {
         Row: {
           amount: number
@@ -58,6 +62,7 @@ export type Database = {
           date: string
           id: number
           is_positive: boolean
+          ledger: number | null
           note: string | null
         }
         Insert: {
@@ -67,6 +72,7 @@ export type Database = {
           date?: string
           id?: number
           is_positive: boolean
+          ledger?: number | null
           note?: string | null
         }
         Update: {
@@ -76,14 +82,44 @@ export type Database = {
           date?: string
           id?: number
           is_positive?: boolean
+          ledger?: number | null
           note?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "entry_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: "fk_ledger"
+            columns: ["ledger"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "ledger"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ledger: {
+        Row: {
+          created_by: string
+          currency_id: number
+          id: number
+          name: string
+        }
+        Insert: {
+          created_by: string
+          currency_id: number
+          id?: number
+          name?: string
+        }
+        Update: {
+          created_by?: string
+          currency_id?: number
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_currency_id_fkey"
+            columns: ["currency_id"]
+            isOneToOne: false
+            referencedRelation: "currency"
             referencedColumns: ["id"]
           },
         ]
@@ -91,32 +127,35 @@ export type Database = {
       settings: {
         Row: {
           allow_report: boolean
-          currency_id: number
+          current_ledger: number
+          default_currency: number
           user_id: string
         }
         Insert: {
           allow_report?: boolean
-          currency_id?: number
+          current_ledger?: number
+          default_currency?: number
           user_id: string
         }
         Update: {
           allow_report?: boolean
-          currency_id?: number
+          current_ledger?: number
+          default_currency?: number
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_data_currency_id_fkey"
-            columns: ["currency_id"]
+            foreignKeyName: "settings_current_ledger_fkey"
+            columns: ["current_ledger"]
             isOneToOne: false
-            referencedRelation: "currency"
+            referencedRelation: "ledger"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "user_data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
+            foreignKeyName: "settings_default_currency_fkey"
+            columns: ["default_currency"]
+            isOneToOne: false
+            referencedRelation: "currency"
             referencedColumns: ["id"]
           },
         ]
@@ -223,4 +262,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
