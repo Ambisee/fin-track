@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { useUserQuery } from "@/lib/hooks"
+import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -47,6 +47,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 
 	const form = useFormContext<FormSchema>()
 	const userData = useUserQuery()
+	const settingsQuery = useSettingsQuery()
 
 	const insertMutation = useMutation({
 		mutationFn: (formData: FormSchema) => {
@@ -63,7 +64,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					created_by: userData.data?.data.user?.id as string,
 					is_positive: isPositive,
 					amount: Number(formData.amount),
-					note: note
+					note: note,
+					ledger: settingsQuery.data?.data?.current_ledger
 				})
 			)
 		}
