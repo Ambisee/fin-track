@@ -43,7 +43,7 @@ function CloseButton(props: CloseButtonProps) {
 	return (
 		<Button
 			variant="ghost"
-			className="absolute top-2 right-2 md:top-4 md:right-4 aspect-square h-10 p-0"
+			className="absolute top-4 right-4 md:top-4 md:right-4 aspect-square h-10 p-0"
 		>
 			<Link
 				onClick={() => {
@@ -72,29 +72,6 @@ export default function PortalLayout(props: PortalLayoutProps) {
 					</CloseButton>
 				</div>
 			)}
-			{/* <AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Exit Registration</AlertDialogTitle>
-					<AlertDialogDescription>
-						Are you sure you want to exit the registration page? Doing so will
-						reset all data previously entered.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction
-						variant="destructive"
-						onClick={() => {
-							Cookies.remove("reg-email")
-							Cookies.remove("reg-username")
-							Cookies.remove("reg-password")
-							router.push("/")
-						}}
-					>
-						Proceed
-					</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent> */}
 			{props.children}
 		</AlertDialog>
 	)

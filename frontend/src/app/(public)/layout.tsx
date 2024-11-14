@@ -15,7 +15,7 @@ export default async function PublicLayout(props: PublicLayoutProps) {
 	return (
 		<>
 			<PublicNavbar user={userResponse.data.user} />
-			<div className="min-h-[calc(100vh-80px)]">{props.children}</div>
+			<div className="h-0 min-h-[calc(100vh-80px)]">{props.children}</div>
 		</>
 	)
 }

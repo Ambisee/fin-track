@@ -53,7 +53,7 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 						<Avatar>
 							<AvatarFallback>F</AvatarFallback>
 						</Avatar>
-						<span className="hidden md:block">FinTrack</span>
+						<span className="hidden sm:block">FinTrack</span>
 					</div>
 				</Link>
 				<NavigationMenu>
