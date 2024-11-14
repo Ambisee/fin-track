@@ -21,8 +21,8 @@ export default function SignIn() {
 
 	return (
 		<div className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center">
-			<div className="w-full max-w-container flex justify-center items-center">
-				<Card className="w-[320px]">
+			<div className="w-full px-4 max-w-container flex justify-center items-center">
+				<Card className="max-w-[320px]">
 					<CardHeader className="w-full text-center">
 						Sign in to your account
 					</CardHeader>

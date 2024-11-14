@@ -16,7 +16,7 @@ export default function SignInEmail() {
 			className="w-full min-h-screen grid grid-flow-col-dense justify-items-center"
 		>
 			<div className="px-3 w-full max-w-container h-full flex justify-center items-center">
-				<Card className="w-full max-w-[360px] grid grid-flow-row">
+				<Card className="w-5/6 min-w-[275px] max-w-[360px] grid grid-flow-row">
 					<CardHeader>Sign in with your email</CardHeader>
 					<CardContent className="grid grid-flow-row gap-4">
 						<EmailSignInForm />
