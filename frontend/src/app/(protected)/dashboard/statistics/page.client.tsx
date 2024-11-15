@@ -20,7 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
 import { MonthPicker } from "@/components/user/MonthPicker"
 import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import { useAmountFormatter, useEntryDataQuery } from "@/lib/hooks"
+import {
+	useAmountFormatter,
+	useEntryDataQuery,
+	useSettingsQuery
+} from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { MonthGroup, cn, filterDataGroup } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
@@ -362,6 +366,7 @@ export default function DashboardStatistics() {
 	})
 
 	const entryDataQuery = useEntryDataQuery()
+	const userSettingsQuery = useSettingsQuery()
 	const { dataGroups } = useContext(DashboardContext)
 	const isDesktop = useMediaQuery({
 		minWidth: DESKTOP_BREAKPOINT
@@ -509,7 +514,12 @@ export default function DashboardStatistics() {
 	return (
 		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
 			<div className="w-full h-full pb-8 md:pb-0">
-				<h1 className="text-3xl">Statistics</h1>
+				<div className="w-full mb-4 flex justify-between items-center">
+					<h1 className="text-3xl">Statistics</h1>
+					<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
+						{userSettingsQuery.data?.data?.ledger?.name}
+					</span>
+				</div>
 				{renderMonthPicker()}
 				{renderStatsUI()}
 			</div>

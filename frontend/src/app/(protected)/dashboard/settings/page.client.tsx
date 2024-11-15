@@ -11,7 +11,12 @@ export default function DashboardSettings() {
 
 	return (
 		<div className="w-full">
-			<h1 className="text-3xl mb-4">Settings</h1>
+			<div className="w-full mb-4 flex justify-between items-center">
+				<h1 className="text-3xl">Settings</h1>
+				<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
+					{userSettingsQuery.data?.data?.ledger?.name}
+				</span>
+			</div>
 			<GeneralSection
 				key={userSettingsQuery.data?.data?.currency?.currency_name}
 			/>

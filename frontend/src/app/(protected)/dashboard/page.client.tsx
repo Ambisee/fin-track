@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
-import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
+import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { filterDataGroup } from "@/lib/utils"
 import { useContext } from "react"
 import { DashboardContext } from "./layout"
@@ -14,6 +14,7 @@ export default function DashboardHome() {
 
 	const userQuery = useUserQuery()
 	const entryDataQuery = useEntryDataQuery()
+	const userSettingsQuery = useSettingsQuery()
 
 	const renderWelcomeMessage = () => {
 		if (userQuery.isLoading || userQuery.data?.data?.user === undefined) {
@@ -26,7 +27,12 @@ export default function DashboardHome() {
 		} else if (userQuery.data?.data?.user !== null) {
 			return (
 				<div className="mb-8">
-					<h1 className="text-3xl">Home</h1>
+					<div className="w-full mb-4 flex justify-between items-center">
+						<h1 className="text-3xl">Home</h1>
+						<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
+							{userSettingsQuery.data?.data?.ledger?.name}
+						</span>
+					</div>
 					<h3 className="text-2xl mt-4">
 						Welcome back, {userQuery.data?.data?.user.user_metadata.username}
 					</h3>
