@@ -18,7 +18,6 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, PencilIcon, X } from "lucide-react"
 import { useFormContext } from "react-hook-form"
 import { FormSchema } from "./EntryForm"
-import { useFormDialog } from "./FormDialogProvider"
 import { useDialogPages } from "../DialogPagesProvider"
 
 interface ChooseCategoryPageProps {
