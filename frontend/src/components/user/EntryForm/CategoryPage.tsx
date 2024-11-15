@@ -175,7 +175,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 
 											setCurPage(0)
 											if (successData.data)
-												form.setValue("category", successData.data[0].name)
+												form?.setValue("category", successData.data[0].name)
 										}
 									}
 								)

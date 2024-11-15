@@ -43,11 +43,11 @@ export default function ComboBox(props: ComboBoxProps) {
 				<Command>
 					<CommandInput placeholder="Select type..." className="h-9" />
 					<CommandList>
-						<CommandEmpty>No framework found.</CommandEmpty>
+						<CommandEmpty>No value found.</CommandEmpty>
 						<CommandGroup>
 							{props.values.map((val) => (
 								<CommandItem
-									value={val.label}
+									value={val.value}
 									key={val.value}
 									onSelect={(e) => {
 										props.onChange(e)

@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -27,29 +29,31 @@ function CategoriesContent() {
 
 	return (
 		<Dialog>
-			<Label className="text-sm">Categories</Label>
-			<DialogTrigger className="mt-2" asChild>
+			<div id="asdf" className="grid mt-8">
+				<Label className="text-sm">Categories</Label>
 				{categoriesQuery.isLoading ? (
 					<Skeleton className="w-full h-10" />
 				) : (
-					<Button>Open category editor</Button>
+					<DialogTrigger className="mt-2" asChild>
+						<Button>Open category editor</Button>
+					</DialogTrigger>
 				)}
-			</DialogTrigger>
-			<p className="mt-2 text-muted-foreground text-sm">
-				All categories created will be available for all ledgers.
-			</p>
-			<DialogContent
-				hideCloseButton
-				onOpenAutoFocus={() => {
-					setCurPage(0)
-				}}
-				onSubmit={(e) => {
-					e.stopPropagation()
-				}}
-				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
-			>
-				{renderPage()}
-			</DialogContent>
+				<p className="mt-2 text-muted-foreground text-sm">
+					All categories created will be available for all ledgers.
+				</p>
+				<DialogContent
+					hideCloseButton
+					onOpenAutoFocus={() => {
+						setCurPage(0)
+					}}
+					onSubmit={(e) => {
+						e.stopPropagation()
+					}}
+					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+				>
+					{renderPage()}
+				</DialogContent>
+			</div>
 		</Dialog>
 	)
 }

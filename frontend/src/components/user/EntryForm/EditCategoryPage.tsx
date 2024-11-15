@@ -103,7 +103,7 @@ export default function EditCategoryPage(props: EditCategoryPageProps) {
 			<AlertDialog>
 				<Command
 					className="h-full w-full gap-4 rounded-none"
-					defaultValue={form.getValues("category")}
+					defaultValue={form?.getValues("category")}
 				>
 					<div className="grid grid-cols-[1fr_auto] border rounded-md cmdk-input-no-border ">
 						<CommandInput

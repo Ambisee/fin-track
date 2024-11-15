@@ -90,15 +90,17 @@ function useLedgersQuery() {
         queryFn: async () => {
             const userId = userData.data?.data.user?.id
             if (!userId) {
-                return await sbBrowser.from("ledger").select("*").eq("id", -1)
+                return await sbBrowser.from("ledger").select("*, currency (currency_name)").eq("id", -1)
             }
 
             return await sbBrowser
                 .from("ledger")
-                .select("*")
+                .select("*, currency (currency_name)")
                 .eq('created_by', userId)
                 .order('name')
         },
+        refetchOnWindowFocus: false,
+        refetchOnMount: (query) => query.state.data === undefined || query.state.data === null,
         enabled: !!userData
     })
 }
