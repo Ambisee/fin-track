@@ -42,17 +42,19 @@ import {
 } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useLedgerToEdit } from "./LedgerProvider"
+import { useLedgerToEdit } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import { useFormContext } from "react-hook-form"
 
-interface LedgersListPageProps {
+interface EntryLedgersListPageProps {
 	isEditMode?: boolean
 	showBackButton?: boolean
 }
 
-export default function LedgersListPage(props: LedgersListPageProps) {
+export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
-	const closeRef = useRef<HTMLButtonElement>(null!)
+
+	const form = useFormContext()
 	const { setCurPage } = useDialogPages()
 	const { setLedgerToEdit } = useLedgerToEdit()
 
@@ -67,21 +69,11 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 	const settingsQuery = useSettingsQuery()
 	const ledgersQuery = useLedgersQuery()
 
-	const selectLedgerMutation = useMutation({
-		mutationKey: USER_SETTINGS_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			if (userQuery.data?.data.user?.id === undefined) {
-				return undefined
-			}
-
-			return sbBrowser
-				.from("settings")
-				.update({ current_ledger: data.id })
-				.eq("user_id", userQuery.data?.data.user.id as string)
-				.select("*, ledger (name)")
-				.single()
+	useEffect(() => {
+		if (ledgersQuery.data?.data !== undefined) {
+			settingsQuery.refetch()
 		}
-	})
+	}, [settingsQuery, ledgersQuery.data?.data])
 
 	const deleteLedgerMutation = useMutation({
 		mutationKey: LEDGER_QKEY,
@@ -90,27 +82,19 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 		}
 	})
 
-	useEffect(() => {
-		if (settingsQuery.data?.data !== undefined) {
-			queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-		}
-	}, [queryClient, settingsQuery.data?.data])
-
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
 			<DialogHeader className="space-y-0 sm:text-center h-fit">
 				<div className="relative">
 					<DialogTitle className="leading-6" asChild>
 						<h1 className="h-6 leading-6">
-							{isEditMode
-								? "Select a ledger to edit"
-								: "Select a ledger to view"}
+							{isEditMode ? "Select a ledger to edit" : "Choose a ledger"}
 						</h1>
 					</DialogTitle>
 					{showBackButton && (
 						<button
 							className="absolute block left-0 top-1/2 translate-y-[-50%]"
-							onClick={() => setCurPage((c) => c - 1)}
+							onClick={() => setCurPage(0)}
 						>
 							<ChevronLeft className="w-4 h-4" />
 						</button>
@@ -138,7 +122,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 								<PencilIcon className="w-4 h-4" />
 							)}
 						</button>
-						<DialogClose ref={closeRef}>
+						<DialogClose>
 							<X className="w-4 h-4" />
 						</DialogClose>
 					</div>
@@ -171,37 +155,11 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 										if (isEditMode) {
 											setLedgerToEdit(val)
 											setCurPage((c) => c + 1)
-										} else {
-											selectLedgerMutation.mutate(
-												{ id: val.id },
-												{
-													onSuccess: async (data) => {
-														if (data === undefined) {
-															toast({
-																description:
-																	"Failed to switch to the specified ledger.",
-																variant: "destructive"
-															})
-															return
-														}
-
-														await settingsQuery.refetch()
-
-														toast({
-															description: (
-																<>
-																	Switched to the ledger:{" "}
-																	<b>{data.data?.ledger?.name}</b>
-																</>
-															),
-															duration: 1500
-														})
-
-														closeRef.current?.click()
-													}
-												}
-											)
+											return
 										}
+
+										form.setValue("ledger", val.id)
+										setCurPage(0)
 									}}
 								>
 									<p className="w-full">{val.name}</p>
@@ -265,7 +223,6 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 												duration: 1500
 											})
 
-											await settingsQuery.refetch()
 											await queryClient.invalidateQueries({
 												queryKey: LEDGER_QKEY
 											})

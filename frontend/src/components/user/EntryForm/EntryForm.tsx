@@ -23,6 +23,10 @@ import CategoryPage from "./CategoryPage"
 import EditCategoryPage from "./EditCategoryPage"
 import CategoryToEditProvider from "./CategoryProvider"
 import DialogPagesProvider, { useDialogPages } from "../DialogPagesProvider"
+import { useSettingsQuery } from "@/lib/hooks"
+import LedgerToEditProvider from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import EntryLedgersListPage from "./EntryLedgersListPage"
+import EntryLedgerPage from "./EntryLedgerPage"
 
 interface EntryFormProps {
 	data?: Entry
@@ -44,7 +48,8 @@ const formSchema = z.object({
 		)
 		.pipe(z.coerce.string()),
 	type: z.enum(["Income", "Expense"]),
-	note: z.string()
+	note: z.string(),
+	ledger: z.number()
 })
 type FormSchema = z.infer<typeof formSchema>
 
@@ -69,6 +74,7 @@ function EntryFormItem(props: {
 function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
 	const { curPage, setCurPage } = useDialogPages()
+	const settingsQuery = useSettingsQuery()
 
 	const formDefaultValues = useMemo(() => {
 		let defaultValues: FormSchema = {
@@ -76,7 +82,8 @@ function DialogEntryForm(props: EntryFormProps) {
 			category: "Miscellaneous",
 			amount: "",
 			type: "Expense",
-			note: ""
+			note: "",
+			ledger: settingsQuery.data?.data?.current_ledger ?? -1
 		}
 
 		if (!isEditForm || !props.data) {
@@ -88,9 +95,10 @@ function DialogEntryForm(props: EntryFormProps) {
 		defaultValues.type = props.data.is_positive ? "Income" : "Expense"
 		defaultValues.amount = props.data.amount.toFixed(2)
 		defaultValues.note = props.data.note ?? ""
+		defaultValues.ledger = props.data.ledger ?? -1
 
 		return defaultValues
-	}, [props.data, isEditForm])
+	}, [props.data, settingsQuery.data?.data, isEditForm])
 
 	const form = useForm<FormSchema>({
 		resolver: zodResolver(formSchema),
@@ -99,17 +107,20 @@ function DialogEntryForm(props: EntryFormProps) {
 
 	useEffect(() => {
 		form.reset(formDefaultValues)
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [props.data, form])
+	}, [props.data, settingsQuery.data?.data, form])
 
 	const renderPage = (form: UseFormReturn<FormSchema>) => {
 		const pages = [
 			EntryFormPage,
 			ChooseCategoryPage,
 			EditCategoryPage,
-			CategoryPage
+			CategoryPage,
+			(props: any) => <EntryLedgersListPage {...props} />,
+			(props: any) => <EntryLedgersListPage isEditMode {...props} />,
+			EntryLedgerPage
 		]
+
 		const CurrentPage = pages[curPage]
 
 		return (
@@ -140,9 +151,11 @@ function DialogEntryForm(props: EntryFormProps) {
 function EntryForm(props: EntryFormProps) {
 	return (
 		<DialogPagesProvider>
-			<CategoryToEditProvider>
-				<DialogEntryForm {...props} />
-			</CategoryToEditProvider>
+			<LedgerToEditProvider>
+				<CategoryToEditProvider>
+					<DialogEntryForm {...props} />
+				</CategoryToEditProvider>
+			</LedgerToEditProvider>
 		</DialogPagesProvider>
 	)
 }

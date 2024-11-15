@@ -19,9 +19,11 @@ import { ChevronLeft, PencilIcon, X } from "lucide-react"
 import { useFormContext } from "react-hook-form"
 import { FormSchema } from "./EntryForm"
 import { useDialogPages } from "../DialogPagesProvider"
+import { Dispatch, SetStateAction } from "react"
 
 interface ChooseCategoryPageProps {
 	showBackButton?: boolean
+	backPageIndex?: SetStateAction<number>
 }
 
 export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
@@ -41,7 +43,9 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					{showBackButton && (
 						<button
 							className="absolute block left-0 top-1/2 translate-y-[-50%]"
-							onClick={() => setCurPage((c) => c - 1)}
+							onClick={() => {
+								setCurPage((c) => c - 1)
+							}}
 						>
 							<ChevronLeft className="w-4 h-4" />
 						</button>

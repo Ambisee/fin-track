@@ -8,8 +8,8 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+} from "../../ui/alert-dialog"
+import { Button } from "../../ui/button"
 import {
 	Command,
 	CommandEmpty,
@@ -17,15 +17,15 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList
-} from "@/components/ui/command"
+} from "../../ui/command"
 import {
 	DialogClose,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle
-} from "@/components/ui/dialog"
-import { useToast } from "@/components/ui/use-toast"
-import { useDialogPages } from "@/components/user/DialogPagesProvider"
+} from "../../ui/dialog"
+import { useToast } from "../../ui/use-toast"
+import { useDialogPages } from "../../user/DialogPagesProvider"
 import { ENTRY_QKEY, LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import {
 	useEntryDataQuery,
@@ -42,23 +42,21 @@ import {
 } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useLedgerToEdit } from "./LedgerProvider"
+import { useLedgerToEdit } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
 
-interface LedgersListPageProps {
-	isEditMode?: boolean
+interface ChooseLedgerPageProps {
 	showBackButton?: boolean
 }
 
-export default function LedgersListPage(props: LedgersListPageProps) {
+export default function ChooseLedgerPage(props: ChooseLedgerPageProps) {
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
-	const closeRef = useRef<HTMLButtonElement>(null!)
 	const { setCurPage } = useDialogPages()
 	const { setLedgerToEdit } = useLedgerToEdit()
 
-	const isEditMode = props.isEditMode ?? false
 	const showBackButton = props.showBackButton ?? true
 
+	const [isEditMode, setIsEditMode] = useState<boolean>(false)
 	const [ledgerToBeDelete, setLedgerToDelete] = useState<Ledger | undefined>(
 		undefined
 	)
@@ -118,7 +116,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					{isEditMode && (
 						<button
 							className="absolute block left-0 top-1/2 translate-y-[-50%]"
-							onClick={() => setCurPage((c) => c - 1)}
+							onClick={() => setIsEditMode(false)}
 						>
 							<ChevronLeft className="w-4 h-4" />
 						</button>
@@ -128,8 +126,10 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 							onClick={() => {
 								if (isEditMode) {
 									setLedgerToEdit(undefined)
+									setCurPage((c) => c + 1)
+								} else {
+									setIsEditMode(true)
 								}
-								setCurPage((c) => c + 1)
 							}}
 						>
 							{isEditMode ? (
@@ -138,7 +138,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 								<PencilIcon className="w-4 h-4" />
 							)}
 						</button>
-						<DialogClose ref={closeRef}>
+						<DialogClose>
 							<X className="w-4 h-4" />
 						</DialogClose>
 					</div>
@@ -196,8 +196,6 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 															),
 															duration: 1500
 														})
-
-														closeRef.current?.click()
 													}
 												}
 											)
@@ -265,7 +263,6 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 												duration: 1500
 											})
 
-											await settingsQuery.refetch()
 											await queryClient.invalidateQueries({
 												queryKey: LEDGER_QKEY
 											})

@@ -69,7 +69,7 @@ function useCategoriesQuery() {
 		queryFn: async () => {
             const userId = userData.data?.data.user?.id
             if (!userId) {
-                return await sbBrowser.from("category").select("*").eq("id", -1).order("id")
+                return await sbBrowser.from("category").select("*").eq("created_by", "false")
             }
 
             return await sbBrowser

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -24,6 +24,7 @@ import { EntryFormItem, FormSchema } from "./EntryForm"
 
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useDialogPages } from "../DialogPagesProvider"
+import ComboBox from "@/components/ui/combobox"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -47,7 +48,12 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 
 	const form = useFormContext<FormSchema>()
 	const userData = useUserQuery()
-	const settingsQuery = useSettingsQuery()
+	const ledgerQuery = useLedgersQuery()
+
+	const getLedgerName = (ledgerId: number) => {
+		return ledgerQuery.data?.data?.find?.((ledger) => ledger.id === ledgerId)
+			?.name
+	}
 
 	const insertMutation = useMutation({
 		mutationFn: (formData: FormSchema) => {
@@ -65,7 +71,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					is_positive: isPositive,
 					amount: Number(formData.amount),
 					note: note,
-					ledger: settingsQuery.data?.data?.current_ledger
+					ledger: formData.ledger
 				})
 			)
 		}
@@ -92,7 +98,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						category: formData.category,
 						is_positive: isPositive,
 						amount: Number(formData.amount),
-						note: note
+						note: note,
+						ledger: formData.ledger
 					})
 					.eq("id", props.data.id)
 			)
@@ -221,6 +228,23 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									</TabsList>
 								</Tabs>
 							</div>
+						</EntryFormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="ledger"
+					render={({ field }) => (
+						<EntryFormItem label="Ledger">
+							<Button
+								type="button"
+								variant="outline"
+								className="w-full text-base justify-normal text-muted-foreground"
+								onClick={() => setCurPage(4)}
+							>
+								{getLedgerName(form.getValues("ledger"))}
+								<ChevronRight className="w-4 h-4 ml-auto" />
+							</Button>
 						</EntryFormItem>
 					)}
 				/>

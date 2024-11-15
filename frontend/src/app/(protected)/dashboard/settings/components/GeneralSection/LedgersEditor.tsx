@@ -1,14 +1,14 @@
-import { useCategoriesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Skeleton } from "@/components/ui/skeleton"
 import DialogPagesProvider, {
 	useDialogPages
 } from "@/components/user/DialogPagesProvider"
+import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import LedgerPage from "./LedgerPage"
 import LedgerToEditProvider from "./LedgerProvider"
 import LedgersListPage from "./LedgersListPage"
-import LedgerPage from "./LedgerPage"
 
 function LedgersEditorContent() {
 	const { curPage, setCurPage } = useDialogPages()
@@ -16,10 +16,15 @@ function LedgersEditorContent() {
 	const settingsQuery = useSettingsQuery()
 
 	const renderPage = () => {
-		const pages = [LedgersListPage, LedgerPage]
+		const pages = [
+			(props: any) => <LedgersListPage {...props} />,
+			(props: any) => <LedgersListPage isEditMode={true} {...props} />,
+			LedgerPage
+		]
 		const CurrentPage = pages[curPage]
+		const props = { showBackButton: !(curPage === 0) }
 
-		return <CurrentPage />
+		return <CurrentPage {...props} />
 	}
 
 	return (
