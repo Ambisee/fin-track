@@ -205,7 +205,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cross-Origin Configuration
 CORS_ALLOWED_ORIGINS = []
-if not DEBUG:
-    CORS_ALLOWED_ORIGINS.append(os.getenv("FRONTEND_URL"))
+if not DEBUG and os.getenv("FRONTEND_URL") is not None:
+    allowed_origins = os.getenv("FRONTEND_URL").split(";")
+    for origin in allowed_origins:
+        CORS_ALLOWED_ORIGINS.append(origin)
 if DEBUG:
     CORS_ALLOWED_ORIGINS.append("http://192.168.18.20:3000")
