@@ -1,8 +1,9 @@
-import { UserResponse } from "@supabase/supabase-js";
+import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, LEDGER_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
+import { Entry } from "@/types/supabase";
 
 function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error, UserResponse, string[]>) {
     return useQuery({
@@ -31,7 +32,7 @@ function useEntryDataQuery() {
 				.limit(100),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
-		enabled: !!userQuery.data?.data.user && !!settingsQuery.data?.data
+		enabled: !!userQuery.data?.data.user && !!settingsQuery.data?.data && !userQuery.isRefetching && !settingsQuery.isRefetching
 	})
 }
 
@@ -48,7 +49,7 @@ function useSettingsQuery() {
 				.single(),
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined || query.state.data.data === null,
-        enabled: !!userQuery.data
+        enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
@@ -62,12 +63,12 @@ function useCurrenciesQuery() {
 }
 
 function useCategoriesQuery() {
-    const userData = useUserQuery()
+    const userQuery = useUserQuery()
     
     return useQuery({
 		queryKey: CATEGORIES_QKEY,
 		queryFn: async () => {
-            const userId = userData.data?.data.user?.id
+            const userId = userQuery.data?.data.user?.id
             if (!userId) {
                 return await sbBrowser.from("category").select("*").eq("created_by", "false")
             }
@@ -78,17 +79,17 @@ function useCategoriesQuery() {
                 .eq('created_by', userId)
                 .order('name')
         },
-		enabled: !!userData
+		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
     })
 }
 
 function useLedgersQuery() {
-    const userData = useUserQuery()
+    const userQuery = useUserQuery()
     
     return useQuery({
         queryKey: LEDGER_QKEY,
         queryFn: async () => {
-            const userId = userData.data?.data.user?.id
+            const userId = userQuery.data?.data.user?.id
             if (!userId) {
                 return await sbBrowser.from("ledger").select("*, currency (currency_name)").eq("id", -1)
             }
@@ -101,7 +102,7 @@ function useLedgersQuery() {
         },
         refetchOnWindowFocus: false,
         refetchOnMount: (query) => query.state.data === undefined || query.state.data === null,
-        enabled: !!userData
+        enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
     })
 }
 
