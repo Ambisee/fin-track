@@ -31,7 +31,7 @@ function CategoriesContent() {
 		<Dialog>
 			<div id="asdf" className="grid mt-8">
 				<Label className="text-sm">Categories</Label>
-				{categoriesQuery.isLoading ? (
+				{!categoriesQuery.isFetched ? (
 					<Skeleton className="w-full h-10" />
 				) : (
 					<DialogTrigger className="mt-2" asChild>
