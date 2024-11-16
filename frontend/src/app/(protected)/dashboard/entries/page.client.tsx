@@ -23,15 +23,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import EntryList from "@/components/user/EntryList"
-import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
-import useGlobalStore from "@/lib/store"
-import { filterDataGroup, groupDataByMonth } from "@/lib/utils"
+import { MONTHS } from "@/lib/constants"
+import { useEntryDataQuery } from "@/lib/hooks"
+import { filterDataGroup } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
 import { SearchResult } from "minisearch"
-import { useContext, useEffect, useMemo, useState, useTransition } from "react"
+import { useContext, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { DashboardContext } from "../layout"
@@ -159,12 +157,7 @@ export default function DashboardEntries() {
 	const [_, startTransition] = useTransition()
 	const { dataGroups } = useContext(DashboardContext)
 
-	const queryClient = useQueryClient()
-	const setData = useGlobalStore((state) => state.setData)
-	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
-
 	const entryQuery = useEntryDataQuery()
-	const userSettingsQuery = useSettingsQuery()
 
 	const renderSearchResult = () => {
 		if (
@@ -262,9 +255,6 @@ export default function DashboardEntries() {
 		<div>
 			<div className="w-full mb-4 flex justify-between items-center">
 				<h1 className="text-3xl">Entries</h1>
-				<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
-					{userSettingsQuery.data?.data?.ledger?.name}
-				</span>
 			</div>
 			<div className="sticky top-0 py-4 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />

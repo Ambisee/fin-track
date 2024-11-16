@@ -1,15 +1,21 @@
 "use client"
 
 import MiniSearch from "minisearch"
-import { Dialog } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
 import useGlobalStore from "@/lib/store"
-import { useEntryDataQuery } from "@/lib/hooks"
+import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { createContext, useEffect, useMemo, useRef } from "react"
 import { groupDataByMonth, MonthGroup } from "@/lib/utils"
 import { MONTHS } from "@/lib/constants"
+import LedgersListPage from "./settings/components/GeneralSection/LedgersListPage"
+import LedgerPage from "./settings/components/GeneralSection/LedgerPage"
+import LedgersToEditProvider from "./settings/components/GeneralSection/LedgerProvider"
+import DialogPagesProvider, {
+	useDialogPages
+} from "@/components/user/DialogPagesProvider"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -22,7 +28,7 @@ interface DashboardContextObject {
 
 const DashboardContext = createContext<DashboardContextObject>(null!)
 
-function LayoutDialog(props: { children: JSX.Element }) {
+function LayoutEntryDialog(props: { children: JSX.Element }) {
 	const open = useGlobalStore((state) => state.open)
 	const setOpen = useGlobalStore((state) => state.setOpen)
 
@@ -33,7 +39,7 @@ function LayoutDialog(props: { children: JSX.Element }) {
 	)
 }
 
-function LayoutEntryForm() {
+function LayoutEntryDialogContent() {
 	const data = useGlobalStore((state) => state.data)
 	const onSubmitSuccess = useGlobalStore((state) => state.onSubmitSuccess)
 
@@ -43,6 +49,63 @@ function LayoutEntryForm() {
 			data={data}
 			onSubmitSuccess={onSubmitSuccess}
 		/>
+	)
+}
+
+function LayoutLedgerEditorDialog(props: { children: JSX.Element }) {
+	return (
+		<DialogPagesProvider>
+			<LedgersToEditProvider>
+				<Dialog>{props.children}</Dialog>
+			</LedgersToEditProvider>
+		</DialogPagesProvider>
+	)
+}
+
+function LayoutLedgerEditorContent() {
+	const { curPage, setCurPage } = useDialogPages()
+	const userQuery = useUserQuery()
+	const settingsQuery = useSettingsQuery()
+
+	const renderPage = () => {
+		const pages = [
+			(props: any) => <LedgersListPage {...props} />,
+			(props: any) => <LedgersListPage isEditMode={true} {...props} />,
+			LedgerPage
+		]
+		const CurrentPage = pages[curPage]
+		const props = { showBackButton: !(curPage === 0) }
+
+		return <CurrentPage {...props} />
+	}
+
+	return (
+		<DialogContent
+			hideCloseButton
+			onSubmit={(e) => e.stopPropagation()}
+			onOpenAutoFocus={() => setCurPage(0)}
+			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+		>
+			{renderPage()}
+		</DialogContent>
+	)
+}
+
+function LedgerBadge() {
+	const settingsQuery = useSettingsQuery()
+
+	if (settingsQuery.isLoading || !settingsQuery.isFetchedAfterMount) {
+		return undefined
+	}
+
+	return (
+		<DialogTrigger asChild>
+			<button className="absolute top-[38px] right-4">
+				<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
+					{settingsQuery.data?.data?.ledger?.name}
+				</span>
+			</button>
+		</DialogTrigger>
 	)
 }
 
@@ -102,17 +165,25 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 }
 
 export default function DashboardLayout(props: DashboardLayoutProps) {
+	const settingsQuery = useSettingsQuery()
+
 	return (
 		<DashboardContextProvider>
-			<LayoutDialog>
+			<LayoutEntryDialog>
 				<>
 					<div className="dashboard-content" vaul-drawer-wrapper="">
 						{props.children}
+						<LayoutLedgerEditorDialog>
+							<>
+								<LedgerBadge />
+								<LayoutLedgerEditorContent />
+							</>
+						</LayoutLedgerEditorDialog>
 					</div>
 					<ProtectedNavbar />
-					<LayoutEntryForm />
+					<LayoutEntryDialogContent />
 				</>
-			</LayoutDialog>
+			</LayoutEntryDialog>
 		</DashboardContextProvider>
 	)
 }

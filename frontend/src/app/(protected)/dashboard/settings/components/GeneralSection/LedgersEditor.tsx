@@ -29,7 +29,7 @@ function LedgersEditorContent() {
 
 	return (
 		<Dialog>
-			<div className="grid mt-8">
+			<div id="ledgers-editor" className="grid pt-4 mt-4">
 				<Label className="text-sm">Ledgers</Label>
 				<div className="mt-2 p-4 rounded-md border">
 					<div className="flex justify-between items-center">

@@ -90,12 +90,6 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 		}
 	})
 
-	useEffect(() => {
-		if (settingsQuery.data?.data !== undefined) {
-			queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
-		}
-	}, [queryClient, settingsQuery.data?.data])
-
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
 			<DialogHeader className="space-y-0 sm:text-center h-fit">
@@ -185,7 +179,10 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 															return
 														}
 
-														await settingsQuery.refetch()
+														queryClient.invalidateQueries({
+															queryKey: USER_SETTINGS_QKEY
+														})
+														closeRef.current?.click()
 
 														toast({
 															description: (
@@ -196,15 +193,13 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 															),
 															duration: 1500
 														})
-
-														closeRef.current?.click()
 													}
 												}
 											)
 										}
 									}}
 								>
-									<p className="w-full">{val.name}</p>
+									<p className="w-full">{val.name} </p>
 									{isEditMode && (
 										<AlertDialogTrigger
 											onClick={(e) => {
@@ -238,9 +233,10 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete ledger</AlertDialogTitle>
 						<AlertDialogDescription>
-							This action will delete all transaction records associated with
-							the ledger. Are you sure that you want to delete the ledger:{" "}
-							<b>{ledgerToBeDelete?.name}</b>?
+							This action will also delete{" "}
+							<b>{ledgerToBeDelete?.entry[0].count}</b> transaction records
+							associated with the ledger. Are you sure that you want to delete
+							the ledger: <b>{ledgerToBeDelete?.name}</b>?
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
