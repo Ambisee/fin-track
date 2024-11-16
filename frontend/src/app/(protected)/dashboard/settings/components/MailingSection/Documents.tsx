@@ -24,7 +24,7 @@ import {
 } from "@/lib/hooks"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ChevronLeft, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { useState } from "react"
 import { useFormContext } from "react-hook-form"
 import LedgerStoreProvider, {
@@ -38,9 +38,7 @@ function LedgerSelectorPage() {
 	const { setCurPage } = useDialogPages()
 	const { setLedger: setLedgerToEdit } = useLedgerStore()
 
-	const [isPendingIndex, setIsPendingIndex] = useState(-1)
-
-	const renderDownloadList = () => {
+	const renderLedgerList = () => {
 		const result: JSX.Element[] = []
 		if (!ledgersQuery.data?.data) {
 			return undefined
@@ -53,7 +51,6 @@ function LedgerSelectorPage() {
 				<li className="px-1" key={ledger.id}>
 					<Button
 						type="button"
-						disabled={isPendingIndex !== -1}
 						onClick={(e) => {
 							e.preventDefault()
 							setLedgerToEdit(ledger)
@@ -63,11 +60,7 @@ function LedgerSelectorPage() {
 						variant="ghost"
 					>
 						<span>{ledger.name}</span>
-						{isPendingIndex === -1 || isPendingIndex !== i ? (
-							<DownloadIcon className="mt-0" />
-						) : (
-							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
-						)}
+						<ChevronRight className="mt-0 w-4 h-4" />
 					</Button>
 				</li>
 			)
@@ -96,7 +89,7 @@ function LedgerSelectorPage() {
 				</DialogDescription>
 			</DialogHeader>
 			<ul className="max-h-full overflow-y-auto [&>:not(:first-child)]:mt-1.5">
-				{renderDownloadList()}
+				{renderLedgerList()}
 			</ul>
 		</>
 	)
@@ -144,12 +137,17 @@ function MonthSelectorPage() {
 							})
 								.then((resp) => {
 									dismiss()
+									if (!resp.ok) {
+										throw Error(
+											"Unable to retrieve the report document. Please try again later"
+										)
+									}
+
 									return resp.blob()
 								})
-								.catch((err) => {
-									update({
-										id: id,
-										description: err,
+								.catch((err: Error) => {
+									toast({
+										description: err.message,
 										variant: "destructive"
 									})
 									return undefined
@@ -193,7 +191,7 @@ function MonthSelectorPage() {
 				<div className="w-full relative space-y-0 sm:text-center">
 					<DialogTitle asChild>
 						<h1 className="w-2/3 mx-auto sm:w-full leading-6">
-							Select a month to download a report PDF
+							Select a month to download a report
 						</h1>
 					</DialogTitle>
 					<button
@@ -214,7 +212,7 @@ function MonthSelectorPage() {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<ul className="max-h-full overflow-y-auto [&_:not(:first-child)]:mt-1.5">
+			<ul className="max-h-full overflow-y-auto [&>:not(:first-child)]:mt-1.5">
 				{renderDownloadList()}
 			</ul>
 		</>
