@@ -66,7 +66,7 @@ export default function DashboardHome() {
 		return (
 			<div>
 				<h2 className="text-xl mb-4">Transactions in November 2024</h2>
-				<EntryList data={group} />
+				<EntryList data={group.toReversed()} />
 			</div>
 		)
 	}
