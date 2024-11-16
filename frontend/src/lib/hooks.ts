@@ -91,12 +91,12 @@ function useLedgersQuery() {
         queryFn: async () => {
             const userId = userQuery.data?.data.user?.id
             if (!userId) {
-                return await sbBrowser.from("ledger").select("*, currency (currency_name)").eq("id", -1)
+                return await sbBrowser.from("ledger").select("*, currency (currency_name), entry(count)").eq("id", -1)
             }
 
             return await sbBrowser
                 .from("ledger")
-                .select("*, currency (currency_name)")
+                .select("*, currency (currency_name), entry(count)")
                 .eq('created_by', userId)
                 .order('name')
         },
