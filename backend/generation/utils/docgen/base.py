@@ -1,7 +1,8 @@
 import os
+from typing import List
 from datetime import datetime
 
-from ...models import UserViewModel
+from ...models import UserViewModel, LedgerModel, EntryModel
 from ... import apps
 
 
@@ -63,7 +64,7 @@ class BaseDocumentEngine:
 
         return filepath
 
-    def generate_pdf(self, user: UserViewModel, entries):
+    def generate_pdf(self, user: UserViewModel, ledger: LedgerModel, entries: List[EntryModel]):
         """Generate a PDF report for the specified user and their data
 
         Params

@@ -77,18 +77,23 @@ class GenerateReportView(UserView):
         data = request.data
         month = data.get("month")
         year = data.get("year")
+        ledger_id = data.get("ledger_id")
 
         # Check for the existence of the month and year values
         if month is None:
             return Response({"error": "No month specified"}, 400)
         if year is None:
             return Response({"error": "No year specified"}, 400)
+        if ledger_id is None:
+            return Response({"error": "No ledger id specified"}, 400)
 
         # Check if the month and year values are ints
         if not isinstance(month, int) or (month < 1 or month > 12):
             return Response({"error": "Expected month to be an integer between 1 and 12"}, 400)
         if not isinstance(year, int):
             return Response({"error": "Expected year to be an integer"}, 400)
+        if not isinstance(ledger_id, int):
+            return Response({"error": "Expected ledger id to be an integer"}, 400)
             
         return request
 
@@ -119,7 +124,13 @@ class GenerateReportView(UserView):
         if isinstance(user, str):
             return Response({'error': user}, status=400)
 
-        data = fetcher.get_period_data(user.id, period.month, period.year)
+        ledger_data = fetcher.get_ledger(user.id, request_data.get("ledger_id"))
+        if isinstance(ledger_data, str):
+            return Response({'error': ledger_data}, status=400)
+
+        entry_data = fetcher.get_period_data(user.id, ledger_data, period.month, period.year)
+        if (len(entry_data) < 1):
+            return Response({'error': "No transaction records available for the given period and ledger."}, status=400)
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
@@ -130,7 +141,7 @@ class GenerateReportView(UserView):
             shutil.rmtree(os.path.dirname(filepath))
             logging.warning("Cleared out the PDF storage directory")
 
-        filepath = d_engine.generate_pdf(user, data)
+        filepath = d_engine.generate_pdf(user, ledger_data, entry_data)
 
         response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
         response["Content-Disposition"] = "inline; filename=report.pdf"

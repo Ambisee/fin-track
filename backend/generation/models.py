@@ -10,6 +10,12 @@ class UserViewModel(pydantic.BaseModel):
     currency_name: str
 
 
+class LedgerModel(pydantic.BaseModel):
+    id: int
+    name: str
+    currency_name: str
+
+
 class EntryModel(pydantic.BaseModel):
     amount: float
     is_positive: bool
@@ -18,3 +24,4 @@ class EntryModel(pydantic.BaseModel):
     id: int
     note: str | None
     category: str
+    ledger: int

@@ -20,7 +20,7 @@ from reportlab.platypus.flowables import PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 
 from .base import BaseDocumentEngine
-from ...models import UserViewModel, EntryModel
+from ...models import UserViewModel, EntryModel, LedgerModel
 
 
 class ReportlabEngine(BaseDocumentEngine):
@@ -30,9 +30,9 @@ class ReportlabEngine(BaseDocumentEngine):
         
         self.margin = cm
         self.pagesize = A4
-        self.initialize_font()
+        self._initialize_font()
 
-    def initialize_font(self) -> None:
+    def _initialize_font(self) -> None:
         raleway_fonts = {
             "normal": TTFont("Raleway", finders.find("fonts/Raleway/Raleway-Regular.ttf")),
             "bold": TTFont("RalewayBd", finders.find("fonts/Raleway/Raleway-Bold.ttf"))
@@ -41,8 +41,14 @@ class ReportlabEngine(BaseDocumentEngine):
         pdfmetrics.registerFont(raleway_fonts["normal"])
         pdfmetrics.registerFont(raleway_fonts["bold"])
         pdfmetrics.registerFontFamily("Raleway", normal="Raleway", bold="RalewayBd")
-
-    def _create_document(self, filename) -> SimpleDocTemplate:
+        
+    def _initialize_currency(self, currency):
+        self.currency_name = currency
+    
+    def _format_currency(self, amount):
+        return format_currency(amount, self.currency_name)
+    
+    def _create_document(self, filename: str) -> SimpleDocTemplate:
         return SimpleDocTemplate(
             filename,
             pagesize=self.pagesize,
@@ -52,12 +58,12 @@ class ReportlabEngine(BaseDocumentEngine):
             bottomMargin=self.margin,
         )
 
-    def _create_header(self) -> Paragraph:
+    def _create_header(self, ledger: LedgerModel) -> Paragraph:
         stylesheet = getSampleStyleSheet()
         style = stylesheet["Heading1"]
         style.fontName = "RalewayBd"
 
-        return Paragraph(f"Monthly Report - {month_name[self.month]} {self.year}", style)
+        return Paragraph(f"Monthly Report - {ledger.name} ({month_name[self.month]} {self.year})", style)
 
     def _create_report_info(self, user: UserViewModel) -> Table:
         _, end_dd = monthrange(self.year, self.month)
@@ -82,7 +88,7 @@ class ReportlabEngine(BaseDocumentEngine):
             ],
         )
 
-    def _create_entry_table(self, user: UserViewModel, entries: List[EntryModel]) -> Table:
+    def _create_entry_table(self, entries: List[EntryModel]) -> Table:
         total_debit = 0
         total_credit = 0
         
@@ -92,7 +98,7 @@ class ReportlabEngine(BaseDocumentEngine):
 
         for i, entry in enumerate(entries):
             row = [str(i + 1) + ".", entry.date, entry.category]
-            amount = format_currency(entry.amount, user.currency_name)
+            amount = self._format_currency(entry.amount)
 
             if entry.is_positive:
                 total_debit += entry.amount
@@ -107,8 +113,8 @@ class ReportlabEngine(BaseDocumentEngine):
 
         data.append([
             'Total', '', '',
-            format_currency(total_debit, user.currency_name),
-            format_currency(total_credit, user.currency_name)
+            self._format_currency(total_debit),
+            self._format_currency(total_credit)
         ])
 
         aW = self.pagesize[0] - 2 * self.margin
@@ -167,8 +173,7 @@ class ReportlabEngine(BaseDocumentEngine):
                 ("RIGHTPADDING", (1, 0), (1, -1), 24),
             ])
 
-
-    def _create_statistics(self, user: UserViewModel, entries: List[EntryModel]):
+    def _create_statistics(self, entries: List[EntryModel]):
         incomes = {}
         expenses = {}
         
@@ -205,7 +210,7 @@ class ReportlabEngine(BaseDocumentEngine):
         for inc in incomes:
             income_list.append([
                 f'{inc} ({round(100 * incomes[inc] / total_income, 2)}%)',
-                format_currency(incomes[inc], user.currency_name)
+                self._format_currency(incomes[inc])
             ])
 
         # Process expense values
@@ -219,7 +224,7 @@ class ReportlabEngine(BaseDocumentEngine):
         for exp in expenses:
             expense_list.append([
                 f'{exp} ({round(100 * expenses[exp] / total_expense, 2)}%)',
-                format_currency(expenses[exp], user.currency_name)
+                self._format_currency(expenses[exp])
             ])
             
         data = [
@@ -237,16 +242,18 @@ class ReportlabEngine(BaseDocumentEngine):
             ]
         )
 
-    def generate_pdf(self, user: UserViewModel, entries: List[EntryModel]):
+    def generate_pdf(self, user: UserViewModel, ledger: LedgerModel, entries: List[EntryModel]):
         filepath = self.get_filepath(user)
         document: SimpleDocTemplate = self._create_document(filepath)
         flowables = []
 
-        flowables.append(self._create_header())
+        self._initialize_currency(ledger.currency_name)
+
+        flowables.append(self._create_header(ledger))
         flowables.append(self._create_report_info(user))
-        flowables.append(self._create_entry_table(user, entries))
+        flowables.append(self._create_entry_table(entries))
         flowables.append(PageBreak())
-        flowables.append(self._create_statistics(user, entries))
+        flowables.append(self._create_statistics(entries))
         
         document.build(flowables)
 

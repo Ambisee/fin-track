@@ -6,7 +6,7 @@ from pydantic import TypeAdapter
 from supabase import Client
 
 from ...supabase import client
-from ...models import UserViewModel, EntryModel
+from ...models import UserViewModel, EntryModel, LedgerModel
 
 
 class DataFetcher:
@@ -68,19 +68,55 @@ class DataFetcher:
             A list of users that allow reports
         """
         response = self.client.table("user_view").select("*").eq("allow_report", True).execute()
-        
+
         adapter = TypeAdapter(List[UserViewModel])
         return adapter.validate_python(response.data)
-        
 
 
-    def get_period_data(self, uid: str, month: int, year: int) -> List[EntryModel]:
+    def get_ledger(self, uid: str, ledger_id: int) -> LedgerModel | str:
+        """Get a ledger from an id
+
+        Params
+        ------
+        uid: str
+            The user's id to be checked against the ledger's creator
+        ledger_id: int
+            The id of the ledger to be fetched
+
+        Returns
+        -------
+        LedgerModel or str
+            If the uid matches the ledger's creator, returns the ledger
+            else it returns None
+        """
+        query = (self.client
+                 .table("ledger")
+                 .select("*, currency (currency_name)")
+                 .eq("id", ledger_id)
+                 .eq("created_by", uid)
+                 )
+
+        response = query.execute()
+        if not response.data:
+            return "Unable to retrieve the ledger. Please check that you have a valid ledger id and user id."
+
+        adapter = TypeAdapter(LedgerModel)
+        return adapter.validate_python({
+            "currency_name": response.data[0]["currency"]["currency_name"],
+            "id": response.data[0]['id'],
+            "name": response.data[0]["name"]
+        })
+
+
+    def get_period_data(self, uid: str, ledger: LedgerModel, month: int, year: int) -> List[EntryModel]:
         """Get a user's entry data in the given month/year period
 
         Params
         ------
-        user_id: str
+        uid: str
             The user's id
+        ledger: LedgerModel
+            The ledger from which to search for the data
         month: int
             An integer value in the range [1,12]
         year: int
@@ -100,6 +136,7 @@ class DataFetcher:
                  .table("entry")
                  .select("*")
                  .eq("created_by", uid)
+                 .eq("ledger", ledger.id)
                  .lte("date", end.strftime("%Y-%m-%d"))
                  .gte("date", start.strftime("%Y-%m-%d")))
         
