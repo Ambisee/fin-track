@@ -43,7 +43,7 @@ function LedgerSelectorPage() {
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
 		if (!ledgersQuery.data?.data) {
-			return result
+			return undefined
 		}
 
 		for (let i = 0; i < ledgersQuery.data.data.length; i++) {
@@ -113,7 +113,7 @@ function MonthSelectorPage() {
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
 		if (!monthGroupQuery?.data?.data) {
-			return result
+			return undefined
 		}
 
 		for (let i = 0; i < monthGroupQuery.data.data.length; i++) {
@@ -160,7 +160,6 @@ function MonthSelectorPage() {
 									}
 
 									const url = window.URL.createObjectURL(value)
-
 									setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 
 									window.location.assign(url)
