@@ -1,6 +1,7 @@
 import os
 from typing import List
 from datetime import datetime
+from babel.numbers import LC_NUMERIC
 
 from ...models import UserViewModel, LedgerModel, EntryModel
 from ... import apps
@@ -14,6 +15,8 @@ class BaseDocumentEngine:
         if period is None:
             return
 
+        self.currency = 'USD'
+        self.locale = LC_NUMERIC
         self.month = period[0]
         self.year = period[1]
 
@@ -22,6 +25,12 @@ class BaseDocumentEngine:
             self.month = month
         if year is not None:
             self.year = year
+
+    def set_currency(self, currency: str):
+        self.currency = currency
+    
+    def set_locale(self, locale: str):
+        self.locale = locale
 
     def is_period_defined(self):
         """Check if the instance's period is valid

@@ -41,14 +41,14 @@ class DataFetcher:
         if not user_response.user:
             return "Unable to find the user with the given user id"
 
-        settings_response = self.client.table("settings").select("allow_report, currency(currency_name)").eq("user_id", uid).single().execute()
+        settings_response = self.client.table("settings").select("allow_report, current_ledger").eq("user_id", uid).single().execute()
         if not settings_response.data:
             return "Unable to retrieve the user's data"
     
         adapter = TypeAdapter(UserViewModel)
         return adapter.validate_python({
             'id': user_response.user.id,
-            'currency_name': settings_response.data['currency']['currency_name'],
+            'current_ledger': settings_response.data['current_ledger'],
             'allow_report': settings_response.data['allow_report'],
             'username': user_response.user.user_metadata.get("username"),
             'email': user_response.user.email

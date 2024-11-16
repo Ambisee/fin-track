@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(`${process.env.NEXT_GENERATE_DOCUMENT_URL}`, {
         method: "POST",
         body: JSON.stringify({
+            locale: payload?.locale,
             ledger_id: payload?.ledger_id,
             month: payload?.month,
             year: payload?.year

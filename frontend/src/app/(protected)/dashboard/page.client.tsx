@@ -14,7 +14,11 @@ export default function DashboardHome() {
 	const entryDataQuery = useEntryDataQuery()
 
 	const renderWelcomeMessage = () => {
-		if (userQuery.isLoading || userQuery.data?.data?.user === undefined) {
+		if (
+			userQuery.isLoading ||
+			!userQuery.isFetched ||
+			userQuery.data?.data?.user === undefined
+		) {
 			return (
 				<div className="mb-8">
 					<Skeleton className="w-24 h-9" />
@@ -43,7 +47,7 @@ export default function DashboardHome() {
 	}
 
 	const renderThisMonthEntries = () => {
-		if (entryDataQuery.isLoading || userQuery.isLoading) {
+		if (!entryDataQuery.isFetched) {
 			return (
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />

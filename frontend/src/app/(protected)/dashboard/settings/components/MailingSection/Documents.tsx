@@ -130,8 +130,9 @@ function MonthSelectorPage() {
 							fetch("/api/documents", {
 								method: "POST",
 								body: JSON.stringify({
-									month: value.month,
+                                    month: value.month,
 									year: value.year,
+									locale: navigator.language,
 									ledger_id: ledgerToEdit?.id as number
 								})
 							})

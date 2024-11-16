@@ -134,6 +134,7 @@ class GenerateReportView(UserView):
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
+        d_engine.set_locale(request_data.get("locale"))
 
         filepath = d_engine.get_filepath(user)
         
@@ -151,9 +152,10 @@ class GenerateReportView(UserView):
 
 class AutomatedMonthlyReportView(AdminView):
 
-    def _generate_report(self, period, user, data):
+    def _generate_report(self, period, user, ledger, data):
         d_engine = ReportlabEngine((period.month, period.year))
-        return d_engine.generate_pdf(user, data)
+
+        return d_engine.generate_pdf(user, ledger, data)
 
     def _set_filepath(self, target, value):
         target["filepath"] = value
@@ -166,12 +168,14 @@ class AutomatedMonthlyReportView(AdminView):
         period = datetime.now()
 
         for u in allow_report_users:
-            user_data = self.fetcher().get_period_data(u.id, period.month, period.year)
+            fetcher = self.fetcher()
+            user_data = fetcher.get_period_data(u.id, period.month, period.year)
+            ledger_data = fetcher.get_ledger(u.id, u.current_ledger)
 
             if len(user_data) < 1:
                 continue
 
-            data.append({'user': u, 'data': user_data})
+            data.append({'user': u, 'ledger': ledger_data, 'data': user_data})
 
         # Generate monthly report
         with ThreadPoolExecutor(max_workers=10) as executor:
@@ -179,25 +183,26 @@ class AutomatedMonthlyReportView(AdminView):
                 # 1. Generate report with the document engine
                 # 2. Update the filepath to the document of the user
                 executor \
-                    .submit(self._generate_report, period, d['user'], d['data']) \
+                    .submit(self._generate_report, period, d['user'], d['ledger'], d['data']) \
                     .add_done_callback(lambda future: self._set_filepath(data[i], future.result()))
 
         # Send the report by email
+        deliv_eng = self.delivery_engine()
         for d in data:
-            self.delivery_engine().send_email(
+            deliv_eng.send_email(
                 f"Monthly Financial Report - {month_name[period.month]} {period.year}",
                 f"""
                     <h2 style="padding-bottom: 1rem;">Hello {d['user'].username},</h2>
                     <p>
                         Your monthly financial report is ready.
-                        You will find attached to this email the report for the period <b>{month_name[period.month]} {period.year}</b>.
+                        You will find attached to this email the report for the ledger <b>{ledger_data.name}</b> and period <b>{month_name[period.month]} {period.year}</b>
                     </p>
                     
                     <p>Thank you for using FinTrack.</p>
                 """,
                 d['user'].email,
                 d['filepath'],
-                f"Monthly Financial Report - {month_name[period.month]} {period.year}.pdf"
+                f"Monthly Financial Report - {ledger_data.name} ({month_name[period.month]} {period.year}).pdf"
             )
 
         return Response({'data': data})

@@ -43,11 +43,12 @@ class ReportlabEngine(BaseDocumentEngine):
         pdfmetrics.registerFont(raleway_fonts["bold"])
         pdfmetrics.registerFontFamily("Raleway", normal="Raleway", bold="RalewayBd")
         
-    def _initialize_currency(self, currency):
-        self.currency_name = currency
-    
     def _format_currency(self, amount):
-        return format_currency(amount, self.currency_name)
+        return format_currency(
+            amount,
+            self.currency,
+            locale=self.locale
+        )
     
     def _create_document(self, filename: str) -> SimpleDocTemplate:
         return SimpleDocTemplate(
@@ -257,8 +258,7 @@ class ReportlabEngine(BaseDocumentEngine):
         document: SimpleDocTemplate = self._create_document(filepath)
         flowables = []
 
-        self._initialize_currency(ledger.currency_name)
-
+        self.set_currency(ledger.currency_name)
         flowables.append(self._create_header(ledger))
         flowables.append(self._create_sub_header(ledger))
         flowables.append(self._create_report_info(user))

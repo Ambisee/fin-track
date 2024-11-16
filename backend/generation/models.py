@@ -7,7 +7,7 @@ class UserViewModel(pydantic.BaseModel):
     email: str
     username: str
     allow_report: bool
-    currency_name: str
+    current_ledger: int
 
 
 class LedgerModel(pydantic.BaseModel):
