@@ -62,7 +62,7 @@ export type Database = {
           date: string
           id: number
           is_positive: boolean
-          ledger: number | null
+          ledger: number
           note: string | null
         }
         Insert: {
@@ -72,7 +72,7 @@ export type Database = {
           date?: string
           id?: number
           is_positive: boolean
-          ledger?: number | null
+          ledger: number
           note?: string | null
         }
         Update: {
@@ -82,7 +82,7 @@ export type Database = {
           date?: string
           id?: number
           is_positive?: boolean
-          ledger?: number | null
+          ledger?: number
           note?: string | null
         }
         Relationships: [
@@ -92,6 +92,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ledger"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_ledger"
+            columns: ["ledger"]
+            isOneToOne: false
+            referencedRelation: "month_groups"
+            referencedColumns: ["ledger_id"]
           },
         ]
       }
@@ -152,6 +159,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "settings_current_ledger_fkey"
+            columns: ["current_ledger"]
+            isOneToOne: false
+            referencedRelation: "month_groups"
+            referencedColumns: ["ledger_id"]
+          },
+          {
             foreignKeyName: "settings_default_currency_fkey"
             columns: ["default_currency"]
             isOneToOne: false
@@ -162,9 +176,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      month_groups: {
+        Row: {
+          created_by: string | null
+          ledger_id: number | null
+          month: number | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      create_default_categories: {
+        Args: {
+          new: unknown
+        }
+        Returns: undefined
+      }
+      create_initial_ledger: {
+        Args: {
+          new: unknown
+        }
+        Returns: undefined
+      }
+      create_settings: {
+        Args: {
+          new: unknown
+        }
+        Returns: undefined
+      }
       update_password: {
         Args: {
           old_password: string

@@ -42,7 +42,7 @@ import {
 } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useLedgerToEdit } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import { useLedgerStore } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
 
 interface ChooseLedgerPageProps {
 	showBackButton?: boolean
@@ -52,7 +52,7 @@ export default function ChooseLedgerPage(props: ChooseLedgerPageProps) {
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
 	const { setCurPage } = useDialogPages()
-	const { setLedgerToEdit } = useLedgerToEdit()
+	const { setLedger: setLedgerToEdit } = useLedgerStore()
 
 	const showBackButton = props.showBackButton ?? true
 

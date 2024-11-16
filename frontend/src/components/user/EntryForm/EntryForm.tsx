@@ -24,7 +24,7 @@ import EditCategoryPage from "./EditCategoryPage"
 import CategoryToEditProvider from "./CategoryProvider"
 import DialogPagesProvider, { useDialogPages } from "../DialogPagesProvider"
 import { useSettingsQuery } from "@/lib/hooks"
-import LedgerToEditProvider from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import LedgerStoreProvider from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
 import EntryLedgersListPage from "./EntryLedgersListPage"
 import EntryLedgerPage from "./EntryLedgerPage"
 
@@ -76,7 +76,43 @@ function DialogEntryForm(props: EntryFormProps) {
 	const { curPage, setCurPage } = useDialogPages()
 	const settingsQuery = useSettingsQuery()
 
-	const formDefaultValues = useMemo(() => {
+	// const formDefaultValues = useMemo(() => {
+	// 	let defaultValues: FormSchema = {
+	// 		date: new Date(),
+	// 		category: "Miscellaneous",
+	// 		amount: "",
+	// 		type: "Expense",
+	// 		note: "",
+	// 		ledger: settingsQuery.data?.data?.current_ledger ?? -1
+	// 	}
+
+	// 	if (!isEditForm || !props.data) {
+	// 		return defaultValues
+	// 	}
+
+	// 	defaultValues.date = new Date(`${props.data?.date} 00:00`)
+	// 	defaultValues.category = props.data.category
+	// 	defaultValues.type = props.data.is_positive ? "Income" : "Expense"
+	// 	defaultValues.amount = props.data.amount.toFixed(2)
+	// 	defaultValues.note = props.data.note ?? ""
+	// 	defaultValues.ledger = props.data.ledger ?? -1
+
+	// 	return defaultValues
+	// }, [props.data, settingsQuery.data?.data, isEditForm])
+
+	const form = useForm<FormSchema>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			date: new Date(),
+			category: "Miscellaneous",
+			amount: "",
+			type: "Expense",
+			note: "",
+			ledger: settingsQuery.data?.data?.current_ledger ?? -1
+		}
+	})
+
+	useEffect(() => {
 		let defaultValues: FormSchema = {
 			date: new Date(),
 			category: "Miscellaneous",
@@ -87,7 +123,8 @@ function DialogEntryForm(props: EntryFormProps) {
 		}
 
 		if (!isEditForm || !props.data) {
-			return defaultValues
+			form.reset(defaultValues)
+			return
 		}
 
 		defaultValues.date = new Date(`${props.data?.date} 00:00`)
@@ -97,18 +134,14 @@ function DialogEntryForm(props: EntryFormProps) {
 		defaultValues.note = props.data.note ?? ""
 		defaultValues.ledger = props.data.ledger ?? -1
 
-		return defaultValues
-	}, [props.data, settingsQuery.data?.data, isEditForm])
+		form.reset(defaultValues)
+		return
+	}, [props.data, settingsQuery.data?.data, form, isEditForm])
 
-	const form = useForm<FormSchema>({
-		resolver: zodResolver(formSchema),
-		defaultValues: formDefaultValues
-	})
-
-	useEffect(() => {
-		form.reset(formDefaultValues)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [props.data, settingsQuery.data?.data, form])
+	// useEffect(() => {
+	// 	form.reset(formDefaultValues)
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [props.data, settingsQuery.data?.data, form])
 
 	const renderPage = (form: UseFormReturn<FormSchema>) => {
 		const pages = [
@@ -151,11 +184,11 @@ function DialogEntryForm(props: EntryFormProps) {
 function EntryForm(props: EntryFormProps) {
 	return (
 		<DialogPagesProvider>
-			<LedgerToEditProvider>
+			<LedgerStoreProvider>
 				<CategoryToEditProvider>
 					<DialogEntryForm {...props} />
 				</CategoryToEditProvider>
-			</LedgerToEditProvider>
+			</LedgerStoreProvider>
 		</DialogPagesProvider>
 	)
 }

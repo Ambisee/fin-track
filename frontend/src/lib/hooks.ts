@@ -1,7 +1,7 @@
 import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
 import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
-import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, LEDGER_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
+import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, LEDGER_QKEY, MONTH_GROUP_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
 import { Entry } from "@/types/supabase";
 
@@ -106,6 +106,24 @@ function useLedgersQuery() {
     })
 }
 
+function useMonthGroupQuery(ledger_id?: number) {
+    const userQuery = useUserQuery()
+    
+    return useQuery({
+        queryKey: [MONTH_GROUP_QKEY, ledger_id],
+        queryFn: async () => {
+            return await sbBrowser
+                .from("month_groups")
+                .select("*")
+                .eq("created_by", userQuery.data?.data.user?.id as string)
+                .eq("ledger_id", ledger_id as number)
+                .order("year, month", {ascending: true})
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!userQuery.data?.data.user && !userQuery.isRefetching && (ledger_id !== undefined)
+    })
+}
+
 function useSetElementWindowHeight() {
     const elementRef = useRef<HTMLDivElement>(null!)
 
@@ -153,6 +171,6 @@ function useAmountFormatter() {
 
 export { 
     useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery, useLedgersQuery,
-    useSetElementWindowHeight, useAmountFormatter
+    useMonthGroupQuery, useSetElementWindowHeight, useAmountFormatter
 };
 

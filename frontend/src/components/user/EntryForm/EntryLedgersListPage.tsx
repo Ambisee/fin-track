@@ -42,7 +42,7 @@ import {
 } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useLedgerToEdit } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import { useLedgerStore } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
 import { useFormContext } from "react-hook-form"
 
 interface EntryLedgersListPageProps {
@@ -56,7 +56,7 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 
 	const form = useFormContext()
 	const { setCurPage } = useDialogPages()
-	const { setLedgerToEdit } = useLedgerToEdit()
+	const { setLedger } = useLedgerStore()
 
 	const isEditMode = props.isEditMode ?? false
 	const showBackButton = props.showBackButton ?? true
@@ -111,7 +111,7 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 						<button
 							onClick={() => {
 								if (isEditMode) {
-									setLedgerToEdit(undefined)
+									setLedger(undefined)
 								}
 								setCurPage((c) => c + 1)
 							}}
@@ -153,7 +153,7 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 									value={val.name}
 									onSelect={() => {
 										if (isEditMode) {
-											setLedgerToEdit(val)
+											setLedger(val)
 											setCurPage((c) => c + 1)
 											return
 										}

@@ -34,7 +34,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import InputSkeleton from "../InputSkeleton"
-import { useLedgerToEdit } from "./LedgerProvider"
+import { useLedgerStore } from "./LedgerProvider"
 
 interface LedgerPageProps {}
 
@@ -51,7 +51,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 
 	const { toast } = useToast()
 	const { setCurPage } = useDialogPages()
-	const { ledgerToEdit } = useLedgerToEdit()
+	const { ledger } = useLedgerStore()
 	const queryClient = useQueryClient()
 
 	const userQuery = useUserQuery()
@@ -71,11 +71,11 @@ export default function LedgerPage(props: LedgerPageProps) {
 			}
 		}
 
-		if (ledgerToEdit !== undefined) {
-			name = ledgerToEdit.name
+		if (ledger !== undefined) {
+			name = ledger.name
 			currency = {
-				id: ledgerToEdit.currency_id,
-				currency_name: ledgerToEdit.currency!.currency_name
+				id: ledger.currency_id,
+				currency_name: ledger.currency!.currency_name
 			}
 		}
 
@@ -93,15 +93,15 @@ export default function LedgerPage(props: LedgerPageProps) {
 	const updateLedgerMutation = useMutation({
 		mutationKey: LEDGER_QKEY,
 		mutationFn: async (data: z.infer<typeof formSchema>) => {
-			if (!userQuery.data?.data || !userQuery.data.data.user || !ledgerToEdit) {
+			if (!userQuery.data?.data || !userQuery.data.data.user || !ledger) {
 				return null
 			}
 
 			const result = await sbBrowser
 				.from("ledger")
 				.update({ name: data.name, currency_id: data.currency.id })
-				.eq("name", ledgerToEdit.name)
-				.eq("created_by", ledgerToEdit.created_by)
+				.eq("name", ledger.name)
+				.eq("created_by", ledger.created_by)
 				.select()
 
 			return result
@@ -133,9 +133,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
 					<h1 className="h-6 leading-6">
-						{ledgerToEdit
-							? `Edit ledger - ${ledgerToEdit.name}`
-							: "Create a new ledger"}
+						{ledger ? `Edit ledger - ${ledger.name}` : "Create a new ledger"}
 					</h1>
 				</DialogTitle>
 				<button
@@ -149,7 +147,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 				</DialogClose>
 				<DialogDescription>
 					<VisuallyHidden>
-						{ledgerToEdit ? "Edit the specified ledger" : "Create a new ledger"}
+						{ledger ? "Edit the specified ledger" : "Create a new ledger"}
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
@@ -175,7 +173,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 									return
 								}
 
-								const isUpdate = ledgerToEdit !== undefined
+								const isUpdate = ledger !== undefined
 								const mutation = isUpdate
 									? updateLedgerMutation
 									: insertLedgerMutation
@@ -259,9 +257,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 							/>
 						</div>
 						<DialogFooter>
-							<Button>
-								{!ledgerToEdit ? "Create new ledger" : "Update ledger"}
-							</Button>
+							<Button>{!ledger ? "Create new ledger" : "Update ledger"}</Button>
 						</DialogFooter>
 					</form>
 				</Form>

@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -7,7 +9,7 @@ import DialogPagesProvider, {
 } from "@/components/user/DialogPagesProvider"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import LedgerPage from "./LedgerPage"
-import LedgerToEditProvider from "./LedgerProvider"
+import LedgerStoreProvider from "./LedgerProvider"
 import LedgersListPage from "./LedgersListPage"
 
 function LedgersEditorContent() {
@@ -70,9 +72,9 @@ function LedgersEditorContent() {
 export default function LedgersEditor() {
 	return (
 		<DialogPagesProvider initialValues={{ curPage: 0 }}>
-			<LedgerToEditProvider>
+			<LedgerStoreProvider>
 				<LedgersEditorContent />
-			</LedgerToEditProvider>
+			</LedgerStoreProvider>
 		</DialogPagesProvider>
 	)
 }

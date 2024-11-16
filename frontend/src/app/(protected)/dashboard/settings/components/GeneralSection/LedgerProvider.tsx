@@ -1,3 +1,5 @@
+"use client"
+
 import { Category, Ledger } from "@/types/supabase"
 import {
 	createContext,
@@ -7,27 +9,27 @@ import {
 	useState
 } from "react"
 
-interface LedgerToEditObject {
-	ledgerToEdit?: Ledger
-	setLedgerToEdit: Dispatch<SetStateAction<Ledger | undefined>>
+interface LedgerStoreObject {
+	ledger?: Ledger
+	setLedger: Dispatch<SetStateAction<Ledger | undefined>>
 }
 
-const LedgerToEditContext = createContext<LedgerToEditObject>(null!)
+const LedgerToEditContext = createContext<LedgerStoreObject>(null!)
 
-export function useLedgerToEdit() {
+export function useLedgerStore() {
 	return useContext(LedgerToEditContext)
 }
 
-export default function LedgerToEditProvider(props: {
-	initialValues?: Partial<Pick<LedgerToEditObject, "ledgerToEdit">>
+export default function LedgerStoreProvider(props: {
+	initialValues?: Partial<Pick<LedgerStoreObject, "ledger">>
 	children: JSX.Element
 }) {
-	const [ledgerToEdit, setLedgerToEdit] = useState(
-		props.initialValues?.ledgerToEdit
-	)
+	const [ledger, setLedger] = useState(props.initialValues?.ledger)
 
 	return (
-		<LedgerToEditContext.Provider value={{ ledgerToEdit, setLedgerToEdit }}>
+		<LedgerToEditContext.Provider
+			value={{ ledger: ledger, setLedger: setLedger }}
+		>
 			{props.children}
 		</LedgerToEditContext.Provider>
 	)

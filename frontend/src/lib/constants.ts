@@ -7,6 +7,7 @@ export const ENTRY_QKEY = ["entryData"]
 export const USER_SETTINGS_QKEY = ["settings"]
 export const CATEGORIES_QKEY = ["categories"]
 export const CURRENCIES_QKEY = ["currencies"]
+export const MONTH_GROUP_QKEY = "monthGroup"
 
 export const MONTHS = [
     'January', 'February', 'March', 'April', 

@@ -7,12 +7,12 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { Form, FormField } from "@/components/ui/form"
+import { FormField } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import { useLedgersQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -24,7 +24,6 @@ import { EntryFormItem, FormSchema } from "./EntryForm"
 
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useDialogPages } from "../DialogPagesProvider"
-import ComboBox from "@/components/ui/combobox"
 
 interface EntryFormPageProps {
 	data?: Entry

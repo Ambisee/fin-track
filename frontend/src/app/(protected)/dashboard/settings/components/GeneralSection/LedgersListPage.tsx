@@ -42,7 +42,7 @@ import {
 } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useLedgerToEdit } from "./LedgerProvider"
+import { useLedgerStore } from "./LedgerProvider"
 
 interface LedgersListPageProps {
 	isEditMode?: boolean
@@ -54,7 +54,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 	const queryClient = useQueryClient()
 	const closeRef = useRef<HTMLButtonElement>(null!)
 	const { setCurPage } = useDialogPages()
-	const { setLedgerToEdit } = useLedgerToEdit()
+	const { setLedger } = useLedgerStore()
 
 	const isEditMode = props.isEditMode ?? false
 	const showBackButton = props.showBackButton ?? true
@@ -121,7 +121,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						<button
 							onClick={() => {
 								if (isEditMode) {
-									setLedgerToEdit(undefined)
+									setLedger(undefined)
 								}
 								setCurPage((c) => c + 1)
 							}}
@@ -163,7 +163,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									value={val.name}
 									onSelect={() => {
 										if (isEditMode) {
-											setLedgerToEdit(val)
+											setLedger(val)
 											setCurPage((c) => c + 1)
 										} else {
 											selectLedgerMutation.mutate(
