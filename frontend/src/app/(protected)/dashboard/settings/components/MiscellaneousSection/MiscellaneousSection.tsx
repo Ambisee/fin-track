@@ -16,7 +16,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { sbBrowser } from "@/lib/supabase"
-import { ENTRY_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import {
+	CURRENCIES_QKEY,
+	ENTRY_QKEY,
+	USER_QKEY,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function MiscellaneousSection() {
@@ -115,6 +120,7 @@ export default function MiscellaneousSection() {
 									toast({ description: error.message })
 								}
 
+								queryClient.removeQueries({ queryKey: CURRENCIES_QKEY })
 								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
 								queryClient.removeQueries({
 									queryKey: USER_SETTINGS_QKEY
