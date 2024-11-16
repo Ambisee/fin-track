@@ -35,6 +35,7 @@ class ReportlabEngine(BaseDocumentEngine):
     def _initialize_font(self) -> None:
         raleway_fonts = {
             "normal": TTFont("Raleway", finders.find("fonts/Raleway/Raleway-Regular.ttf")),
+            "semi-bold": TTFont("RalewaySemi", finders.find("fonts/Raleway/Raleway-SemiBold.ttf")),
             "bold": TTFont("RalewayBd", finders.find("fonts/Raleway/Raleway-Bold.ttf"))
         }
 
@@ -62,8 +63,17 @@ class ReportlabEngine(BaseDocumentEngine):
         stylesheet = getSampleStyleSheet()
         style = stylesheet["Heading1"]
         style.fontName = "RalewayBd"
+        style.leading = 13
+        style.underlineOffset = -6
 
-        return Paragraph(f"Monthly Report - {ledger.name} ({month_name[self.month]} {self.year})", style)
+        return Paragraph("<u>FinTrack Monthly Report</u>", style)
+
+    def _create_sub_header(self, ledger: LedgerModel) -> Table:
+        stylesheet = getSampleStyleSheet()
+        style = stylesheet["Heading3"]
+        style.fontName = "Raleway"
+
+        return Paragraph(f"{ledger.name} - {month_name[self.month]} {self.year}", style)
 
     def _create_report_info(self, user: UserViewModel) -> Table:
         _, end_dd = monthrange(self.year, self.month)
@@ -121,7 +131,7 @@ class ReportlabEngine(BaseDocumentEngine):
         return Table(
             data,
             colWidths=[aW * 0.075, aW * 0.145, aW * 0.38, aW * 0.2, aW * 0.2],
-            spaceBefore=cm,
+            spaceBefore=1.5 * cm,
             repeatRows=1,
             style=[
                 ("FONT", (0, 0), (-1, -1), "Raleway"),
@@ -250,6 +260,7 @@ class ReportlabEngine(BaseDocumentEngine):
         self._initialize_currency(ledger.currency_name)
 
         flowables.append(self._create_header(ledger))
+        flowables.append(self._create_sub_header(ledger))
         flowables.append(self._create_report_info(user))
         flowables.append(self._create_entry_table(entries))
         flowables.append(PageBreak())
