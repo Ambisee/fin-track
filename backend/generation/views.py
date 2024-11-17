@@ -134,7 +134,7 @@ class GenerateReportView(UserView):
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
-        d_engine.set_locale(request_data.get("locale"))
+        d_engine.set_locale(request_data.get("locale").replace('-', '_')
 
         filepath = d_engine.get_filepath(user)
         
