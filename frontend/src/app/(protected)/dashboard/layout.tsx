@@ -1,21 +1,21 @@
 "use client"
 
-import MiniSearch from "minisearch"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import MiniSearch from "minisearch"
 
-import EntryForm from "@/components/user/EntryForm/EntryForm"
-import ProtectedNavbar from "@/components/user/ProtectedNavbar"
-import useGlobalStore from "@/lib/store"
-import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { createContext, useEffect, useMemo, useRef } from "react"
-import { groupDataByMonth, MonthGroup } from "@/lib/utils"
-import { MONTHS } from "@/lib/constants"
-import LedgersListPage from "./settings/components/GeneralSection/LedgersListPage"
-import LedgerPage from "./settings/components/GeneralSection/LedgerPage"
-import LedgersToEditProvider from "./settings/components/GeneralSection/LedgerProvider"
 import DialogPagesProvider, {
 	useDialogPages
 } from "@/components/user/DialogPagesProvider"
+import EntryForm from "@/components/user/EntryForm/EntryForm"
+import ProtectedNavbar from "@/components/user/ProtectedNavbar"
+import { MONTHS } from "@/lib/constants"
+import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
+import { groupDataByMonth, MonthGroup } from "@/lib/utils"
+import { createContext, useEffect, useMemo, useRef } from "react"
+import LedgerPage from "./settings/components/GeneralSection/LedgerPage"
+import LedgersToEditProvider from "./settings/components/GeneralSection/LedgerProvider"
+import LedgersListPage from "./settings/components/GeneralSection/LedgersListPage"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -64,8 +64,6 @@ function LayoutLedgerEditorDialog(props: { children: JSX.Element }) {
 
 function LayoutLedgerEditorContent() {
 	const { curPage, setCurPage } = useDialogPages()
-	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
 
 	const renderPage = () => {
 		const pages = [
@@ -165,8 +163,6 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 }
 
 export default function DashboardLayout(props: DashboardLayoutProps) {
-	const settingsQuery = useSettingsQuery()
-
 	return (
 		<DashboardContextProvider>
 			<LayoutEntryDialog>

@@ -29,11 +29,11 @@
 		--chart-3: 197 37% 24%;
 		--chart-4: 43 74% 66%;
 		--chart-5: 27 87% 67%;
-        --chart-6: 200 70% 55%; /* Soft teal */
-        --chart-7: 100 75% 50%; /* Fresh green */
-        --chart-8: 50 70% 60%;  /* Warm yellow */
-        --chart-9: 260 65% 50%; /* Cool purple */
-        --chart-10: 320 70% 50%; /* Vibrant magenta */
+		--chart-6: 200 70% 55%; /* Soft teal */
+		--chart-7: 100 75% 50%; /* Fresh green */
+		--chart-8: 50 70% 60%; /* Warm yellow */
+		--chart-9: 260 65% 50%; /* Cool purple */
+		--chart-10: 320 70% 50%; /* Vibrant magenta */
 	}
 
 	.dark {
@@ -61,11 +61,11 @@
 		--chart-3: 30 80% 55%;
 		--chart-4: 280 65% 60%;
 		--chart-5: 340 75% 55%;
-        --chart-6: 200 70% 55%; /* Soft teal */
-        --chart-7: 100 75% 50%; /* Fresh green */
-        --chart-8: 50 70% 60%;  /* Warm yellow */
-        --chart-9: 260 65% 50%; /* Cool purple */
-        --chart-10: 320 70% 50%; /* Vibrant magenta */
+		--chart-6: 200 70% 55%; /* Soft teal */
+		--chart-7: 100 75% 50%; /* Fresh green */
+		--chart-8: 50 70% 60%; /* Warm yellow */
+		--chart-9: 260 65% 50%; /* Cool purple */
+		--chart-10: 320 70% 50%; /* Vibrant magenta */
 	}
 }
 
@@ -100,17 +100,17 @@
 	}
 
 	.dashboard-navbar {
-		@apply w-full fixed bottom-0 left-0 h-16 px-6 bg-secondary text-secondary-foreground flex items-center
+		@apply w-full fixed bottom-0 left-0 h-16 bg-secondary text-secondary-foreground flex items-center
         md:w-3/12 md:max-w-52 md:fixed md:left-0 md:top-0 md:h-screen md:block md:py-4 md:items-start;
 	}
 
-    .text-entry-item {
-        @apply group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-violet-600
-    }
+	.text-entry-item {
+		@apply group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-violet-600;
+	}
 
-    .cmdk-input-no-border {
-        & [cmdk-input-wrapper] {
-            @apply border-none
-        }
-    }
+	.cmdk-input-no-border {
+		& [cmdk-input-wrapper] {
+			@apply border-none;
+		}
+	}
 }

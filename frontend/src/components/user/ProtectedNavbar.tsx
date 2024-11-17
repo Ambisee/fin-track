@@ -3,7 +3,7 @@
 import { ENTRY_QKEY } from "@/lib/constants"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
-import { GearIcon, TableIcon } from "@radix-ui/react-icons"
+import { GearIcon, ReloadIcon, TableIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
 import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
 import Link from "next/link"
@@ -15,14 +15,14 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
 
 	return (
-		<li>
-			<Link prefetch href={props.href} className="w-full md:block">
+		<li className="w-1/5 md:w-full">
+			<Link prefetch href={props.href} className="w-full h-full md:block">
 				<div
 					className={cn(
 						buttonVariants({
 							variant: pathname === props.href ? "default" : "ghost"
 						}),
-						"p-2 h-fit grid grid-flow-row justify-items-center md:w-full md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
+						"p-2 w-fit h-fit mx-auto grid grid-flow-row justify-items-center md:w-full md:flex md:justify-start md:gap-4 md:px-4 md:py-2"
 					)}
 				>
 					{props.icon}
@@ -50,8 +50,8 @@ export default function ProtectedNavbar() {
 				<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
 					FinTrack
 				</h1>
-				<nav className="w-full">
-					<ul className="list-none flex justify-between items-center w-full md:grid md:justify-center md:gap-1">
+				<nav className="w-full h-full md:h-auto">
+					<ul className="w-full h-full list-none flex justify-between items-center md:grid md:justify-center md:gap-1">
 						<NavLink
 							href="/dashboard"
 							icon={<HouseIcon className="block" width={20} height={20} />}
