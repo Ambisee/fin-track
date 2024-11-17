@@ -53,6 +53,8 @@ export default function CurrencyChange() {
 				onSubmit={(e) => {
 					e.preventDefault()
 					form.handleSubmit(async (data) => {
+						setIsPendingSubmit(true)
+
 						if (
 							currencies === null ||
 							currencies === undefined ||
