@@ -254,14 +254,14 @@ function MobileStatsUI(props: StatsUIProps) {
 
 	return (
 		<Tabs value={curTab} onValueChange={setCurTab}>
-			<TabsList className="w-full h-full mb-4 bg-background border rounded-sm">
+			<TabsList className="w-full h-full relative mb-4 bg-background border rounded-sm">
 				<TabsTrigger
 					value="expense"
-					className="w-1/2 text-left bg-background data-[state=active]:bg-muted group"
+					className="w-1/2 text-left z-50 data-[state=active]:bg-transparent peer/expense group"
 					data-is-positive="false"
 					data-curtab={curTab}
 				>
-					<div className="w-full">
+					<div className="w-full bg-transparent">
 						<h2 className="text-md group-data-[curtab='income']:opacity-55">
 							Total expense
 						</h2>
@@ -274,11 +274,11 @@ function MobileStatsUI(props: StatsUIProps) {
 				</TabsTrigger>
 				<TabsTrigger
 					value="income"
-					className="w-1/2 text-left bg-background data-[state=active]:bg-muted group"
+					className="w-1/2 text-left z-50 data-[state=active]:bg-transparent peer/income group"
 					data-curtab={curTab}
 					data-is-positive="true"
 				>
-					<div className="w-full">
+					<div className="w-full bg-transparent">
 						<h2 className="text-md group-data-[curtab='expense']:opacity-55">
 							Total income
 						</h2>
@@ -289,6 +289,12 @@ function MobileStatsUI(props: StatsUIProps) {
 						</h1>
 					</div>
 				</TabsTrigger>
+				<div
+					className="
+                        items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted 
+                        absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] peer-data-[state=active]/income:translate-x-full peer-data-[state=active]/expense:translate-x-0
+                        duration-300"
+				></div>
 			</TabsList>
 			<TabsContent value="expense">
 				<ChartDisplay
