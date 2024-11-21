@@ -61,6 +61,7 @@ export default function CurrencyChange() {
 							userSettings?.currency?.currency_name === undefined ||
 							userSettings.default_currency === data.currency.id
 						) {
+							setIsPendingSubmit(false)
 							toast({
 								description: "Unable to fetch currency data",
 								variant: "destructive",
