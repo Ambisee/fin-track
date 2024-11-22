@@ -187,7 +187,7 @@ export default function DashboardEntries() {
 	}
 
 	const renderEntries = () => {
-		if (entryQuery.isLoading || !entryQuery.data?.data) {
+		if (entryQuery.isFetching || !entryQuery.data?.data) {
 			return (
 				<div className="mb-8">
 					<div className="w-full flex justify-between items-center pt-2 pb-4">

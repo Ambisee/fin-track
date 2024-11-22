@@ -20,6 +20,7 @@ import { useFormContext } from "react-hook-form"
 import { FormSchema } from "./EntryForm"
 import { useDialogPages } from "../DialogPagesProvider"
 import { Dispatch, SetStateAction } from "react"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface ChooseCategoryPageProps {
 	showBackButton?: boolean
@@ -81,11 +82,17 @@ export default function ChooseCategoryPage(props: ChooseCategoryPageProps) {
 					/>
 				</div>
 				<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-					<span className="text-center">No category found</span>
-					<div className="flex gap-2">
-						<Button>Create a category</Button>
-						<Button variant="outline">Reset</Button>
-					</div>
+					{!categoriesQuery.isFetching || !categoriesQuery.isFetched ? (
+						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+					) : (
+						<>
+							<span className="text-center">No category found</span>
+							<div className="flex gap-2">
+								<Button>Create a category</Button>
+								<Button variant="outline">Reset</Button>
+							</div>
+						</>
+					)}
 				</CommandEmpty>
 				<CommandList className="max-h-none overflow-y-auto flex-1 px-1">
 					<CommandGroup className="*:grid *:gap-2 *:grid-cols-[repeat(auto-fill,minmax(125px,1fr))] *:grid-flow-row *:auto-rows-[150px]">

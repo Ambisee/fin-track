@@ -43,6 +43,7 @@ import {
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLedgerStore } from "./LedgerProvider"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface LedgersListPageProps {
 	isEditMode?: boolean
@@ -148,13 +149,21 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						/>
 					</div>
 					<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-						<span className="text-center">No ledger found</span>
-						<div className="flex gap-2">
-							<Button>Create a ledger</Button>
-							<Button variant="outline">Reset</Button>
-						</div>
+						{ledgersQuery.isFetched && !ledgersQuery.isFetching ? (
+							<>
+								<span className="text-center">No ledger found</span>
+								<div className="flex gap-2">
+									<Button>Create a ledger</Button>
+									<Button variant="outline">Reset</Button>
+								</div>
+							</>
+						) : (
+							<div className="h-full w-full flex justify-center items-center">
+								<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+							</div>
+						)}
 					</CommandEmpty>
-					<CommandList className="max-h-none overflow-y-auto flex-1 px-1">
+					<CommandList className="max-h-none h-full overflow-y-auto flex-1 px-1">
 						<CommandGroup className="">
 							{ledgersQuery.data?.data?.map((val) => (
 								<CommandItem

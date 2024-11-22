@@ -170,7 +170,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						className="absolute block left-0 top-1/2 translate-y-[-50%]"
 						onClick={() => form.reset()}
 					>
-						<ReloadIcon />
+						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 					</button>
 				)}
 				<DialogTitle className="leading-6" asChild>
@@ -238,10 +238,15 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							<Button
 								type="button"
 								variant="outline"
+								disabled={ledgerQuery.isFetching || !ledgerQuery.isFetched}
 								className="w-full text-base justify-normal text-muted-foreground"
 								onClick={() => setCurPage(4)}
 							>
-								{getLedgerName(form.getValues("ledger"))}
+								{ledgerQuery.isFetching || !ledgerQuery.isFetched ? (
+									<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+								) : (
+									getLedgerName(form.getValues("ledger"))
+								)}
 								<ChevronRight className="w-4 h-4 ml-auto" />
 							</Button>
 						</EntryFormItem>

@@ -47,7 +47,7 @@ export default function DashboardHome() {
 	}
 
 	const renderThisMonthEntries = () => {
-		if (!entryDataQuery.isFetched) {
+		if (!entryDataQuery.isFetched || entryDataQuery.isFetching) {
 			return (
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />

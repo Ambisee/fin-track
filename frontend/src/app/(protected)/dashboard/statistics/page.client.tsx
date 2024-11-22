@@ -423,7 +423,7 @@ export default function DashboardStatistics() {
 	}
 
 	const renderStatsUI = () => {
-		if (entryDataQuery.data === undefined) {
+		if (entryDataQuery.isFetching || !entryDataQuery.isFetched) {
 			return (
 				<div className="w-full py-4 flex gap-2 ">
 					<div className="grid gap-2 flex-1">

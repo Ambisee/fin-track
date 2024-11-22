@@ -15,7 +15,7 @@ import { useToast } from "@/components/ui/use-toast"
 import DialogPagesProvider, {
 	useDialogPages
 } from "@/components/user/DialogPagesProvider"
-import { MONTHS } from "@/lib/constants"
+import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
 import {
 	useLedgersQuery,
 	useMonthGroupQuery,
@@ -30,6 +30,8 @@ import { useFormContext } from "react-hook-form"
 import LedgerStoreProvider, {
 	useLedgerStore
 } from "../GeneralSection/LedgerProvider"
+import useGlobalStore from "@/lib/store"
+import { useQueryClient } from "@tanstack/react-query"
 
 function LedgerSelectorPage() {
 	const { toast } = useToast()
@@ -97,16 +99,46 @@ function LedgerSelectorPage() {
 
 function MonthSelectorPage() {
 	const { toast } = useToast()
-	const [isPendingIndex, setIsPendingIndex] = useState(-1)
-	const { ledger: ledgerToEdit } = useLedgerStore()
-	const { setCurPage } = useDialogPages()
 
+	const [isPendingIndex, setIsPendingIndex] = useState(-1)
+	const { setCurPage } = useDialogPages()
+	const { ledger: ledgerToEdit } = useLedgerStore()
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
+
+	const queryClient = useQueryClient()
 	const monthGroupQuery = useMonthGroupQuery(ledgerToEdit?.id)
 
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
-		if (!monthGroupQuery?.data?.data) {
-			return undefined
+		if (!monthGroupQuery.isFetched || monthGroupQuery.isFetching) {
+			return (
+				<div className="w-full h-full flex justify-center items-center">
+					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+				</div>
+			)
+		}
+
+		if (!monthGroupQuery?.data?.data || monthGroupQuery.data.data.length < 1) {
+			return (
+				<div className="w-full h-full flex justify-center items-center flex-col text-sm text-center">
+					<p className="w-5/6 mb-4">
+						No data found for this ledger. Please add some transaction records
+						to download its reports.
+					</p>
+					<DialogTrigger
+						asChild
+						onClick={() => {
+							setData(undefined)
+							setOnSubmitSuccess((data) => {
+								queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+							})
+						}}
+					>
+						<Button>Add an entry</Button>
+					</DialogTrigger>
+				</div>
+			)
 		}
 
 		for (let i = 0; i < monthGroupQuery.data.data.length; i++) {
@@ -130,7 +162,7 @@ function MonthSelectorPage() {
 							fetch("/api/documents", {
 								method: "POST",
 								body: JSON.stringify({
-                                    month: value.month,
+									month: value.month,
 									year: value.year,
 									locale: navigator.language,
 									ledger_id: ledgerToEdit?.id as number
@@ -213,7 +245,7 @@ function MonthSelectorPage() {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<ul className="max-h-full overflow-y-auto [&>:not(:first-child)]:mt-1.5">
+			<ul className="max-h-full relative overflow-y-auto [&>:not(:first-child)]:mt-1.5">
 				{renderDownloadList()}
 			</ul>
 		</>
