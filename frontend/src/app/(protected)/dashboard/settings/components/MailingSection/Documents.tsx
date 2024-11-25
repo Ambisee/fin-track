@@ -25,8 +25,7 @@ import {
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useState } from "react"
-import { useFormContext } from "react-hook-form"
+import { useState, type JSX } from "react"
 import LedgerStoreProvider, {
 	useLedgerStore
 } from "../GeneralSection/LedgerProvider"
@@ -35,13 +34,21 @@ import { useQueryClient } from "@tanstack/react-query"
 
 function LedgerSelectorPage() {
 	const { toast } = useToast()
-	const form = useFormContext()
+
 	const ledgersQuery = useLedgersQuery()
 	const { setCurPage } = useDialogPages()
 	const { setLedger: setLedgerToEdit } = useLedgerStore()
 
 	const renderLedgerList = () => {
 		const result: JSX.Element[] = []
+		if (!ledgersQuery.isFetched && ledgersQuery.isFetching) {
+			return (
+				<div className="h-full w-full flex justify-center items-center">
+					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+				</div>
+			)
+		}
+
 		if (!ledgersQuery.data?.data) {
 			return undefined
 		}
@@ -149,11 +156,19 @@ function MonthSelectorPage() {
 					<Button
 						type="button"
 						disabled={isPendingIndex !== -1}
-						onClick={(e) => {
+						onClick={async (e) => {
 							e.preventDefault()
+							if (value.month === null || value.year === null) {
+								toast({
+									description: "No month/year provided.",
+									duration: 1500,
+									variant: "destructive"
+								})
+								return
+							}
 
 							setIsPendingIndex(i)
-							const { dismiss, id, update } = toast({
+							const { dismiss } = toast({
 								description: "Fetching document. Please wait...",
 								duration: Infinity
 							})
