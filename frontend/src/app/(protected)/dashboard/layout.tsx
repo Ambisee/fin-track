@@ -12,10 +12,19 @@ import { MONTHS } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { groupDataByMonth, MonthGroup } from "@/lib/utils"
-import { createContext, useEffect, useMemo, useRef } from "react"
+import {
+	createContext,
+	Suspense,
+	useEffect,
+	useMemo,
+	useRef,
+	use,
+	type JSX
+} from "react"
 import LedgerPage from "./settings/components/GeneralSection/LedgerPage"
 import LedgersToEditProvider from "./settings/components/GeneralSection/LedgerProvider"
 import LedgersListPage from "./settings/components/GeneralSection/LedgersListPage"
+import Loading from "./loading"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -28,7 +37,7 @@ interface DashboardContextObject {
 
 const DashboardContext = createContext<DashboardContextObject>(null!)
 
-function LayoutEntryDialog(props: { children: JSX.Element }) {
+function LayoutEntryDialog(props: { children?: JSX.Element | JSX.Element[] }) {
 	const open = useGlobalStore((state) => state.open)
 	const setOpen = useGlobalStore((state) => state.setOpen)
 
@@ -52,7 +61,9 @@ function LayoutEntryDialogContent() {
 	)
 }
 
-function LayoutLedgerEditorDialog(props: { children: JSX.Element }) {
+function LayoutLedgerEditorDialog(props: {
+	children?: JSX.Element | JSX.Element[]
+}) {
 	return (
 		<DialogPagesProvider>
 			<LedgersToEditProvider>
@@ -166,19 +177,17 @@ export default function DashboardLayout(props: DashboardLayoutProps) {
 	return (
 		<DashboardContextProvider>
 			<LayoutEntryDialog>
-				<>
-					<div className="dashboard-content" vaul-drawer-wrapper="">
-						{props.children}
-						<LayoutLedgerEditorDialog>
-							<>
-								<LedgerBadge />
-								<LayoutLedgerEditorContent />
-							</>
-						</LayoutLedgerEditorDialog>
-					</div>
-					<ProtectedNavbar />
-					<LayoutEntryDialogContent />
-				</>
+				<div className="dashboard-content" vaul-drawer-wrapper="">
+					<Suspense fallback={<Loading />}>{props.children}</Suspense>
+					<LayoutLedgerEditorDialog>
+						<>
+							<LedgerBadge />
+							<LayoutLedgerEditorContent />
+						</>
+					</LayoutLedgerEditorDialog>
+				</div>
+				<ProtectedNavbar />
+				<LayoutEntryDialogContent />
 			</LayoutEntryDialog>
 		</DashboardContextProvider>
 	)
