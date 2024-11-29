@@ -33,8 +33,6 @@ import useGlobalStore from "@/lib/store"
 import { useQueryClient } from "@tanstack/react-query"
 
 function LedgerSelectorPage() {
-	const { toast } = useToast()
-
 	const ledgersQuery = useLedgersQuery()
 	const { setCurPage } = useDialogPages()
 	const { setLedger: setLedgerToEdit } = useLedgerStore()
@@ -54,7 +52,8 @@ function LedgerSelectorPage() {
 		}
 
 		for (let i = 0; i < ledgersQuery.data.data.length; i++) {
-			const ledger = ledgersQuery.data.data[i]
+			const ledger =
+				ledgersQuery.data.data[ledgersQuery.data.data.length - 1 - i]
 
 			result.push(
 				<li className="px-1" key={ledger.id}>
@@ -174,45 +173,37 @@ function MonthSelectorPage() {
 							})
 
 							// Using fetch to handle redirection on iOS
-							fetch("/api/documents", {
-								method: "POST",
-								body: JSON.stringify({
-									month: value.month,
-									year: value.year,
-									locale: navigator.language,
-									ledger_id: ledgerToEdit?.id as number
-								})
-							})
-								.then((resp) => {
-									dismiss()
-									if (!resp.ok) {
-										throw Error(
-											"Unable to retrieve the report document. Please try again later"
-										)
-									}
-
-									return resp.blob()
-								})
-								.catch((err: Error) => {
-									toast({
-										description: err.message,
-										variant: "destructive"
+							try {
+								const response = await fetch("/api/documents", {
+									method: "POST",
+									body: JSON.stringify({
+										month: value.month,
+										year: value.year,
+										locale: navigator.language,
+										ledger_id: ledgerToEdit?.id as number
 									})
-									return undefined
 								})
-								.then((value) => {
-									if (value === undefined) {
-										return
-									}
 
-									const url = window.URL.createObjectURL(value)
-									setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+								dismiss()
+								if (!response.ok) {
+									throw Error(
+										"Unable to connect to the server. Please try again later."
+									)
+								}
 
-									window.location.assign(url)
+								const fileBlob: Blob = await response.blob()
+								const url = window.URL.createObjectURL(fileBlob)
+								setTimeout(() => window.URL.revokeObjectURL(url), 1000)
+
+								window.location.assign(url)
+							} catch (error: any) {
+								toast({
+									description: error.message,
+									variant: "destructive"
 								})
-								.finally(() => {
-									setIsPendingIndex(-1)
-								})
+							}
+
+							setIsPendingIndex(-1)
 						}}
 						className="p-4 w-full h-full flex justify-between items-center"
 						variant="ghost"
@@ -269,7 +260,6 @@ function MonthSelectorPage() {
 
 function DocumentsContent() {
 	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
 	const { curPage, setCurPage } = useDialogPages()
 
 	const renderPage = () => {
