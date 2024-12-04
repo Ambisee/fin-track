@@ -178,8 +178,7 @@ export default function DashboardLayout(props: DashboardLayoutProps) {
 		<DashboardContextProvider>
 			<LayoutEntryDialog>
 				<div className="dashboard-content" vaul-drawer-wrapper="">
-					{/* <Suspense fallback={<Loading />}>{props.children}</Suspense> */}
-					<Loading />
+				 <Suspense fallback={<Loading />}>{props.children}</Suspense>
 					<LayoutLedgerEditorDialog>
 						<>
 							<LedgerBadge />
