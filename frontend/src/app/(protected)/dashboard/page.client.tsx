@@ -69,7 +69,7 @@ export default function DashboardHome() {
 
 		return (
 			<div>
-				<h2 className="text-xl mb-4">Transactions in {today.getMonth()}} {today.getFullYear()}</h2>
+				<h2 className="text-xl mb-4">Transactions in {today.getMonth()} {today.getFullYear()}</h2>
 				<EntryList data={group.toReversed()} />
 			</div>
 		)
