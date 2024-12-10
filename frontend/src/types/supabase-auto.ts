@@ -22,7 +22,15 @@ export type Database = {
           created_by?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "category_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       currency: {
         Row: {
@@ -87,6 +95,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "entry_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_ledger"
             columns: ["ledger"]
             isOneToOne: false
@@ -123,6 +138,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "ledger_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "ledger_currency_id_fkey"
             columns: ["currency_id"]
             isOneToOne: false
@@ -135,19 +157,16 @@ export type Database = {
         Row: {
           allow_report: boolean
           current_ledger: number
-          default_currency: number
           user_id: string
         }
         Insert: {
           allow_report?: boolean
           current_ledger?: number
-          default_currency?: number
           user_id: string
         }
         Update: {
           allow_report?: boolean
           current_ledger?: number
-          default_currency?: number
           user_id?: string
         }
         Relationships: [
@@ -166,10 +185,10 @@ export type Database = {
             referencedColumns: ["ledger_id"]
           },
           {
-            foreignKeyName: "settings_default_currency_fkey"
-            columns: ["default_currency"]
-            isOneToOne: false
-            referencedRelation: "currency"
+            foreignKeyName: "user_data_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_view"
             referencedColumns: ["id"]
           },
         ]
@@ -183,7 +202,40 @@ export type Database = {
           month: number | null
           year: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ledger_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_view: {
+        Row: {
+          allow_report: boolean | null
+          current_ledger: number | null
+          email: string | null
+          id: string | null
+          username: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settings_current_ledger_fkey"
+            columns: ["current_ledger"]
+            isOneToOne: false
+            referencedRelation: "ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settings_current_ledger_fkey"
+            columns: ["current_ledger"]
+            isOneToOne: false
+            referencedRelation: "month_groups"
+            referencedColumns: ["ledger_id"]
+          },
+        ]
       }
     }
     Functions: {

@@ -14,9 +14,7 @@ export default function DashboardSettings() {
 			<div className="w-full mb-4 flex justify-between items-center">
 				<h1 className="text-3xl">Settings</h1>
 			</div>
-			<GeneralSection
-				key={userSettingsQuery.data?.data?.currency?.currency_name}
-			/>
+			<GeneralSection />
 			<AccountSection />
 			<MailingSection />
 			<MiscellaneousSection />

@@ -62,20 +62,13 @@ export default function LedgerPage(props: LedgerPageProps) {
 	const settingsData = settingsQuery.data?.data
 	const formDefaultValues = () => {
 		let name = ""
-		let currency = { id: 1, currency_name: "USD" }
+		let currency = currenciesQuery.data?.data?.at(0)
 
-		if (settingsData !== null && settingsData !== undefined) {
-			currency = {
-				id: settingsData.default_currency,
-				currency_name: settingsData.currency!.currency_name
-			}
-		}
-
-		if (ledger !== undefined) {
+		if (ledger) {
 			name = ledger.name
 			currency = {
 				id: ledger.currency_id,
-				currency_name: ledger.currency!.currency_name
+				currency_name: ledger.currency?.currency_name ?? ""
 			}
 		}
 
@@ -183,6 +176,8 @@ export default function LedgerPage(props: LedgerPageProps) {
 									{
 										onSuccess: (successData) => {
 											if (!successData) return
+
+											// Hard-coded error handler for duplicate ledger name
 											if (successData?.error?.code === "23505") {
 												toast({
 													description:

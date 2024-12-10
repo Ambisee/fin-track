@@ -43,7 +43,7 @@ function useSettingsQuery() {
 		queryFn: async () =>
 			await sbBrowser
 				.from("settings")
-				.select(`*, currency (currency_name), ledger (*, currency (currency_name))`)
+				.select(`*, ledger (*, currency (currency_name))`)
                 .eq("user_id", userQuery.data?.data.user?.id as string)
 				.limit(1)
 				.single(),
