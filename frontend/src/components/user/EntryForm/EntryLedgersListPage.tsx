@@ -1,3 +1,4 @@
+import { useLedgerStore } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -26,23 +27,13 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { useDialogPages } from "@/components/user/DialogPagesProvider"
-import { ENTRY_QKEY, LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
-import {
-	useEntryDataQuery,
-	useLedgersQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/hooks"
+import { LEDGER_QKEY } from "@/lib/constants"
+import { useLedgersQuery, useSettingsQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Ledger } from "@/types/supabase"
-import {
-	QueryObserver,
-	useMutation,
-	useQueryClient
-} from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { useLedgerStore } from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 
 interface EntryLedgersListPageProps {
@@ -65,22 +56,47 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 		undefined
 	)
 
-	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
 	const ledgersQuery = useLedgersQuery()
+
+	const deleteLedgerMutation = useMutation({
+		mutationKey: LEDGER_QKEY,
+		mutationFn: async (data: { id: number }) => {
+			const ledgersCount = ledgersQuery.data?.data?.length
+			if (!ledgersCount) {
+				throw Error("An unexpected error occured. Please try again later.")
+			}
+
+			if (ledgersCount < 2) {
+				throw Error(
+					"Unable to delete the ledger. User must have at least one ledger."
+				)
+			}
+
+			const { data: result, error } = await sbBrowser
+				.from("ledger")
+				.delete()
+				.eq("id", data.id)
+
+			if (error) {
+				throw error
+			}
+
+			return result
+		},
+		onError: (error) => {
+			toast({
+				description: error.message,
+				variant: "destructive"
+			})
+		}
+	})
 
 	useEffect(() => {
 		if (ledgersQuery.data?.data !== undefined) {
 			settingsQuery.refetch()
 		}
 	}, [settingsQuery, ledgersQuery.data?.data])
-
-	const deleteLedgerMutation = useMutation({
-		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			return sbBrowser.from("ledger").delete().eq("id", data.id).select()
-		}
-	})
 
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
@@ -146,49 +162,40 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 					</CommandEmpty>
 					<CommandList className="max-h-none overflow-y-auto flex-1 px-1">
 						<CommandGroup className="">
-							{ledgersQuery.data?.data?.map((val) => (
-								<CommandItem
-									className="border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
-									key={val.name}
-									value={val.name}
-									onSelect={() => {
-										if (isEditMode) {
-											setLedger(val)
-											setCurPage((c) => c + 1)
-											return
-										}
+							{ledgersQuery.data?.data?.map((val) => {
+								const isCurrentLedger =
+									val.id === settingsQuery.data?.data?.current_ledger
 
-										form.setValue("ledger", val.id)
-										setCurPage(0)
-									}}
-								>
-									<p className="w-full">{val.name}</p>
-									{isEditMode && (
-										<AlertDialogTrigger
-											onClick={(e) => {
-												if (
-													ledgersQuery.data?.data?.length !== undefined &&
-													ledgersQuery.data?.data.length < 2
-												) {
-													e.preventDefault()
+								return (
+									<CommandItem
+										className="border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
+										key={val.name}
+										value={val.name}
+										onSelect={() => {
+											if (isEditMode) {
+												setLedger(val)
+												setCurPage((c) => c + 1)
+												return
+											}
+
+											form.setValue("ledger", val.id)
+											setCurPage(0)
+										}}
+									>
+										<p className="w-full">{val.name}</p>
+										{isEditMode && !isCurrentLedger && (
+											<AlertDialogTrigger
+												onClick={(e) => {
 													e.stopPropagation()
-													toast({
-														description:
-															"Unable to delete the ledger. User must have at least one ledger.",
-														variant: "destructive"
-													})
-													return
-												}
-
-												e.stopPropagation()
-												setLedgerToDelete(val)
-											}}
-										>
-											<Trash2Icon className="w-4 h-4 stroke-destructive" />
-										</AlertDialogTrigger>
-									)}
-								</CommandItem>
-							))}
+													setLedgerToDelete(val)
+												}}
+											>
+												<Trash2Icon className="w-4 h-4 stroke-destructive" />
+											</AlertDialogTrigger>
+										)}
+									</CommandItem>
+								)
+							})}
 						</CommandGroup>
 					</CommandList>
 				</Command>

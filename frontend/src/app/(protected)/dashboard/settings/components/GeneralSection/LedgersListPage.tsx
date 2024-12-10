@@ -26,24 +26,15 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { useDialogPages } from "@/components/user/DialogPagesProvider"
-import { ENTRY_QKEY, LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
-import {
-	useEntryDataQuery,
-	useLedgersQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/hooks"
+import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { Ledger } from "@/types/supabase"
-import {
-	QueryObserver,
-	useMutation,
-	useQueryClient
-} from "@tanstack/react-query"
-import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { useLedgerStore } from "./LedgerProvider"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
+import { useRef, useState } from "react"
+import { useLedgerStore } from "./LedgerProvider"
 
 interface LedgersListPageProps {
 	isEditMode?: boolean
@@ -75,19 +66,85 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 				return undefined
 			}
 
-			return sbBrowser
+			const { data: result, error } = await sbBrowser
 				.from("settings")
 				.update({ current_ledger: data.id })
 				.eq("user_id", userQuery.data?.data.user.id as string)
 				.select("*, ledger (name)")
 				.single()
+
+			if (error) {
+				throw error
+			}
+
+			return result
+		},
+		onSuccess: async (data) => {
+			if (data === undefined) {
+				toast({
+					description: "Failed to switch to the specified ledger.",
+					variant: "destructive"
+				})
+				return
+			}
+
+			queryClient.invalidateQueries({
+				queryKey: USER_SETTINGS_QKEY
+			})
+			closeRef.current?.click()
+
+			toast({
+				description: (
+					<>
+						Switched to the ledger: <b>{data.ledger?.name}</b>
+					</>
+				),
+				duration: 1500
+			})
 		}
 	})
 
 	const deleteLedgerMutation = useMutation({
 		mutationKey: LEDGER_QKEY,
 		mutationFn: async (data: { id: number }) => {
-			return sbBrowser.from("ledger").delete().eq("id", data.id).select()
+			const ledgersCount = ledgersQuery.data?.data?.length
+			if (!ledgersCount) {
+				throw Error("An unexpected error occured. Please try again later.")
+			}
+
+			if (ledgersCount < 2) {
+				throw Error(
+					"Unable to delete the ledger. User must have at least one ledger."
+				)
+			}
+
+			const { data: result, error } = await sbBrowser
+				.from("ledger")
+				.delete()
+				.eq("id", data.id)
+
+			if (error) {
+				throw error
+			}
+
+			return result
+		},
+		onSuccess: async () => {
+			toast({
+				description: "Ledger deleted",
+				duration: 1500
+			})
+
+			await settingsQuery.refetch()
+			await queryClient.invalidateQueries({
+				queryKey: LEDGER_QKEY
+			})
+		},
+		onError: (error) => {
+			toast({
+				description: error.message,
+				variant: "destructive"
+			})
 		}
 	})
 
@@ -175,64 +232,22 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 											setLedger(val)
 											setCurPage((c) => c + 1)
 										} else {
-											selectLedgerMutation.mutate(
-												{ id: val.id },
-												{
-													onSuccess: async (data) => {
-														if (data === undefined) {
-															toast({
-																description:
-																	"Failed to switch to the specified ledger.",
-																variant: "destructive"
-															})
-															return
-														}
-
-														queryClient.invalidateQueries({
-															queryKey: USER_SETTINGS_QKEY
-														})
-														closeRef.current?.click()
-
-														toast({
-															description: (
-																<>
-																	Switched to the ledger:{" "}
-																	<b>{data.data?.ledger?.name}</b>
-																</>
-															),
-															duration: 1500
-														})
-													}
-												}
-											)
+											selectLedgerMutation.mutate({ id: val.id })
 										}
 									}}
 								>
 									<p className="w-full">{val.name} </p>
-									{isEditMode && (
-										<AlertDialogTrigger
-											onClick={(e) => {
-												if (
-													ledgersQuery.data?.data?.length !== undefined &&
-													ledgersQuery.data?.data.length < 2
-												) {
-													e.preventDefault()
+									{isEditMode &&
+										val.id !== settingsQuery.data?.data?.current_ledger && (
+											<AlertDialogTrigger
+												onClick={(e) => {
 													e.stopPropagation()
-													toast({
-														description:
-															"Unable to delete the ledger. User must have at least one ledger.",
-														variant: "destructive"
-													})
-													return
-												}
-
-												e.stopPropagation()
-												setLedgerToDelete(val)
-											}}
-										>
-											<Trash2Icon className="w-4 h-4 stroke-destructive" />
-										</AlertDialogTrigger>
-									)}
+													setLedgerToDelete(val)
+												}}
+											>
+												<Trash2Icon className="w-4 h-4 stroke-destructive" />
+											</AlertDialogTrigger>
+										)}
 								</CommandItem>
 							))}
 						</CommandGroup>
@@ -259,24 +274,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									return
 								}
 
-								deleteLedgerMutation.mutate(
-									{
-										id: ledgerToBeDelete.id
-									},
-									{
-										onSuccess: async (data) => {
-											toast({
-												description: "Ledger deleted",
-												duration: 1500
-											})
-
-											await settingsQuery.refetch()
-											await queryClient.invalidateQueries({
-												queryKey: LEDGER_QKEY
-											})
-										}
-									}
-								)
+								deleteLedgerMutation.mutate({ id: ledgerToBeDelete.id })
 							}}
 							variant="destructive"
 						>

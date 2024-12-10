@@ -56,27 +56,18 @@ export default function EntryLedgerPage(props: LedgerPageProps) {
 
 	const form = useFormContext()
 	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
 	const ledgersQuery = useLedgersQuery()
 	const currenciesQuery = useCurrenciesQuery()
 
-	const settingsData = settingsQuery.data?.data
 	const formDefaultValues = () => {
 		let name = ""
-		let currency = { id: 1, currency_name: "USD" }
+		let currency = currenciesQuery.data?.data?.at(0)
 
-		if (settingsData !== null && settingsData !== undefined) {
-			currency = {
-				id: settingsData.default_currency,
-				currency_name: settingsData.currency!.currency_name
-			}
-		}
-
-		if (ledger !== undefined) {
+		if (ledger) {
 			name = ledger.name
 			currency = {
 				id: ledger.currency_id,
-				currency_name: ledger.currency!.currency_name
+				currency_name: ledger.currency?.currency_name ?? ""
 			}
 		}
 
