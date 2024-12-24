@@ -6,6 +6,8 @@ import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
 import { filterDataGroup } from "@/lib/utils"
 import { useContext } from "react"
 import { DashboardContext } from "./layout"
+import { MONTHS } from "@/lib/constants"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function DashboardHome() {
 	const { dataGroups } = useContext(DashboardContext)
@@ -31,16 +33,23 @@ export default function DashboardHome() {
 					<div className="w-full mb-4 flex justify-between items-center">
 						<h1 className="text-3xl">Home</h1>
 					</div>
-					<h3 className="text-2xl mt-4">
+					<h2 className="text-2xl mt-4">
 						Welcome back, {userQuery.data?.data?.user.user_metadata.username}
-					</h3>
+					</h2>
 				</div>
 			)
 		} else {
 			return (
 				<div className="mb-8">
-					<h1 className="text-2xl">Home</h1>
-					<h3 className="text-lg">ERROR</h3>
+					<div className="w-full mb-4 flex justify-between items-center">
+						<h1 className="text-3xl">Home</h1>
+					</div>
+					<Alert variant="destructive">
+						<AlertTitle>User data not found</AlertTitle>
+						<AlertDescription>
+							{userQuery.failureReason?.message}
+						</AlertDescription>
+					</Alert>
 				</div>
 			)
 		}
@@ -69,7 +78,9 @@ export default function DashboardHome() {
 
 		return (
 			<div>
-				<h2 className="text-xl mb-4">Transactions in {today.getMonth()} {today.getFullYear()}</h2>
+				<h2 className="text-xl mb-4">
+					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
+				</h2>
 				<EntryList data={group.toReversed()} />
 			</div>
 		)
