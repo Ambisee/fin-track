@@ -82,9 +82,9 @@ function LedgerSelectorPage() {
 			<DialogHeader className="space-y-0">
 				<div className="w-full relative space-y-0 sm:text-center">
 					<DialogTitle asChild>
-						<h1 className="w-2/3 mx-auto sm:w-full leading-6">
+						<h2 className="w-2/3 mx-auto sm:w-full leading-6">
 							Select a ledger
-						</h1>
+						</h2>
 					</DialogTitle>
 					<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
 						<X className="w-4 h-4" />
@@ -229,9 +229,9 @@ function MonthSelectorPage() {
 			<DialogHeader className="space-y-0">
 				<div className="w-full relative space-y-0 sm:text-center">
 					<DialogTitle asChild>
-						<h1 className="w-2/3 mx-auto sm:w-full leading-6">
+						<h2 className="w-2/3 mx-auto sm:w-full leading-6">
 							Select a month to download a report
-						</h1>
+						</h2>
 					</DialogTitle>
 					<button
 						className="absolute block left-0 top-1/2 translate-y-[-50%]"

@@ -137,9 +137,9 @@ function MonthPicker(props: MonthPickerProps) {
 			</DialogContent>
 			<DialogTrigger asChild>
 				<Button variant="ghost" className="text-lg" onClick={() => {}} asChild>
-					<h3 className="text-lg hover:cursor-pointer">
+					<h2 className="text-lg hover:cursor-pointer">
 						{MONTHS[props.value[0]]} {props.value[1]}
-					</h3>
+					</h2>
 				</Button>
 			</DialogTrigger>
 		</Dialog>

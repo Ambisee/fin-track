@@ -92,7 +92,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	if (data.length < 1) {
 		return (
 			<div className="h-[250px] flex items-center justify-center flex-col gap-2">
-				<h1>No {props.dataKey} data entered for this period.</h1>
+				<h2>No {props.dataKey} data entered for this period.</h2>
 				<DialogTrigger
 					asChild
 					onClick={() => {
@@ -204,7 +204,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 												className="mx-auto w-2/3 leading-6 lg:w-full"
 												asChild
 											>
-												<h1 className="leading-6">{dialogTitle}</h1>
+												<h2 className="leading-6">{dialogTitle}</h2>
 											</DialogTitle>
 											<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
 												<X className="w-4 h-4" />
@@ -265,11 +265,11 @@ function MobileStatsUI(props: StatsUIProps) {
 						<h2 className="text-md group-data-[curtab='income']:opacity-55">
 							Total expense
 						</h2>
-						<h1 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='income']:text-opacity-55">
+						<h3 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='income']:text-opacity-55">
 							<span ref={expenseValRef}>
 								{formatAmount(props.stats?.totalExpense)}
 							</span>
-						</h1>
+						</h3>
 					</div>
 				</TabsTrigger>
 				<TabsTrigger
@@ -282,11 +282,11 @@ function MobileStatsUI(props: StatsUIProps) {
 						<h2 className="text-md group-data-[curtab='expense']:opacity-55">
 							Total income
 						</h2>
-						<h1 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
+						<h3 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
 							<span ref={incomeValRef}>
 								{formatAmount(props.stats?.totalIncome)}
 							</span>
-						</h1>
+						</h3>
 					</div>
 				</TabsTrigger>
 				<div
@@ -329,9 +329,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 		<div className="flex py-4 w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-sm">
 			<div className="flex-1 px-4 group" data-is-positive="false">
 				<h2 className="text-md">Total expense</h2>
-				<h1 className="text-3xl text-entry-item">
+				<h3 className="text-3xl text-entry-item">
 					{formatAmount(props.stats?.totalExpense)}
-				</h1>
+				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
 					data={
@@ -344,9 +344,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 			</div>
 			<div className="flex-1 px-4 group border-l" data-is-positive="true">
 				<h2 className="text-md">Total income</h2>
-				<h1 className="text-3xl text-entry-item">
+				<h3 className="text-3xl text-entry-item">
 					{formatAmount(props.stats?.totalIncome)}
-				</h1>
+				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
 					data={

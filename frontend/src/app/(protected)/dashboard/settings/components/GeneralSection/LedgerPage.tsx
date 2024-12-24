@@ -125,9 +125,9 @@ export default function LedgerPage(props: LedgerPageProps) {
 		<div className="grid grid-rows-[auto_1fr]">
 			<DialogHeader className="relative space-y-0 sm:text-center">
 				<DialogTitle className="leading-6" asChild>
-					<h1 className="h-6 leading-6">
+					<h2 className="h-6 leading-6">
 						{ledger ? `Edit ledger - ${ledger.name}` : "Create a new ledger"}
-					</h1>
+					</h2>
 				</DialogTitle>
 				<button
 					className="absolute block left-0 top-1/2 translate-y-[-50%]"

@@ -153,11 +153,11 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 			<DialogHeader className="space-y-0 sm:text-center h-fit">
 				<div className="relative">
 					<DialogTitle className="leading-6" asChild>
-						<h1 className="h-6 leading-6">
+						<h2 className="h-6 leading-6">
 							{isEditMode
 								? "Select a ledger to edit"
 								: "Select a ledger to view"}
-						</h1>
+						</h2>
 					</DialogTitle>
 					{showBackButton && (
 						<button
