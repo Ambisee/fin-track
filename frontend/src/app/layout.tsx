@@ -8,8 +8,7 @@ import "./globals.css"
 import DataProvider from "@/components/user/DataProvider"
 
 export const metadata: Metadata = {
-	title: "FinTrack Prototype",
-	description: ""
+	description: "An application for tracking your daily transactions."
 }
 
 export default function RootLayout({

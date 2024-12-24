@@ -1,11 +1,10 @@
 import { Metadata } from "next"
 import { ReactElement } from "react"
-import PortalLayout from "./sign-up/layout.client"
 
 export const metadata: Metadata = {
-	title: "Sign Up - FinTrack"
+	title: "Sign In - FinTrack"
 }
 
 export default function Layout(props: { children: ReactElement }) {
-	return <PortalLayout>{props.children}</PortalLayout>
+	return props.children
 }
