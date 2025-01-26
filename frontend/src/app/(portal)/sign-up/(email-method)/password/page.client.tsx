@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { FormEventHandler, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -21,6 +21,7 @@ import { sbBrowser } from "@/lib/supabase"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
+import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 
 const formSchema = z
 	.object({
@@ -44,7 +45,9 @@ const formSchema = z
 export default function SignUpPassword() {
 	const router = useRouter()
 	const { toast } = useToast()
-	const [isFormLoading, setIsPendingSubmit] = useState(false)
+	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+
+	const { navigateTo } = useTransitionContext()
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username") as string
@@ -58,73 +61,71 @@ export default function SignUpPassword() {
 		}
 	})
 
+	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+		e.preventDefault()
+		form.handleSubmit(
+			async (formData) => {
+				setIsPendingSubmit(true)
+				Cookies.set("reg-password", formData.password)
+				if (email === undefined) {
+					toast({
+						title: "Signup Error",
+						description: "Missing signup information",
+						variant: "destructive"
+					})
+					return
+				}
+
+				const recipient = email.substring(0, email.search("@"))
+				const { error } = await sbBrowser.auth.signUp({
+					email: email,
+					password: formData.password,
+					options: {
+						data: {
+							username:
+								username ??
+								recipient.substring(
+									0,
+									Math.min(MAX_USERNAME_LENGTH - 1, recipient.length)
+								)
+						}
+					}
+				})
+
+				if (error !== null) {
+					setIsPendingSubmit(false)
+					toast({
+						title: "Signup Error",
+						description: error.message,
+						variant: "destructive"
+					})
+					return
+				}
+
+				toast({
+					title: "Signup Success",
+					description: (
+						<p>
+							The accont has been successfully created. Please check your inbox
+							and follow the verification link to verify your account.
+						</p>
+					),
+					duration: 15000
+				})
+
+				Cookies.remove("reg-password")
+				Cookies.remove("reg-email")
+				Cookies.remove("reg-username")
+				setIsPendingSubmit(false)
+				router.push("/sign-in")
+			},
+			(error) => {}
+		)()
+	}
+
 	return (
 		<Form {...form}>
-			<form
-				className="w-full h-full"
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit(
-						async (formData) => {
-							setIsPendingSubmit(true)
-							Cookies.set("reg-password", formData.password)
-							if (email === undefined) {
-								toast({
-									title: "Signup Error",
-									description: "Missing signup information",
-									variant: "destructive"
-								})
-								return
-							}
-
-							const recipient = email.substring(0, email.search("@"))
-							const { error } = await sbBrowser.auth.signUp({
-								email: email,
-								password: formData.password,
-								options: {
-									data: {
-										username:
-											username ??
-											recipient.substring(
-												0,
-												Math.min(MAX_USERNAME_LENGTH - 1, recipient.length)
-											)
-									}
-								}
-							})
-
-							if (error !== null) {
-								setIsPendingSubmit(false)
-								toast({
-									title: "Signup Error",
-									description: error.message,
-									variant: "destructive"
-								})
-								return
-							}
-
-							toast({
-								title: "Signup Success",
-								description: (
-									<p>
-										The accont has been successfully created. Please check your
-										inbox and follow the verification link to verify your
-										account.
-									</p>
-								),
-								duration: 15000
-							})
-
-							Cookies.remove("reg-password")
-							Cookies.remove("reg-email")
-							Cookies.remove("reg-username")
-							setIsPendingSubmit(false)
-							router.push("/sign-in")
-						},
-						(error) => {}
-					)()
-				}}
-			>
+			<form className="w-full h-full" onSubmit={handleOnSubmit}>
 				<CardHeader>Password</CardHeader>
 				<CardContent className="flex flex-col md:justify-start justify-end gap-4">
 					<FormField
@@ -160,22 +161,22 @@ export default function SignUpPassword() {
 						)}
 					/>
 				</CardContent>
-				<CardFooter className="flex justify-between footer">
+				<CardFooter className="flex justify-between">
 					<Button
 						variant="ghost"
 						type="button"
 						className="aspect-square p-0 flex gap-2"
 						onClick={(e) => {
-							router.replace("/sign-up/username")
+							navigateTo("/sign-up/username")
 						}}
 					>
 						<ArrowLeftIcon />
 					</Button>
-					<Button disabled={isFormLoading}>
-						{isFormLoading && (
+					<Button disabled={isPendingSubmit}>
+						{isPendingSubmit && (
 							<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
 						)}
-						{isFormLoading ? "Loading" : "Submit"}
+						{isPendingSubmit ? "Loading" : "Submit"}
 					</Button>
 				</CardFooter>
 			</form>

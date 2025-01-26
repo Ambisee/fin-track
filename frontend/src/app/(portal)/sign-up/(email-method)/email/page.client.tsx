@@ -22,8 +22,9 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { FormEventHandler, useState } from "react"
 import { ChevronRight } from "lucide-react"
+import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
@@ -34,6 +35,8 @@ export default function SignUpEmail() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
+	const { navigateTo } = useTransitionContext()
+
 	const email = Cookies.get("reg-email")
 	const form = useForm<z.infer<typeof formSchema>>({
 		mode: "onChange",
@@ -43,28 +46,26 @@ export default function SignUpEmail() {
 		}
 	})
 
+	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+		e.preventDefault()
+		// setIsPendingSubmit(true)
+		form.handleSubmit(
+			(formData) => {
+				Cookies.set("reg-email", formData.email)
+				navigateTo("/sign-up/username")
+			},
+			(errors) => {
+				// setIsPendingSubmit(false)
+				toast({
+					description: errors.email?.message,
+					variant: "destructive"
+				})
+			}
+		)()
+	}
 	return (
 		<Form {...form}>
-			<form
-				className="w-full"
-				onSubmit={(e) => {
-					e.preventDefault()
-                    setIsPendingSubmit(true)
-					form.handleSubmit(
-						(formData) => {
-							Cookies.set("reg-email", formData.email)
-							router.push("/sign-up/username")
-						},
-						(errors) => {
-							setIsPendingSubmit(false)
-							toast({
-								description: errors.email?.message,
-								variant: "destructive"
-							})
-						}
-					)()
-				}}
-			>
+			<form className="w-full" onSubmit={handleOnSubmit}>
 				<CardHeader>Email</CardHeader>
 				<CardContent className="flex flex-col">
 					<FormField

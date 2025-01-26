@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,7 +16,7 @@ import {
 import Cookies from "js-cookie"
 import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { FormEventHandler, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -33,6 +34,8 @@ const formSchema = z.object({
 export default function SignUpUsername() {
 	const router = useRouter()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+
+	const { navigateTo } = useTransitionContext()
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username")
@@ -53,24 +56,24 @@ export default function SignUpUsername() {
 		}
 	})
 
+	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+		e.preventDefault()
+		form.handleSubmit((formData) => {
+			setIsPendingSubmit(true)
+			let username = getUsernameFromEmail(email)
+			if (formData.username !== "") {
+				username = formData.username
+			}
+
+			setIsPendingSubmit(false)
+			Cookies.set("reg-username", username)
+			navigateTo("/sign-up/password")
+		})()
+	}
+
 	return (
 		<Form {...form}>
-			<form
-				className="w-full h-full"
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit((formData) => {
-                        setIsPendingSubmit(true)
-						let username = getUsernameFromEmail(email)
-						if (formData.username !== "") {
-							username = formData.username
-						}
-
-						Cookies.set("reg-username", username)
-						router.replace("/sign-up/password")
-					})()
-				}}
-			>
+			<form className="w-full h-full" onSubmit={handleOnSubmit}>
 				<CardHeader>Username (Optional)</CardHeader>
 				<CardContent className="flex flex-col">
 					<FormField
@@ -98,7 +101,7 @@ export default function SignUpUsername() {
 						className="aspect-square p-0 flex gap-2"
 						type="button"
 						onClick={(e) => {
-							router.replace("/sign-up/email")
+							navigateTo("/sign-up/email")
 						}}
 					>
 						<ArrowLeftIcon />
