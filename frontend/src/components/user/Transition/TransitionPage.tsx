@@ -1,12 +1,10 @@
 "use client"
 
 import { DEFAULT_LABEL, TRANSITION_PAGE_CLASSNAME } from "@/lib/constants"
-import { usePathname } from "next/navigation"
 import { HTMLProps, useEffect } from "react"
 import { useTransitionContext } from "./TransitionRoot"
 
 export default function TransitionPage(props: HTMLProps<HTMLDivElement>) {
-	const pathname = usePathname()
 	const { isExiting, curLabel, transitionLabels } = useTransitionContext()
 
 	useEffect(() => {
@@ -41,10 +39,12 @@ export default function TransitionPage(props: HTMLProps<HTMLDivElement>) {
 			}
 		}
 
-		pageComponent.classList.remove("opacity-0")
-		pageComponent.classList.add(animationClassName)
+		setTimeout(() => {
+			pageComponent.classList.remove("opacity-0")
+			pageComponent.classList.add(animationClassName)
 
-		pageComponent.addEventListener("animationend", animationFinishCallback)
+			pageComponent.addEventListener("animationend", animationFinishCallback)
+		}, 50)
 
 		return () => {
 			pageComponent.removeEventListener("animationend", animationFinishCallback)
