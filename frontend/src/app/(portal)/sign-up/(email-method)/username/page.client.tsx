@@ -8,11 +8,7 @@ import { useTransitionContext } from "@/components/user/Transition/TransitionRoo
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-	ArrowLeftIcon,
-	ArrowRightIcon,
-	ReloadIcon
-} from "@radix-ui/react-icons"
+import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
