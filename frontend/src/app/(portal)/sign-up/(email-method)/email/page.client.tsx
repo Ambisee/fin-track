@@ -20,11 +20,11 @@ import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { ArrowRightIcon, ReloadIcon } from "@radix-ui/react-icons"
+import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FormEventHandler, useState } from "react"
-import { ChevronRight } from "lucide-react"
-import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
