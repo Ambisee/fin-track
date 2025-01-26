@@ -1,0 +1,100 @@
+.forward-enter {
+    animation-timing-function: ease-in-out;
+    animation-name: animation-forward-enter;
+    animation-duration: var(--signup-page-transition-duration);
+    animation-fill-mode: forwards;
+}
+
+.forward-exit {
+    animation-timing-function: ease-in-out;
+    animation-name: animation-forward-exit;
+    animation-duration: var(--signup-page-transition-duration);
+    animation-fill-mode: forwards;
+}
+
+.backward-enter {
+    animation-timing-function: ease-in-out;
+    animation-name: animation-backward-enter;
+    animation-duration: var(--signup-page-transition-duration);
+    animation-fill-mode: forwards;
+}
+
+.backward-exit {
+    animation-timing-function: ease-in-out;
+    animation-name: animation-backward-exit;
+    animation-duration: var(--signup-page-transition-duration);
+    animation-fill-mode: forwards;
+}
+
+@keyframes animation-forward-enter {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes animation-forward-exit {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes animation-backward-enter {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes animation-backward-exit {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+@-webkit-keyframes animation-forward-enter {
+    0% {
+        -webkit-transform: translateX(100%);
+    }
+    100% {
+        -webkit-transform: translateX(0);
+    }
+}
+
+@-webkit-keyframes animation-forward-exit {
+    0% {
+        -webkit-transform: translateX(0);
+    }
+    100% {
+        -webkit-transform: translateX(-100%);
+    }
+}
+
+@-webkit-keyframes animation-backward-enter {
+    0% {
+        -webkit-transform: translateX(-100%);
+    }
+    100% {
+        -webkit-transform: translateX(0);
+    }
+}
+
+@-webkit-keyframes animation-backward-exit {
+    0% {
+        -webkit-transform: translateX(0);
+    }
+    100% {
+        -webkit-transform: translateX(100%);
+    }
+}

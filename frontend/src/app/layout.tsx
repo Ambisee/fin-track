@@ -4,8 +4,10 @@ import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
-import "./globals.css"
 import DataProvider from "@/components/user/DataProvider"
+
+import "@/styles/signup-transitions.css"
+import "@/styles/globals.css"
 
 export const metadata: Metadata = {
 	description: "An application for tracking your daily transactions."
