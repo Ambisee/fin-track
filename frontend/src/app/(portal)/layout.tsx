@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import { ReactElement } from "react"
-import PortalLayout from "./sign-up/layout.client"
+import PortalLayout from "./layout.client"
 
 export const metadata: Metadata = {
 	title: "Sign Up - FinTrack"
