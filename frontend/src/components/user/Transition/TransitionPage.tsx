@@ -41,12 +41,10 @@ export default function TransitionPage(props: HTMLProps<HTMLDivElement>) {
 			}
 		}
 
-		setTimeout(() => {
-			pageComponent.classList.remove("opacity-0")
-			pageComponent.classList.add(animationClassName)
+		pageComponent.classList.remove("opacity-0")
+		pageComponent.classList.add(animationClassName)
 
-			pageComponent.addEventListener("animationend", animationFinishCallback)
-		}, 0)
+		pageComponent.addEventListener("animationend", animationFinishCallback)
 
 		return () => {
 			pageComponent.removeEventListener("animationend", animationFinishCallback)
