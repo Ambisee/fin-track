@@ -48,14 +48,14 @@ export default function SignUpEmail() {
 
 	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
 		e.preventDefault()
-		// setIsPendingSubmit(true)
+		setIsPendingSubmit(true)
 		form.handleSubmit(
 			(formData) => {
 				Cookies.set("reg-email", formData.email)
 				navigateTo("/sign-up/username")
 			},
 			(errors) => {
-				// setIsPendingSubmit(false)
+				setIsPendingSubmit(false)
 				toast({
 					description: errors.email?.message,
 					variant: "destructive"
