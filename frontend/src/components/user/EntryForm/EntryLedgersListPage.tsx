@@ -92,12 +92,6 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 		}
 	})
 
-	useEffect(() => {
-		if (ledgersQuery.data?.data !== undefined) {
-			settingsQuery.refetch()
-		}
-	}, [settingsQuery, ledgersQuery.data?.data])
-
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
 			<DialogHeader className="space-y-0 sm:text-center h-fit">
@@ -229,6 +223,13 @@ export default function EntryLedgersListPage(props: EntryLedgersListPageProps) {
 												description: "Ledger deleted",
 												duration: 1500
 											})
+
+											if (form.getValues("ledger") == ledgerToBeDelete.id) {
+												form.setValue(
+													"ledger",
+													settingsQuery.data?.data?.current_ledger ?? -1
+												)
+											}
 
 											await queryClient.invalidateQueries({
 												queryKey: LEDGER_QKEY

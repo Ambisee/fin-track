@@ -30,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import InputSkeleton from "../InputSkeleton"
@@ -55,32 +55,18 @@ export default function LedgerPage(props: LedgerPageProps) {
 	const queryClient = useQueryClient()
 
 	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
 	const ledgersQuery = useLedgersQuery()
 	const currenciesQuery = useCurrenciesQuery()
 
-	const settingsData = settingsQuery.data?.data
-	const formDefaultValues = () => {
-		let name = ""
-		let currency = currenciesQuery.data?.data?.at(0)
-
-		if (ledger) {
-			name = ledger.name
-			currency = {
-				id: ledger.currency_id,
-				currency_name: ledger.currency?.currency_name ?? ""
-			}
-		}
-
-		return {
-			name,
-			currency
-		}
-	}
-
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: formDefaultValues()
+		defaultValues: {
+			name: "",
+			currency: {
+				id: -1,
+				currency_name: ""
+			}
+		}
 	})
 
 	const updateLedgerMutation = useMutation({
@@ -120,6 +106,34 @@ export default function LedgerPage(props: LedgerPageProps) {
 			return result
 		}
 	})
+
+	useEffect(() => {
+		if (currenciesQuery.isLoading) {
+			return
+		}
+
+		if (ledger) {
+			form.reset({
+				name: ledger.name,
+				currency: {
+					id: ledger.currency_id,
+					currency_name: ledger.currency?.currency_name ?? ""
+				}
+			})
+			return
+		}
+
+		const defaultCurrency = currenciesQuery.data?.data?.at(0)!
+		form.reset({
+			name: "",
+			currency: {
+				id: defaultCurrency.id,
+				currency_name: defaultCurrency.currency_name
+			}
+		})
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currenciesQuery.data, currenciesQuery.isLoading, ledger])
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
@@ -214,7 +228,14 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="mt-2">
 										<FormLabel>Ledger Name</FormLabel>
 										<FormControl>
-											<Input placeholder="Enter a new ledger name" {...field} />
+											{userQuery.isLoading || currenciesQuery.isLoading ? (
+												<InputSkeleton />
+											) : (
+												<Input
+													placeholder="Enter a new ledger name"
+													{...field}
+												/>
+											)}
 										</FormControl>
 										<FormDescription>
 											Please note that no two ledgers can share the same name.
