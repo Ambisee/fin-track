@@ -30,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm, useFormContext } from "react-hook-form"
 import { z } from "zod"
 import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
@@ -59,27 +59,15 @@ export default function EntryLedgerPage(props: LedgerPageProps) {
 	const ledgersQuery = useLedgersQuery()
 	const currenciesQuery = useCurrenciesQuery()
 
-	const formDefaultValues = () => {
-		let name = ""
-		let currency = currenciesQuery.data?.data?.at(0)
-
-		if (ledger) {
-			name = ledger.name
-			currency = {
-				id: ledger.currency_id,
-				currency_name: ledger.currency?.currency_name ?? ""
-			}
-		}
-
-		return {
-			name,
-			currency
-		}
-	}
-
 	const ledgerForm = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: formDefaultValues()
+		defaultValues: {
+			name: "",
+			currency: {
+				id: -1,
+				currency_name: ""
+			}
+		}
 	})
 
 	const updateLedgerMutation = useMutation({
@@ -119,6 +107,34 @@ export default function EntryLedgerPage(props: LedgerPageProps) {
 			return result
 		}
 	})
+
+	useEffect(() => {
+		if (currenciesQuery.isLoading) {
+			return
+		}
+
+		if (ledger) {
+			ledgerForm.reset({
+				name: ledger.name,
+				currency: {
+					id: ledger.currency_id,
+					currency_name: ledger.currency?.currency_name ?? ""
+				}
+			})
+			return
+		}
+
+		const defaultCurrency = currenciesQuery.data?.data?.at(0)!
+		ledgerForm.reset({
+			name: "",
+			currency: {
+				id: defaultCurrency.id,
+				currency_name: defaultCurrency.currency_name
+			}
+		})
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currenciesQuery.data, currenciesQuery.isLoading, ledger])
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
