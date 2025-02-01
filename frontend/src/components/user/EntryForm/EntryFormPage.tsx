@@ -24,11 +24,12 @@ import { EntryFormItem, FormSchema } from "./EntryForm"
 
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useDialogPages } from "../DialogPagesProvider"
+import { EntryFormState } from "@/lib/store"
 
 interface EntryFormPageProps {
 	data?: Entry
 	isEditForm: boolean
-	onSubmitSuccess?: (data: PostgrestSingleResponse<null>) => void
+	onSubmitSuccess: EntryFormState["onSubmitSuccess"]
 }
 
 const getErrors = (errors: FieldErrors<FormSchema>) => {
@@ -63,15 +64,19 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 			}
 
 			return Promise.resolve(
-				sbBrowser.from("entry").insert({
-					date: formData.date.toLocaleDateString(),
-					category: formData.category,
-					created_by: userData.data?.data.user?.id as string,
-					is_positive: isPositive,
-					amount: Number(formData.amount),
-					note: note,
-					ledger: formData.ledger
-				})
+				sbBrowser
+					.from("entry")
+					.insert({
+						date: formData.date.toLocaleDateString(),
+						category: formData.category,
+						created_by: userData.data?.data.user?.id as string,
+						is_positive: isPositive,
+						amount: Number(formData.amount),
+						note: note,
+						ledger: formData.ledger
+					})
+					.select()
+					.single()
 			)
 		}
 	})
@@ -101,6 +106,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						ledger: formData.ledger
 					})
 					.eq("id", props.data.id)
+					.select()
+					.single()
 			)
 		}
 	})

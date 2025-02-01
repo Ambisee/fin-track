@@ -11,8 +11,8 @@ interface EntryFormState {
     data?: Entry
     setData: Dispatch<SetStateAction<Entry | undefined>>
 
-    onSubmitSuccess?: ((data: PostgrestSingleResponse<null>) => void)
-    setOnSubmitSuccess: (value: ((data: PostgrestSingleResponse<null>) => void) | undefined ) => void
+    onSubmitSuccess?: ((data: PostgrestSingleResponse<Entry>) => void)
+    setOnSubmitSuccess: (value: ((data: PostgrestSingleResponse<Entry | undefined>) => void) | undefined ) => void
 
     // For the category page
     isCategoryEdit: boolean
@@ -48,4 +48,4 @@ const useGlobalStore = create<GlobalState>()((...a) => ({
 }))
 
 export default useGlobalStore
-export { resetGlobalStore }
+export { resetGlobalStore, type EntryFormState }

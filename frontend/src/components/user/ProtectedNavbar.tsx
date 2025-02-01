@@ -10,6 +10,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
+import { useSettingsQuery } from "@/lib/hooks"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -40,6 +41,8 @@ export default function ProtectedNavbar() {
 	const pathname = usePathname()
 	const queryClient = useQueryClient()
 
+	const settingsQuery = useSettingsQuery()
+
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
@@ -69,6 +72,13 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
+											if (
+												data.data?.ledger !==
+												settingsQuery.data?.data?.current_ledger
+											) {
+												return
+											}
+
 											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 										})
 										setOpen(true)
