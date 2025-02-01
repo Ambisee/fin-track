@@ -233,7 +233,14 @@ export default function EntryLedgerPage(props: LedgerPageProps) {
 									<FormItem className="mt-2">
 										<FormLabel>Ledger Name</FormLabel>
 										<FormControl>
-											<Input placeholder="Enter a new ledger name" {...field} />
+											{userQuery.isLoading || currenciesQuery.isLoading ? (
+												<InputSkeleton />
+											) : (
+												<Input
+													placeholder="Enter a new ledger name"
+													{...field}
+												/>
+											)}
 										</FormControl>
 										<FormDescription>
 											Please note that no two ledgers can share the same name.
