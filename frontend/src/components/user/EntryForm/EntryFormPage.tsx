@@ -22,7 +22,7 @@ import { ChevronRight, X } from "lucide-react"
 import { FieldErrors, useFormContext } from "react-hook-form"
 import { EntryFormItem, FormSchema } from "./EntryForm"
 
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { ReloadIcon, ResetIcon } from "@radix-ui/react-icons"
 import { useDialogPages } from "../DialogPagesProvider"
 import { EntryFormState } from "@/lib/store"
 
@@ -177,7 +177,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						className="absolute block left-0 top-1/2 translate-y-[-50%]"
 						onClick={() => form.reset()}
 					>
-						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+						<ResetIcon className="ml-2 h-4 w-4" />
 					</button>
 				)}
 				<DialogTitle className="leading-6" asChild>
