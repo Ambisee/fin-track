@@ -25,16 +25,18 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
-import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
 import { Ledger } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useRef, useState } from "react"
+import { useState } from "react"
 
 export interface LedgersListPageProps {
+	currentLedger?: Omit<Ledger, "entry">
+	ledgersList: Ledger[]
+	isLoading: boolean
+
+	isEditMode?: boolean
+
 	onBackButton?: () => void
 	onAddButton?: () => void
 	onSelect?: (ledger: Ledger, isEditing: boolean) => void
@@ -42,92 +44,86 @@ export interface LedgersListPageProps {
 }
 
 export default function LedgersListPage(props: LedgersListPageProps) {
-	const closeRef = useRef<HTMLButtonElement>(null!)
-	const [isEditMode, setIsEditMode] = useState<boolean>(false)
+	const [isEditMode, setIsEditMode] = useState<boolean>(!!props.isEditMode)
 	const [ledgerToBeDelete, setLedgerToDelete] = useState<Ledger | undefined>(
 		undefined
 	)
 
 	const { toast } = useToast()
-	const queryClient = useQueryClient()
 
-	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
-	const ledgersQuery = useLedgersQuery()
+	// const selectLedgerMutation = useMutation({
+	// 	mutationKey: USER_SETTINGS_QKEY,
+	// 	mutationFn: async (data: { id: number }) => {
+	// 		if (userQuery.data?.data.user?.id === undefined) {
+	// 			return undefined
+	// 		}
 
-	const selectLedgerMutation = useMutation({
-		mutationKey: USER_SETTINGS_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			if (userQuery.data?.data.user?.id === undefined) {
-				return undefined
-			}
+	// 		const { data: result, error } = await sbBrowser
+	// 			.from("settings")
+	// 			.update({ current_ledger: data.id })
+	// 			.eq("user_id", userQuery.data?.data.user.id as string)
+	// 			.select("*, ledger (name)")
+	// 			.single()
 
-			const { data: result, error } = await sbBrowser
-				.from("settings")
-				.update({ current_ledger: data.id })
-				.eq("user_id", userQuery.data?.data.user.id as string)
-				.select("*, ledger (name)")
-				.single()
+	// 		if (error) {
+	// 			throw error
+	// 		}
 
-			if (error) {
-				throw error
-			}
+	// 		return result
+	// 	},
+	// 	onSuccess: async (data) => {
+	// 		if (data === undefined) {
+	// 			toast({
+	// 				description: "Failed to switch to the specified ledger.",
+	// 				variant: "destructive"
+	// 			})
+	// 			return
+	// 		}
 
-			return result
-		},
-		onSuccess: async (data) => {
-			if (data === undefined) {
-				toast({
-					description: "Failed to switch to the specified ledger.",
-					variant: "destructive"
-				})
-				return
-			}
+	// 		queryClient.invalidateQueries({
+	// 			queryKey: USER_SETTINGS_QKEY
+	// 		})
+	// 		closeRef.current?.click()
 
-			queryClient.invalidateQueries({
-				queryKey: USER_SETTINGS_QKEY
-			})
-			closeRef.current?.click()
+	// 		toast({
+	// 			description: (
+	// 				<>
+	// 					Switched to the ledger: <b>{data.ledger?.name}</b>
+	// 				</>
+	// 			),
+	// 			duration: 1500
+	// 		})
+	// 	}
+	// })
 
-			toast({
-				description: (
-					<>
-						Switched to the ledger: <b>{data.ledger?.name}</b>
-					</>
-				),
-				duration: 1500
-			})
-		}
-	})
+	// const deleteLedgerMutation = useMutation({
+	// 	mutationKey: LEDGER_QKEY,
+	// 	mutationFn: async (data: { id: number }) => {
+	// 		const ledgersCount = ledgersQuery.data?.data?.length
+	// 		if (!ledgersCount) {
+	// 			throw Error("An unexpected error occured. Please try again later.")
+	// 		}
 
-	const deleteLedgerMutation = useMutation({
-		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			const ledgersCount = ledgersQuery.data?.data?.length
-			if (!ledgersCount) {
-				throw Error("An unexpected error occured. Please try again later.")
-			}
+	// 		if (ledgersCount < 2) {
+	// 			throw Error(
+	// 				"Unable to delete the ledger. User must have at least one ledger."
+	// 			)
+	// 		}
 
-			if (ledgersCount < 2) {
-				throw Error(
-					"Unable to delete the ledger. User must have at least one ledger."
-				)
-			}
+	// 		const { data: result, error } = await sbBrowser
+	// 			.from("ledger")
+	// 			.delete()
+	// 			.eq("id", data.id)
+	// 			.select("*, currency (currency_name), entry(count)")
+	// 			.single()
 
-			const { data: result, error } = await sbBrowser
-				.from("ledger")
-				.delete()
-				.eq("id", data.id)
-				.select("*, currency (currency_name), entry(count)")
-				.single()
+	// 		if (error) {
+	// 			throw Error("Unable to delete the ledger", { cause: error })
+	// 		}
 
-			if (error) {
-				throw Error("Unable to delete the ledger", { cause: error })
-			}
-
-			return result
-		}
-	})
+	// 		return result
+	// 	}
+	// })
 
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
@@ -165,7 +161,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 								<PencilIcon className="w-4 h-4" />
 							)}
 						</button>
-						<DialogClose ref={closeRef}>
+						<DialogClose>
 							<X className="w-4 h-4" />
 						</DialogClose>
 					</div>
@@ -181,7 +177,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						/>
 					</div>
 					<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-						{ledgersQuery.isFetched && !ledgersQuery.isFetching ? (
+						{!props.isLoading ? (
 							<>
 								<span className="text-center">No ledger found</span>
 								<div className="flex gap-2">
@@ -197,7 +193,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					</CommandEmpty>
 					<CommandList className="max-h-none h-full overflow-y-auto flex-1 px-1">
 						<CommandGroup className="">
-							{ledgersQuery.data?.data?.map((val) => (
+							{props.ledgersList.map((val) => (
 								<CommandItem
 									className="border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
 									key={val.name}
@@ -207,17 +203,16 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									}}
 								>
 									<p className="w-full">{val.name} </p>
-									{isEditMode &&
-										val.id !== settingsQuery.data?.data?.current_ledger && (
-											<AlertDialogTrigger
-												onClick={(e) => {
-													e.stopPropagation()
-													setLedgerToDelete(val)
-												}}
-											>
-												<Trash2Icon className="w-4 h-4 stroke-destructive" />
-											</AlertDialogTrigger>
-										)}
+									{isEditMode && val.id !== props.currentLedger?.id && (
+										<AlertDialogTrigger
+											onClick={(e) => {
+												e.stopPropagation()
+												setLedgerToDelete(val)
+											}}
+										>
+											<Trash2Icon className="w-4 h-4 stroke-destructive" />
+										</AlertDialogTrigger>
+									)}
 								</CommandItem>
 							))}
 						</CommandGroup>
@@ -244,25 +239,27 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									return
 								}
 
-								deleteLedgerMutation.mutate(
-									{ id: ledgerToBeDelete.id },
-									{
-										onSuccess: (successData) => {
-											toast({
-												description: "Ledger deleted",
-												duration: 1500
-											})
+								props.onDelete?.(ledgerToBeDelete)
 
-											props.onDelete?.(successData)
-										},
-										onError: (error) => {
-											toast({
-												description: error.message,
-												variant: "destructive"
-											})
-										}
-									}
-								)
+								// deleteLedgerMutation.mutate(
+								// 	{ id: ledgerToBeDelete.id },
+								// 	{
+								// 		onSuccess: (successData) => {
+								// 			toast({
+								// 				description: "Ledger deleted",
+								// 				duration: 1500
+								// 			})
+
+								// 			props.onDelete?.(successData)
+								// 		},
+								// 		onError: (error) => {
+								// 			toast({
+								// 				description: error.message,
+								// 				variant: "destructive"
+								// 			})
+								// 		}
+								// 	}
+								// )
 							}}
 							variant="destructive"
 						>

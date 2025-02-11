@@ -17,26 +17,25 @@ import {
 	FormLabel
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
-import { LEDGER_QKEY } from "@/lib/constants"
-import { useCurrenciesQuery, useLedgersQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
-import { Ledger } from "@/types/supabase"
+import { Currency, Ledger } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { PostgrestError } from "@supabase/supabase-js"
-import { useMutation } from "@tanstack/react-query"
 import { ChevronLeft, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+export type LedgerFormData = Pick<Ledger, "id" | "currency_id" | "name">
+
 export interface LedgerPageProps {
 	data?: Ledger
+	isLoading?: boolean
+	currencyList: Currency[]
+
 	onBackButton?: () => void
-	onCreate?: (ledger: Ledger) => void
-	onEdit?: (ledger: Ledger) => void
+	onCreate?: (ledger: LedgerFormData) => void
+	onUpdate?: (ledger: LedgerFormData) => void
 }
 
 const formSchema = z.object({
@@ -50,73 +49,19 @@ const formSchema = z.object({
 export default function LedgerPage(props: LedgerPageProps) {
 	const [isFormLoading, setIsFormLoading] = useState(false)
 
-	const { toast } = useToast()
-
-	const userQuery = useUserQuery()
-	const ledgersQuery = useLedgersQuery()
-	const currenciesQuery = useCurrenciesQuery()
-
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: "",
+			name: props.data?.name,
 			currency: {
-				id: -1,
-				currency_name: ""
+				id: props.data?.currency_id,
+				currency_name: props.data?.currency?.currency_name
 			}
-		}
-	})
-
-	const updateLedgerMutation = useMutation({
-		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: z.infer<typeof formSchema>) => {
-			if (!userQuery.data?.data?.user || !props.data || !data) {
-				throw Error("Unexpected error")
-			}
-
-			const { data: result, error } = await sbBrowser
-				.from("ledger")
-				.update({ name: data.name, currency_id: data.currency.id })
-				.eq("name", props.data.name)
-				.eq("created_by", props.data.created_by)
-				.select("*, currency (currency_name), entry(count)")
-				.single()
-
-			if (error != null) {
-				throw Error("Unable to update the ledger", { cause: error })
-			}
-
-			return result
-		}
-	})
-
-	const insertLedgerMutation = useMutation({
-		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: z.infer<typeof formSchema>) => {
-			if (!userQuery.data?.data || !userQuery.data.data.user) {
-				throw Error("Unexpected error")
-			}
-
-			const { data: result, error } = await sbBrowser
-				.from("ledger")
-				.insert({
-					created_by: userQuery.data.data.user.id,
-					name: data.name,
-					currency_id: data.currency.id
-				})
-				.select("*, currency (currency_name), entry(count)")
-				.single()
-
-			if (error) {
-				throw Error("Unable to create the new ledger.", { cause: error })
-			}
-
-			return result
 		}
 	})
 
 	useEffect(() => {
-		if (currenciesQuery.isLoading) {
+		if (props.isLoading) {
 			return
 		}
 
@@ -131,7 +76,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 			return
 		}
 
-		const defaultCurrency = currenciesQuery.data?.data?.at(0)!
+		const defaultCurrency = props.currencyList[0]
 		form.reset({
 			name: "",
 			currency: {
@@ -141,7 +86,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 		})
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currenciesQuery.data, currenciesQuery.isLoading, props.data])
+	}, [props.currencyList, props.data])
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
@@ -178,72 +123,25 @@ export default function LedgerPage(props: LedgerPageProps) {
 							e.preventDefault()
 							form.handleSubmit((formData) => {
 								setIsFormLoading(true)
-								if (!userQuery.data?.data) {
-									return
-								}
-
-								if (!ledgersQuery.data?.data) {
-									toast({
-										description:
-											"The ledger name has been used. Please enter a different name.",
-										variant: "destructive"
-									})
-									setIsFormLoading(false)
-									return
-								}
 
 								const isUpdate = props.data !== undefined
-								const mutation = isUpdate
-									? updateLedgerMutation
-									: insertLedgerMutation
+								const ledgerData: LedgerFormData = {
+									id: props.data?.id ?? -1,
+									name: formData.name,
+									currency_id: formData.currency.id
+								}
 
-								mutation.mutate(
-									{ name: formData.name, currency: formData.currency },
-									{
-										onError: (errorData: Error) => {
-											// Hard-coded error handler for duplicate ledger name
-											setIsFormLoading(false)
-
-											if (errorData.cause == undefined) {
-												toast({
-													description: errorData.message,
-													variant: "destructive"
-												})
-											}
-
-											if (
-												(errorData.cause as PostgrestError).code === "23505"
-											) {
-												toast({
-													description:
-														"The ledger name has been used. Please enter another one",
-													variant: "destructive"
-												})
-											}
-										},
-										onSuccess: (successData) => {
-											if (!successData) return
-
-											toast({
-												description: isUpdate
-													? "Ledger updated"
-													: "New ledger created"
-											})
-
-											setIsFormLoading(false)
-											if (isUpdate) {
-												props.onEdit?.(successData)
-											} else {
-												props.onCreate?.(successData)
-											}
-
-											// queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-											// queryClient.invalidateQueries({
-											// 	queryKey: USER_SETTINGS_QKEY
-											// })
-										}
+								try {
+									if (isUpdate) {
+										props.onUpdate?.(ledgerData)
+									} else {
+										props.onCreate?.(ledgerData)
 									}
-								)
+								} catch (e) {
+									console.error(e)
+								} finally {
+									setIsFormLoading(false)
+								}
 							})()
 						}}
 					>
@@ -255,13 +153,13 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="mt-2">
 										<FormLabel>Ledger Name</FormLabel>
 										<FormControl>
-											{userQuery.isLoading || currenciesQuery.isLoading ? (
-												<InputSkeleton />
-											) : (
+											{!props.isLoading ? (
 												<Input
 													placeholder="Enter a new ledger name"
 													{...field}
 												/>
+											) : (
+												<InputSkeleton />
 											)}
 										</FormControl>
 										<FormDescription>
@@ -277,9 +175,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="grid mt-8">
 										<FormLabel className="text-sm">Currency</FormLabel>
 										<FormControl>
-											{userQuery.isLoading || currenciesQuery.isLoading ? (
-												<InputSkeleton />
-											) : (
+											{!props.isLoading ? (
 												<ComboBox
 													closeOnSelect
 													value={field.value.currency_name}
@@ -287,12 +183,14 @@ export default function LedgerPage(props: LedgerPageProps) {
 														form.setValue("currency", JSON.parse(e))
 													}}
 													values={
-														currenciesQuery.data?.data?.map((val) => ({
+														props.currencyList.map((val) => ({
 															label: val.currency_name,
 															value: JSON.stringify(val)
 														})) ?? []
 													}
 												/>
+											) : (
+												<InputSkeleton />
 											)}
 										</FormControl>
 									</FormItem>
