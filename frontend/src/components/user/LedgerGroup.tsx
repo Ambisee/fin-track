@@ -20,18 +20,28 @@ import { PostgrestError } from "@supabase/supabase-js"
 interface LedgerGroupProps
 	extends Omit<
 		LedgersListPageProps & LedgerPageProps,
-		"onAddButton" | "currencyList" | "ledgersList" | "isLoading" | "data"
+		| "onCreate"
+		| "onUpdate"
+		| "onAddButton"
+		| "currencyList"
+		| "ledgersList"
+		| "isLoading"
+		| "data"
 	> {
 	/**
 	 * Set this flag to `false` to directly call the `props.onSelect`
 	 * callback, skipping the HTTP request to switch the current ledger.
 	 */
 	shouldUseSelectRequest?: boolean
+
+	onCreate: (ledger: LedgerFormData) => void
+	onUpdate: (ledger: LedgerFormData) => void
 }
 
 export default function LedgerGroup(props: LedgerGroupProps) {
 	const [isEditMode, setIsEditMode] = useState(false)
 	const [currentPage, setCurrentPage] = useState(0)
+	const [isFormLoading, setIsFormLoading] = useState(false)
 	const [currentLedger, setCurrentLedger] = useState<Ledger | undefined>()
 
 	const userQuery = useUserQuery()
@@ -43,13 +53,17 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	const queryClient = useQueryClient()
 
 	const insertLedgerMutation = useInsertLedgerMutation()
-	const onCreateCallback = (ledger: LedgerFormData) => {
+	const onCreateCallback = (
+		ledger: LedgerFormData,
+		doneCallback: () => void
+	) => {
 		const userID = userQuery.data?.data.user?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
 		}
 
+		setIsFormLoading(false)
 		const payload: Parameters<typeof insertLedgerMutation.mutate>[0] = {
 			...ledger,
 			created_by: userID
@@ -83,18 +97,25 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 				props.onCreate?.(successData)
 				setCurrentPage(0)
+			},
+			onSettled: () => {
+				doneCallback()
 			}
 		})
 	}
 
 	const updateLedgerMutation = useUpdateLedgerMutation()
-	const onUpdateCallback = (ledger: LedgerFormData) => {
+	const onUpdateCallback = (
+		ledger: LedgerFormData,
+		doneCallback: () => void
+	) => {
 		const userID = userQuery.data?.data.user?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
 		}
 
+		setIsFormLoading(true)
 		const payload: Parameters<typeof updateLedgerMutation.mutate>[0] = {
 			...ledger,
 			created_by: userID
@@ -128,6 +149,9 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 				props.onUpdate?.(successData)
 				setCurrentPage(0)
+			},
+			onSettled: () => {
+				doneCallback()
 			}
 		})
 	}

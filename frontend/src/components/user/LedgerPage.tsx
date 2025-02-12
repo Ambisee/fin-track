@@ -34,8 +34,8 @@ export interface LedgerPageProps {
 	currencyList: Currency[]
 
 	onBackButton?: () => void
-	onCreate?: (ledger: LedgerFormData) => void
-	onUpdate?: (ledger: LedgerFormData) => void
+	onCreate?: (ledger: LedgerFormData, doneCallback: () => void) => void
+	onUpdate?: (ledger: LedgerFormData, doneCallback: () => void) => void
 }
 
 const formSchema = z.object({
@@ -133,14 +133,12 @@ export default function LedgerPage(props: LedgerPageProps) {
 
 								try {
 									if (isUpdate) {
-										props.onUpdate?.(ledgerData)
+										props.onUpdate?.(ledgerData, () => setIsFormLoading(false))
 									} else {
-										props.onCreate?.(ledgerData)
+										props.onCreate?.(ledgerData, () => setIsFormLoading(false))
 									}
 								} catch (e) {
 									console.error(e)
-								} finally {
-									setIsFormLoading(false)
 								}
 							})()
 						}}
@@ -198,7 +196,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 							/>
 						</div>
 						<DialogFooter>
-							<Button>
+							<Button disabled={isFormLoading}>
 								{props.data ? "Update ledger" : "Create new ledger"}
 								{isFormLoading && (
 									<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
