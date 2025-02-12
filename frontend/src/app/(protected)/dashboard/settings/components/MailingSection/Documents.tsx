@@ -12,30 +12,31 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import DialogPagesProvider, {
-	useDialogPages
-} from "@/components/user/DialogPagesProvider"
 import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import {
-	useLedgersQuery,
-	useMonthGroupQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/hooks"
+import { useLedgersQuery, useMonthGroupQuery, useUserQuery } from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
+import { Ledger } from "@/types/supabase"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { useState, type JSX } from "react"
-import LedgerStoreProvider, {
-	useLedgerStore
-} from "../GeneralSection/LedgerProvider"
-import useGlobalStore from "@/lib/store"
 import { useQueryClient } from "@tanstack/react-query"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import { Dispatch, SetStateAction, useState, type JSX } from "react"
 
-function LedgerSelectorPage() {
+interface DocumentPageProps {
+	curPageState: {
+		curPage: number
+		setCurPage: Dispatch<SetStateAction<number>>
+	}
+	ledgerState: {
+		ledger: Ledger | undefined
+		setLedger: Dispatch<SetStateAction<Ledger | undefined>>
+	}
+}
+
+function LedgerSelectorPage(props: DocumentPageProps) {
+	const { setCurPage } = props.curPageState
+	const { setLedger } = props.ledgerState
 	const ledgersQuery = useLedgersQuery()
-	const { setCurPage } = useDialogPages()
-	const { setLedger: setLedgerToEdit } = useLedgerStore()
 
 	const renderLedgerList = () => {
 		const result: JSX.Element[] = []
@@ -52,7 +53,7 @@ function LedgerSelectorPage() {
 		}
 
 		for (let i = 0; i < ledgersQuery.data.data.length; i++) {
-			const ledger =
+			const ledger: Ledger =
 				ledgersQuery.data.data[ledgersQuery.data.data.length - 1 - i]
 
 			result.push(
@@ -61,7 +62,7 @@ function LedgerSelectorPage() {
 						type="button"
 						onClick={(e) => {
 							e.preventDefault()
-							setLedgerToEdit(ledger)
+							setLedger(ledger)
 							setCurPage((c) => c + 1)
 						}}
 						className="p-4 w-full h-full flex justify-between items-center"
@@ -103,17 +104,18 @@ function LedgerSelectorPage() {
 	)
 }
 
-function MonthSelectorPage() {
+function MonthSelectorPage(props: DocumentPageProps) {
 	const { toast } = useToast()
 
+	const { ledger } = props.ledgerState
+	const { setCurPage } = props.curPageState
 	const [isPendingIndex, setIsPendingIndex] = useState(-1)
-	const { setCurPage } = useDialogPages()
-	const { ledger: ledgerToEdit } = useLedgerStore()
+
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const queryClient = useQueryClient()
-	const monthGroupQuery = useMonthGroupQuery(ledgerToEdit?.id)
+	const monthGroupQuery = useMonthGroupQuery(ledger?.id)
 
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
@@ -180,7 +182,7 @@ function MonthSelectorPage() {
 										month: value.month,
 										year: value.year,
 										locale: navigator.language,
-										ledger_id: ledgerToEdit?.id as number
+										ledger_id: ledger?.id as number
 									})
 								})
 
@@ -258,9 +260,11 @@ function MonthSelectorPage() {
 	)
 }
 
-function DocumentsContent() {
+export default function Documents() {
+	const [curPage, setCurPage] = useState(0)
+	const [ledger, setLedger] = useState<Ledger | undefined>(undefined)
+
 	const userQuery = useUserQuery()
-	const { curPage, setCurPage } = useDialogPages()
 
 	const renderPage = () => {
 		const pages = [LedgerSelectorPage, MonthSelectorPage]
@@ -269,11 +273,16 @@ function DocumentsContent() {
 		if (CurrentPage === undefined) {
 			return undefined
 		}
-		return <CurrentPage />
+		return (
+			<CurrentPage
+				curPageState={{ curPage, setCurPage }}
+				ledgerState={{ ledger, setLedger }}
+			/>
+		)
 	}
 
 	return (
-		<>
+		<Dialog>
 			<div className="mt-8">
 				<div>
 					<Label>Documents</Label>
@@ -294,18 +303,6 @@ function DocumentsContent() {
 			>
 				{renderPage()}
 			</DialogContent>
-		</>
-	)
-}
-
-export default function Documents() {
-	return (
-		<DialogPagesProvider initialValues={{ curPage: 0 }}>
-			<LedgerStoreProvider>
-				<Dialog>
-					<DocumentsContent />
-				</Dialog>
-			</LedgerStoreProvider>
-		</DialogPagesProvider>
+		</Dialog>
 	)
 }
