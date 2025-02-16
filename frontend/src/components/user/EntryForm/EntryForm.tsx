@@ -1,24 +1,24 @@
 "use client"
 
-import LedgerStoreProvider from "@/app/(protected)/dashboard/settings/components/GeneralSection/LedgerProvider"
+import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import { EntryFormState } from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { useForm, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
 import { Form, FormControl, FormItem, FormLabel } from "../../ui/form"
 import DialogPagesProvider, { useDialogPages } from "../DialogPagesProvider"
+import LedgerGroup from "../LedgerGroup"
 import CategoryPage from "./CategoryPage"
 import CategoryToEditProvider from "./CategoryProvider"
 import ChooseCategoryPage from "./ChooseCategoryPage"
 import EditCategoryPage from "./EditCategoryPage"
 import EntryFormPage from "./EntryFormPage"
-import EntryLedgerPage from "./EntryLedgerPage"
-import EntryLedgersListPage from "./EntryLedgersListPage"
 
 interface EntryFormProps {
 	data?: Entry
@@ -66,6 +66,8 @@ function EntryFormItem(props: {
 function DialogEntryForm(props: EntryFormProps) {
 	const isEditForm = props.data !== undefined
 	const { curPage, setCurPage } = useDialogPages()
+
+	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
 
 	const form = useForm<FormSchema>({
@@ -112,9 +114,29 @@ function DialogEntryForm(props: EntryFormProps) {
 			ChooseCategoryPage,
 			EditCategoryPage,
 			CategoryPage,
-			(props: any) => <EntryLedgersListPage {...props} />,
-			(props: any) => <EntryLedgersListPage isEditMode {...props} />,
-			EntryLedgerPage
+			(props: any) => (
+				<LedgerGroup
+					onBackButton={() => setCurPage(0)}
+					shouldUseSelectRequest={false}
+					onSelect={(ledger, isEditing) => {
+						form.setValue("ledger", ledger.id)
+						setCurPage(0)
+					}}
+					onUpdate={(ledger) => {
+						if (ledger.id === settingsQuery.data?.data?.current_ledger) {
+							queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+						}
+
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+					onCreate={(ledger) => {
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+					onDelete={(ledger) => {
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+				/>
+			)
 		]
 
 		const CurrentPage = pages[curPage]
@@ -147,11 +169,9 @@ function DialogEntryForm(props: EntryFormProps) {
 function EntryForm(props: EntryFormProps) {
 	return (
 		<DialogPagesProvider>
-			<LedgerStoreProvider>
-				<CategoryToEditProvider>
-					<DialogEntryForm {...props} />
-				</CategoryToEditProvider>
-			</LedgerStoreProvider>
+			<CategoryToEditProvider>
+				<DialogEntryForm {...props} />
+			</CategoryToEditProvider>
 		</DialogPagesProvider>
 	)
 }

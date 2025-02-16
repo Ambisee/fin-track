@@ -3,28 +3,26 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import MiniSearch from "minisearch"
 
-import DialogPagesProvider, {
-	useDialogPages
-} from "@/components/user/DialogPagesProvider"
+import { useToast } from "@/components/ui/use-toast"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
+import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
-import { MONTHS } from "@/lib/constants"
+import { LEDGER_QKEY, MONTHS, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { groupDataByMonth, MonthGroup } from "@/lib/utils"
+import { useQueryClient } from "@tanstack/react-query"
 import {
 	createContext,
 	Suspense,
 	useEffect,
 	useMemo,
 	useRef,
-	use,
+	useState,
 	type JSX
 } from "react"
-import LedgerPage from "./settings/components/GeneralSection/LedgerPage"
-import LedgersToEditProvider from "./settings/components/GeneralSection/LedgerProvider"
-import LedgersListPage from "./settings/components/GeneralSection/LedgersListPage"
 import Loading from "./loading"
+import { useRouter } from "next/navigation"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -61,42 +59,48 @@ function LayoutEntryDialogContent() {
 	)
 }
 
-function LayoutLedgerEditorDialog(props: {
-	children?: JSX.Element | JSX.Element[]
-}) {
-	return (
-		<DialogPagesProvider>
-			<LedgersToEditProvider>
-				<Dialog>{props.children}</Dialog>
-			</LedgersToEditProvider>
-		</DialogPagesProvider>
-	)
-}
+function LayoutLedgerEditorDialog() {
+	const [open, setOpen] = useState(false)
 
-function LayoutLedgerEditorContent() {
-	const { curPage, setCurPage } = useDialogPages()
-
-	const renderPage = () => {
-		const pages = [
-			(props: any) => <LedgersListPage {...props} />,
-			(props: any) => <LedgersListPage isEditMode={true} {...props} />,
-			LedgerPage
-		]
-		const CurrentPage = pages[curPage]
-		const props = { showBackButton: !(curPage === 0) }
-
-		return <CurrentPage {...props} />
-	}
+	const { toast } = useToast()
+	const queryClient = useQueryClient()
 
 	return (
-		<DialogContent
-			hideCloseButton
-			onSubmit={(e) => e.stopPropagation()}
-			onOpenAutoFocus={() => setCurPage(0)}
-			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
-		>
-			{renderPage()}
-		</DialogContent>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<LedgerBadge />
+			<DialogContent
+				hideCloseButton
+				onSubmit={(e) => e.stopPropagation()}
+				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+			>
+				<LedgerGroup
+					onCreate={(data) => {
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+					onUpdate={(data) => {
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+					onDelete={(data) => {
+						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+					}}
+					onSelect={(data) => {
+						setOpen(false)
+						queryClient.invalidateQueries({
+							queryKey: USER_SETTINGS_QKEY
+						})
+
+						toast({
+							description: (
+								<>
+									Switched to the ledger: <b>{data.name}</b>
+								</>
+							),
+							duration: 1500
+						})
+					}}
+				/>
+			</DialogContent>
+		</Dialog>
 	)
 }
 
@@ -178,13 +182,8 @@ export default function DashboardLayout(props: DashboardLayoutProps) {
 		<DashboardContextProvider>
 			<LayoutEntryDialog>
 				<div className="dashboard-content" vaul-drawer-wrapper="">
-				 <Suspense fallback={<Loading />}>{props.children}</Suspense>
-					<LayoutLedgerEditorDialog>
-						<>
-							<LedgerBadge />
-							<LayoutLedgerEditorContent />
-						</>
-					</LayoutLedgerEditorDialog>
+					<Suspense fallback={<Loading />}>{props.children}</Suspense>
+					<LayoutLedgerEditorDialog />
 				</div>
 				<ProtectedNavbar />
 				<LayoutEntryDialogContent />

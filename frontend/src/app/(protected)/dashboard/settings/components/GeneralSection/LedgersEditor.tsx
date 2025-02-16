@@ -4,33 +4,27 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/components/ui/use-toast"
 import DialogPagesProvider, {
 	useDialogPages
 } from "@/components/user/DialogPagesProvider"
+import LedgerGroup from "@/components/user/LedgerGroup"
+import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import LedgerPage from "./LedgerPage"
-import LedgerStoreProvider from "./LedgerProvider"
-import LedgersListPage from "./LedgersListPage"
+import { useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
 
-function LedgersEditorContent() {
-	const { curPage, setCurPage } = useDialogPages()
+export default function LedgersEditor() {
+	const { toast } = useToast()
+	const [open, setOpen] = useState(false)
+
 	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
 
-	const renderPage = () => {
-		const pages = [
-			(props: any) => <LedgersListPage {...props} />,
-			(props: any) => <LedgersListPage isEditMode={true} {...props} />,
-			LedgerPage
-		]
-		const CurrentPage = pages[curPage]
-		const props = { showBackButton: !(curPage === 0) }
-
-		return <CurrentPage {...props} />
-	}
+	const queryClient = useQueryClient()
 
 	return (
-		<Dialog>
+		<Dialog open={open} onOpenChange={setOpen}>
 			<div id="ledgers-editor" className="grid pt-4 mt-4">
 				<Label className="text-sm">Ledgers</Label>
 				<div className="mt-2 p-4 rounded-md border">
@@ -59,22 +53,36 @@ function LedgersEditorContent() {
 				<DialogContent
 					hideCloseButton
 					onSubmit={(e) => e.stopPropagation()}
-					onOpenAutoFocus={() => setCurPage(0)}
 					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 				>
-					{renderPage()}
+					<LedgerGroup
+						// onCreate={() => {
+						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+						// }}
+						// onUpdate={() => {
+						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+						// }}
+						// onDelete={() => {
+						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+						// }}
+						onSelect={(ledger) => {
+							setOpen(false)
+							// queryClient.invalidateQueries({
+							// 	queryKey: USER_SETTINGS_QKEY
+							// })
+
+							toast({
+								description: (
+									<>
+										Switched to the ledger: <b>{ledger.name}</b>
+									</>
+								),
+								duration: 1500
+							})
+						}}
+					/>
 				</DialogContent>
 			</div>
 		</Dialog>
-	)
-}
-
-export default function LedgersEditor() {
-	return (
-		<DialogPagesProvider initialValues={{ curPage: 0 }}>
-			<LedgerStoreProvider>
-				<LedgersEditorContent />
-			</LedgerStoreProvider>
-		</DialogPagesProvider>
 	)
 }

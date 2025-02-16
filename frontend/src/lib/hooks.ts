@@ -1,9 +1,9 @@
 import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
-import { UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query";
+import { UndefinedInitialDataOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 import { CATEGORIES_QKEY, CURRENCIES_QKEY, ENTRY_QKEY, LEDGER_QKEY, MONTH_GROUP_QKEY, USER_QKEY, USER_SETTINGS_QKEY } from "./constants";
 import { sbBrowser } from "./supabase";
-import { Entry } from "@/types/supabase";
+import { Entry, Ledger } from "@/types/supabase";
 
 function useUserQuery(options?: UndefinedInitialDataOptions<UserResponse, Error, UserResponse, string[]>) {
     return useQuery({
@@ -124,6 +124,121 @@ function useMonthGroupQuery(ledger_id?: number) {
     })
 }
 
+function useInsertLedgerMutation() {
+    const userQuery = useUserQuery()
+
+    return useMutation({
+            mutationKey: LEDGER_QKEY,
+            mutationFn: async (data: Pick<Ledger, "created_by" | "name" | "currency_id">) => {
+                if (!userQuery.data?.data || !userQuery.data.data.user) {
+                    throw Error("Unexpected error")
+                }
+    
+                const { data: result, error } = await sbBrowser
+                    .from("ledger")
+                    .insert({
+                        created_by: userQuery.data.data.user.id,
+                        name: data.name,
+                        currency_id: data.currency_id
+                    })
+                    .select("*, currency (currency_name), entry(count)")
+                    .single()
+    
+                if (error) {
+                    throw Error("Unable to create the new ledger.", { cause: error })
+                }
+    
+                return result
+            }
+        })
+}
+
+function useUpdateLedgerMutation() {
+    const userQuery = useUserQuery()
+
+    return useMutation({
+            mutationKey: LEDGER_QKEY,
+            mutationFn: async (data: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">) => {
+                if (!userQuery.data?.data?.user || !data) {
+                    throw Error("Unexpected error")
+                }
+    
+                const { data: result, error } = await sbBrowser
+                    .from("ledger")
+                    .update({ name: data.name, currency_id: data.currency_id })
+                    .eq("id", data.id)
+                    .eq("created_by", data.created_by)
+                    .select("*, currency (currency_name), entry(count)")
+                    .single()
+    
+                if (error != null) {
+                    throw Error("Unable to update the ledger", { cause: error })
+                }
+    
+                return result
+            }
+        })
+}
+
+function useDeleteLedgerMutation() {
+    const ledgersQuery = useLedgersQuery()
+
+    return useMutation({
+		mutationKey: LEDGER_QKEY,
+		mutationFn: async (data: { id: number }) => {
+			const ledgersCount = ledgersQuery.data?.data?.length
+			if (!ledgersCount) {
+				throw Error("An unexpected error occured. Please try again later.")
+			}
+
+			if (ledgersCount < 2) {
+				throw Error(
+					"Unable to delete the ledger. User must have at least one ledger."
+				)
+			}
+
+			const { data: result, error } = await sbBrowser
+				.from("ledger")
+				.delete()
+				.eq("id", data.id)
+				.select("*, currency (currency_name), entry(count)")
+				.single()
+
+			if (error) {
+				throw Error("Unable to delete the ledger", { cause: error })
+			}
+
+			return result
+		}
+	})
+}
+
+function useSwitchLedgerMutation() {
+    const userQuery = useUserQuery()
+
+    return useMutation({
+		mutationKey: USER_SETTINGS_QKEY,
+		mutationFn: async (data: { id: number }) => {
+			if (userQuery.data?.data.user?.id === undefined) {
+				return undefined
+			}
+
+			const { data: result, error } = await sbBrowser
+				.from("settings")
+				.update({ current_ledger: data.id })
+				.eq("user_id", userQuery.data?.data.user.id as string)
+				.select("*, ledger (name)")
+				.single()
+
+			if (error) {
+				throw Error("Unable to switch ledger", {cause: error})
+			}
+
+			return result
+		},
+	})
+}
+
 function useSetElementWindowHeight() {
     const elementRef = useRef<HTMLDivElement>(null!)
 
@@ -171,6 +286,7 @@ function useAmountFormatter() {
 
 export { 
     useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useSettingsQuery, useUserQuery, useLedgersQuery,
+    useInsertLedgerMutation, useUpdateLedgerMutation, useDeleteLedgerMutation, useSwitchLedgerMutation,
     useMonthGroupQuery, useSetElementWindowHeight, useAmountFormatter
 };
 

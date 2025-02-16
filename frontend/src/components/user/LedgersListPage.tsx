@@ -25,128 +25,37 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
-import { useDialogPages } from "@/components/user/DialogPagesProvider"
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
-import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
 import { Ledger } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useRef, useState } from "react"
-import { useLedgerStore } from "./LedgerProvider"
+import { useEffect, useState } from "react"
 
-interface LedgersListPageProps {
+export interface LedgersListPageProps {
+	currentLedger?: Omit<Ledger, "entry">
+	ledgersList: Ledger[]
+
+	isLoading?: boolean
+	isInitialized?: boolean
 	isEditMode?: boolean
-	showBackButton?: boolean
+
+	onBackButton?: () => void
+	onAddButton?: () => void
+	onSelect?: (ledger: Ledger, isEditing: boolean) => Promise<void>
+	onDelete?: (ledger: Ledger) => Promise<void>
 }
 
 export default function LedgersListPage(props: LedgersListPageProps) {
 	const { toast } = useToast()
-	const queryClient = useQueryClient()
-	const closeRef = useRef<HTMLButtonElement>(null!)
-	const { setCurPage } = useDialogPages()
-	const { setLedger } = useLedgerStore()
 
-	const isEditMode = props.isEditMode ?? false
-	const showBackButton = props.showBackButton ?? true
-
+	const [isLoading, setIsLoading] = useState(props.isLoading ?? false)
+	const [isEditMode, setIsEditMode] = useState<boolean>(!!props.isEditMode)
 	const [ledgerToBeDelete, setLedgerToDelete] = useState<Ledger | undefined>(
 		undefined
 	)
 
-	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
-	const ledgersQuery = useLedgersQuery()
-
-	const selectLedgerMutation = useMutation({
-		mutationKey: USER_SETTINGS_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			if (userQuery.data?.data.user?.id === undefined) {
-				return undefined
-			}
-
-			const { data: result, error } = await sbBrowser
-				.from("settings")
-				.update({ current_ledger: data.id })
-				.eq("user_id", userQuery.data?.data.user.id as string)
-				.select("*, ledger (name)")
-				.single()
-
-			if (error) {
-				throw error
-			}
-
-			return result
-		},
-		onSuccess: async (data) => {
-			if (data === undefined) {
-				toast({
-					description: "Failed to switch to the specified ledger.",
-					variant: "destructive"
-				})
-				return
-			}
-
-			queryClient.invalidateQueries({
-				queryKey: USER_SETTINGS_QKEY
-			})
-			closeRef.current?.click()
-
-			toast({
-				description: (
-					<>
-						Switched to the ledger: <b>{data.ledger?.name}</b>
-					</>
-				),
-				duration: 1500
-			})
-		}
-	})
-
-	const deleteLedgerMutation = useMutation({
-		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			const ledgersCount = ledgersQuery.data?.data?.length
-			if (!ledgersCount) {
-				throw Error("An unexpected error occured. Please try again later.")
-			}
-
-			if (ledgersCount < 2) {
-				throw Error(
-					"Unable to delete the ledger. User must have at least one ledger."
-				)
-			}
-
-			const { data: result, error } = await sbBrowser
-				.from("ledger")
-				.delete()
-				.eq("id", data.id)
-
-			if (error) {
-				throw error
-			}
-
-			return result
-		},
-		onSuccess: async () => {
-			toast({
-				description: "Ledger deleted",
-				duration: 1500
-			})
-
-			await settingsQuery.refetch()
-			await queryClient.invalidateQueries({
-				queryKey: LEDGER_QKEY
-			})
-		},
-		onError: (error) => {
-			toast({
-				description: error.message,
-				variant: "destructive"
-			})
-		}
-	})
+	useEffect(() => {
+		setIsLoading(props.isLoading ?? false)
+	}, [props.isLoading])
 
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
@@ -159,18 +68,12 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 								: "Select a ledger to view"}
 						</h2>
 					</DialogTitle>
-					{showBackButton && (
+					{(isEditMode || props.onBackButton) && (
 						<button
 							className="absolute block left-0 top-1/2 translate-y-[-50%]"
-							onClick={() => setCurPage((c) => c - 1)}
-						>
-							<ChevronLeft className="w-4 h-4" />
-						</button>
-					)}
-					{isEditMode && (
-						<button
-							className="absolute block left-0 top-1/2 translate-y-[-50%]"
-							onClick={() => setCurPage((c) => c - 1)}
+							onClick={
+								isEditMode ? () => setIsEditMode(false) : props.onBackButton
+							}
 						>
 							<ChevronLeft className="w-4 h-4" />
 						</button>
@@ -179,9 +82,9 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						<button
 							onClick={() => {
 								if (isEditMode) {
-									setLedger(undefined)
+									props.onAddButton?.()
 								}
-								setCurPage((c) => c + 1)
+								setIsEditMode(true)
 							}}
 						>
 							{isEditMode ? (
@@ -190,7 +93,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 								<PencilIcon className="w-4 h-4" />
 							)}
 						</button>
-						<DialogClose ref={closeRef}>
+						<DialogClose>
 							<X className="w-4 h-4" />
 						</DialogClose>
 					</div>
@@ -201,17 +104,19 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 				<Command className="h-full w-full gap-4 rounded-none">
 					<div className="grid grid-cols-[1fr_auto] border rounded-md cmdk-input-no-border ">
 						<CommandInput
+							disabled={isLoading}
 							className="text-base"
 							placeholder="Search for a ledger..."
 						/>
 					</div>
 					<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-						{ledgersQuery.isFetched && !ledgersQuery.isFetching ? (
+						{props.isInitialized ?? true ? (
 							<>
 								<span className="text-center">No ledger found</span>
 								<div className="flex gap-2">
-									<Button>Create a ledger</Button>
-									<Button variant="outline">Reset</Button>
+									<Button onClick={() => props.onAddButton?.()}>
+										Create a ledger
+									</Button>
 								</div>
 							</>
 						) : (
@@ -222,32 +127,29 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					</CommandEmpty>
 					<CommandList className="max-h-none h-full overflow-y-auto flex-1 px-1">
 						<CommandGroup className="">
-							{ledgersQuery.data?.data?.map((val) => (
+							{props.ledgersList.map((val) => (
 								<CommandItem
 									className="border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
 									key={val.name}
 									value={val.name}
-									onSelect={() => {
-										if (isEditMode) {
-											setLedger(val)
-											setCurPage((c) => c + 1)
-										} else {
-											selectLedgerMutation.mutate({ id: val.id })
-										}
+									disabled={!(props.isInitialized ?? true) || isLoading}
+									onSelect={async () => {
+										setIsLoading(true)
+										await props.onSelect?.(val, isEditMode)
+										setIsLoading(false)
 									}}
 								>
 									<p className="w-full">{val.name} </p>
-									{isEditMode &&
-										val.id !== settingsQuery.data?.data?.current_ledger && (
-											<AlertDialogTrigger
-												onClick={(e) => {
-													e.stopPropagation()
-													setLedgerToDelete(val)
-												}}
-											>
-												<Trash2Icon className="w-4 h-4 stroke-destructive" />
-											</AlertDialogTrigger>
-										)}
+									{isEditMode && val.id !== props.currentLedger?.id && (
+										<AlertDialogTrigger
+											onClick={(e) => {
+												e.stopPropagation()
+												setLedgerToDelete(val)
+											}}
+										>
+											<Trash2Icon className="w-4 h-4 stroke-destructive" />
+										</AlertDialogTrigger>
+									)}
 								</CommandItem>
 							))}
 						</CommandGroup>
@@ -266,7 +168,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={() => {
+							onClick={async () => {
 								if (ledgerToBeDelete === undefined) {
 									toast({
 										description: "No ledger provided"
@@ -274,7 +176,9 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									return
 								}
 
-								deleteLedgerMutation.mutate({ id: ledgerToBeDelete.id })
+								setIsLoading(true)
+								await props.onDelete?.(ledgerToBeDelete)
+								setIsLoading(false)
 							}}
 							variant="destructive"
 						>
