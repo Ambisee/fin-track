@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react"
-import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
-import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
-import { Ledger } from "@/types/supabase"
+import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import {
 	useCurrenciesQuery,
 	useDeleteLedgerMutation,
@@ -12,10 +9,13 @@ import {
 	useUpdateLedgerMutation,
 	useUserQuery
 } from "@/lib/hooks"
-import { useQueryClient } from "@tanstack/react-query"
-import { useToast } from "../ui/use-toast"
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { Ledger } from "@/types/supabase"
 import { PostgrestError } from "@supabase/supabase-js"
+import { useIsMutating, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { useToast } from "../ui/use-toast"
+import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
+import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
 
 interface LedgerGroupProps
 	extends Omit<
@@ -54,6 +54,9 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
+
+	const isLedgerMutating = useIsMutating({ mutationKey: LEDGER_QKEY })
+	const isSettingsMutating = useIsMutating({ mutationKey: USER_SETTINGS_QKEY })
 
 	const insertLedgerMutation = useInsertLedgerMutation()
 	const onCreateCallback = async (ledger: LedgerFormData) => {
@@ -225,10 +228,8 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	}
 
 	const isLoading =
-		switchLedgerMutation.isPending ||
-		insertLedgerMutation.isPending ||
-		updateLedgerMutation.isPending ||
-		deleteLedgerMutation.isPending ||
+		isLedgerMutating > 0 ||
+		isSettingsMutating > 0 ||
 		ledgersQuery.isFetching ||
 		settingsQuery.isFetching
 

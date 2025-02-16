@@ -114,8 +114,9 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 							<>
 								<span className="text-center">No ledger found</span>
 								<div className="flex gap-2">
-									<Button>Create a ledger</Button>
-									<Button variant="outline">Reset</Button>
+									<Button onClick={() => props.onAddButton?.()}>
+										Create a ledger
+									</Button>
 								</div>
 							</>
 						) : (
