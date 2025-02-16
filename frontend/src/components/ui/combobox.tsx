@@ -28,6 +28,7 @@ export default function ComboBox(props: ComboBoxProps) {
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger asChild>
 				<Button
+					disabled={props.disabled}
 					variant="outline"
 					role="combobox"
 					className={cn(

@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import MiniSearch from "minisearch"
 
 import { useToast } from "@/components/ui/use-toast"
-import DialogPagesProvider from "@/components/user/DialogPagesProvider"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
@@ -23,6 +22,7 @@ import {
 	type JSX
 } from "react"
 import Loading from "./loading"
+import { useRouter } from "next/navigation"
 
 interface DashboardLayoutProps {
 	children: JSX.Element

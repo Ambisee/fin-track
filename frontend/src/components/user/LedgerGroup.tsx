@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
 import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
 import { Ledger } from "@/types/supabase"
@@ -14,7 +14,7 @@ import {
 } from "@/lib/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import { useToast } from "../ui/use-toast"
-import { USER_SETTINGS_QKEY } from "@/lib/constants"
+import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { PostgrestError } from "@supabase/supabase-js"
 
 interface LedgerGroupProps
@@ -22,6 +22,8 @@ interface LedgerGroupProps
 		LedgersListPageProps & LedgerPageProps,
 		| "onCreate"
 		| "onUpdate"
+		| "onDelete"
+		| "onSelect"
 		| "onAddButton"
 		| "currencyList"
 		| "ledgersList"
@@ -34,14 +36,15 @@ interface LedgerGroupProps
 	 */
 	shouldUseSelectRequest?: boolean
 
-	onCreate: (ledger: LedgerFormData) => void
-	onUpdate: (ledger: LedgerFormData) => void
+	onDelete?: (ledger: Ledger) => void
+	onSelect?: (ledger: Ledger, isEditing: boolean) => void
+	onCreate?: (ledger: LedgerFormData) => void
+	onUpdate?: (ledger: LedgerFormData) => void
 }
 
 export default function LedgerGroup(props: LedgerGroupProps) {
 	const [isEditMode, setIsEditMode] = useState(false)
 	const [currentPage, setCurrentPage] = useState(0)
-	const [isFormLoading, setIsFormLoading] = useState(false)
 	const [currentLedger, setCurrentLedger] = useState<Ledger | undefined>()
 
 	const userQuery = useUserQuery()
@@ -53,136 +56,124 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	const queryClient = useQueryClient()
 
 	const insertLedgerMutation = useInsertLedgerMutation()
-	const onCreateCallback = (
-		ledger: LedgerFormData,
-		doneCallback: () => void
-	) => {
+	const onCreateCallback = async (ledger: LedgerFormData) => {
 		const userID = userQuery.data?.data.user?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
 		}
 
-		setIsFormLoading(false)
 		const payload: Parameters<typeof insertLedgerMutation.mutate>[0] = {
 			...ledger,
 			created_by: userID
 		}
 
-		insertLedgerMutation.mutate(payload, {
-			onError: (errorData: Error) => {
-				// Hard-coded error handler for duplicate ledger name
-				if (errorData.cause == undefined) {
-					toast({
-						description: errorData.message,
-						variant: "destructive"
-					})
-				}
+		try {
+			const successData = await insertLedgerMutation.mutateAsync(payload)
+			toast({
+				description: "New ledger created",
+				duration: 1500
+			})
 
-				if ((errorData.cause as PostgrestError).code === "23505") {
-					toast({
-						description:
-							"The ledger name has been used. Please enter another one",
-						variant: "destructive"
-					})
-				}
-			},
-			onSuccess: (successData) => {
-				if (!successData) return
+			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			props.onCreate?.(successData)
+			setCurrentPage(0)
+		} catch (e) {
+			const errorData = e as Error
 
+			// Hard-coded error handler for duplicate ledger name
+			if (errorData.cause == undefined) {
 				toast({
-					description: "New ledger created",
-					duration: 1500
+					description: errorData.message,
+					variant: "destructive"
 				})
-
-				props.onCreate?.(successData)
-				setCurrentPage(0)
-			},
-			onSettled: () => {
-				doneCallback()
 			}
-		})
+
+			if ((errorData.cause as PostgrestError).code === "23505") {
+				toast({
+					description:
+						"The ledger name has been used. Please enter another one",
+					variant: "destructive"
+				})
+			}
+		}
+
+		return
 	}
 
 	const updateLedgerMutation = useUpdateLedgerMutation()
-	const onUpdateCallback = (
-		ledger: LedgerFormData,
-		doneCallback: () => void
-	) => {
+	const onUpdateCallback = async (ledger: LedgerFormData) => {
 		const userID = userQuery.data?.data.user?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
 		}
 
-		setIsFormLoading(true)
 		const payload: Parameters<typeof updateLedgerMutation.mutate>[0] = {
 			...ledger,
 			created_by: userID
 		}
 
-		updateLedgerMutation.mutate(payload, {
-			onError: (errorData) => {
-				// Hard-coded error handler for duplicate ledger name
-				if (errorData.cause == undefined) {
-					toast({
-						description: errorData.message,
-						variant: "destructive"
-					})
-				}
+		try {
+			const successData = await updateLedgerMutation.mutateAsync(payload)
 
-				if ((errorData.cause as PostgrestError).code === "23505") {
-					toast({
-						description:
-							"The ledger name has been used. Please enter another one",
-						variant: "destructive"
-					})
-				}
-			},
-			onSuccess: (successData) => {
-				if (!successData) return
+			toast({
+				description: "Ledger updated",
+				duration: 1500
+			})
 
+			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			props.onUpdate?.(successData)
+			setCurrentPage(0)
+		} catch (e) {
+			const errorData = e as Error
+
+			// Hard-coded error handler for duplicate ledger name
+			if (errorData.cause == undefined) {
 				toast({
-					description: "Ledger updated",
-					duration: 1500
+					description: errorData.message,
+					variant: "destructive"
 				})
-
-				props.onUpdate?.(successData)
-				setCurrentPage(0)
-			},
-			onSettled: () => {
-				doneCallback()
 			}
-		})
+
+			if ((errorData.cause as PostgrestError).code === "23505") {
+				toast({
+					description:
+						"The ledger name has been used. Please enter another one",
+					variant: "destructive"
+				})
+			}
+		}
+
+		return
 	}
 
 	const deleteLedgerMutation = useDeleteLedgerMutation()
-	const onDeleteCallback = (ledger: Ledger) => {
-		deleteLedgerMutation.mutate(
-			{ id: ledger.id },
-			{
-				onSuccess: (successData) => {
-					toast({
-						description: "Ledger deleted",
-						duration: 1500
-					})
+	const onDeleteCallback = async (ledger: Ledger) => {
+		try {
+			const successData = await deleteLedgerMutation.mutateAsync({
+				id: ledger.id
+			})
 
-					props.onDelete?.(successData)
-				},
-				onError: (error) => {
-					toast({
-						description: error.message,
-						variant: "destructive"
-					})
-				}
-			}
-		)
+			toast({
+				description: "Ledger deleted",
+				duration: 1500
+			})
 
-		props.onDelete?.(ledger)
+			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			props.onDelete?.(successData)
+		} catch (e) {
+			const errorData = e as Error
+
+			toast({
+				description: errorData.message,
+				variant: "destructive"
+			})
+		}
 	}
 
 	const switchLedgerMutation = useSwitchLedgerMutation()
-	const onSelectCallback = (ledger: Ledger, isEditing: boolean) => {
+	const onSelectCallback = async (ledger: Ledger, isEditing: boolean) => {
 		if (isEditing) {
 			setCurrentLedger(ledger)
 			setCurrentPage(1)
@@ -197,41 +188,55 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			return
 		}
 
-		switchLedgerMutation.mutate(
-			{ id: ledger.id },
-			{
-				onSuccess: async (data) => {
-					if (data === undefined) {
-						toast({
-							description: "Failed to switch to the specified ledger.",
-							variant: "destructive"
-						})
-						return
-					}
-
-					queryClient.invalidateQueries({
-						queryKey: USER_SETTINGS_QKEY
-					})
-
-					toast({
-						description: (
-							<>
-								Switched to the ledger: <b>{data.ledger?.name}</b>
-							</>
-						),
-						duration: 1500
-					})
-
-					props.onSelect?.(ledger, isEditing)
-				}
+		try {
+			const successData = await switchLedgerMutation.mutateAsync({
+				id: ledger.id
+			})
+			if (successData === undefined) {
+				toast({
+					description: "Failed to switch to the specified ledger.",
+					variant: "destructive"
+				})
+				return
 			}
-		)
+
+			queryClient.invalidateQueries({
+				queryKey: USER_SETTINGS_QKEY
+			})
+
+			toast({
+				description: (
+					<>
+						Switched to the ledger: <b>{successData.ledger?.name}</b>
+					</>
+				),
+				duration: 1500
+			})
+
+			props.onSelect?.(ledger, isEditing)
+		} catch (e) {
+			const errorData = e as Error
+
+			toast({
+				description: errorData.message,
+				variant: "destructive"
+			})
+		}
 	}
+
+	const isLoading =
+		switchLedgerMutation.isPending ||
+		insertLedgerMutation.isPending ||
+		updateLedgerMutation.isPending ||
+		deleteLedgerMutation.isPending ||
+		ledgersQuery.isFetching ||
+		settingsQuery.isFetching
 
 	const Component = [
 		<LedgersListPage
 			key="ledger-list-page"
-			isLoading={ledgersQuery.isLoading}
+			isLoading={isLoading}
+			isInitialized={!ledgersQuery.isLoading}
 			isEditMode={isEditMode}
 			ledgersList={ledgersQuery.data?.data ?? []}
 			currentLedger={settingsQuery.data?.data?.ledger ?? undefined}
@@ -245,7 +250,8 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 		/>,
 		<LedgerPage
 			key="ledger-page"
-			isLoading={currenciesQuery.isLoading}
+			isLoading={isLoading}
+			isInitialized={!ledgersQuery.isLoading && !currenciesQuery.isLoading}
 			data={currentLedger}
 			currencyList={currenciesQuery.data?.data ?? []}
 			onBackButton={() => {

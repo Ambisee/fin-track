@@ -30,12 +30,14 @@ export type LedgerFormData = Pick<Ledger, "id" | "currency_id" | "name">
 
 export interface LedgerPageProps {
 	data?: Ledger
-	isLoading?: boolean
 	currencyList: Currency[]
 
+	isLoading?: boolean
+	isInitialized?: boolean
+
 	onBackButton?: () => void
-	onCreate?: (ledger: LedgerFormData, doneCallback: () => void) => void
-	onUpdate?: (ledger: LedgerFormData, doneCallback: () => void) => void
+	onCreate?: (ledger: LedgerFormData) => Promise<void>
+	onUpdate?: (ledger: LedgerFormData) => Promise<void>
 }
 
 const formSchema = z.object({
@@ -47,7 +49,7 @@ const formSchema = z.object({
 })
 
 export default function LedgerPage(props: LedgerPageProps) {
-	const [isFormLoading, setIsFormLoading] = useState(false)
+	const [isFormLoading, setIsFormLoading] = useState(props.isLoading ?? false)
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -61,7 +63,11 @@ export default function LedgerPage(props: LedgerPageProps) {
 	})
 
 	useEffect(() => {
-		if (props.isLoading) {
+		setIsFormLoading(props.isLoading ?? false)
+	}, [props.isLoading])
+
+	useEffect(() => {
+		if (!(props.isInitialized ?? true)) {
 			return
 		}
 
@@ -121,7 +127,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 						className="h-full mt-4 grid grid-rows-[1fr_auto]"
 						onSubmit={(e) => {
 							e.preventDefault()
-							form.handleSubmit((formData) => {
+							form.handleSubmit(async (formData) => {
 								setIsFormLoading(true)
 
 								const isUpdate = props.data !== undefined
@@ -131,15 +137,13 @@ export default function LedgerPage(props: LedgerPageProps) {
 									currency_id: formData.currency.id
 								}
 
-								try {
-									if (isUpdate) {
-										props.onUpdate?.(ledgerData, () => setIsFormLoading(false))
-									} else {
-										props.onCreate?.(ledgerData, () => setIsFormLoading(false))
-									}
-								} catch (e) {
-									console.error(e)
+								if (isUpdate) {
+									await props.onUpdate?.(ledgerData)
+								} else {
+									await props.onCreate?.(ledgerData)
 								}
+
+								setIsFormLoading(false)
 							})()
 						}}
 					>
@@ -151,9 +155,10 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="mt-2">
 										<FormLabel>Ledger Name</FormLabel>
 										<FormControl>
-											{!props.isLoading ? (
+											{props.isInitialized ?? true ? (
 												<Input
 													placeholder="Enter a new ledger name"
+													disabled={isFormLoading}
 													{...field}
 												/>
 											) : (
@@ -173,9 +178,10 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="grid mt-8">
 										<FormLabel className="text-sm">Currency</FormLabel>
 										<FormControl>
-											{!props.isLoading ? (
+											{props.isInitialized ?? true ? (
 												<ComboBox
 													closeOnSelect
+													disabled={isFormLoading}
 													value={field.value.currency_name}
 													onChange={(e) => {
 														form.setValue("currency", JSON.parse(e))
@@ -196,7 +202,9 @@ export default function LedgerPage(props: LedgerPageProps) {
 							/>
 						</div>
 						<DialogFooter>
-							<Button disabled={isFormLoading}>
+							<Button
+								disabled={!(props.isInitialized ?? true) || isFormLoading}
+							>
 								{props.data ? "Update ledger" : "Create new ledger"}
 								{isFormLoading && (
 									<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
