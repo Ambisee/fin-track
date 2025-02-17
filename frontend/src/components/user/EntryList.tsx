@@ -1,13 +1,13 @@
 "use client"
 
+import { ENTRY_QKEY } from "@/lib/constants"
+import useGlobalStore from "@/lib/store"
 import { Entry } from "@/types/supabase"
+import { useQueryClient } from "@tanstack/react-query"
+import { Button } from "../ui/button"
+import { DialogTrigger } from "../ui/dialog"
 import { Skeleton } from "../ui/skeleton"
 import EntryListItem from "./EntryListItem"
-import { DialogTrigger } from "../ui/dialog"
-import { Button } from "../ui/button"
-import { useQueryClient } from "@tanstack/react-query"
-import useGlobalStore from "@/lib/store"
-import { ENTRY_QKEY } from "@/lib/constants"
 
 interface EntryListProps {
 	data?: Entry[]
@@ -39,7 +39,7 @@ export default function EntryList({
 							className="w-fit justify-self-center"
 							onClick={() => {
 								setData(undefined)
-								setOnSubmitSuccess((data) => {
+								setOnSubmitSuccess(() => {
 									queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 								})
 							}}

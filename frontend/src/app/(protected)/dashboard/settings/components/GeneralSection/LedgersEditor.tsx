@@ -5,11 +5,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
-import DialogPagesProvider, {
-	useDialogPages
-} from "@/components/user/DialogPagesProvider"
 import LedgerGroup from "@/components/user/LedgerGroup"
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
@@ -20,8 +16,6 @@ export default function LedgersEditor() {
 
 	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
-
-	const queryClient = useQueryClient()
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
