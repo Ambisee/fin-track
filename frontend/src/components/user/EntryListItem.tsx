@@ -9,13 +9,14 @@ import {
 } from "@/components/ui/card"
 import { ENTRY_QKEY } from "@/lib/constants"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
 import { sbBrowser } from "@/lib/supabase"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -30,7 +31,6 @@ import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { useToast } from "../ui/use-toast"
-import useGlobalStore from "@/lib/store"
 
 interface EntryListItemProps {
 	data: Entry
@@ -132,14 +132,6 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data) => {
-											if (data.error !== null) {
-												toast({
-													description: data.error.message,
-													variant: "destructive"
-												})
-												return
-											}
-
 											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 											setOpen(false)
 										})

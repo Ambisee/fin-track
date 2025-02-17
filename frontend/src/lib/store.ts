@@ -11,8 +11,8 @@ interface EntryFormState {
     data?: Entry
     setData: Dispatch<SetStateAction<Entry | undefined>>
 
-    onSubmitSuccess?: ((data: PostgrestSingleResponse<Entry>) => void)
-    setOnSubmitSuccess: (value: ((data: PostgrestSingleResponse<Entry | undefined>) => void) | undefined ) => void
+    onSubmitSuccess?: ((data: Entry) => void)
+    setOnSubmitSuccess: (value: ((data: Entry) => void) | undefined) => void
 
     // For the category page
     isCategoryEdit: boolean

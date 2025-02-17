@@ -7,17 +7,13 @@ import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
-import { useForm, UseFormReturn } from "react-hook-form"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
-import { Form, FormControl, FormItem, FormLabel } from "../../ui/form"
-import DialogPagesProvider, { useDialogPages } from "../DialogPagesProvider"
+import { FormControl, FormItem, FormLabel } from "../../ui/form"
+import CategoryGroup from "../CategoryGroup"
 import LedgerGroup from "../LedgerGroup"
-import CategoryPage from "./CategoryPage"
-import CategoryToEditProvider from "./CategoryProvider"
-import ChooseCategoryPage from "./ChooseCategoryPage"
-import EditCategoryPage from "./EditCategoryPage"
 import EntryFormPage from "./EntryFormPage"
 
 interface EntryFormProps {
@@ -43,9 +39,10 @@ const formSchema = z.object({
 	note: z.string(),
 	ledger: z.number()
 })
-type FormSchema = z.infer<typeof formSchema>
 
-function EntryFormItem(props: {
+export type EntryFormData = z.infer<typeof formSchema>
+
+export function EntryFormItem(props: {
 	className?: string
 	label: string
 	children: JSX.Element
@@ -63,14 +60,15 @@ function EntryFormItem(props: {
 	)
 }
 
-function DialogEntryForm(props: EntryFormProps) {
+export default function EntryForm(props: EntryFormProps) {
+	const [curPage, setCurPage] = useState(0)
+
 	const isEditForm = props.data !== undefined
-	const { curPage, setCurPage } = useDialogPages()
 
 	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
 
-	const form = useForm<FormSchema>({
+	const form = useForm<EntryFormData>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			date: new Date(),
@@ -83,7 +81,7 @@ function DialogEntryForm(props: EntryFormProps) {
 	})
 
 	useEffect(() => {
-		let defaultValues: FormSchema = {
+		let defaultValues: EntryFormData = {
 			date: new Date(),
 			category: "Miscellaneous",
 			amount: "",
@@ -108,73 +106,60 @@ function DialogEntryForm(props: EntryFormProps) {
 		return
 	}, [props.data, settingsQuery.data?.data, form, isEditForm])
 
-	const renderPage = (form: UseFormReturn<FormSchema>) => {
-		const pages = [
-			EntryFormPage,
-			ChooseCategoryPage,
-			EditCategoryPage,
-			CategoryPage,
-			(props: any) => (
-				<LedgerGroup
-					onBackButton={() => setCurPage(0)}
-					shouldUseSelectRequest={false}
-					onSelect={(ledger, isEditing) => {
-						form.setValue("ledger", ledger.id)
-						setCurPage(0)
-					}}
-					onUpdate={(ledger) => {
-						if (ledger.id === settingsQuery.data?.data?.current_ledger) {
-							queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
-						}
+	const Component = [
+		<EntryFormPage
+			key="entry-form-page"
+			data={props.data}
+			entryForm={form}
+			isEditForm={isEditForm}
+			onLedgerButton={() => setCurPage(1)}
+			onCategoryButton={() => setCurPage(2)}
+			onSubmitSuccess={props.onSubmitSuccess}
+		/>,
+		<LedgerGroup
+			key="ledger-group"
+			onBackButton={() => setCurPage(0)}
+			shouldUseSelectRequest={false}
+			onSelect={(ledger, isEditing) => {
+				form.setValue("ledger", ledger.id)
+				setCurPage(0)
+			}}
+			onUpdate={(ledger) => {
+				if (ledger.id === settingsQuery.data?.data?.current_ledger) {
+					queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+				}
 
-						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-					}}
-					onCreate={(ledger) => {
-						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-					}}
-					onDelete={(ledger) => {
-						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-					}}
-				/>
-			)
-		]
-
-		const CurrentPage = pages[curPage]
-
-		return (
-			<CurrentPage
-				data={props.data}
-				isEditForm={isEditForm}
-				onSubmitSuccess={props.onSubmitSuccess}
-			/>
-		)
-	}
+				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			}}
+			onCreate={(ledger) => {
+				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			}}
+			onDelete={(ledger) => {
+				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			}}
+		/>,
+		<CategoryGroup
+			key="category-group"
+			onSelect={(category) => {
+				form.setValue("category", category.name)
+				setCurPage(0)
+			}}
+			onBackButton={() => {
+				setCurPage(0)
+			}}
+		/>
+	]
 
 	return (
-		<Form {...form}>
-			<DialogContent
-				hideCloseButton
-				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-[460px] sm:max-w-lg"
-				onOpenAutoFocus={() => {
-					form.reset()
-					setCurPage(0)
-				}}
-			>
-				{renderPage(form)}
-			</DialogContent>
-		</Form>
+		<DialogContent
+			hideCloseButton
+			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-[460px] sm:max-w-lg"
+			onOpenAutoFocus={() => {
+				form.reset()
+				setCurPage(0)
+			}}
+		>
+			{Component[curPage]}
+		</DialogContent>
 	)
 }
-
-function EntryForm(props: EntryFormProps) {
-	return (
-		<DialogPagesProvider>
-			<CategoryToEditProvider>
-				<DialogEntryForm {...props} />
-			</CategoryToEditProvider>
-		</DialogPagesProvider>
-	)
-}
-
-export default EntryForm
-export { EntryFormItem, type FormSchema }

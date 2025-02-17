@@ -1,16 +1,16 @@
 "use client"
 
 import { ENTRY_QKEY } from "@/lib/constants"
+import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
-import { GearIcon, ReloadIcon, TableIcon } from "@radix-ui/react-icons"
+import { GearIcon, TableIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
 import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
-import { useSettingsQuery } from "@/lib/hooks"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -73,8 +73,7 @@ export default function ProtectedNavbar() {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
 											if (
-												data.data?.ledger !==
-												settingsQuery.data?.data?.current_ledger
+												data.ledger !== settingsQuery.data?.data?.current_ledger
 											) {
 												return
 											}

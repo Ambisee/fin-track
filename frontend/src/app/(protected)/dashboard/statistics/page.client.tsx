@@ -97,7 +97,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 					asChild
 					onClick={() => {
 						setData(undefined)
-						setOnSubmitSuccess((data) => {
+						setOnSubmitSuccess(() => {
 							queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
 						})
 					}}

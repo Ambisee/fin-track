@@ -5,12 +5,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import CategoryGroup from "@/components/user/CategoryGroup"
-import DialogPagesProvider, {
-	useDialogPages
-} from "@/components/user/DialogPagesProvider"
-import CategoryPage from "@/components/user/EntryForm/CategoryPage"
-import CategoryToEditProvider from "@/components/user/EntryForm/CategoryProvider"
-import EditCategoryPage from "@/components/user/EntryForm/EditCategoryPage"
 
 import { useCategoriesQuery } from "@/lib/hooks"
 
