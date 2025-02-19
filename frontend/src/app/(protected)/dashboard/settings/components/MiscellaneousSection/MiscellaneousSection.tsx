@@ -31,7 +31,7 @@ export default function MiscellaneousSection() {
 	const [isDeleteChecked, setIsDeleteChecked] = useState(false)
 
 	return (
-		<SettingsSection name="Miscellaneous">
+		<SettingsSection className="mb-0" name="Miscellaneous">
 			<>
 				<AlertDialog>
 					<AlertDialogContent>

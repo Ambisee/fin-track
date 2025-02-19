@@ -514,7 +514,7 @@ export default function DashboardStatistics() {
 
 	return (
 		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
-			<div className="w-full h-full pb-8 md:pb-0">
+			<div className="w-full h-full">
 				<div className="w-full mb-4 flex justify-between items-center">
 					<h1 className="text-3xl">Statistics</h1>
 				</div>

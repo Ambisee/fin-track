@@ -98,7 +98,7 @@
 	}
 
 	.dashboard-content {
-		@apply p-4 pt-8 pb-16 relative min-h-screen md:w-9/12 md:min-w-[calc(100%-13rem)] md:ml-auto md:pb-4;
+		@apply p-4 pt-8 pb-24 relative min-h-screen md:w-9/12 md:min-w-[calc(100%-13rem)] md:ml-auto md:pb-8;
 	}
 
 	.dashboard-navbar {

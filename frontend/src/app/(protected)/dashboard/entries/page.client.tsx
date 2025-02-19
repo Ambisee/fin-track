@@ -189,7 +189,7 @@ export default function DashboardEntries() {
 	const renderEntries = () => {
 		if (entryQuery.isFetching || !entryQuery.data?.data) {
 			return (
-				<div className="mb-8">
+				<div>
 					<div className="w-full flex justify-between items-center pt-2 pb-4">
 						<Skeleton className="w-12 h-12 rounded-full" />
 						<Skeleton className="w-36 h-12" />
@@ -204,7 +204,7 @@ export default function DashboardEntries() {
 		const currentGroup = filterDataGroup(curPeriod[0], curPeriod[1], dataGroups)
 
 		return (
-			<div className="mb-8">
+			<div>
 				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
 					<Button
 						className="w-12 h-12 rounded-full"
