@@ -26,9 +26,21 @@ export interface TransitionContextObject {
 }
 
 export interface TransitionRootProps extends HTMLProps<HTMLDivElement> {
+	/**
+	 * A callback function to render the new page, referenced by `nextPath`
+	 *
+	 * This function should cause the current `TransitionPage` component to
+	 * unmount and render a new `TransitionPage` component referenced by `nextPath`
+	 */
+	onNavigate: (nextPath: string) => void
+
+	/**
+	 *
+	 */
 	navigationGraph: {
 		[path: string]: NavigationEdges
 	}
+
 	transitionLabels: {
 		[label: string]: TransitionClassNames
 	}

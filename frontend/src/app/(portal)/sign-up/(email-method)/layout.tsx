@@ -130,6 +130,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 					</div>
 					<Card className="flex flex-col justify-between registration-card">
 						<TransitionRoot
+							onNavigate={(nextPath) => router.push(nextPath)}
 							className="inline-block overflow-hidden"
 							navigationGraph={navigationGraph}
 							transitionLabels={transitionLabels}
