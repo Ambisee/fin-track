@@ -13,6 +13,7 @@ import {
 	ENTRY_QKEY,
 	LEDGER_QKEY,
 	MONTH_GROUP_QKEY,
+	QUERY_STALE_TIME,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "./constants"
@@ -52,6 +53,7 @@ function useEntryDataQuery() {
 				.order("date")
 				.order("category")
 				.limit(100),
+        staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
 		enabled:
@@ -73,6 +75,7 @@ function useSettingsQuery() {
 				.eq("user_id", userQuery.data?.data.user?.id as string)
 				.limit(1)
 				.single(),
+        staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) =>
 			query.state.data === undefined || query.state.data.data === null,
@@ -84,6 +87,7 @@ function useCurrenciesQuery() {
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => await sbBrowser.from("currency").select("*"),
+        staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
@@ -109,6 +113,7 @@ function useCategoriesQuery() {
 				.eq("created_by", userId)
 				.order("name")
 		},
+        staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => !!query.state.data,
 		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
@@ -135,6 +140,7 @@ function useLedgersQuery() {
 				.eq("created_by", userId)
 				.order("name")
 		},
+        staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => !!query.state.data,
 		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching

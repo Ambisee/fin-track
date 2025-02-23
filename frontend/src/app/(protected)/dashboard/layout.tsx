@@ -114,7 +114,7 @@ function LedgerBadge() {
 	return (
 		<DialogTrigger asChild>
 			<button className="absolute top-[38px] right-4">
-				<span className="text-sm mr-4 bg-secondary text-secondary-foreground rounded-full py-1 px-6">
+				<span className="w-full text-sm bg-secondary text-secondary-foreground rounded-full py-1 px-6">
 					{settingsQuery.data?.data?.ledger?.name}
 				</span>
 			</button>

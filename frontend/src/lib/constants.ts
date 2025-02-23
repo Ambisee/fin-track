@@ -5,7 +5,9 @@ export const ENTRY_QKEY = ["entryData"]
 export const USER_SETTINGS_QKEY = ["settings"]
 export const CATEGORIES_QKEY = ["categories"]
 export const CURRENCIES_QKEY = ["currencies"]
-export const MONTH_GROUP_QKEY = "monthGroup"
+export const MONTH_GROUP_QKEY = ["monthGroup"]
+
+export const QUERY_STALE_TIME = 15 * 60 * 1000
 
 // Transition Components
 export const DEFAULT_LABEL = "DEFAULT_LABEL"
