@@ -6,7 +6,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import DataProvider from "@/components/user/DataProvider"
 
-import "@/styles/signup-transitions.css"
 import "@/styles/globals.css"
 
 export const metadata: Metadata = {
