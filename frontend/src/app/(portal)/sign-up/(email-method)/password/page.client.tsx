@@ -21,7 +21,7 @@ import { sbBrowser } from "@/lib/supabase"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
-import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
+import { useSignupTransition } from "../layout"
 
 const formSchema = z
 	.object({
@@ -47,7 +47,7 @@ export default function SignUpPassword() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
-	const { navigateTo } = useTransitionContext()
+	const { navigateTo } = useSignupTransition()
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username") as string

@@ -5,17 +5,16 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-	TransitionRoot,
-	TransitionRootProps
-} from "@/components/user/Transition/TransitionRoot"
+import { TransitionFactory } from "@/components/user/Transition/TransitionFactory"
+import { TransitionRootProps } from "@/components/user/Transition/TransitionRoot"
 import { BACKWARD_LABEL, FORWARD_LABEL } from "@/lib/constants"
 import { useSetElementWindowHeight } from "@/lib/hooks"
-import { motion } from "framer-motion"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import classNames from "@/styles/signup-transitions.module.css"
 
 export type EmailSignupPaths =
 	| "/sign-up/email"
@@ -45,12 +44,12 @@ export const navigationGraph: TransitionRootProps["navigationGraph"] = {
 
 export const transitionLabels: TransitionRootProps["transitionLabels"] = {
 	[FORWARD_LABEL]: {
-		enter: "forward-enter",
-		exit: "forward-exit"
+		enter: classNames["forward-enter"],
+		exit: classNames["forward-exit"]
 	},
 	[BACKWARD_LABEL]: {
-		enter: "backward-enter",
-		exit: "backward-exit"
+		enter: classNames["backward-enter"],
+		exit: classNames["backward-exit"]
 	}
 }
 
@@ -59,6 +58,14 @@ export const pageIndexMap = new Map<EmailSignupPaths, number>([
 	["/sign-up/username", 1],
 	["/sign-up/password", 2]
 ])
+
+const {
+	useTransitionContext: useSignupTransition,
+	TransitionRoot: SignupTransitionRoot,
+	TransitionPage: SignupTransitionPage
+} = TransitionFactory.createTransitionComponents()
+
+export { useSignupTransition, SignupTransitionPage }
 
 export default function SignUpLayout(props: SignUpLayoutProps) {
 	const router = useRouter()
@@ -129,13 +136,14 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 						)}
 					</div>
 					<Card className="flex flex-col justify-between registration-card">
-						<TransitionRoot
-							className="inline-block overflow-hidden"
+						<SignupTransitionRoot
+							onNavigate={(nextPath) => router.push(nextPath)}
+							className={`inline-block overflow-hidden ${classNames["signup-transition-root"]}`}
 							navigationGraph={navigationGraph}
 							transitionLabels={transitionLabels}
 						>
 							{props.children}
-						</TransitionRoot>
+						</SignupTransitionRoot>
 						<div className="w-full px-6 pb-6 flex flex-col gap-6 justify-end items-center">
 							<Separator className="w-full" />
 							<div>

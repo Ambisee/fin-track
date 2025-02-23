@@ -34,8 +34,6 @@
 		--chart-8: 50 70% 60%; /* Warm yellow */
 		--chart-9: 260 65% 50%; /* Cool purple */
 		--chart-10: 320 70% 50%; /* Vibrant magenta */
-
-        --signup-page-transition-duration: 500ms;
 	}
 
 	.dark {
