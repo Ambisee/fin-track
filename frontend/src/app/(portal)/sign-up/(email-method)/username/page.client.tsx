@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { FormEventHandler, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useSignupTransition } from "../layout"
 
 const formSchema = z.object({
 	username: z
@@ -31,7 +31,7 @@ export default function SignUpUsername() {
 	const router = useRouter()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
-	const { navigateTo } = useTransitionContext()
+	const { navigateTo } = useSignupTransition()
 
 	const email = Cookies.get("reg-email") as string
 	const username = Cookies.get("reg-username")

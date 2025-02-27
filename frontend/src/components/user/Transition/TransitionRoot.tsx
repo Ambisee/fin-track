@@ -8,6 +8,7 @@ import {
 import { NavigationEdges, TransitionClassNames } from "@/types/transition"
 import { usePathname, useRouter } from "next/navigation"
 import {
+	Context,
 	createContext,
 	HTMLProps,
 	useContext,
@@ -26,100 +27,105 @@ export interface TransitionContextObject {
 }
 
 export interface TransitionRootProps extends HTMLProps<HTMLDivElement> {
+	/**
+	 * A callback function to render the new page, referenced by `nextPath`
+	 *
+	 * This function should cause the current `TransitionPage` component to
+	 * unmount and render a new `TransitionPage` component referenced by `nextPath`
+	 */
+	onNavigate: (nextPath: string) => void
+
+	/**
+	 *
+	 */
 	navigationGraph: {
 		[path: string]: NavigationEdges
 	}
+
 	transitionLabels: {
 		[label: string]: TransitionClassNames
 	}
 }
 
-const TransitionContext = createContext<TransitionContextObject>(null!)
+export const createTransitionRoot = (
+	context: Context<TransitionContextObject>
+) => {
+	return function TransitionRoot(props: TransitionRootProps) {
+		const { navigationGraph, transitionLabels, className, ...elementProps } =
+			props
 
-export function useTransitionContext() {
-	const context = useContext(TransitionContext)
-	if (!context) {
-		throw Error("Transition context should be called from a TransitionRoot")
-	}
+		const [isExiting, setIsExiting] = useState<boolean>(false)
+		const [curPath, setCurPath] = useState<string>("")
+		const [curLabel, setCurLabel] = useState<string>(DEFAULT_LABEL)
 
-	return context
-}
+		const navigationGraphRef = useRef(navigationGraph)
+		const transitionLabelRef = useRef(transitionLabels)
 
-export function TransitionRoot(props: TransitionRootProps) {
-	const { navigationGraph, transitionLabels, className, ...elementProps } =
-		props
+		const pathname = usePathname()
+		const router = useRouter()
 
-	const [isExiting, setIsExiting] = useState<boolean>(false)
-	const [curPath, setCurPath] = useState<string>("")
-	const [curLabel, setCurLabel] = useState<string>(DEFAULT_LABEL)
+		useEffect(() => {
+			if (curPath === "") {
+				setCurPath(pathname)
+			}
+		}, [pathname, curPath, setCurPath])
 
-	const navigationGraphRef = useRef(navigationGraph)
-	const transitionLabelRef = useRef(transitionLabels)
+		const navigateTo = (nextPath: string) => {
+			// Retrieve the label for the redirection
+			const label = navigationGraphRef.current?.[curPath]?.[nextPath]
+			setIsExiting(true)
+			setCurLabel(label ?? DEFAULT_LABEL)
 
-	const pathname = usePathname()
-	const router = useRouter()
+			// Set the new current path
+			setCurPath(nextPath)
 
-	useEffect(() => {
-		if (curPath === "") {
-			setCurPath(pathname)
+			// Apply the animation
+			if (label === undefined) {
+				setIsExiting(false)
+				props.onNavigate(nextPath)
+				return
+			}
+
+			const animationClassName = transitionLabelRef.current?.[label]?.exit
+			if (animationClassName === undefined) {
+				setIsExiting(false)
+				props.onNavigate(nextPath)
+				return
+			}
+
+			const pageComponent = document.querySelector(
+				`.${TRANSITION_PAGE_CLASSNAME}`
+			)
+			pageComponent?.classList.add("pointer-events-none")
+
+			if (!pageComponent) {
+				setIsExiting(false)
+				props.onNavigate(nextPath)
+				return
+			}
+
+			// Animate the page component and redirect after animation end
+			pageComponent.classList.add(animationClassName)
+			pageComponent.addEventListener("animationend", () => {
+				setIsExiting(false)
+				props.onNavigate(nextPath)
+			})
 		}
-	}, [pathname, curPath, setCurPath])
 
-	const navigateTo = (nextPath: string) => {
-		// Retrieve the label for the redirection
-		const label = navigationGraphRef.current?.[curPath]?.[nextPath]
-		setIsExiting(true)
-		setCurLabel(label ?? DEFAULT_LABEL)
-
-		// Set the new current path
-		setCurPath(nextPath)
-
-		// Apply the animation
-		if (label === undefined) {
-			setIsExiting(false)
-			router.push(nextPath)
-			return
-		}
-
-		const animationClassName = transitionLabelRef.current?.[label]?.exit
-		if (animationClassName === undefined) {
-			setIsExiting(false)
-			router.push(nextPath)
-			return
-		}
-
-		const pageComponent = document.querySelector(
-			`.${TRANSITION_PAGE_CLASSNAME}`
+		return (
+			<context.Provider
+				value={{
+					curLabel,
+					isExiting,
+					transitionLabels: transitionLabelRef.current,
+					navigateTo
+				}}
+			>
+				<div
+					className={`${TRANSITION_ROOT_CLASSNAME} ${className}`}
+					{...elementProps}
+				/>
+			</context.Provider>
 		)
-		pageComponent?.classList.add("pointer-events-none")
-
-		if (!pageComponent) {
-			setIsExiting(false)
-			router.push(nextPath)
-			return
-		}
-
-		// Animate the page component and redirect after animation end
-		pageComponent.classList.add(animationClassName)
-		pageComponent.addEventListener("animationend", () => {
-			setIsExiting(false)
-			router.push(nextPath)
-		})
 	}
-
-	return (
-		<TransitionContext.Provider
-			value={{
-				curLabel,
-				isExiting,
-				transitionLabels: transitionLabelRef.current,
-				navigateTo
-			}}
-		>
-			<div
-				className={`${TRANSITION_ROOT_CLASSNAME} ${className}`}
-				{...elementProps}
-			></div>
-		</TransitionContext.Provider>
-	)
 }

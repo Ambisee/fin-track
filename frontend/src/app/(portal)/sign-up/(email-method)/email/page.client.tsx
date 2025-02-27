@@ -20,11 +20,11 @@ import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { useTransitionContext } from "@/components/user/Transition/TransitionRoot"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FormEventHandler, useState } from "react"
+import { useSignupTransition } from "../layout"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
@@ -35,7 +35,7 @@ export default function SignUpEmail() {
 	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
-	const { navigateTo } = useTransitionContext()
+	const { navigateTo } = useSignupTransition()
 
 	const email = Cookies.get("reg-email")
 	const form = useForm<z.infer<typeof formSchema>>({
