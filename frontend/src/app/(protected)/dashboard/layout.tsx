@@ -7,7 +7,12 @@ import { useToast } from "@/components/ui/use-toast"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
-import { LEDGER_QKEY, MONTHS, USER_SETTINGS_QKEY } from "@/lib/constants"
+import {
+	ENTRY_QKEY,
+	LEDGER_QKEY,
+	MONTHS,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { groupDataByMonth, MonthGroup } from "@/lib/utils"
@@ -83,10 +88,13 @@ function LayoutLedgerEditorDialog() {
 					onDelete={(data) => {
 						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 					}}
-					onSelect={(data) => {
+					onSelect={async (data) => {
 						setOpen(false)
-						queryClient.invalidateQueries({
+						await queryClient.invalidateQueries({
 							queryKey: USER_SETTINGS_QKEY
+						})
+						await queryClient.invalidateQueries({
+							queryKey: ENTRY_QKEY
 						})
 
 						toast({
