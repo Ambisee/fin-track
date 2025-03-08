@@ -153,11 +153,14 @@ function ChartDisplay(props: ChartDisplayProps) {
 							return undefined
 						}
 
-						const entryData = value.data.filter(
-							(entry) =>
-								(props.dataKey === "income" && entry.is_positive) ||
-								(props.dataKey === "expense" && !entry.is_positive)
-						)
+						const entryData = value.data
+							.filter(
+								(entry) =>
+									(props.dataKey === "income" && entry.is_positive) ||
+									(props.dataKey === "expense" && !entry.is_positive)
+							)
+							.reverse()
+
 						const dialogTitle = (
 							<>
 								<span className="whitespace-nowrap">
