@@ -246,7 +246,10 @@ export default function DashboardEntries() {
 						<ChevronRight className="w-4 h-4" />
 					</Button>
 				</div>
-				<EntryList data={currentGroup.data.toReversed()} />
+				<EntryList
+					data={currentGroup.data.toReversed()}
+					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+				/>
 			</div>
 		)
 	}
