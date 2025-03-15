@@ -122,9 +122,7 @@ export default function MiscellaneousSection() {
 
 								queryClient.removeQueries({ queryKey: CURRENCIES_QKEY })
 								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
-								queryClient.removeQueries({
-									queryKey: USER_SETTINGS_QKEY
-								})
+								queryClient.removeQueries({ queryKey: USER_SETTINGS_QKEY })
 								queryClient.removeQueries({ queryKey: USER_QKEY })
 
 								router.push("/")
