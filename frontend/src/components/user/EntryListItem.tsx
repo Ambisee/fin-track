@@ -38,6 +38,11 @@ interface EntryListItemProps {
 	showButtons?: boolean
 }
 
+function formatListItemDate(date: Date) {
+	const formatter = Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
+	return formatter.format(date)
+}
+
 function NoteText(props: { className?: string; text: string }) {
 	if (props.text === "") {
 		return <p className="text-muted">No notes here.</p>
@@ -95,7 +100,9 @@ export default function EntryListItem({
 							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis">
 								{props.data.category}
 							</CardTitle>
-							<CardDescription>{props.data.date}</CardDescription>
+							<CardDescription>
+								{formatListItemDate(new Date(props.data.date))}
+							</CardDescription>
 						</div>
 						<div className="flex gap-2 items-center">
 							{userSettingsQuery.isLoading ? (
