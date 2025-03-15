@@ -207,25 +207,6 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 								setIsLoading(true)
 								await props.onDelete?.(categoryToBeDelete)
 								setIsLoading(false)
-
-								// deleteCategoryMutation.mutate(
-								// 	{
-								// 		created_by: categoryToBeDelete.created_by as string,
-								// 		name: categoryToBeDelete.name
-								// 	},
-								// 	{
-								// 		onSuccess: async (data) => {
-								// 			toast({
-								// 				description: "Category deleted",
-								// 				duration: 1500
-								// 			})
-
-								// 			await queryClient.invalidateQueries({
-								// 				queryKey: CATEGORIES_QKEY
-								// 			})
-								// 		}
-								// 	}
-								// )
 							}}
 							variant="destructive"
 						>

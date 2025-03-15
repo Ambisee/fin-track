@@ -86,79 +86,26 @@ export default function CategoryPage(props: CategoryPageProps) {
 				<Form {...form}>
 					<form
 						className="h-full grid grid-rows-[1fr_auto]"
-						onSubmit={
-							(e) => {
-								e.preventDefault()
-								form.handleSubmit(async (formData) => {
-									setIsFormLoading(true)
+						onSubmit={(e) => {
+							e.preventDefault()
+							form.handleSubmit(async (formData) => {
+								setIsFormLoading(true)
 
-									if (props.data !== undefined) {
-										await props.onUpdate?.({
-											oldName: props.data.name,
-											...formData
-										})
-									} else {
-										await props.onCreate?.({
-											oldName: "",
-											...formData
-										})
-									}
+								if (props.data !== undefined) {
+									await props.onUpdate?.({
+										oldName: props.data.name,
+										...formData
+									})
+								} else {
+									await props.onCreate?.({
+										oldName: "",
+										...formData
+									})
+								}
 
-									setIsFormLoading(false)
-								})()
-							}
-
-							// if (!props.userData) {
-							// 	return
-							// }
-
-							// if (!categoriesQuery.data?.data) {
-							// 	toast({
-							// 		description:
-							// 			"The category name has been used. Please enter a different name.",
-							// 		variant: "destructive"
-							// 	})
-							// 	setIsFormLoading(false)
-							// 	return
-							// }
-
-							// const isUpdate = categoryToEdit !== undefined
-							// const mutation = isUpdate
-							// 	? updateCategoryMutation
-							// 	: insertCategoryMutation
-
-							// mutation.mutate(
-							// 	{ name: formData.name },
-							// 	{
-							// 		onSuccess: (successData) => {
-							// 			if (!successData) return
-							// 			if (successData?.error?.code === "23505") {
-							// 				toast({
-							// 					description:
-							// 						"The category name has been used. Please enter another one",
-							// 					variant: "destructive"
-							// 				})
-							// 				setIsFormLoading(false)
-							// 				return
-							// 			}
-
-							// 			toast({
-							// 				description: isUpdate
-							// 					? "Category updated"
-							// 					: "New category created"
-							// 			})
-
-							// 			setIsFormLoading(false)
-							// 			if (isUpdate) {
-							// 				setCurPage((c) => c - 1)
-							// 				return
-							// 			}
-
-							// 			setCurPage(0)
-							// 			if (successData.data)
-							// 				form?.setValue("category", successData.data[0].name)
-							// 		}
-						}
+								setIsFormLoading(false)
+							})()
+						}}
 					>
 						<FormField
 							control={form.control}

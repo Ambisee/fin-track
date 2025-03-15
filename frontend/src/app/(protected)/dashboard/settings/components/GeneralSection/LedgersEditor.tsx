@@ -50,21 +50,8 @@ export default function LedgersEditor() {
 					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 				>
 					<LedgerGroup
-						// onCreate={() => {
-						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-						// }}
-						// onUpdate={() => {
-						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-						// }}
-						// onDelete={() => {
-						// 	queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-						// }}
 						onSelect={(ledger) => {
 							setOpen(false)
-							// queryClient.invalidateQueries({
-							// 	queryKey: USER_SETTINGS_QKEY
-							// })
-
 							toast({
 								description: (
 									<>
