@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { ENTRY_QKEY, MONTHS } from "@/lib/constants"
+import { ENTRY_QKEY, MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useLedgersQuery, useMonthGroupQuery, useUserQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { Ledger } from "@/types/supabase"
@@ -162,7 +162,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 							if (value.month === null || value.year === null) {
 								toast({
 									description: "No month/year provided.",
-									duration: 1500,
+									duration: SHORT_TOAST_DURATION,
 									variant: "destructive"
 								})
 								return

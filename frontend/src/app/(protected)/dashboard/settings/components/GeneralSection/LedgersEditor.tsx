@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import LedgerGroup from "@/components/user/LedgerGroup"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
@@ -58,7 +59,7 @@ export default function LedgersEditor() {
 										Switched to the ledger: <b>{ledger.name}</b>
 									</>
 								),
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 						}}
 					/>

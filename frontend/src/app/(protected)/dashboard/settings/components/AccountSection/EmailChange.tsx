@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 
 const emailChangeFormSchema = z.object({
 	email: z.string().email("Please provide a valid email").default("")
@@ -56,7 +57,7 @@ export default function EmailChange() {
 								toast({
 									description: error.message,
 									variant: "destructive",
-									duration: 1500
+									duration: SHORT_TOAST_DURATION
 								})
 								setIsPendingSubmit(false)
 								return

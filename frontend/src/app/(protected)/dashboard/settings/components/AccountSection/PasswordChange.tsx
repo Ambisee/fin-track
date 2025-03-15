@@ -20,6 +20,7 @@ import PasswordField from "@/components/user/PasswordField"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 
 const passwordChangeFormSchema = z
 	.object({
@@ -107,7 +108,7 @@ export default function PasswordChange() {
 								toast({
 									description: error.message,
 									variant: "destructive",
-									duration: 1500
+									duration: SHORT_TOAST_DURATION
 								})
 								return
 							}
@@ -115,7 +116,7 @@ export default function PasswordChange() {
 							toast({
 								description:
 									"Please check your inbox for a link to reset your password.",
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 						}}
 					>
@@ -196,7 +197,7 @@ export default function PasswordChange() {
 								toast({
 									description: error?.message,
 									variant: "destructive",
-									duration: 1500
+									duration: SHORT_TOAST_DURATION
 								})
 								return
 							}
@@ -204,7 +205,7 @@ export default function PasswordChange() {
 							toast({
 								description:
 									"Please check your inbox and follow the instructions to reset your password.",
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 							return
 						}}
@@ -237,7 +238,7 @@ export default function PasswordChange() {
 							toast({
 								description: error?.message,
 								variant: "destructive",
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 							return
 						}
@@ -246,7 +247,7 @@ export default function PasswordChange() {
 
 						toast({
 							description: "Successfully updated the account's password",
-							duration: 1500
+							duration: SHORT_TOAST_DURATION
 						})
 
 						form.reset()

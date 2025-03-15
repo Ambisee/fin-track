@@ -19,6 +19,7 @@ import { sbBrowser } from "@/lib/supabase"
 import {
 	CURRENCIES_QKEY,
 	ENTRY_QKEY,
+	SHORT_TOAST_DURATION,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
@@ -75,7 +76,7 @@ export default function MiscellaneousSection() {
 											toast({
 												description: (await response.json()).message,
 												variant: "destructive",
-												duration: 1500
+												duration: SHORT_TOAST_DURATION
 											})
 											return
 										}

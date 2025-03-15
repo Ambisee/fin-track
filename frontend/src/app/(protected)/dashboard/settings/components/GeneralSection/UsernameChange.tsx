@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import InputSkeleton from "../InputSkeleton"
 import {
 	MAX_USERNAME_LENGTH,
+	SHORT_TOAST_DURATION,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
@@ -81,7 +82,7 @@ export default function UsernameChange() {
 							toast({
 								title: error.message,
 								variant: "destructive",
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 							setIsPendingSubmit(false)
 
@@ -96,7 +97,7 @@ export default function UsernameChange() {
 
 						toast({
 							description: "Username updated",
-							duration: 1500
+							duration: SHORT_TOAST_DURATION
 						})
 					})()
 				}}

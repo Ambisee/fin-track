@@ -10,6 +10,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -52,7 +53,7 @@ export default function AutomaticMonthlyReport() {
 							toast({
 								description: error.message,
 								variant: "destructive",
-								duration: 1500
+								duration: SHORT_TOAST_DURATION
 							})
 							setIsPendingSubmit(false)
 							return
@@ -61,7 +62,7 @@ export default function AutomaticMonthlyReport() {
 						setIsPendingSubmit(false)
 						toast({
 							description: "New settings data saved.",
-							duration: 1500
+							duration: SHORT_TOAST_DURATION
 						})
 					})()
 				}}

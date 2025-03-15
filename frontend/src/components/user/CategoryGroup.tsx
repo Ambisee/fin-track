@@ -17,7 +17,7 @@ import {
 } from "@/lib/hooks"
 import { useToast } from "../ui/use-toast"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
-import { CATEGORIES_QKEY } from "@/lib/constants"
+import { CATEGORIES_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
 
 interface CategoryGroupProps
 	extends Omit<
@@ -105,7 +105,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 			toast({
 				description: "Category deleted",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			await queryClient.invalidateQueries({
@@ -135,7 +135,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 			toast({
 				description: "Category deleted",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			await queryClient.invalidateQueries({

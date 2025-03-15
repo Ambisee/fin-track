@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { useToast } from "@/components/ui/use-toast"
 import PasswordField from "@/components/user/PasswordField"
-import { MAX_USERNAME_LENGTH } from "@/lib/constants"
+import { MAX_USERNAME_LENGTH, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
@@ -110,7 +110,7 @@ export default function SignUpPassword() {
 							and follow the verification link to verify your account.
 						</p>
 					),
-					duration: 15000
+					duration: SHORT_TOAST_DURATION
 				})
 
 				Cookies.remove("reg-password")

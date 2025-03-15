@@ -11,6 +11,7 @@ import {
 	ENTRY_QKEY,
 	LEDGER_QKEY,
 	MONTHS,
+	SHORT_TOAST_DURATION,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
@@ -103,7 +104,7 @@ function LayoutLedgerEditorDialog() {
 									Switched to the ledger: <b>{data.name}</b>
 								</>
 							),
-							duration: 1500
+							duration: SHORT_TOAST_DURATION
 						})
 					}}
 				/>

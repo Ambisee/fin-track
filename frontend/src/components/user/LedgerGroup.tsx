@@ -1,4 +1,8 @@
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import {
+	LEDGER_QKEY,
+	SHORT_TOAST_DURATION,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import {
 	useCurrenciesQuery,
 	useDeleteLedgerMutation,
@@ -75,7 +79,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			const successData = await insertLedgerMutation.mutateAsync(payload)
 			toast({
 				description: "New ledger created",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
@@ -122,7 +126,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 			toast({
 				description: "Ledger updated",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
@@ -160,7 +164,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 			toast({
 				description: "Ledger deleted",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
@@ -213,7 +217,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 						Switched to the ledger: <b>{successData.ledger?.name}</b>
 					</>
 				),
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 
 			props.onSelect?.(ledger, isEditing)

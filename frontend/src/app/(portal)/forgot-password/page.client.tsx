@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSetElementWindowHeight } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
@@ -68,7 +69,7 @@ export default function ForgotPassword() {
 												toast({
 													description: error?.message,
 													variant: "destructive",
-													duration: 1500
+													duration: SHORT_TOAST_DURATION
 												})
 												return
 											}
@@ -77,7 +78,7 @@ export default function ForgotPassword() {
 											toast({
 												description:
 													"Please check your inbox and follow the instructions to reset your password.",
-												duration: 1500
+												duration: SHORT_TOAST_DURATION
 											})
 										},
 										(errors) => {}

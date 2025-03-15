@@ -15,7 +15,11 @@ import { useCurrenciesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { toast } from "@/components/ui/use-toast"
 import { sbBrowser } from "@/lib/supabase"
 import { useCallback, useEffect, useState } from "react"
-import { USER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import {
+	SHORT_TOAST_DURATION,
+	USER_QKEY,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import { useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -76,7 +80,7 @@ export default function CurrencyChange() {
 			toast({
 				description: error.message,
 				variant: "destructive",
-				duration: 1500
+				duration: SHORT_TOAST_DURATION
 			})
 			setIsPendingSubmit(false)
 			return
@@ -95,7 +99,7 @@ export default function CurrencyChange() {
 					<b>{data.currency.currency_name}</b>
 				</>
 			),
-			duration: 15000
+			duration: SHORT_TOAST_DURATION
 		})
 	}
 

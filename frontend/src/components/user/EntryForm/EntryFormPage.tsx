@@ -26,6 +26,7 @@ import { EntryFormData, EntryFormItem } from "./EntryForm"
 import { EntryFormState } from "@/lib/store"
 import { ReloadIcon, ResetIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -90,7 +91,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								toast({
 									description: !props.isEditForm
 										? "New entry added"
-										: "Entry updated"
+										: "Entry updated",
+									duration: SHORT_TOAST_DURATION
 								})
 
 								form.reset()
