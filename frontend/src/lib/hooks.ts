@@ -79,7 +79,7 @@ function useSettingsQuery() {
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) =>
 			query.state.data === undefined || query.state.data.data === null,
-		enabled: !!userQuery.data && !userQuery.isRefetching
+		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
 	})
 }
 
