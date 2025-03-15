@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 interface DatePickerProps {
 	value: Date
 	required?: boolean
+	disabled?: boolean
 	onChange: Dispatch<SetStateAction<Date | undefined>>
 	closeOnSelect?: boolean
 }
@@ -30,6 +31,7 @@ export function DatePicker(props: DatePickerProps) {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button
+					disabled={props.disabled ?? false}
 					variant={"outline"}
 					className={cn(
 						"w-full justify-start text-left font-normal text-base",

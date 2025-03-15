@@ -25,6 +25,7 @@ import { EntryFormData, EntryFormItem } from "./EntryForm"
 
 import { EntryFormState } from "@/lib/store"
 import { ReloadIcon, ResetIcon } from "@radix-ui/react-icons"
+import { useState } from "react"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -47,6 +48,8 @@ const getErrors = (errors: FieldErrors<EntryFormData>) => {
 }
 
 export default function EntryFormPage(props: EntryFormPageProps) {
+	const [isFormLoading, setIsFormLoading] = useState(false)
+
 	const { toast } = useToast()
 	const form = props.entryForm
 
@@ -68,6 +71,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					form.handleSubmit(
 						async (formData) => {
 							let result: Entry
+							setIsFormLoading(true)
 
 							try {
 								if (!props.isEditForm) {
@@ -98,6 +102,8 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									description: errorData.message,
 									variant: "destructive"
 								})
+							} finally {
+								setIsFormLoading(false)
 							}
 						},
 						(errors) => {
@@ -114,10 +120,13 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					{props.isEditForm && (
 						<button
 							type="button"
+							disabled={isFormLoading}
 							className="absolute block left-0 top-1/2 translate-y-[-50%]"
 							onClick={() => form.reset()}
 						>
-							<ResetIcon className="ml-2 h-4 w-4" />
+							<ResetIcon
+								className={`ml-2 h-4 w-4 ${isFormLoading && "text-muted"}`}
+							/>
 						</button>
 					)}
 					<DialogTitle className="leading-6" asChild>
@@ -150,6 +159,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									>
 										<TabsList className="w-full relative">
 											<TabsTrigger
+												disabled={isFormLoading}
 												className="peer/expense w-1/2 z-50
                                                 data-[state=active]:bg-transparent
                                                 "
@@ -158,6 +168,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 												Expense
 											</TabsTrigger>
 											<TabsTrigger
+												disabled={isFormLoading}
 												className="peer/income w-1/2 z-50
                                                 data-[state=active]:bg-transparent
                                                 "
@@ -185,7 +196,11 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								<Button
 									type="button"
 									variant="outline"
-									disabled={ledgerQuery.isFetching || !ledgerQuery.isFetched}
+									disabled={
+										ledgerQuery.isFetching ||
+										!ledgerQuery.isFetched ||
+										isFormLoading
+									}
 									className="w-full text-base justify-normal text-muted-foreground"
 									onClick={props.onLedgerButton}
 								>
@@ -206,6 +221,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							<EntryFormItem label="Date">
 								<DatePicker
 									required
+									disabled={isFormLoading}
 									onChange={field.onChange}
 									value={field.value}
 									closeOnSelect
@@ -220,6 +236,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						<Button
 							type="button"
 							variant="outline"
+							disabled={isFormLoading}
 							className="w-full text-base justify-normal text-muted-foreground"
 							onClick={props.onCategoryButton}
 						>
@@ -240,6 +257,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 										placeholder="Amount"
 										inputMode="decimal"
 										onChange={onChange}
+										disabled={isFormLoading}
 										{...rest}
 									/>
 								</EntryFormItem>
@@ -256,6 +274,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							>
 								<Textarea
 									className="max-h-none h-36 sm:max-h-28 sm:h-auto"
+									disabled={isFormLoading}
 									{...field}
 								/>
 							</EntryFormItem>
@@ -263,7 +282,12 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					/>
 				</div>
 				<DialogFooter className="h-fit gap-2">
-					<Button>Submit</Button>
+					<Button disabled={isFormLoading}>
+						Submit
+						{isFormLoading && (
+							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+						)}
+					</Button>
 				</DialogFooter>
 			</form>
 		</Form>

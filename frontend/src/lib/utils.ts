@@ -10,12 +10,6 @@ interface MonthGroup {
     data: Entry[]
 }
 
-interface MonthGroupV2 {
-    month: string,
-    year: number,
-    data: number[]
-}
-
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -277,7 +271,7 @@ function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) 
         month: MONTHS[today.getMonth()],
         year: today.getFullYear(),
         data: []
-    }    
+    }
 }
 
 function isFunction(value: any): value is Function { return typeof value === "function"}
