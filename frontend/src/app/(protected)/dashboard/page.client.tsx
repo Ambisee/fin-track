@@ -81,7 +81,10 @@ export default function DashboardHome() {
 				<h2 className="text-xl mb-4">
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
-				<EntryList data={group.toReversed()} />
+				<EntryList
+					data={group.toReversed()}
+					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+				/>
 			</div>
 		)
 	}

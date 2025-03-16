@@ -34,8 +34,10 @@ import { useToast } from "../ui/use-toast"
 
 interface EntryListItemProps {
 	data: Entry
-	onEdit?: (data: Entry) => void
+	expanded?: boolean
 	showButtons?: boolean
+	onEdit?: (data: Entry) => void
+	onExpand?: (value: boolean) => void
 }
 
 function formatListItemDate(date: Date) {
@@ -62,7 +64,7 @@ export default function EntryListItem({
 	showButtons = true,
 	...props
 }: EntryListItemProps) {
-	const [isItemOpen, setIsItemOpen] = useState(false)
+	const [isItemOpen, setIsItemOpen] = useState(props.expanded ?? false)
 
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
@@ -92,7 +94,10 @@ export default function EntryListItem({
 					type="button"
 					className="h-full w-full p-4 text-left focus:bg-background focus:outline-none"
 					onClick={() => {
-						setIsItemOpen((c) => !c)
+						setIsItemOpen((c) => {
+							props.onExpand?.(!c)
+							return !c
+						})
 					}}
 				>
 					<div className="flex justify-between items-center w-inherit">

@@ -213,8 +213,14 @@ function ChartDisplay(props: ChartDisplayProps) {
 												<X className="w-4 h-4" />
 											</DialogClose>
 										</DialogHeader>
-										<div className="overflow-y-auto pr-1">
-											<EntryList data={entryData} showButtons={false} />
+										<div className="h-full overflow-y-auto pr-1">
+											<EntryList
+												data={entryData}
+												showButtons={false}
+												virtualizerType={
+													EntryList.VirtualizerType.NORMAL_VIRTUALIZER
+												}
+											/>
 										</div>
 									</DialogContent>
 								</Dialog>
