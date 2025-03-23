@@ -12,9 +12,15 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { ENTRY_QKEY, MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
-import { useLedgersQuery, useMonthGroupQuery, useUserQuery } from "@/lib/hooks"
+import { MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
+import {
+	useLedgersQuery,
+	useMonthGroupQuery,
+	useSettingsQuery,
+	useUserQuery
+} from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
+import { getEntryQueryKey, getStatisticsQueryKey } from "@/lib/utils"
 import { Ledger } from "@/types/supabase"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -115,11 +121,17 @@ function MonthSelectorPage(props: DocumentPageProps) {
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const queryClient = useQueryClient()
+	const settingsQuery = useSettingsQuery()
 	const monthGroupQuery = useMonthGroupQuery(ledger?.id)
 
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
-		if (!monthGroupQuery.isFetched || monthGroupQuery.isFetching) {
+		if (
+			!monthGroupQuery.isFetched ||
+			!monthGroupQuery.data?.data ||
+			monthGroupQuery.isFetching ||
+			settingsQuery.isFetching
+		) {
 			return (
 				<div className="w-full h-full flex justify-center items-center">
 					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
@@ -127,7 +139,10 @@ function MonthSelectorPage(props: DocumentPageProps) {
 			)
 		}
 
-		if (!monthGroupQuery?.data?.data || monthGroupQuery.data.data.length < 1) {
+		if (
+			!!settingsQuery.data?.data?.current_ledger &&
+			(!monthGroupQuery?.data?.data || monthGroupQuery.data.data.length < 1)
+		) {
 			return (
 				<div className="w-full h-full flex justify-center items-center flex-col text-sm text-center">
 					<p className="w-5/6 mb-4">
@@ -138,8 +153,16 @@ function MonthSelectorPage(props: DocumentPageProps) {
 						asChild
 						onClick={() => {
 							setData(undefined)
-							setOnSubmitSuccess(() => {
-								queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+							setOnSubmitSuccess((data) => {
+								queryClient.invalidateQueries({
+									queryKey: getEntryQueryKey(data.ledger, new Date(data.date))
+								})
+								queryClient.invalidateQueries({
+									queryKey: getStatisticsQueryKey(
+										data.ledger,
+										new Date(data.date)
+									)
+								})
 							})
 						}}
 					>

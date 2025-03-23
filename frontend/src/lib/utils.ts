@@ -2,7 +2,7 @@ import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { MONTHS } from "./constants"
+import { ENTRY_QKEY, MONTHS, STATISTICS_QKEY } from "./constants"
 
 interface MonthGroup {
     month: string,
@@ -233,6 +233,34 @@ function groupDataByMonth(
     return result
 }
 
+function getEntryQueryKey(ledger?: number, period: Date = new Date()) {
+    const queryKey = [...ENTRY_QKEY]
+    queryKey.push(`${ledger}`)
+    queryKey.push(`${period.getMonth()}-${period.getFullYear()}`)
+
+    return queryKey
+}
+
+function getStatisticsQueryKey(ledger?: number, period?: Date) {    
+    const queryKey = [...STATISTICS_QKEY]
+    queryKey.push(`${ledger}`)
+    queryKey.push(`${period?.getMonth()}-${period?.getFullYear()}`)
+
+    return queryKey
+}
+
+function getMonthSpan(date: Date): { start: Date, end: Date } {
+    const start = new Date(date)
+    const end = new Date(date)
+
+    start.setDate(1)
+
+    end.setMonth(end.getMonth() + 1)
+    end.setDate(0)
+
+    return { start, end }
+}
+
 function getUsernameFromEmail(email: string) {
     const atSymbol = email.indexOf("@")
     if (atSymbol === -1) {
@@ -243,7 +271,6 @@ function getUsernameFromEmail(email: string) {
     let username = email.slice(0, atSymbol)
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
-
 
 function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) {
     const today = new Date(year, month)
@@ -274,10 +301,16 @@ function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) 
     }
 }
 
-function isFunction(value: any): value is Function { return typeof value === "function"}
-
-export type {MonthGroup}
-export {
-    cn, getUsernameFromEmail, filterDataGroup, isFunction,
-    handleDataChange, groupDataByMonth, groupData
+function isNonNullable<T>(value: T): value is NonNullable<T> {
+    return value !== null && value !== undefined
 }
+
+function isFunction(value: any): value is Function { 
+    return typeof value === "function"
+}
+
+export {
+    cn, filterDataGroup, getEntryQueryKey, getMonthSpan, getStatisticsQueryKey, getUsernameFromEmail, groupData, groupDataByMonth, handleDataChange, isFunction, isNonNullable
+}
+export type { MonthGroup }
+

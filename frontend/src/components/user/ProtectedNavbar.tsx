@@ -1,9 +1,8 @@
 "use client"
 
-import { ENTRY_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { cn } from "@/lib/utils"
+import { cn, getEntryQueryKey, getStatisticsQueryKey } from "@/lib/utils"
 import { GearIcon, TableIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
 import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
@@ -38,7 +37,6 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 }
 
 export default function ProtectedNavbar() {
-	const pathname = usePathname()
 	const queryClient = useQueryClient()
 
 	const settingsQuery = useSettingsQuery()
@@ -72,13 +70,18 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
-											if (
-												data.ledger !== settingsQuery.data?.data?.current_ledger
-											) {
-												return
-											}
-
-											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+											queryClient.invalidateQueries({
+												queryKey: getEntryQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: getStatisticsQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
 										})
 										setOpen(true)
 									}}

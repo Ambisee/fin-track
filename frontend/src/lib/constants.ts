@@ -2,6 +2,7 @@
 export const USER_QKEY = ["user"]
 export const LEDGER_QKEY = ["ledger"]
 export const ENTRY_QKEY = ["entryData"]
+export const STATISTICS_QKEY = ["statistics"]
 export const USER_SETTINGS_QKEY = ["settings"]
 export const CATEGORIES_QKEY = ["categories"]
 export const CURRENCIES_QKEY = ["currencies"]

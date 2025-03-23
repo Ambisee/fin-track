@@ -1,7 +1,11 @@
 "use client"
 
-import { ENTRY_QKEY } from "@/lib/constants"
 import useGlobalStore from "@/lib/store"
+import {
+	getEntryQueryKey,
+	getStatisticsQueryKey,
+	isNonNullable
+} from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
@@ -158,7 +162,7 @@ export default function EntryList({
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
-	if (props.data === undefined) {
+	if (!isNonNullable(props.data)) {
 		return (
 			<div className="grid gap-4">
 				<Skeleton className="w-full h-[6.25rem]" />
@@ -169,6 +173,8 @@ export default function EntryList({
 	}
 
 	if (props.data.length < 1) {
+		const dataCopy = props.data
+
 		return (
 			<div className="px-0 py-12 grid gap-2 items-center justify-center">
 				<p className="text-center">No entry data available for this period.</p>
@@ -177,8 +183,16 @@ export default function EntryList({
 						className="w-fit justify-self-center"
 						onClick={() => {
 							setData(undefined)
-							setOnSubmitSuccess(() => {
-								queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+							setOnSubmitSuccess((data) => {
+								queryClient.invalidateQueries({
+									queryKey: getEntryQueryKey(data.ledger, new Date(data.date))
+								})
+								queryClient.invalidateQueries({
+									queryKey: getStatisticsQueryKey(
+										data.ledger,
+										new Date(data.date)
+									)
+								})
 							})
 						}}
 					>

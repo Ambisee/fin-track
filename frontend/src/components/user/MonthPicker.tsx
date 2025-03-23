@@ -1,33 +1,34 @@
-import { useToast } from "../ui/use-toast"
+import { MONTHS } from "@/lib/constants"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { Button } from "../ui/button"
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
-	DialogDescription,
-	DialogFooter
+	DialogTrigger
 } from "../ui/dialog"
-import { z } from "zod"
-import { MONTHS } from "@/lib/constants"
 import { Form, FormControl, FormField } from "../ui/form"
 import { Input } from "../ui/input"
-import { Button } from "../ui/button"
 import {
 	Select,
 	SelectContent,
 	SelectGroup,
+	SelectItem,
 	SelectTrigger,
-	SelectValue,
-	SelectItem
+	SelectValue
 } from "../ui/select"
+import { useToast } from "../ui/use-toast"
 
 interface MonthPickerProps {
-	value: number[]
-	onValueChange: (value: number[]) => void
+	value: Date
+	onValueChange: (value: Date) => void
 }
 
 const monthPickerFormSchema = z.object({
@@ -35,15 +36,15 @@ const monthPickerFormSchema = z.object({
 	year: z.coerce.number().min(0)
 })
 
-export function MonthPicker(props: MonthPickerProps) {
+export default function MonthPicker(props: MonthPickerProps) {
 	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 
 	const form = useForm<z.infer<typeof monthPickerFormSchema>>({
 		resolver: zodResolver(monthPickerFormSchema),
 		defaultValues: {
-			month: MONTHS[props.value[0]],
-			year: props.value[1]
+			month: MONTHS[props.value.getMonth()],
+			year: props.value.getFullYear()
 		}
 	})
 
@@ -56,10 +57,12 @@ export function MonthPicker(props: MonthPickerProps) {
 							e.preventDefault()
 							form.handleSubmit(
 								(formData) => {
-									props.onValueChange([
-										MONTHS.indexOf(formData.month),
-										formData.year
-									])
+									const value = new Date()
+									value.setDate(1)
+									value.setMonth(MONTHS.indexOf(formData.month))
+									value.setFullYear(formData.year)
+
+									props.onValueChange(value)
 									setOpen(false)
 								},
 								(error) => {
@@ -126,13 +129,35 @@ export function MonthPicker(props: MonthPickerProps) {
 					</form>
 				</Form>
 			</DialogContent>
+			<Button
+				className="w-12 h-12 rounded-full"
+				variant="ghost"
+				onClick={() => {
+					const result = new Date(props.value)
+					result.setMonth(result.getMonth() - 1)
+					props.onValueChange(result)
+				}}
+			>
+				<ChevronLeft className="w-4 h-4" />
+			</Button>
 			<DialogTrigger asChild>
 				<Button variant="ghost" className="text-lg" onClick={() => {}} asChild>
-					<h3 className="text-lg hover:cursor-pointer">
-						{MONTHS[props.value[0]]} {props.value[1]}
-					</h3>
+					<h2 className="text-lg hover:cursor-pointer">
+						{MONTHS[props.value.getMonth()]} {props.value.getFullYear()}
+					</h2>
 				</Button>
 			</DialogTrigger>
+			<Button
+				className="h-12 w-12 rounded-full"
+				variant="ghost"
+				onClick={() => {
+					const result = new Date(props.value)
+					result.setMonth(result.getMonth() + 1)
+					props.onValueChange(result)
+				}}
+			>
+				<ChevronRight className="w-4 h-4" />
+			</Button>
 		</Dialog>
 	)
 }

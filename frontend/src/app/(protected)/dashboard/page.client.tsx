@@ -1,19 +1,20 @@
 "use client"
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
-import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
-import { filterDataGroup } from "@/lib/utils"
-import { useContext } from "react"
-import { DashboardContext } from "./layout"
 import { MONTHS } from "@/lib/constants"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 
 export default function DashboardHome() {
-	const { dataGroups } = useContext(DashboardContext)
+	const today = new Date()
 
 	const userQuery = useUserQuery()
-	const entryDataQuery = useEntryDataQuery()
+	const settingsQuery = useSettingsQuery()
+	const entryDataQuery = useEntryDataQuery(
+		settingsQuery.data?.data?.current_ledger,
+		today
+	)
 
 	const renderWelcomeMessage = () => {
 		if (
@@ -69,12 +70,16 @@ export default function DashboardHome() {
 			)
 		}
 
-		const today = new Date()
-		const group = filterDataGroup(
-			today.getMonth(),
-			today.getFullYear(),
-			dataGroups
-		).data
+		if (!entryDataQuery.data?.data) {
+			return (
+				<Alert variant="destructive">
+					<AlertTitle>Unable to retrieve entry data</AlertTitle>
+					<AlertDescription>
+						{entryDataQuery.failureReason?.message}
+					</AlertDescription>
+				</Alert>
+			)
+		}
 
 		return (
 			<div>
@@ -82,7 +87,7 @@ export default function DashboardHome() {
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
 				<EntryList
-					data={group.toReversed()}
+					data={entryDataQuery.data?.data.toReversed()}
 					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
 				/>
 			</div>

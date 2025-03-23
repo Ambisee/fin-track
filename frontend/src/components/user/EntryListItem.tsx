@@ -7,10 +7,10 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
-import { ENTRY_QKEY } from "@/lib/constants"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { sbBrowser } from "@/lib/supabase"
+import { getEntryQueryKey, getStatisticsQueryKey } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
@@ -144,7 +144,18 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data) => {
-											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+											queryClient.invalidateQueries({
+												queryKey: getEntryQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: getStatisticsQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
 											setOpen(false)
 										})
 									}}
@@ -199,7 +210,16 @@ export default function EntryListItem({
 														})
 
 														queryClient.invalidateQueries({
-															queryKey: ENTRY_QKEY
+															queryKey: getEntryQueryKey(
+																props.data.ledger,
+																new Date(props.data.date)
+															)
+														})
+														queryClient.invalidateQueries({
+															queryKey: getStatisticsQueryKey(
+																props.data.ledger,
+																new Date(props.data.date)
+															)
 														})
 													}
 												})

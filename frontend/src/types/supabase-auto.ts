@@ -102,14 +102,14 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_ledger"
+            foreignKeyName: "entry_ledger_fkey"
             columns: ["ledger"]
             isOneToOne: false
             referencedRelation: "ledger"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_ledger"
+            foreignKeyName: "entry_ledger_fkey"
             columns: ["ledger"]
             isOneToOne: false
             referencedRelation: "month_groups"
@@ -209,6 +209,39 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_view"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      statistics: {
+        Row: {
+          category: string | null
+          created_by: string | null
+          is_positive: boolean | null
+          ledger: number | null
+          period: string | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_ledger_fkey"
+            columns: ["ledger"]
+            isOneToOne: false
+            referencedRelation: "ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_ledger_fkey"
+            columns: ["ledger"]
+            isOneToOne: false
+            referencedRelation: "month_groups"
+            referencedColumns: ["ledger_id"]
           },
         ]
       }

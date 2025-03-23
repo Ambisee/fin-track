@@ -8,27 +8,15 @@ import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
 import {
-	ENTRY_QKEY,
 	LEDGER_QKEY,
-	MONTHS,
 	SHORT_TOAST_DURATION,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { groupDataByMonth, MonthGroup } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
-import {
-	createContext,
-	Suspense,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-	type JSX
-} from "react"
+import { createContext, Suspense, useRef, useState, type JSX } from "react"
 import Loading from "./loading"
-import { useRouter } from "next/navigation"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -36,7 +24,6 @@ interface DashboardLayoutProps {
 
 interface DashboardContextObject {
 	search: MiniSearch
-	dataGroups: MonthGroup[]
 }
 
 const DashboardContext = createContext<DashboardContextObject>(null!)
@@ -94,9 +81,6 @@ function LayoutLedgerEditorDialog() {
 						await queryClient.invalidateQueries({
 							queryKey: USER_SETTINGS_QKEY
 						})
-						await queryClient.invalidateQueries({
-							queryKey: ENTRY_QKEY
-						})
 
 						toast({
 							description: (
@@ -132,55 +116,31 @@ function LedgerBadge() {
 }
 
 function DashboardContextProvider(props: { children: JSX.Element }) {
-	const entryQuery = useEntryDataQuery()
-
-	const dataGroups = useMemo(() => {
-		if (entryQuery.isLoading) {
-			return []
-		}
-
-		if (entryQuery.data === undefined || entryQuery.data.data === null) {
-			return []
-		}
-
-		const result = groupDataByMonth(entryQuery.data.data)
-		if (result.length < 1) {
-			const d = new Date()
-			return [
-				{
-					month: MONTHS[d.getMonth()],
-					year: d.getFullYear(),
-					data: []
-				}
-			]
-		}
-
-		return result
-	}, [entryQuery.data, entryQuery.isLoading])
+	const settingsQuery = useSettingsQuery()
+	const entryQuery = useEntryDataQuery(settingsQuery.data?.data?.current_ledger)
 
 	const searchRef = useRef(
-		new MiniSearch({
-			fields: ["index", "amount", "category", "note"],
-			storeFields: ["index"],
-			idField: "index"
-		})
+		new MiniSearch({ fields: ["index", "amount", "category", "note"] })
+		// new MiniSearch({
+		// 	fields: ["index", "amount", "category", "note"],
+		// 	storeFields: ["index"],
+		// 	idField: "index"
+		// })
 	)
 
-	useEffect(() => {
-		if (!entryQuery.data?.data) {
-			return
-		}
+	// useEffect(() => {
+	// 	if (!entryQuery.data?.data) {
+	// 		return
+	// 	}
 
-		searchRef.current.removeAll()
-		searchRef.current.addAll(
-			entryQuery.data.data.map((val, index) => ({ ...val, index: index }))
-		)
-	}, [entryQuery])
+	// 	searchRef.current.removeAll()
+	// 	searchRef.current.addAll(
+	// 		entryQuery.data.data.map((val, index) => ({ ...val, index: index }))
+	// 	)
+	// }, [entryQuery])
 
 	return (
-		<DashboardContext.Provider
-			value={{ dataGroups: dataGroups, search: searchRef.current }}
-		>
+		<DashboardContext.Provider value={{ search: searchRef.current }}>
 			{props.children}
 		</DashboardContext.Provider>
 	)

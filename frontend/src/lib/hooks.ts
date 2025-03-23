@@ -1,23 +1,23 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Category, Entry, Ledger } from "@/types/supabase"
+import { Category, Ledger } from "@/types/supabase"
 import { UserResponse } from "@supabase/supabase-js"
 import {
-	UndefinedInitialDataOptions,
-	useMutation,
-	useQuery
+    UndefinedInitialDataOptions,
+    useMutation,
+    useQuery
 } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef } from "react"
 import {
-	CATEGORIES_QKEY,
-	CURRENCIES_QKEY,
-	ENTRY_QKEY,
-	LEDGER_QKEY,
-	MONTH_GROUP_QKEY,
-	QUERY_STALE_TIME,
-	USER_QKEY,
-	USER_SETTINGS_QKEY
+    CATEGORIES_QKEY,
+    CURRENCIES_QKEY,
+    LEDGER_QKEY,
+    MONTH_GROUP_QKEY,
+    QUERY_STALE_TIME,
+    USER_QKEY,
+    USER_SETTINGS_QKEY
 } from "./constants"
 import { sbBrowser } from "./supabase"
+import { getEntryQueryKey, getMonthSpan, getStatisticsQueryKey } from "./utils"
 
 function useUserQuery(
 	options?: UndefinedInitialDataOptions<
@@ -38,18 +38,45 @@ function useUserQuery(
 	})
 }
 
-function useEntryDataQuery() {
+function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
+    const userQuery = useUserQuery()
+    const queryKey = getStatisticsQueryKey(ledger, period)
+    const { start, end } = getMonthSpan(period)
+
+    return useQuery({
+        queryKey,
+        queryFn: async () => await sbBrowser
+            .from("statistics")
+            .select("*")
+            .eq("ledger", ledger!)
+            .eq("created_by", userQuery.data?.data.user?.id!)
+            .lte("period", end.toDateString())
+            .gte("period", start.toDateString()),
+        staleTime: QUERY_STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined,
+        enabled:
+            !!ledger &&
+            !!userQuery.data?.data.user &&
+            !userQuery.isRefetching
+    })
+}
+
+function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 	const userQuery = useUserQuery()
-	const settingsQuery = useSettingsQuery()
+    const queryKey = getEntryQueryKey(ledger, period)
+    const { start, end } = getMonthSpan(period)
 
 	return useQuery({
-		queryKey: ENTRY_QKEY,
-		queryFn: async () =>
+		queryKey,
+		queryFn: async () => 
 			await sbBrowser
 				.from("entry")
 				.select(`*`)
-				.eq("created_by", userQuery?.data?.data.user?.id as string)
-				.eq("ledger", settingsQuery.data?.data?.current_ledger as number)
+				.eq("created_by", userQuery?.data?.data.user?.id!)
+				.eq("ledger", ledger!)
+                .lte("date", end.toDateString())
+                .gte("date", start.toDateString())
 				.order("date")
 				.order("category")
 				.limit(100),
@@ -57,10 +84,9 @@ function useEntryDataQuery() {
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
 		enabled:
+            !!ledger &&
 			!!userQuery.data?.data.user &&
-			!!settingsQuery.data?.data &&
-			!userQuery.isRefetching &&
-			!settingsQuery.isRefetching
+			!userQuery.isRefetching
 	})
 }
 
@@ -169,7 +195,7 @@ function useMonthGroupQuery(ledger_id?: number) {
 }
 
 function useInsertEntryMutation() {
-	const userQuery = useUserQuery()
+    const userQuery = useUserQuery()
 
 	return useMutation({
 		mutationFn: async (entry: EntryFormData) => {
@@ -523,23 +549,15 @@ function useAmountFormatter() {
 }
 
 export {
-	useAmountFormatter,
-	useCategoriesQuery,
-	useCurrenciesQuery,
-	useInsertEntryMutation,
-    useDeleteEntryMutation,
-    useUpdateEntryMutation,
-	useDeleteCategoryMutation,
-	useDeleteLedgerMutation,
-	useEntryDataQuery,
-	useInsertCategoryMutation,
-	useInsertLedgerMutation,
-	useLedgersQuery,
-	useMonthGroupQuery,
-	useSetElementWindowHeight,
-	useSettingsQuery,
-	useSwitchLedgerMutation,
-	useUpdateCategoryMutation,
-	useUpdateLedgerMutation,
-	useUserQuery
+    useAmountFormatter,
+    useCategoriesQuery,
+    useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
+    useEntryDataQuery,
+    useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation, useLedgersQuery,
+    useMonthGroupQuery,
+    useSetElementWindowHeight,
+    useSettingsQuery, useStatisticsQuery, useSwitchLedgerMutation,
+    useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
+    useUserQuery
 }
+
