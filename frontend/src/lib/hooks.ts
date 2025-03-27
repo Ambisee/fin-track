@@ -18,6 +18,7 @@ import {
 	USER_SETTINGS_QKEY
 } from "./constants"
 import { sbBrowser } from "./supabase"
+import { DatabaseHelper } from "./helper/DatabaseHelper"
 
 function useUserQuery(
 	options?: UndefinedInitialDataOptions<
@@ -187,7 +188,7 @@ function useInsertEntryMutation() {
 			const { data, error } = await sbBrowser
 				.from("entry")
 				.insert({
-					date: entry.date.toLocaleDateString(),
+					date: DatabaseHelper.parseDateString(entry.date),
 					category: entry.category,
 					created_by: userData.id,
 					is_positive: isPositive,
@@ -235,8 +236,6 @@ function useDeleteEntryMutation() {
 }
 
 function useUpdateEntryMutation() {
-    const userQuery = useUserQuery()
-
     return useMutation({
         mutationFn: async (entry: EntryFormData & {id: number}) => {
 			const isPositive = entry.type === "Income"
@@ -249,7 +248,7 @@ function useUpdateEntryMutation() {
 			const {data, error} = await sbBrowser
                 .from("entry")
                 .update({
-                    date: entry.date.toDateString(),
+                    date: DatabaseHelper.parseDateString(entry.date),
                     category: entry.category,
                     is_positive: isPositive,
                     amount: Number(entry.amount),
