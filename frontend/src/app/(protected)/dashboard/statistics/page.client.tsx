@@ -141,6 +141,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 						isAnimationActive={false}
 						nameKey={props.nameKey}
 						dataKey={props.dataKey}
+						minAngle={15}
 					>
 						{props.data.map((entry, index) => (
 							<Cell key={`cell-${index}`} fill={entry.fillColor} />
@@ -198,7 +199,7 @@ function CategoryItem(props: CategoryItemProps) {
 							</span>
 						</span>
 						<span className="flex-1 text-right">
-							{formatAmount(props.value.total as number)}
+							{formatAmount(props.value.total_amount as number)}
 						</span>
 					</button>
 				</DialogTrigger>
@@ -321,7 +322,7 @@ function MobileStatsUI(props: StatsUIProps) {
 						(value) => !value.is_positive
 					)}
 					nameKey="category"
-					dataKey="total"
+					dataKey="total_amount"
 				/>
 			</TabsContent>
 			<TabsContent value="income">
@@ -331,7 +332,7 @@ function MobileStatsUI(props: StatsUIProps) {
 						(value) => value.is_positive
 					)}
 					nameKey="category"
-					dataKey="total"
+					dataKey="total_amount"
 				/>
 			</TabsContent>
 		</Tabs>
@@ -354,7 +355,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 						(value) => !value.is_positive
 					)}
 					nameKey="category"
-					dataKey="total"
+					dataKey="total_amount"
 				/>
 			</div>
 			<div className="flex-1 px-4 group border-l" data-is-positive="true">
@@ -368,7 +369,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 						(value) => value.is_positive
 					)}
 					nameKey="category"
-					dataKey="total"
+					dataKey="total_amount"
 				/>
 			</div>
 		</div>
@@ -399,15 +400,15 @@ export default function DashboardStatistics() {
 		let colorIndex = 1
 		for (let i = 0; i < statisticsQuery.data.data.length; i++) {
 			const statistic: Statistic = statisticsQuery.data.data[i]
-			if (!isNonNullable(statistic.total)) {
+			if (!isNonNullable(statistic.total_amount)) {
 				console.error("Expected a non-null value: statistic.total")
 				continue
 			}
 
 			if (statistic.is_positive) {
-				result.totalIncome += statistic.total
+				result.totalIncome += statistic.total_amount
 			} else {
-				result.totalExpense += statistic.total
+				result.totalExpense += statistic.total_amount
 			}
 
 			result.groupByCategory.push({
@@ -419,15 +420,15 @@ export default function DashboardStatistics() {
 
 		for (let i = 0; i < result.groupByCategory.length; i++) {
 			const group: Group = result.groupByCategory[i]
-			if (!isNonNullable(group.total)) {
-				console.error("Expected a non-null value: group.total")
+			if (!isNonNullable(group.total_amount)) {
+				console.error("Expected a non-null value: group.total_amount")
 				continue
 			}
 
 			const totalAmount = group.is_positive
 				? result.totalIncome
 				: result.totalExpense
-			group.percentage = group.total / totalAmount
+			group.percentage = group.total_amount / totalAmount
 		}
 
 		return result

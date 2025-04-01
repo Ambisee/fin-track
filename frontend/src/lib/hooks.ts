@@ -47,7 +47,7 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
     return useQuery({
         queryKey,
         queryFn: async () => await sbBrowser
-            .from("statistics")
+            .from("statistic")
             .select("*")
             .eq("ledger", ledger!)
             .eq("created_by", userQuery.data?.data.user?.id!)

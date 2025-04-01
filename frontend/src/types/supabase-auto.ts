@@ -212,14 +212,14 @@ export type Database = {
           },
         ]
       }
-      statistics: {
+      statistic: {
         Row: {
           category: string | null
           created_by: string | null
           is_positive: boolean | null
           ledger: number | null
           period: string | null
-          total: number | null
+          total_amount: number | null
         }
         Relationships: [
           {
