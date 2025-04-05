@@ -23,6 +23,12 @@ type Category = InferQueryType<ReturnType<typeof useCategoriesQuery>>
 type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
 type Currency = InferQueryType<ReturnType<typeof useCurrenciesQuery>>
 type UserSettings = Database["public"]["Tables"]["settings"]["Row"]
+type EntryDataCursor = {
+    index: number
+    id: number
+    category: string
+    date: string
+} | undefined
 
 export {
 	type Category,
@@ -31,5 +37,7 @@ export {
 	type Entry,
 	type Ledger,
 	type Statistic,
-	type UserSettings
+	type UserSettings,
+    
+    type EntryDataCursor
 }

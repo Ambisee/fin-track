@@ -1,10 +1,13 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Category, Ledger } from "@/types/supabase"
+import { Category, EntryDataCursor, Ledger } from "@/types/supabase"
 import { UserResponse } from "@supabase/supabase-js"
 import {
     UndefinedInitialDataOptions,
+    useInfiniteQuery,
     useMutation,
-    useQuery
+    UseMutationOptions,
+    useQuery,
+    useQueryClient
 } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef } from "react"
 import {
@@ -16,9 +19,10 @@ import {
     USER_QKEY,
     USER_SETTINGS_QKEY
 } from "./constants"
+import { DateHelper } from "./helper/DateHelper"
 import { sbBrowser } from "./supabase"
-import { getEntryQueryKey, getMonthSpan, getStatisticsQueryKey } from "./utils"
-import { DatabaseHelper } from "./helper/DatabaseHelper"
+import { QueryHelper } from "./helper/QueryHelper"
+import { StringHelper } from "./helper/StringHelper"
 
 function useUserQuery(
 	options?: UndefinedInitialDataOptions<
@@ -41,8 +45,8 @@ function useUserQuery(
 
 function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
     const userQuery = useUserQuery()
-    const queryKey = getStatisticsQueryKey(ledger, period)
-    const { start, end } = getMonthSpan(period)
+    const queryKey = QueryHelper.getStatisticQueryKey(ledger, period)
+    const { start, end } = DateHelper.getMonthStartEnd(period)
 
     return useQuery({
         queryKey,
@@ -65,8 +69,8 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 
 function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 	const userQuery = useUserQuery()
-    const queryKey = getEntryQueryKey(ledger, period)
-    const { start, end } = getMonthSpan(period)
+    const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
+    const { start, end } = DateHelper.getMonthStartEnd(period)
 
 	return useQuery({
 		queryKey,
@@ -78,8 +82,9 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 				.eq("ledger", ledger!)
                 .lte("date", end.toDateString())
                 .gte("date", start.toDateString())
-				.order("date")
-				.order("category")
+				.order("date", {ascending: false})
+				.order("category", {ascending: false})
+                .order("id", {ascending: true})
 				.limit(100),
         staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
@@ -89,6 +94,105 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 			!!userQuery.data?.data.user &&
 			!userQuery.isRefetching
 	})
+}
+
+function useInfiniteEntryDataQuery(ledger?: number, period: Date = new Date(), limit: number = 100) {
+    const userQuery = useUserQuery()
+    const queryClient = useQueryClient()
+
+    const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
+    const { start, end } = DateHelper.getMonthStartEnd(period)
+    
+    return useInfiniteQuery({
+        queryKey,
+        queryFn: async ({ pageParam }) => {
+            const data = queryClient.getQueryData(queryKey) as
+                ReturnType<typeof useInfiniteEntryDataQuery>["data"]
+
+            let query = sbBrowser
+                .from("entry")
+                .select("*")
+                .eq("created_by", userQuery?.data?.data.user?.id!)
+				.eq("ledger", ledger!)
+            
+            if (data?.pageParams === undefined) {
+                return await query
+                    .gte("date", DateHelper.toDatabaseString(start))
+                    .lte("date", DateHelper.toDatabaseString(end))
+                    .order("date", {ascending: false})
+                    .order("category", {ascending: false})
+                    .order("id", {ascending: true})
+                    .limit(limit)
+            }
+            
+            if (pageParam.index === 0) {
+                if (data.pageParams.length > 2) {
+                    const nextParam = data.pageParams[1] as EntryDataCursor
+                    query = query
+                        .lte("date", DateHelper.toDatabaseString(end))
+                        .or(StringHelper.removeWhitespaces(`
+                            date.gt.${nextParam!.date},
+                            and(date.eq.${nextParam!.date}, category.gt.${nextParam!.category}),
+                            and(date.eq.${nextParam!.date}, category.eq.${nextParam!.category}, id.gte.${nextParam!.id})
+                        `))
+                } else {
+                    query = query
+                        .lte("date", DateHelper.toDatabaseString(end))
+                        .gte("date", DateHelper.toDatabaseString(start))
+                        .limit(limit)
+                }
+            } else if (pageParam.index === data.pageParams.length) {
+                query = query
+                    .gte("date", DateHelper.toDatabaseString(start))
+                    .or(StringHelper.removeWhitespaces(`
+                        date.lt.${pageParam.date}, 
+                        and(date.eq.${pageParam.date}, category.lt.${pageParam.category}), 
+                        and(date.eq.${pageParam.date}, category.eq.${pageParam.category}, id.lt.${pageParam.id})
+                    `))
+                    .limit(limit)
+            } else {
+                const nextParam = data.pageParams.at(pageParam.index + 1) as EntryDataCursor
+
+                query = query
+                    .or(StringHelper.removeWhitespaces(`
+                        date.lt.${pageParam.date},
+                        and(date.eq.${pageParam.date}, category.lt.${pageParam.category}),
+                        and(date.eq.${pageParam.date}, category.eq.${pageParam.category}, id.lt.${pageParam.id})
+                    `))
+                    .or(StringHelper.removeWhitespaces(`
+                        date.gt.${nextParam!.date},
+                        and(date.eq.${nextParam!.date}, category.gt.${nextParam!.category}),
+                        and(date.eq.${nextParam!.date}, category.eq.${nextParam!.category}, id.gte.${nextParam!.id})
+                    `))
+            }
+
+            return await query
+                .order("date", {ascending: false})
+                .order("category", {ascending: false})
+                .order("id", {ascending: true})
+        },
+        getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+            if (lastPage.data === null || lastPage.data.length < limit) {
+                return null
+            }
+            
+            const lastEntry = lastPage.data.at(-1)
+            return {
+                index: allPageParams.at(-1)!!.index + 1,
+                id: lastEntry!!.id,
+                date: lastEntry!!.date,
+                category: lastEntry!!.category,
+            }
+        },
+        initialPageParam: {index: 0, id: -1, date: DateHelper.toDatabaseString(start), category: ""},
+        staleTime: QUERY_STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined,
+		enabled:
+            !!ledger &&
+			!!userQuery.data?.data.user &&
+			!userQuery.isRefetching
+    })
 }
 
 function useSettingsQuery() {
@@ -214,7 +318,7 @@ function useInsertEntryMutation() {
 			const { data, error } = await sbBrowser
 				.from("entry")
 				.insert({
-					date: DatabaseHelper.parseDateString(entry.date),
+					date: DateHelper.toDatabaseString(entry.date),
 					category: entry.category,
 					created_by: userData.id,
 					is_positive: isPositive,
@@ -274,7 +378,7 @@ function useUpdateEntryMutation() {
 			const {data, error} = await sbBrowser
                 .from("entry")
                 .update({
-                    date: DatabaseHelper.parseDateString(entry.date),
+                    date: DateHelper.toDatabaseString(entry.date),
                     category: entry.category,
                     is_positive: isPositive,
                     amount: Number(entry.amount),
@@ -551,7 +655,7 @@ export {
     useAmountFormatter,
     useCategoriesQuery,
     useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
-    useEntryDataQuery,
+    useEntryDataQuery, useInfiniteEntryDataQuery,
     useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation, useLedgersQuery,
     useMonthGroupQuery,
     useSetElementWindowHeight,
@@ -559,4 +663,3 @@ export {
     useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
     useUserQuery
 }
-

@@ -233,34 +233,6 @@ function groupDataByMonth(
     return result
 }
 
-function getEntryQueryKey(ledger?: number, period: Date = new Date()) {
-    const queryKey = [...ENTRY_QKEY]
-    queryKey.push(`${ledger}`)
-    queryKey.push(`${period.getMonth()}-${period.getFullYear()}`)
-
-    return queryKey
-}
-
-function getStatisticsQueryKey(ledger?: number, period?: Date) {    
-    const queryKey = [...STATISTICS_QKEY]
-    queryKey.push(`${ledger}`)
-    queryKey.push(`${period?.getMonth()}-${period?.getFullYear()}`)
-
-    return queryKey
-}
-
-function getMonthSpan(date: Date): { start: Date, end: Date } {
-    const start = new Date(date)
-    const end = new Date(date)
-
-    start.setDate(1)
-
-    end.setMonth(end.getMonth() + 1)
-    end.setDate(0)
-
-    return { start, end }
-}
-
 function getUsernameFromEmail(email: string) {
     const atSymbol = email.indexOf("@")
     if (atSymbol === -1) {
@@ -310,7 +282,7 @@ function isFunction(value: any): value is Function {
 }
 
 export {
-    cn, filterDataGroup, getEntryQueryKey, getMonthSpan, getStatisticsQueryKey, getUsernameFromEmail, groupData, groupDataByMonth, handleDataChange, isFunction, isNonNullable
+    cn, filterDataGroup, getUsernameFromEmail, groupData, groupDataByMonth, handleDataChange, isFunction, isNonNullable
 }
 export type { MonthGroup }
 

@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
 import MonthPicker from "@/components/user/MonthPicker"
 import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
 	useAmountFormatter,
 	useEntryDataQuery,
@@ -27,12 +28,7 @@ import {
 	useStatisticsQuery
 } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import {
-	cn,
-	getEntryQueryKey,
-	getStatisticsQueryKey,
-	isNonNullable
-} from "@/lib/utils"
+import { cn, isNonNullable } from "@/lib/utils"
 import { Statistic } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { X } from "lucide-react"
@@ -95,10 +91,13 @@ function ChartDisplay(props: ChartDisplayProps) {
 						setData(undefined)
 						setOnSubmitSuccess((data) => {
 							queryClient.invalidateQueries({
-								queryKey: getEntryQueryKey(data.ledger, new Date(data.date))
+								queryKey: QueryHelper.getEntryQueryKey(
+									data.ledger,
+									new Date(data.date)
+								)
 							})
 							queryClient.invalidateQueries({
-								queryKey: getStatisticsQueryKey(
+								queryKey: QueryHelper.getStatisticQueryKey(
 									data.ledger,
 									new Date(data.date)
 								)
@@ -226,13 +225,11 @@ function CategoryItem(props: CategoryItemProps) {
 					</DialogHeader>
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
-							data={entryDataQuery.data?.data
-								?.filter(
-									(value) =>
-										value.category === props.value.category &&
-										value.is_positive == props.value.is_positive
-								)
-								?.toReversed()}
+							data={entryDataQuery.data?.data?.filter(
+								(value) =>
+									value.category === props.value.category &&
+									value.is_positive == props.value.is_positive
+							)}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
 						/>

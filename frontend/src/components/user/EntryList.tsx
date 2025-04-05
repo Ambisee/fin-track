@@ -1,11 +1,7 @@
 "use client"
 
 import useGlobalStore from "@/lib/store"
-import {
-	getEntryQueryKey,
-	getStatisticsQueryKey,
-	isNonNullable
-} from "@/lib/utils"
+import { cn, isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
@@ -14,6 +10,7 @@ import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import { Skeleton } from "../ui/skeleton"
 import EntryListItem from "./EntryListItem"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 
 enum EntryListVirtualizerType {
 	NONE,
@@ -31,7 +28,7 @@ interface EntryListProps {
 
 function NormalList(props: EntryListProps) {
 	return (
-		<div className="w-full">
+		<div className="w-full grid gap-4">
 			{props.data?.map((val) => (
 				<EntryListItem
 					key={val.id}
@@ -185,10 +182,13 @@ export default function EntryList({
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
 								queryClient.invalidateQueries({
-									queryKey: getEntryQueryKey(data.ledger, new Date(data.date))
+									queryKey: QueryHelper.getEntryQueryKey(
+										data.ledger,
+										new Date(data.date)
+									)
 								})
 								queryClient.invalidateQueries({
-									queryKey: getStatisticsQueryKey(
+									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
 										new Date(data.date)
 									)

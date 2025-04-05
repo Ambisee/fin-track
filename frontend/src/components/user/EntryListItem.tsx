@@ -7,10 +7,10 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { sbBrowser } from "@/lib/supabase"
-import { getEntryQueryKey, getStatisticsQueryKey } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
@@ -145,13 +145,13 @@ export default function EntryListItem({
 										setData(props.data)
 										setOnSubmitSuccess((data) => {
 											queryClient.invalidateQueries({
-												queryKey: getEntryQueryKey(
+												queryKey: QueryHelper.getEntryQueryKey(
 													data.ledger,
 													new Date(data.date)
 												)
 											})
 											queryClient.invalidateQueries({
-												queryKey: getStatisticsQueryKey(
+												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,
 													new Date(data.date)
 												)
@@ -210,13 +210,13 @@ export default function EntryListItem({
 														})
 
 														queryClient.invalidateQueries({
-															queryKey: getEntryQueryKey(
+															queryKey: QueryHelper.getEntryQueryKey(
 																props.data.ledger,
 																new Date(props.data.date)
 															)
 														})
 														queryClient.invalidateQueries({
-															queryKey: getStatisticsQueryKey(
+															queryKey: QueryHelper.getStatisticQueryKey(
 																props.data.ledger,
 																new Date(props.data.date)
 															)

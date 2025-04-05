@@ -46,7 +46,7 @@ export default function DashboardEntries() {
 					</>
 				) : (
 					<EntryList
-						data={entryQuery.data.data.toReversed()}
+						data={entryQuery.data.data}
 						virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
 					/>
 				)}

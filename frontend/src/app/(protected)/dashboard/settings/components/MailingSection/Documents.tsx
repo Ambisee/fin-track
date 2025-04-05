@@ -13,6 +13,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
 	useLedgersQuery,
 	useMonthGroupQuery,
@@ -20,7 +21,6 @@ import {
 	useUserQuery
 } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { getEntryQueryKey, getStatisticsQueryKey } from "@/lib/utils"
 import { Ledger } from "@/types/supabase"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -155,10 +155,13 @@ function MonthSelectorPage(props: DocumentPageProps) {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
 								queryClient.invalidateQueries({
-									queryKey: getEntryQueryKey(data.ledger, new Date(data.date))
+									queryKey: QueryHelper.getEntryQueryKey(
+										data.ledger,
+										new Date(data.date)
+									)
 								})
 								queryClient.invalidateQueries({
-									queryKey: getStatisticsQueryKey(
+									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
 										new Date(data.date)
 									)
