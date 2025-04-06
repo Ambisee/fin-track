@@ -225,11 +225,13 @@ function CategoryItem(props: CategoryItemProps) {
 					</DialogHeader>
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
-							data={entryDataQuery.data?.data?.filter(
-								(value) =>
-									value.category === props.value.category &&
-									value.is_positive == props.value.is_positive
-							)}
+							data={
+								entryDataQuery.data?.data?.filter(
+									(value) =>
+										value.category === props.value.category &&
+										value.is_positive == props.value.is_positive
+								) ?? []
+							}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
 						/>

@@ -46,6 +46,9 @@ export default function DashboardTest() {
 				</button>
 			</div>
 			<EntryList
+				onScrollToBottom={() => {
+					if (entryQuery.hasNextPage) entryQuery.fetchNextPage()
+				}}
 				data={
 					entryQuery.data?.pages
 						?.map((value, index) => value.data ?? [])

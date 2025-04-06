@@ -8,7 +8,6 @@ import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
 import { useEffect, useRef } from "react"
 import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
-import { Skeleton } from "../ui/skeleton"
 import EntryListItem from "./EntryListItem"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 
@@ -19,34 +18,64 @@ enum EntryListVirtualizerType {
 }
 
 interface EntryListProps {
-	data?: Entry[]
+	data: Entry[]
 	showButtons?: boolean
 	virtualizerType?: EntryListVirtualizerType
 
 	onEditItem?: (data: Entry) => void
+	onScrollToBottom?: () => void
 }
 
 function NormalList(props: EntryListProps) {
+	const { data, onScrollToBottom, ...restProps } = props
+	const lastItemRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.target === lastItemRef.current && entry.isIntersecting) {
+						onScrollToBottom?.()
+						break
+					}
+				}
+			},
+			{ threshold: 1 }
+		)
+
+		let lastItem = null
+		if (isNonNullable(lastItemRef.current)) {
+			lastItem = lastItemRef.current
+			observer.observe(lastItem)
+		}
+
+		return () => {
+			if (isNonNullable(lastItem)) observer.unobserve(lastItem)
+		}
+	}, [data, onScrollToBottom])
+
 	return (
 		<div className="w-full grid gap-4">
-			{props.data?.map((val) => (
-				<EntryListItem
-					key={val.id}
-					data={val}
-					showButtons={props.showButtons}
-					onEdit={props.onEditItem}
-				/>
+			{data.map((val, index) => (
+				<div key={val.id} ref={index === data.length - 1 ? lastItemRef : null}>
+					<EntryListItem
+						data={val}
+						showButtons={restProps.showButtons}
+						onEdit={restProps.onEditItem}
+					/>
+				</div>
 			))}
 		</div>
 	)
 }
 
 function VirtualizedList(props: EntryListProps) {
+	const { data, onScrollToBottom } = props
 	const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
 
 	const virtualizer = useVirtualizer({
-		count: props.data?.length ?? 0,
+		count: data.length,
 		estimateSize: () => 100,
 		getScrollElement: () => listRef.current,
 		overscan: 5,
@@ -54,10 +83,17 @@ function VirtualizedList(props: EntryListProps) {
 	})
 
 	useEffect(() => {
-		expandedRef.current = Array(props.data?.length ?? 0).fill(false)
-	}, [props.data])
+		expandedRef.current = Array(data.length).fill(false)
+	}, [data])
+
+	useEffect(() => {
+		if (virtualizer.getVirtualIndexes().at(-1) === data.length - 1) {
+			onScrollToBottom?.()
+		}
+	}, [data, virtualizer, onScrollToBottom])
 
 	const virtualItems = virtualizer.getVirtualItems()
+
 	return (
 		<div ref={listRef} className="w-full h-full overflow-y-auto">
 			<div
@@ -79,7 +115,7 @@ function VirtualizedList(props: EntryListProps) {
 							data-index={value.index}
 						>
 							<EntryListItem
-								data={props.data![value.index]}
+								data={data[value.index]}
 								onEdit={props.onEditItem}
 								showButtons={props.showButtons}
 							/>
@@ -92,23 +128,36 @@ function VirtualizedList(props: EntryListProps) {
 }
 
 function WindowVirtualizedList(props: EntryListProps) {
+	const { data, onScrollToBottom } = props
 	const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
 
 	const virtualizer = useWindowVirtualizer({
-		count: props.data?.length ?? 0,
+		count: data.length,
 		estimateSize: () => 100,
-		overscan: 5,
+		overscan: 3,
 		gap: 16,
 		scrollMargin: listRef.current?.offsetTop ?? 0
 	})
 
 	useEffect(() => {
-		expandedRef.current = Array(props.data?.length ?? 0).fill(false)
-	}, [props.data])
+		expandedRef.current = Array(data.length ?? 0).fill(false)
+	}, [data])
 
 	const virtualItems = virtualizer.getVirtualItems()
 	const y = (virtualItems[0]?.start ?? 0) - virtualizer.options.scrollMargin
+
+	useEffect(() => {
+		const [lastItem] = [...virtualItems].reverse()
+		if (!lastItem) {
+			return
+		}
+
+		if (lastItem.index >= data.length - 1) {
+			onScrollToBottom?.()
+		}
+	}, [data, virtualItems, onScrollToBottom])
+
 	return (
 		<div ref={listRef}>
 			<div
@@ -134,7 +183,7 @@ function WindowVirtualizedList(props: EntryListProps) {
 							<EntryListItem
 								expanded={expandedRef.current[it.index]}
 								showButtons={props.showButtons}
-								data={props.data!.at(it.index)!}
+								data={data!.at(it.index)!}
 								onEdit={props.onEditItem}
 								onExpand={(value) => {
 									expandedRef.current[it.index] = value
@@ -159,18 +208,8 @@ export default function EntryList({
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
-	if (!isNonNullable(props.data)) {
-		return (
-			<div className="grid gap-4">
-				<Skeleton className="w-full h-[6.25rem]" />
-				<Skeleton className="w-full h-[6.25rem]" />
-				<Skeleton className="w-full h-[6.25rem]" />
-			</div>
-		)
-	}
-
 	if (props.data.length < 1) {
-		const dataCopy = props.data
+		const dataCopy = [...props.data]
 
 		return (
 			<div className="px-0 py-12 grid gap-2 items-center justify-center">

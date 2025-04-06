@@ -4,16 +4,22 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { MONTHS } from "@/lib/constants"
-import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import {
+	useEntryDataQuery,
+	useInfiniteEntryDataQuery,
+	useSettingsQuery,
+	useUserQuery
+} from "@/lib/hooks"
 
 export default function DashboardHome() {
 	const today = new Date()
 
 	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
-	const entryDataQuery = useEntryDataQuery(
+	const entryDataQuery = useInfiniteEntryDataQuery(
 		settingsQuery.data?.data?.current_ledger,
-		today
+		today,
+		10
 	)
 
 	const renderWelcomeMessage = () => {
@@ -57,7 +63,7 @@ export default function DashboardHome() {
 	}
 
 	const renderThisMonthEntries = () => {
-		if (!entryDataQuery.isFetched || entryDataQuery.isFetching) {
+		if (entryDataQuery.isLoading) {
 			return (
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />
@@ -70,7 +76,7 @@ export default function DashboardHome() {
 			)
 		}
 
-		if (!entryDataQuery.data?.data) {
+		if (!entryDataQuery.data?.pages) {
 			return (
 				<Alert variant="destructive">
 					<AlertTitle>Unable to retrieve entry data</AlertTitle>
@@ -87,7 +93,12 @@ export default function DashboardHome() {
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
 				<EntryList
-					data={entryDataQuery.data?.data}
+					data={entryDataQuery.data.pages
+						.map((value) => value.data ?? [])
+						.flat()}
+					onScrollToBottom={() => {
+						if (entryDataQuery.hasNextPage) entryDataQuery.fetchNextPage()
+					}}
 					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
 				/>
 			</div>
