@@ -160,17 +160,13 @@ export default function DashboardEntries() {
 	const entryQuery = useEntryDataQuery()
 
 	const renderSearchResult = () => {
-		if (
-			entryQuery.isLoading ||
-			!entryQuery.data?.data ||
-			searchResult === null
-		) {
+		if (entryQuery.isLoading || !entryQuery.data || searchResult === null) {
 			return []
 		}
 
 		const data = []
 		for (const value of searchResult) {
-			data.push(entryQuery.data.data[value.id])
+			data.push(entryQuery.data[value.id])
 		}
 
 		return (
@@ -187,7 +183,7 @@ export default function DashboardEntries() {
 	}
 
 	const renderEntries = () => {
-		if (entryQuery.isFetching || !entryQuery.data?.data) {
+		if (entryQuery.isFetching || !entryQuery.data) {
 			return (
 				<div>
 					<div className="w-full flex justify-between items-center pt-2 pb-4">
@@ -262,7 +258,7 @@ export default function DashboardEntries() {
 			<div className="sticky top-0 py-4 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input
-					disabled={entryQuery.isLoading || !entryQuery.data?.data}
+					disabled={entryQuery.isLoading || !entryQuery.data}
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."

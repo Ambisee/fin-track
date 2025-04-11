@@ -31,7 +31,7 @@ export default function LedgersEditor() {
 							<Skeleton className="rounded-full h-8" />
 						) : (
 							<span className="text-sm bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
-								{settingsQuery.data?.data?.ledger?.name}
+								{settingsQuery.data?.ledger?.name}
 							</span>
 						)}
 					</div>

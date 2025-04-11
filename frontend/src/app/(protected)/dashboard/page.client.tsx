@@ -19,7 +19,7 @@ export default function DashboardHome() {
 		if (
 			userQuery.isLoading ||
 			!userQuery.isFetched ||
-			userQuery.data?.data?.user === undefined
+			userQuery.data === undefined
 		) {
 			return (
 				<div className="mb-8">
@@ -27,14 +27,14 @@ export default function DashboardHome() {
 					<Skeleton className="min-w-36 w-3/4 h-8 mt-4" />
 				</div>
 			)
-		} else if (userQuery.data?.data?.user !== null) {
+		} else if (userQuery.data !== null) {
 			return (
 				<div className="mb-8">
 					<div className="w-full mb-4 flex justify-between items-center">
 						<h1 className="text-3xl">Home</h1>
 					</div>
 					<h2 className="text-2xl mt-4">
-						Welcome back, {userQuery.data?.data?.user.user_metadata.username}
+						Welcome back, {userQuery.data.user_metadata.username}
 					</h2>
 				</div>
 			)

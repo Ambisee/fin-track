@@ -72,9 +72,7 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
-											if (
-												data.ledger !== settingsQuery.data?.data?.current_ledger
-											) {
+											if (data.ledger !== settingsQuery.data?.current_ledger) {
 												return
 											}
 

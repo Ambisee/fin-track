@@ -60,7 +60,7 @@ export default function PasswordChange() {
 
 	const getUserIdentities = () => {
 		const result = new Set()
-		const identities = userQuery.data?.data.user?.identities
+		const identities = userQuery.data?.identities
 		if (identities === undefined) {
 			return result
 		}
@@ -98,7 +98,7 @@ export default function PasswordChange() {
 						onClick={async (e) => {
 							e.preventDefault()
 							const { error } = await sbBrowser.auth.resetPasswordForEmail(
-								userQuery.data?.data.user?.email as string,
+								userQuery.data?.email as string,
 								{
 									redirectTo: `${window.location.origin}/recovery`
 								}
@@ -184,14 +184,12 @@ export default function PasswordChange() {
 					</Button>
 					<Button
 						onClick={async () => {
-							if (userQuery.data?.data.user?.email === undefined) {
+							if (userQuery.data?.email === undefined) {
 								return
 							}
 
 							const { data, error } =
-								await sbBrowser.auth.resetPasswordForEmail(
-									userQuery.data.data.user.email
-								)
+								await sbBrowser.auth.resetPasswordForEmail(userQuery.data.email)
 
 							if (error !== null) {
 								toast({

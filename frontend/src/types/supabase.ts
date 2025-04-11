@@ -4,8 +4,8 @@ import { useCategoriesQuery, useCurrenciesQuery, useEntryDataQuery, useLedgersQu
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 
 
-type InferQueryType<T> = T extends DefinedQueryObserverResult<PostgrestSingleResponse<infer U>> ? 
-    (U extends Array<infer V> ? V : never) : 
+type InferQueryType<T> = T extends DefinedQueryObserverResult<infer U> ? 
+    (U extends Array<infer V> ? V : U) : 
     never
 
 type Entry = InferQueryType<ReturnType<typeof useEntryDataQuery>>

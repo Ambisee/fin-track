@@ -63,10 +63,11 @@ export function EntryFormItem(props: {
 export default function EntryForm(props: EntryFormProps) {
 	const [curPage, setCurPage] = useState(0)
 
-	const isEditForm = props.data !== undefined
-
 	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
+
+	const isEditForm = props.data !== undefined
+	const currentLedger = settingsQuery.data?.current_ledger
 
 	const form = useForm<EntryFormData>({
 		resolver: zodResolver(formSchema),
@@ -76,7 +77,7 @@ export default function EntryForm(props: EntryFormProps) {
 			amount: "",
 			type: "Expense",
 			note: "",
-			ledger: settingsQuery.data?.data?.current_ledger ?? -1
+			ledger: currentLedger ?? -1
 		}
 	})
 
@@ -87,7 +88,7 @@ export default function EntryForm(props: EntryFormProps) {
 			amount: "",
 			type: "Expense",
 			note: "",
-			ledger: settingsQuery.data?.data?.current_ledger ?? -1
+			ledger: currentLedger ?? -1
 		}
 
 		if (!isEditForm || !props.data) {
@@ -104,7 +105,7 @@ export default function EntryForm(props: EntryFormProps) {
 
 		form.reset(defaultValues)
 		return
-	}, [props.data, settingsQuery.data?.data, form, isEditForm])
+	}, [props.data, currentLedger, form, isEditForm])
 
 	const Component = [
 		<EntryFormPage
@@ -125,7 +126,7 @@ export default function EntryForm(props: EntryFormProps) {
 				setCurPage(0)
 			}}
 			onUpdate={(ledger) => {
-				if (ledger.id === settingsQuery.data?.data?.current_ledger) {
+				if (ledger.id === currentLedger) {
 					queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
 				}
 

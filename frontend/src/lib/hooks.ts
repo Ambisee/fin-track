@@ -1,6 +1,6 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
 import { Category, Entry, Ledger } from "@/types/supabase"
-import { UserResponse } from "@supabase/supabase-js"
+import { AuthError, PostgrestError, UserResponse } from "@supabase/supabase-js"
 import {
 	UndefinedInitialDataOptions,
 	useMutation,
@@ -19,23 +19,51 @@ import {
 } from "./constants"
 import { sbBrowser } from "./supabase"
 import { DatabaseHelper } from "./helper/DatabaseHelper"
+import { isNonNullable } from "./utils"
+import { QueryHelper } from "./helper/QueryHelper"
 
-function useUserQuery(
-	options?: UndefinedInitialDataOptions<
-		UserResponse,
-		Error,
-		UserResponse,
-		string[]
-	>
-) {
+function useUserQuery() {
 	return useQuery({
 		queryKey: USER_QKEY,
-		queryFn: () => sbBrowser.auth.getUser(),
+		queryFn: async () => {
+			const { data: { user }, error } = await sbBrowser.auth.getUser()
+
+			if (isNonNullable(error)) {
+				throw error
+			}
+
+			return user
+		},
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) =>
-			query.state.data?.data.user === undefined ||
-			query.state.data.data.user === null,
-		...options
+		refetchOnMount: (query) => !isNonNullable(query.state.data)
+	})
+}
+
+function useSettingsQuery() {
+	const userQuery = useUserQuery()
+
+	return useQuery({
+		queryKey: USER_SETTINGS_QKEY,
+		queryFn: async () => {
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
+			}
+
+			const { data } = await sbBrowser
+				.from("settings")
+				.select(`*, ledger (*, currency (currency_name))`)
+				.eq("user_id", user.id)
+				.limit(1)
+				.single()
+                .throwOnError()
+
+			return data
+		},
+		staleTime: QUERY_STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => !isNonNullable(query.state.data),
+		enabled: !isNonNullable(userQuery.data) && !userQuery.isRefetching
 	})
 }
 
@@ -45,50 +73,49 @@ function useEntryDataQuery() {
 
 	return useQuery({
 		queryKey: ENTRY_QKEY,
-		queryFn: async () =>
-			await sbBrowser
+		queryFn: async () => {
+			const user = userQuery.data
+			const settings = settingsQuery.data
+
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
+			}
+
+			if (!isNonNullable(settings)) {
+				throw Error(QueryHelper.MESSAGE_NO_SETTINGS)
+			}
+
+			const { data } = await sbBrowser
 				.from("entry")
 				.select(`*`)
-				.eq("created_by", userQuery?.data?.data.user?.id as string)
-				.eq("ledger", settingsQuery.data?.data?.current_ledger as number)
+				.eq("created_by", user.id)
+				.eq("ledger", settings.current_ledger)
 				.order("date")
 				.order("category")
-				.limit(100),
-        staleTime: QUERY_STALE_TIME,
+				.limit(100)
+                .throwOnError()
+
+			return data ?? []
+		},
+		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
 		enabled:
-			!!userQuery.data?.data.user &&
-			!!settingsQuery.data?.data &&
+			!!userQuery.data &&
+			!!settingsQuery.data &&
 			!userQuery.isRefetching &&
 			!settingsQuery.isRefetching
-	})
-}
-
-function useSettingsQuery() {
-	const userQuery = useUserQuery()
-	return useQuery({
-		queryKey: USER_SETTINGS_QKEY,
-		queryFn: async () =>
-			await sbBrowser
-				.from("settings")
-				.select(`*, ledger (*, currency (currency_name))`)
-				.eq("user_id", userQuery.data?.data.user?.id as string)
-				.limit(1)
-				.single(),
-        staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) =>
-			query.state.data === undefined || query.state.data.data === null,
-		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
 	})
 }
 
 function useCurrenciesQuery() {
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
-		queryFn: async () => await sbBrowser.from("currency").select("*"),
-        staleTime: QUERY_STALE_TIME,
+		queryFn: async () => {
+            const { data } = await sbBrowser.from("currency").select("*").throwOnError()
+            return data ?? []
+        },
+		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
 	})
@@ -100,24 +127,24 @@ function useCategoriesQuery() {
 	return useQuery({
 		queryKey: CATEGORIES_QKEY,
 		queryFn: async () => {
-			const userId = userQuery.data?.data.user?.id
-			if (!userId) {
-				return await sbBrowser
-					.from("category")
-					.select("*")
-					.eq("created_by", "false")
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			return await sbBrowser
+			const { data } = await sbBrowser
 				.from("category")
 				.select("*")
-				.eq("created_by", userId)
+				.eq("created_by", user.id)
 				.order("name")
+                .throwOnError()
+
+			return data ?? []
 		},
-        staleTime: QUERY_STALE_TIME,
+		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => !!query.state.data,
-		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
+		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
@@ -127,24 +154,24 @@ function useLedgersQuery() {
 	return useQuery({
 		queryKey: LEDGER_QKEY,
 		queryFn: async () => {
-			const userId = userQuery.data?.data.user?.id
-			if (!userId) {
-				return await sbBrowser
-					.from("ledger")
-					.select("*, currency (currency_name), entry(count)")
-					.eq("id", -1)
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			return await sbBrowser
+			const { data } = await sbBrowser
 				.from("ledger")
 				.select("*, currency (currency_name), entry(count)")
-				.eq("created_by", userId)
+				.eq("created_by", user.id)
 				.order("name")
+                .throwOnError()
+
+			return data ?? []
 		},
-        staleTime: QUERY_STALE_TIME,
+		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => !!query.state.data,
-		enabled: !!userQuery.data?.data.user && !userQuery.isRefetching
+		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
@@ -154,18 +181,28 @@ function useMonthGroupQuery(ledger_id?: number) {
 	return useQuery({
 		queryKey: [MONTH_GROUP_QKEY, ledger_id],
 		queryFn: async () => {
-			return await sbBrowser
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
+			}
+
+			if (!isNonNullable(ledger_id)) {
+				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
+			}
+
+			const { data } = await sbBrowser
 				.from("month_groups")
 				.select("*")
-				.eq("created_by", userQuery.data?.data.user?.id as string)
-				.eq("ledger_id", ledger_id as number)
+				.eq("created_by", user.id)
+				.eq("ledger_id", ledger_id)
 				.order("year, month", { ascending: true })
+                .throwOnError()
+
+			return data ?? []
 		},
 		refetchOnWindowFocus: false,
 		enabled:
-			!!userQuery.data?.data.user &&
-			!userQuery.isRefetching &&
-			ledger_id !== undefined
+			!!userQuery.data && !userQuery.isRefetching && ledger_id !== undefined
 	})
 }
 
@@ -174,9 +211,9 @@ function useInsertEntryMutation() {
 
 	return useMutation({
 		mutationFn: async (entry: EntryFormData) => {
-			const userData = userQuery.data?.data.user
-			if (!userData) {
-				throw Error("An unexpected error occured: No user data")
+			const user = userQuery.data
+			if (!user) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
 			const isPositive = entry.type === "Income"
@@ -185,12 +222,12 @@ function useInsertEntryMutation() {
 				note = null
 			}
 
-			const { data, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("entry")
 				.insert({
 					date: DatabaseHelper.parseDateString(entry.date),
 					category: entry.category,
-					created_by: userData.id,
+					created_by: user.id,
 					is_positive: isPositive,
 					amount: Number(entry.amount),
 					note: note,
@@ -198,10 +235,7 @@ function useInsertEntryMutation() {
 				})
 				.select()
 				.single()
-
-			if (error !== null) {
-				throw Error("Unable to create the entry", { cause: error })
-			}
+                .throwOnError()
 
 			return data
 		}
@@ -213,31 +247,28 @@ function useDeleteEntryMutation() {
 
 	return useMutation({
 		mutationFn: async (id: number) => {
-			const userData = userQuery.data?.data.user
-			if (!userData) {
-				throw Error("An unexpected error occured: No user data")
+			const user = userQuery.data
+			if (!user) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("entry")
 				.delete()
-				.eq("created_by", userData.id)
+				.eq("created_by", user.id)
 				.eq("id", id)
-                .select("*")
-                .single()
+				.select("*")
+				.single()
+				.throwOnError()
 
-            if (error !== null) {
-                throw Error("Unable to delete the entry", {cause: error})
-            }
-
-            return data
+			return data
 		}
 	})
 }
 
 function useUpdateEntryMutation() {
-    return useMutation({
-        mutationFn: async (entry: EntryFormData & {id: number}) => {
+	return useMutation({
+		mutationFn: async (entry: EntryFormData & { id: number }) => {
 			const isPositive = entry.type === "Income"
 
 			let note: string | null = entry.note
@@ -245,27 +276,24 @@ function useUpdateEntryMutation() {
 				note = null
 			}
 
-			const {data, error} = await sbBrowser
-                .from("entry")
-                .update({
-                    date: DatabaseHelper.parseDateString(entry.date),
-                    category: entry.category,
-                    is_positive: isPositive,
-                    amount: Number(entry.amount),
-                    note: note,
-                    ledger: entry.ledger
-                })
-                .eq("id", entry.id)
-                .select()
-                .single()
-			
-            if (error !== null) {
-                throw Error("Unable to update the entry", {cause: error})
-            }
+			const { data } = await sbBrowser
+				.from("entry")
+				.update({
+					date: DatabaseHelper.parseDateString(entry.date),
+					category: entry.category,
+					is_positive: isPositive,
+					amount: Number(entry.amount),
+					note: note,
+					ledger: entry.ledger
+				})
+				.eq("id", entry.id)
+				.select()
+				.single()
+                .throwOnError()
 
-            return data
+			return data
 		}
-    })
+	})
 }
 
 function useInsertLedgerMutation() {
@@ -273,28 +301,24 @@ function useInsertLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (
-			data: Pick<Ledger, "created_by" | "name" | "currency_id">
-		) => {
-			if (!userQuery.data?.data || !userQuery.data.data.user) {
-				throw Error("An unexpected error occured: No user data")
+		mutationFn: async (ledger: Pick<Ledger, "created_by" | "name" | "currency_id">) => {
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data: result, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("ledger")
 				.insert({
-					created_by: userQuery.data.data.user.id,
-					name: data.name,
-					currency_id: data.currency_id
+					created_by: user.id,
+					name: ledger.name,
+					currency_id: ledger.currency_id
 				})
 				.select("*, currency (currency_name), entry(count)")
 				.single()
+                .throwOnError()
 
-			if (error) {
-				throw Error("Unable to create the new ledger", { cause: error })
-			}
-
-			return result
+			return data
 		}
 	})
 }
@@ -304,26 +328,22 @@ function useUpdateLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (
-			data: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">
-		) => {
-			if (!userQuery.data?.data?.user || !data) {
-				throw Error("An unexpected error occured: No user data")
+		mutationFn: async (ledger: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">) => {
+			const user = userQuery.data
+            if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data: result, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("ledger")
-				.update({ name: data.name, currency_id: data.currency_id })
-				.eq("id", data.id)
-				.eq("created_by", data.created_by)
+				.update({ name: ledger.name, currency_id: ledger.currency_id })
+				.eq("id", ledger.id)
+				.eq("created_by", ledger.created_by)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
+                .throwOnError()
 
-			if (error != null) {
-				throw Error("Unable to update the ledger", { cause: error })
-			}
-
-			return result
+			return data
 		}
 	})
 }
@@ -333,30 +353,25 @@ function useDeleteLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			const ledgersCount = ledgersQuery.data?.data?.length
+		mutationFn: async (ledger: Pick<Ledger, "id">) => {
+			const ledgersCount = ledgersQuery.data?.length
 			if (!ledgersCount) {
-				throw Error("An unexpected error occured: No ledger data")
+				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
 			}
 
 			if (ledgersCount < 2) {
-				throw Error(
-					"Unable to delete the ledger. User must have at least one ledger"
-				)
+				throw Error(QueryHelper.MESSAGE_REQUIRE_AT_LEAST_ONE_LEDGER)
 			}
 
-			const { data: result, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("ledger")
 				.delete()
-				.eq("id", data.id)
+				.eq("id", ledger.id)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
+                .throwOnError()
 
-			if (error) {
-				throw Error("Unable to delete the ledger", { cause: error })
-			}
-
-			return result
+			return data
 		}
 	})
 }
@@ -366,23 +381,21 @@ function useSwitchLedgerMutation() {
 
 	return useMutation({
 		mutationKey: USER_SETTINGS_QKEY,
-		mutationFn: async (data: { id: number }) => {
-			if (userQuery.data?.data.user?.id === undefined) {
-				return undefined
+		mutationFn: async (ledger: Pick<Ledger, "id">) => {
+			const user = userQuery.data
+            if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data: result, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("settings")
-				.update({ current_ledger: data.id })
-				.eq("user_id", userQuery.data?.data.user.id as string)
+				.update({ current_ledger: ledger.id })
+				.eq("user_id", user.id)
 				.select("*, ledger (name)")
 				.single()
+                .throwOnError()
 
-			if (error) {
-				throw Error("Unable to switch ledger", { cause: error })
-			}
-
-			return result
+			return data
 		}
 	})
 }
@@ -393,22 +406,21 @@ function useInsertCategoryMutation() {
 	return useMutation({
 		mutationKey: CATEGORIES_QKEY,
 		mutationFn: async (category: Category) => {
-			if (userQuery.data?.data.user?.id === undefined) {
-				return
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("category")
 				.insert({
-					created_by: userQuery.data.data.user.id,
+					created_by: user.id,
 					name: category.name
 				})
 				.select("*")
 				.single()
+                .throwOnError()
 
-			if (error !== null) {
-				throw Error("Unable to create the category", { cause: error })
-			}
 
 			return data
 		}
@@ -421,24 +433,21 @@ function useUpdateCategoryMutation() {
 	return useMutation({
 		mutationKey: CATEGORIES_QKEY,
 		mutationFn: async (category: Category & { oldName: string }) => {
-			const userData = userQuery.data?.data.user
-			if (!userData) {
-				throw Error("An unexpected error occured: No user data")
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("category")
 				.update({
 					name: category.name
 				})
 				.eq("name", category.oldName)
-				.eq("created_by", userData.id)
+				.eq("created_by", user.id)
 				.select("*")
 				.single()
-
-			if (error !== null) {
-				throw Error("Unable to update the category", { cause: error })
-			}
+                .throwOnError()
 
 			return data
 		}
@@ -451,21 +460,18 @@ function useDeleteCategoryMutation() {
 	return useMutation({
 		mutationKey: CATEGORIES_QKEY,
 		mutationFn: async (category: Category) => {
-			const userData = userQuery.data?.data.user
-			if (!userData) {
-				return
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data } = await sbBrowser
 				.from("category")
 				.delete()
 				.eq("created_by", category.created_by)
 				.eq("name", category.name)
 				.select()
-
-			if (error !== null) {
-				throw Error("Unable to delete the category", { cause: error })
-			}
+                .throwOnError()
 
 			return data
 		}
@@ -499,9 +505,8 @@ function useAmountFormatter() {
 
 	const formatAmount = useCallback(
 		(num?: number) => {
-			const currency =
-				userSettingsQuery?.data?.data?.ledger?.currency?.currency_name
-			if (num === undefined || currency === undefined || currency === null) {
+			const currency = userSettingsQuery.data?.ledger?.currency?.currency_name
+			if (!isNonNullable(num) || !isNonNullable(currency)) {
 				return num
 			}
 
@@ -526,8 +531,8 @@ export {
 	useCategoriesQuery,
 	useCurrenciesQuery,
 	useInsertEntryMutation,
-    useDeleteEntryMutation,
-    useUpdateEntryMutation,
+	useDeleteEntryMutation,
+	useUpdateEntryMutation,
 	useDeleteCategoryMutation,
 	useDeleteLedgerMutation,
 	useEntryDataQuery,

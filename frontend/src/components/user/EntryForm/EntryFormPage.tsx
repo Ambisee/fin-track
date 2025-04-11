@@ -27,6 +27,7 @@ import { EntryFormState } from "@/lib/store"
 import { ReloadIcon, ResetIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
+import { isNonNullable } from "@/lib/utils"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -59,8 +60,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 	const updateEntryMutation = useUpdateEntryMutation()
 
 	const getLedgerName = (ledgerId: number) => {
-		return ledgerQuery.data?.data?.find?.((ledger) => ledger.id === ledgerId)
-			?.name
+		return ledgerQuery.data?.find?.((ledger) => ledger.id === ledgerId)?.name
 	}
 
 	return (
@@ -71,7 +71,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					e.preventDefault()
 					form.handleSubmit(
 						async (formData) => {
-							let result: Entry
+							let result: Entry | null
 							setIsFormLoading(true)
 
 							try {
@@ -85,6 +85,12 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								} else {
 									throw Error(
 										"An unexpected error occured: No entry id referenced to update"
+									)
+								}
+
+								if (!isNonNullable(result)) {
+									throw Error(
+										"An unexpected error occured: Inserted entry is null"
 									)
 								}
 

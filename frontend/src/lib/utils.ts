@@ -274,10 +274,14 @@ function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) 
     }
 }
 
+function isNonNullable<T>(value: T): value is NonNullable<T> { 
+    return value !== null && value !== undefined
+}
+
 function isFunction(value: any): value is Function { return typeof value === "function"}
 
 export type {MonthGroup}
 export {
-    cn, getUsernameFromEmail, filterDataGroup, isFunction,
+    cn, getUsernameFromEmail, filterDataGroup, isFunction, isNonNullable,
     handleDataChange, groupDataByMonth, groupData
 }

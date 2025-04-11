@@ -16,7 +16,7 @@ import {
 } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { groupDataByMonth, MonthGroup } from "@/lib/utils"
+import { groupDataByMonth, isNonNullable, MonthGroup } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import {
 	createContext,
@@ -28,7 +28,6 @@ import {
 	type JSX
 } from "react"
 import Loading from "./loading"
-import { useRouter } from "next/navigation"
 
 interface DashboardLayoutProps {
 	children: JSX.Element
@@ -124,7 +123,7 @@ function LedgerBadge() {
 		<DialogTrigger asChild>
 			<button className="absolute top-[38px] right-4">
 				<span className="w-full text-sm bg-secondary text-secondary-foreground rounded-full py-1 px-6">
-					{settingsQuery.data?.data?.ledger?.name}
+					{settingsQuery.data?.ledger?.name}
 				</span>
 			</button>
 		</DialogTrigger>
@@ -135,15 +134,11 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 	const entryQuery = useEntryDataQuery()
 
 	const dataGroups = useMemo(() => {
-		if (entryQuery.isLoading) {
+		if (entryQuery.isLoading || !isNonNullable(entryQuery.data)) {
 			return []
 		}
 
-		if (entryQuery.data === undefined || entryQuery.data.data === null) {
-			return []
-		}
-
-		const result = groupDataByMonth(entryQuery.data.data)
+		const result = groupDataByMonth(entryQuery.data)
 		if (result.length < 1) {
 			const d = new Date()
 			return [
@@ -167,13 +162,13 @@ function DashboardContextProvider(props: { children: JSX.Element }) {
 	)
 
 	useEffect(() => {
-		if (!entryQuery.data?.data) {
+		if (!isNonNullable(entryQuery.data)) {
 			return
 		}
 
 		searchRef.current.removeAll()
 		searchRef.current.addAll(
-			entryQuery.data.data.map((val, index) => ({ ...val, index: index }))
+			entryQuery.data.map((val, index) => ({ ...val, index: index }))
 		)
 	}, [entryQuery])
 

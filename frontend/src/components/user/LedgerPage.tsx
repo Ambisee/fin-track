@@ -82,12 +82,23 @@ export default function LedgerPage(props: LedgerPageProps) {
 			return
 		}
 
+		if (props.currencyList.length < 1) {
+			form.reset({
+				name: "",
+				currency: {
+					id: -1,
+					currency_name: ""
+				}
+			})
+			return
+		}
+
 		const defaultCurrency = props.currencyList[0]
 		form.reset({
 			name: "",
 			currency: {
-				id: defaultCurrency.id,
-				currency_name: defaultCurrency.currency_name
+				id: defaultCurrency?.id,
+				currency_name: defaultCurrency?.currency_name
 			}
 		})
 

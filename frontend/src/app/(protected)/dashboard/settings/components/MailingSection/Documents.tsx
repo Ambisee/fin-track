@@ -48,13 +48,12 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 			)
 		}
 
-		if (!ledgersQuery.data?.data) {
+		if (!ledgersQuery.data) {
 			return undefined
 		}
 
-		for (let i = 0; i < ledgersQuery.data.data.length; i++) {
-			const ledger: Ledger =
-				ledgersQuery.data.data[ledgersQuery.data.data.length - 1 - i]
+		for (let i = 0; i < ledgersQuery.data.length; i++) {
+			const ledger: Ledger = ledgersQuery.data[ledgersQuery.data.length - 1 - i]
 
 			result.push(
 				<li className="px-1" key={ledger.id}>
@@ -127,7 +126,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 			)
 		}
 
-		if (!monthGroupQuery?.data?.data || monthGroupQuery.data.data.length < 1) {
+		if (!monthGroupQuery?.data || monthGroupQuery.data.length < 1) {
 			return (
 				<div className="w-full h-full flex justify-center items-center flex-col text-sm text-center">
 					<p className="w-5/6 mb-4">
@@ -149,8 +148,8 @@ function MonthSelectorPage(props: DocumentPageProps) {
 			)
 		}
 
-		for (let i = 0; i < monthGroupQuery.data.data.length; i++) {
-			const value = monthGroupQuery.data.data[i]
+		for (let i = 0; i < monthGroupQuery.data.length; i++) {
+			const value = monthGroupQuery.data[i]
 
 			result.push(
 				<li className="px-1" key={`${value.month} ${value.year}`}>
