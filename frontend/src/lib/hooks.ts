@@ -63,7 +63,7 @@ function useSettingsQuery() {
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => !isNonNullable(query.state.data),
-		enabled: !isNonNullable(userQuery.data) && !userQuery.isRefetching
+		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
@@ -202,7 +202,7 @@ function useMonthGroupQuery(ledger_id?: number) {
 		},
 		refetchOnWindowFocus: false,
 		enabled:
-			!!userQuery.data && !userQuery.isRefetching && ledger_id !== undefined
+			!!userQuery.data && !userQuery.isRefetching && !!ledger_id
 	})
 }
 
