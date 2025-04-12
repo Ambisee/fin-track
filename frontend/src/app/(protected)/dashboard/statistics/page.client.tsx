@@ -77,7 +77,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const formatAmount = useAmountFormatter()
 	const percentageKey = "percentage" as keyof Group
 
-	if (props.data === undefined || !settingsQuery.data?.data?.current_ledger) {
+	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
 		return <Skeleton className="w-full h-[250px] mt-5" />
 	}
 
@@ -170,7 +170,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 function CategoryItem(props: CategoryItemProps) {
 	const settingsQuery = useSettingsQuery()
 	const entryDataQuery = useEntryDataQuery(
-		settingsQuery.data?.data?.current_ledger,
+		settingsQuery.data?.current_ledger,
 		props.period
 	)
 
@@ -226,7 +226,7 @@ function CategoryItem(props: CategoryItemProps) {
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
 							data={
-								entryDataQuery.data?.data?.filter(
+								entryDataQuery.data?.filter(
 									(value) =>
 										value.category === props.value.category &&
 										value.is_positive == props.value.is_positive
@@ -380,7 +380,7 @@ export default function DashboardStatistics() {
 
 	const settingsQuery = useSettingsQuery()
 	const statisticsQuery = useStatisticsQuery(
-		settingsQuery.data?.data?.current_ledger,
+		settingsQuery.data?.current_ledger,
 		curPeriod
 	)
 	const isDesktop = useMediaQuery({ minWidth: DESKTOP_BREAKPOINT })
@@ -392,13 +392,13 @@ export default function DashboardStatistics() {
 			groupByCategory: []
 		}
 
-		if (!statisticsQuery.data?.data) {
+		if (!statisticsQuery.data) {
 			return result
 		}
 
 		let colorIndex = 1
-		for (let i = 0; i < statisticsQuery.data.data.length; i++) {
-			const statistic: Statistic = statisticsQuery.data.data[i]
+		for (let i = 0; i < statisticsQuery.data.length; i++) {
+			const statistic: Statistic = statisticsQuery.data[i]
 			if (!isNonNullable(statistic.total_amount)) {
 				console.error("Expected a non-null value: statistic.total")
 				continue

@@ -108,7 +108,7 @@ function LedgerBadge() {
 		<DialogTrigger asChild>
 			<button className="absolute top-[38px] right-4">
 				<span className="w-full text-sm bg-secondary text-secondary-foreground rounded-full py-1 px-6">
-					{settingsQuery.data?.data?.ledger?.name}
+					{settingsQuery.data?.ledger?.name}
 				</span>
 			</button>
 		</DialogTrigger>
@@ -117,7 +117,7 @@ function LedgerBadge() {
 
 function DashboardContextProvider(props: { children: JSX.Element }) {
 	const settingsQuery = useSettingsQuery()
-	const entryQuery = useEntryDataQuery(settingsQuery.data?.data?.current_ledger)
+	const entryQuery = useEntryDataQuery(settingsQuery.data?.current_ledger)
 
 	const searchRef = useRef(
 		new MiniSearch({ fields: ["index", "amount", "category", "note"] })

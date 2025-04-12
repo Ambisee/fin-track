@@ -33,7 +33,7 @@ export default function AutomaticMonthlyReport() {
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),
 		values: {
-			allowReport: userSettingsQuery.data?.data?.allow_report ?? false
+			allowReport: userSettingsQuery.data?.allow_report ?? false
 		}
 	})
 
@@ -47,7 +47,7 @@ export default function AutomaticMonthlyReport() {
 						const { error } = await sbBrowser
 							.from("settings")
 							.update({ allow_report: formData.allowReport })
-							.eq("user_id", userSettingsQuery.data?.data?.user_id as string)
+							.eq("user_id", userSettingsQuery.data?.user_id as string)
 
 						if (error !== null) {
 							toast({

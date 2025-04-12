@@ -9,13 +9,9 @@ import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 import { Database } from "./supabase-auto"
 
-type InferQueryType<T> = T extends DefinedQueryObserverResult<
-	PostgrestSingleResponse<infer U>
->
-	? U extends Array<infer V>
-		? V
-		: never
-	: never
+type InferQueryType<T> = T extends DefinedQueryObserverResult<infer U> ? 
+    (U extends Array<infer V> ? V : U) : 
+    never
 
 type Entry = InferQueryType<ReturnType<typeof useEntryDataQuery>>
 type Statistic = InferQueryType<ReturnType<typeof useStatisticsQuery>>

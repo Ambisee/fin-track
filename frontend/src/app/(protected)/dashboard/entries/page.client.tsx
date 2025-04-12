@@ -4,11 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import MonthPicker from "@/components/user/MonthPicker"
-import {
-	useEntryDataQuery,
-	useInfiniteEntryDataQuery,
-	useSettingsQuery
-} from "@/lib/hooks"
+import { useInfiniteEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { SearchIcon } from "lucide-react"
 import { useState } from "react"
@@ -19,7 +15,7 @@ export default function DashboardEntries() {
 
 	const settingsQuery = useSettingsQuery()
 	const entryQuery = useInfiniteEntryDataQuery(
-		settingsQuery.data?.data?.current_ledger,
+		settingsQuery.data?.current_ledger,
 		curPeriod,
 		5
 	)
@@ -52,7 +48,7 @@ export default function DashboardEntries() {
 					</>
 				) : (
 					<EntryList
-						data={entryQuery.data.pages.map((value) => value.data ?? []).flat()}
+						data={entryQuery.data.pages.flat()}
 						onScrollToBottom={() => {
 							if (entryQuery.hasNextPage) entryQuery.fetchNextPage()
 						}}

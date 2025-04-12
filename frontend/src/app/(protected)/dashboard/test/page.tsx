@@ -12,7 +12,7 @@ export default function DashboardTest() {
 
 	const settingsQuery = useSettingsQuery()
 	const entryQuery = useInfiniteEntryDataQuery(
-		settingsQuery.data?.data?.current_ledger,
+		settingsQuery.data?.current_ledger,
 		new Date("2025-02-25"),
 		5
 	)
@@ -49,11 +49,7 @@ export default function DashboardTest() {
 				onScrollToBottom={() => {
 					if (entryQuery.hasNextPage) entryQuery.fetchNextPage()
 				}}
-				data={
-					entryQuery.data?.pages
-						?.map((value, index) => value.data ?? [])
-						?.flatMap((value) => value) ?? []
-				}
+				data={entryQuery.data?.pages.flat() ?? []}
 			/>
 		</div>
 	)

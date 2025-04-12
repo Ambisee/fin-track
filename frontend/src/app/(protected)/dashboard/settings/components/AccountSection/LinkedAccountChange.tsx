@@ -19,7 +19,7 @@ export default function LinkedAccountChange() {
 
 	const getIdentityProviders = () => {
 		const result = new Set()
-		const identities = userQuery.data?.data.user?.identities
+		const identities = userQuery.data?.identities
 		if (identities === undefined) {
 			return result
 		}
@@ -32,13 +32,13 @@ export default function LinkedAccountChange() {
 	}
 
 	const renderButton = (provider: string) => {
-		if (userQuery.data?.data.user?.identities === undefined) {
+		if (userQuery.data?.identities === undefined) {
 			return undefined
 		}
 
 		const identityProviders = getIdentityProviders()
 		if (identityProviders.has(provider)) {
-			const identity = userQuery.data.data.user.identities.find(
+			const identity = userQuery.data?.identities.find(
 				(value) => value.provider === provider
 			)
 
