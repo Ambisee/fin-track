@@ -4,21 +4,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { MONTHS } from "@/lib/constants"
-import {
-	useInfiniteEntryDataQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/hooks"
+import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 
 export default function DashboardHome() {
 	const today = new Date()
 
 	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
-	const entryDataQuery = useInfiniteEntryDataQuery(
+	const entryDataQuery = useEntryDataQuery(
 		settingsQuery.data?.current_ledger,
-		today,
-		10
+		today
 	)
 
 	const renderWelcomeMessage = () => {
@@ -75,7 +70,7 @@ export default function DashboardHome() {
 			)
 		}
 
-		if (!entryDataQuery.data?.pages) {
+		if (!entryDataQuery.data) {
 			return (
 				<Alert variant="destructive">
 					<AlertTitle>Unable to retrieve entry data</AlertTitle>
@@ -92,10 +87,7 @@ export default function DashboardHome() {
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
 				<EntryList
-					data={entryDataQuery.data.pages.flat()}
-					onScrollToBottom={() => {
-						if (entryDataQuery.hasNextPage) entryDataQuery.fetchNextPage()
-					}}
+					data={entryDataQuery.data}
 					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
 				/>
 			</div>

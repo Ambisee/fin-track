@@ -1,10 +1,8 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Category, EntryDataCursor, Ledger } from "@/types/supabase"
+import { Category, Ledger } from "@/types/supabase"
 import {
-    useInfiniteQuery,
     useMutation,
-    useQuery,
-    useQueryClient
+    useQuery
 } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef } from "react"
 import {
@@ -18,7 +16,6 @@ import {
 } from "./constants"
 import { DateHelper } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
-import { StringHelper } from "./helper/StringHelper"
 import { sbBrowser } from "./supabase"
 import { isNonNullable } from "./utils"
 
@@ -138,113 +135,6 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 	})
 }
 
-function useInfiniteEntryDataQuery(ledger?: number, period: Date = new Date(), limit: number = 100) {
-    const userQuery = useUserQuery()
-    const queryClient = useQueryClient()
-
-    const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
-    const { start, end } = DateHelper.getMonthStartEnd(period)
-    
-    return useInfiniteQuery({
-        queryKey,
-        queryFn: async ({ pageParam }) => {
-            const user = userQuery.data
-            if (!isNonNullable(user)) {
-                throw Error(QueryHelper.MESSAGE_NO_USER)
-            }
-
-            const data = queryClient.getQueryData(queryKey) as
-                ReturnType<typeof useInfiniteEntryDataQuery>["data"]
-
-            let query = sbBrowser
-                .from("entry")
-                .select("*")
-                .eq("created_by", user.id)
-				.eq("ledger", ledger!)
-            
-            if (data?.pageParams === undefined) {
-                const { data: result } = await query
-                    .gte("date", DateHelper.toDatabaseString(start))
-                    .lte("date", DateHelper.toDatabaseString(end))
-                    .order("date", {ascending: false})
-                    .order("category", {ascending: false})
-                    .order("id", {ascending: true})
-                    .limit(limit)
-                
-                return result ?? []
-            }
-            
-            if (pageParam.index === 0) {
-                if (data.pageParams.length > 2) {
-                    const nextParam = data.pageParams[1] as EntryDataCursor
-                    query = query
-                        .lte("date", DateHelper.toDatabaseString(end))
-                        .or(StringHelper.removeWhitespaces(`
-                            date.gt.${nextParam!.date},
-                            and(date.eq.${nextParam!.date}, category.gt.${nextParam!.category}),
-                            and(date.eq.${nextParam!.date}, category.eq.${nextParam!.category}, id.gte.${nextParam!.id})
-                        `))
-                } else {
-                    query = query
-                        .lte("date", DateHelper.toDatabaseString(end))
-                        .gte("date", DateHelper.toDatabaseString(start))
-                        .limit(limit)
-                }
-            } else if (pageParam.index === data.pageParams.length) {
-                query = query
-                    .gte("date", DateHelper.toDatabaseString(start))
-                    .or(StringHelper.removeWhitespaces(`
-                        date.lt.${pageParam.date}, 
-                        and(date.eq.${pageParam.date}, category.lt.${pageParam.category}), 
-                        and(date.eq.${pageParam.date}, category.eq.${pageParam.category}, id.lt.${pageParam.id})
-                    `))
-                    .limit(limit)
-            } else {
-                const nextParam = data.pageParams.at(pageParam.index + 1) as EntryDataCursor
-
-                query = query
-                    .or(StringHelper.removeWhitespaces(`
-                        date.lt.${pageParam.date},
-                        and(date.eq.${pageParam.date}, category.lt.${pageParam.category}),
-                        and(date.eq.${pageParam.date}, category.eq.${pageParam.category}, id.lt.${pageParam.id})
-                    `))
-                    .or(StringHelper.removeWhitespaces(`
-                        date.gt.${nextParam!.date},
-                        and(date.eq.${nextParam!.date}, category.gt.${nextParam!.category}),
-                        and(date.eq.${nextParam!.date}, category.eq.${nextParam!.category}, id.gte.${nextParam!.id})
-                    `))
-            }
-
-            const { data: result } = await query
-                .order("date", {ascending: false})
-                .order("category", {ascending: false})
-                .order("id", {ascending: true})
-            
-            return result ?? []
-        },
-        getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-            if (!isNonNullable(lastPage) || lastPage.length < limit) {
-                return null
-            }
-            
-            const lastEntry = lastPage.at(-1)
-            return {
-                index: allPageParams.at(-1)!!.index + 1,
-                id: lastEntry!!.id,
-                date: lastEntry!!.date,
-                category: lastEntry!!.category,
-            }
-        },
-        initialPageParam: {index: 0, id: -1, date: DateHelper.toDatabaseString(start), category: ""},
-        staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
-		enabled:
-            !!ledger &&
-			!!userQuery.data &&
-			!userQuery.isRefetching
-    })
-}
 
 function useCurrenciesQuery() {
 	return useQuery({
@@ -671,7 +561,7 @@ export {
     useAmountFormatter,
     useCategoriesQuery,
     useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
-    useEntryDataQuery, useInfiniteEntryDataQuery,
+    useEntryDataQuery,
     useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
     useLedgersQuery,
     useMonthGroupQuery,

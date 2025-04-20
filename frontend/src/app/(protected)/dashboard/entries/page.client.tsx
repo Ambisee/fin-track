@@ -4,8 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import MonthPicker from "@/components/user/MonthPicker"
-import { useInfiniteEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import { SearchIcon } from "lucide-react"
 import { useState } from "react"
 
@@ -14,10 +13,9 @@ export default function DashboardEntries() {
 	const [searchQuery, setSearchQuery] = useState<string>("")
 
 	const settingsQuery = useSettingsQuery()
-	const entryQuery = useInfiniteEntryDataQuery(
+	const entryQuery = useEntryDataQuery(
 		settingsQuery.data?.current_ledger,
-		curPeriod,
-		5
+		curPeriod
 	)
 
 	// TODO: Update the search function
@@ -48,17 +46,9 @@ export default function DashboardEntries() {
 					</>
 				) : (
 					<EntryList
-						data={entryQuery.data.pages.flat()}
-						onScrollToBottom={() => {
-							if (entryQuery.hasNextPage) entryQuery.fetchNextPage()
-						}}
+						data={entryQuery.data}
 						virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
 					/>
-				)}
-				{entryQuery.isFetchingNextPage && (
-					<div className="w-full flex justify-center items-center py-12">
-						<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-					</div>
 				)}
 			</div>
 		)
@@ -72,7 +62,7 @@ export default function DashboardEntries() {
 			<div className="sticky top-0 py-4 z-50 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<Input
-					disabled={entryQuery.isLoading || !entryQuery.data?.pages}
+					disabled={entryQuery.isLoading || !entryQuery.data}
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."
