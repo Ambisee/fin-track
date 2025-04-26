@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { MONTHS } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import { isNonNullable } from "@/lib/utils"
 
 export default function DashboardHome() {
 	const today = new Date()
@@ -57,7 +58,7 @@ export default function DashboardHome() {
 	}
 
 	const renderThisMonthEntries = () => {
-		if (entryDataQuery.isLoading) {
+		if (entryDataQuery.isLoading || !entryDataQuery.isFetched) {
 			return (
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />
@@ -70,7 +71,7 @@ export default function DashboardHome() {
 			)
 		}
 
-		if (!entryDataQuery.data) {
+		if (!isNonNullable(entryDataQuery.data)) {
 			return (
 				<Alert variant="destructive">
 					<AlertTitle>Unable to retrieve entry data</AlertTitle>
