@@ -11,8 +11,8 @@ interface EntryFormState {
     data?: Entry
     setData: Dispatch<SetStateAction<Entry | undefined>>
 
-    onSubmitSuccess?: ((data: Entry) => void)
-    setOnSubmitSuccess: (value: ((data: Entry) => void) | undefined) => void
+    onSubmitSuccess?: ((data: Entry, oldData?: Entry) => void)
+    setOnSubmitSuccess: (value: ((data: Entry, oldData?: Entry) => void) | undefined) => void
 
     // For the category page
     isCategoryEdit: boolean

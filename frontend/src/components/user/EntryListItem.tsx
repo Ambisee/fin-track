@@ -11,6 +11,7 @@ import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { sbBrowser } from "@/lib/supabase"
+import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
@@ -143,7 +144,7 @@ export default function EntryListItem({
 									type="button"
 									onClick={() => {
 										setData(props.data)
-										setOnSubmitSuccess((data) => {
+										setOnSubmitSuccess((data, oldData) => {
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getEntryQueryKey(
 													data.ledger,
@@ -156,6 +157,30 @@ export default function EntryListItem({
 													new Date(data.date)
 												)
 											})
+
+											// // Update the query data corresponding to the data's old ledger and date
+											const oldDataExists = isNonNullable(oldData)
+											const similarLedgerAndDate =
+												data.ledger === oldData?.ledger &&
+												data.date === oldData?.date
+
+											if (!oldDataExists || similarLedgerAndDate) {
+												return
+											}
+
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getEntryQueryKey(
+													oldData.ledger,
+													new Date(oldData.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getStatisticQueryKey(
+													oldData.ledger,
+													new Date(oldData.date)
+												)
+											})
+
 											setOpen(false)
 										})
 									}}

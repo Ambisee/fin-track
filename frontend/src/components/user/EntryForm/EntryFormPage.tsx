@@ -102,7 +102,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								})
 
 								form.reset()
-								props.onSubmitSuccess?.(result)
+								props.onSubmitSuccess?.(result, props.data)
 							} catch (e) {
 								const errorData = e as Error
 
