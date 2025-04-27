@@ -7,10 +7,11 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
-import { ENTRY_QKEY } from "@/lib/constants"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { sbBrowser } from "@/lib/supabase"
+import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
@@ -34,8 +35,10 @@ import { useToast } from "../ui/use-toast"
 
 interface EntryListItemProps {
 	data: Entry
-	onEdit?: (data: Entry) => void
+	expanded?: boolean
 	showButtons?: boolean
+	onEdit?: (data: Entry) => void
+	onExpand?: (value: boolean) => void
 }
 
 function formatListItemDate(date: Date) {
@@ -62,7 +65,7 @@ export default function EntryListItem({
 	showButtons = true,
 	...props
 }: EntryListItemProps) {
-	const [isItemOpen, setIsItemOpen] = useState(false)
+	const [isItemOpen, setIsItemOpen] = useState(props.expanded ?? false)
 
 	const { toast } = useToast()
 	const queryClient = useQueryClient()
@@ -92,7 +95,10 @@ export default function EntryListItem({
 					type="button"
 					className="h-full w-full p-4 text-left focus:bg-background focus:outline-none"
 					onClick={() => {
-						setIsItemOpen((c) => !c)
+						setIsItemOpen((c) => {
+							props.onExpand?.(!c)
+							return !c
+						})
 					}}
 				>
 					<div className="flex justify-between items-center w-inherit">
@@ -138,8 +144,43 @@ export default function EntryListItem({
 									type="button"
 									onClick={() => {
 										setData(props.data)
-										setOnSubmitSuccess((data) => {
-											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+										setOnSubmitSuccess((data, oldData) => {
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getEntryQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getStatisticQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
+
+											// Update the query data corresponding to the data's old ledger and date
+											const oldDataExists = isNonNullable(oldData)
+											const similarLedgerAndDate =
+												data.ledger === oldData?.ledger &&
+												data.date === oldData?.date
+
+											if (!oldDataExists || similarLedgerAndDate) {
+												return
+											}
+
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getEntryQueryKey(
+													oldData.ledger,
+													new Date(oldData.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getStatisticQueryKey(
+													oldData.ledger,
+													new Date(oldData.date)
+												)
+											})
+
 											setOpen(false)
 										})
 									}}
@@ -194,7 +235,16 @@ export default function EntryListItem({
 														})
 
 														queryClient.invalidateQueries({
-															queryKey: ENTRY_QKEY
+															queryKey: QueryHelper.getEntryQueryKey(
+																props.data.ledger,
+																new Date(props.data.date)
+															)
+														})
+														queryClient.invalidateQueries({
+															queryKey: QueryHelper.getStatisticQueryKey(
+																props.data.ledger,
+																new Date(props.data.date)
+															)
 														})
 													}
 												})

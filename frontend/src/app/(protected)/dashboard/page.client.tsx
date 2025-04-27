@@ -1,25 +1,27 @@
 "use client"
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
-import { useEntryDataQuery, useUserQuery } from "@/lib/hooks"
-import { filterDataGroup } from "@/lib/utils"
-import { useContext } from "react"
-import { DashboardContext } from "./layout"
 import { MONTHS } from "@/lib/constants"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
+import { isNonNullable } from "@/lib/utils"
 
 export default function DashboardHome() {
-	const { dataGroups } = useContext(DashboardContext)
+	const today = new Date()
 
 	const userQuery = useUserQuery()
-	const entryDataQuery = useEntryDataQuery()
+	const settingsQuery = useSettingsQuery()
+	const entryDataQuery = useEntryDataQuery(
+		settingsQuery.data?.current_ledger,
+		today
+	)
 
 	const renderWelcomeMessage = () => {
 		if (
 			userQuery.isLoading ||
 			!userQuery.isFetched ||
-			userQuery.data?.data?.user === undefined
+			userQuery.data === undefined
 		) {
 			return (
 				<div className="mb-8">
@@ -27,14 +29,14 @@ export default function DashboardHome() {
 					<Skeleton className="min-w-36 w-3/4 h-8 mt-4" />
 				</div>
 			)
-		} else if (userQuery.data?.data?.user !== null) {
+		} else if (userQuery.data !== null) {
 			return (
 				<div className="mb-8">
 					<div className="w-full mb-4 flex justify-between items-center">
 						<h1 className="text-3xl">Home</h1>
 					</div>
 					<h2 className="text-2xl mt-4">
-						Welcome back, {userQuery.data?.data?.user.user_metadata.username}
+						Welcome back, {userQuery.data.user_metadata.username}
 					</h2>
 				</div>
 			)
@@ -56,7 +58,7 @@ export default function DashboardHome() {
 	}
 
 	const renderThisMonthEntries = () => {
-		if (!entryDataQuery.isFetched || entryDataQuery.isFetching) {
+		if (entryDataQuery.isLoading || !entryDataQuery.isFetched) {
 			return (
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />
@@ -69,19 +71,26 @@ export default function DashboardHome() {
 			)
 		}
 
-		const today = new Date()
-		const group = filterDataGroup(
-			today.getMonth(),
-			today.getFullYear(),
-			dataGroups
-		).data
+		if (!isNonNullable(entryDataQuery.data)) {
+			return (
+				<Alert variant="destructive">
+					<AlertTitle>Unable to retrieve entry data</AlertTitle>
+					<AlertDescription>
+						{entryDataQuery.failureReason?.message}
+					</AlertDescription>
+				</Alert>
+			)
+		}
 
 		return (
 			<div>
 				<h2 className="text-xl mb-4">
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
-				<EntryList data={group.toReversed()} />
+				<EntryList
+					data={entryDataQuery.data}
+					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+				/>
 			</div>
 		)
 	}

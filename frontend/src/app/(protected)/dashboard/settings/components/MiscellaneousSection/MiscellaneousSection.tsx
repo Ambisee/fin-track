@@ -1,29 +1,30 @@
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
-import SettingsSection from "../SettingsSection"
 import {
 	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
 	AlertDialogDescription,
 	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction,
+	AlertDialogHeader,
+	AlertDialogTitle,
 	AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { sbBrowser } from "@/lib/supabase"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useToast } from "@/components/ui/use-toast"
 import {
 	CURRENCIES_QKEY,
 	ENTRY_QKEY,
 	SHORT_TOAST_DURATION,
+	STATISTICS_QKEY,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
-import { useToast } from "@/components/ui/use-toast"
+import { sbBrowser } from "@/lib/supabase"
+import { useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import SettingsSection from "../SettingsSection"
 
 export default function MiscellaneousSection() {
 	const router = useRouter()
@@ -123,6 +124,7 @@ export default function MiscellaneousSection() {
 
 								queryClient.removeQueries({ queryKey: CURRENCIES_QKEY })
 								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
+								queryClient.removeQueries({ queryKey: STATISTICS_QKEY })
 								queryClient.removeQueries({ queryKey: USER_SETTINGS_QKEY })
 								queryClient.removeQueries({ queryKey: USER_QKEY })
 

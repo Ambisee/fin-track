@@ -20,6 +20,7 @@ import { useState } from "react"
 import { useToast } from "../ui/use-toast"
 import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
 import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
+import { isNonNullable } from "@/lib/utils"
 
 interface LedgerGroupProps
 	extends Omit<
@@ -64,7 +65,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 	const insertLedgerMutation = useInsertLedgerMutation()
 	const onCreateCallback = async (ledger: LedgerFormData) => {
-		const userID = userQuery.data?.data.user?.id
+		const userID = userQuery.data?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
@@ -77,6 +78,10 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 		try {
 			const successData = await insertLedgerMutation.mutateAsync(payload)
+			if (!isNonNullable(successData)) {
+				throw Error("An unexpected error occured: Inserted entry is null")
+			}
+
 			toast({
 				description: "New ledger created",
 				duration: SHORT_TOAST_DURATION
@@ -110,7 +115,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 	const updateLedgerMutation = useUpdateLedgerMutation()
 	const onUpdateCallback = async (ledger: LedgerFormData) => {
-		const userID = userQuery.data?.data.user?.id
+		const userID = userQuery.data?.id
 		if (!userID) {
 			toast({ description: "No user ID found" })
 			return
@@ -123,6 +128,9 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 		try {
 			const successData = await updateLedgerMutation.mutateAsync(payload)
+			if (!isNonNullable(successData)) {
+				throw Error("An unexpected error occured: Inserted entry is null")
+			}
 
 			toast({
 				description: "Ledger updated",
@@ -161,6 +169,9 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			const successData = await deleteLedgerMutation.mutateAsync({
 				id: ledger.id
 			})
+			if (!isNonNullable(successData)) {
+				throw Error("An unexpected error occured: Inserted entry is null")
+			}
 
 			toast({
 				description: "Ledger deleted",
@@ -214,7 +225,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			toast({
 				description: (
 					<>
-						Switched to the ledger: <b>{successData.ledger?.name}</b>
+						Switched to the ledger: <b>{successData?.ledger?.name}</b>
 					</>
 				),
 				duration: SHORT_TOAST_DURATION
@@ -243,8 +254,8 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			isLoading={isLoading}
 			isInitialized={!ledgersQuery.isLoading}
 			isEditMode={isEditMode}
-			ledgersList={ledgersQuery.data?.data ?? []}
-			currentLedger={settingsQuery.data?.data?.ledger ?? undefined}
+			ledgersList={ledgersQuery.data ?? []}
+			currentLedger={settingsQuery.data?.ledger ?? undefined}
 			onAddButton={() => {
 				setCurrentLedger(undefined)
 				setCurrentPage(1)
@@ -258,7 +269,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			isLoading={isLoading}
 			isInitialized={!ledgersQuery.isLoading && !currenciesQuery.isLoading}
 			data={currentLedger}
-			currencyList={currenciesQuery.data?.data ?? []}
+			currencyList={currenciesQuery.data ?? []}
 			onBackButton={() => {
 				setCurrentLedger(undefined)
 				setIsEditMode(true)

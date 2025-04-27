@@ -1,6 +1,5 @@
 "use client"
 
-import { ENTRY_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -11,6 +10,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -38,7 +38,6 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 }
 
 export default function ProtectedNavbar() {
-	const pathname = usePathname()
 	const queryClient = useQueryClient()
 
 	const settingsQuery = useSettingsQuery()
@@ -72,13 +71,18 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
-											if (
-												data.ledger !== settingsQuery.data?.data?.current_ledger
-											) {
-												return
-											}
-
-											queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getEntryQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
+											queryClient.invalidateQueries({
+												queryKey: QueryHelper.getStatisticQueryKey(
+													data.ledger,
+													new Date(data.date)
+												)
+											})
 										})
 										setOpen(true)
 									}}

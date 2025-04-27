@@ -57,7 +57,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 	const insertCategoryMutation = useInsertCategoryMutation()
 	const onCreateCallback = async (category: CategoryFormData) => {
-		const userData = userQuery.data?.data.user
+		const userData = userQuery.data
 		if (!userData) {
 			return
 		}
@@ -91,7 +91,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 	const updateCategoryMutation = useUpdateCategoryMutation()
 	const onUpdateCallback = async (category: CategoryFormData) => {
-		const userData = userQuery.data?.data.user
+		const userData = userQuery.data
 		if (!userData) {
 			return
 		}
@@ -122,7 +122,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 	const deleteCategoryMutation = useDeleteCategoryMutation()
 	const onDeleteCallback = async (category: Category) => {
-		const userData = userQuery.data?.data.user
+		const userData = userQuery.data
 		if (!userData) {
 			return
 		}
@@ -160,7 +160,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 			editModeOnly={props.editModeOnly}
 			isInitialized={!categoriesQuery.isLoading && !userQuery.isLoading}
 			currentCategory={curCategory}
-			categoriesList={categoriesQuery.data?.data ?? []}
+			categoriesList={categoriesQuery.data ?? []}
 			onBackButton={props.onBackButton}
 			onAddButton={() => {
 				setCurCategory(undefined)

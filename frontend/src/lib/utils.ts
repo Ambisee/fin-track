@@ -2,7 +2,7 @@ import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { MONTHS } from "./constants"
+import { ENTRY_QKEY, MONTHS, STATISTICS_QKEY } from "./constants"
 
 interface MonthGroup {
     month: string,
@@ -244,7 +244,6 @@ function getUsernameFromEmail(email: string) {
     return username.replace(/[^a-zA-Z0-9]/g, '')
 }
 
-
 function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) {
     const today = new Date(year, month)
     
@@ -274,10 +273,17 @@ function filterDataGroup(month: number, year: number, dataGroups: MonthGroup[]) 
     }
 }
 
-function isFunction(value: any): value is Function { return typeof value === "function"}
+function isNonNullable<T>(value: T): value is NonNullable<T> { 
+    return value !== null && value !== undefined
+}
 
-export type {MonthGroup}
+function isFunction(value: any): value is Function { 
+    return typeof value === "function"
+}
+
 export {
-    cn, getUsernameFromEmail, filterDataGroup, isFunction,
+    cn, getUsernameFromEmail, filterDataGroup, isFunction, isNonNullable,
     handleDataChange, groupDataByMonth, groupData
 }
+export type { MonthGroup }
+

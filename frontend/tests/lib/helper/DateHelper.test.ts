@@ -1,11 +1,11 @@
-import { DatabaseHelper } from "@/lib/helper/DatabaseHelper"
+import { DateHelper } from "@/lib/helper/DateHelper"
 
 interface TestCase<I, E> {
 	input: I
 	expected: E
 }
 
-describe("DatabaseHelper tests", () => {
+describe("DateHelper tests", () => {
 	const testcases: TestCase<Date, string>[] = [
 		{ input: new Date("2024-12-12"), expected: "2024-12-12" },
 		{ input: new Date("2024/01/01"), expected: "2024-01-01" },
@@ -16,7 +16,7 @@ describe("DatabaseHelper tests", () => {
 
 	it("should format date strings into Postgres' date format", () => {
         for (let i = 0; i < testcases.length; i++) {
-            const actual = DatabaseHelper.parseDateString(testcases[i].input)
+            const actual = DateHelper.toDatabaseString(testcases[i].input)
             expect(actual).toEqual(testcases[i].expected)
         }
     })

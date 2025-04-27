@@ -18,35 +18,23 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
-import { MonthPicker } from "@/components/user/MonthPicker"
-import { DESKTOP_BREAKPOINT, ENTRY_QKEY, MONTHS } from "@/lib/constants"
-import { useAmountFormatter, useEntryDataQuery } from "@/lib/hooks"
-import useGlobalStore from "@/lib/store"
-import { MonthGroup, cn, filterDataGroup } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
-import { useQueryClient } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import MonthPicker from "@/components/user/MonthPicker"
+import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
+import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
-	createContext,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState
-} from "react"
+	useAmountFormatter,
+	useEntryDataQuery,
+	useSettingsQuery,
+	useStatisticsQuery
+} from "@/lib/hooks"
+import useGlobalStore from "@/lib/store"
+import { cn, isNonNullable } from "@/lib/utils"
+import { Statistic } from "@/types/supabase"
+import { useQueryClient } from "@tanstack/react-query"
+import { X } from "lucide-react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
-import { DashboardContext } from "../layout"
-
-interface Group {
-	name: string
-	income: number
-	expense: number
-	incomePercentage: number
-	expensePercentage: number
-	data: Entry[]
-	fill: string
-}
 
 interface Statistics {
 	totalIncome: number
@@ -54,18 +42,29 @@ interface Statistics {
 	groupByCategory: Group[]
 }
 
+interface Group extends Statistic {
+	fillColor: string
+	percentage: number
+}
+
 interface StatsUIProps {
 	stats: Statistics
 	chartConfig: ChartConfig
 }
 
-interface ChartDisplayProps {
-	data?: any[]
-	chartConfig: ChartConfig
-	dataKey: "income" | "expense"
+interface CategoryItemProps {
+	value: Group
+	period: Date
 }
 
-const StatisticsPageContext = createContext<{ period: number[] }>(null!)
+interface ChartDisplayProps {
+	data?: Group[]
+	chartConfig: ChartConfig
+	dataKey: string
+	nameKey: string
+}
+
+const StatisticsPageContext = createContext<{ period: Date }>(null!)
 
 function ChartDisplay(props: ChartDisplayProps) {
 	const { period } = useContext(StatisticsPageContext)
@@ -74,22 +73,15 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const queryClient = useQueryClient()
+	const settingsQuery = useSettingsQuery()
 	const formatAmount = useAmountFormatter()
-	const percentageKey = props.dataKey.concat("Percentage") as keyof Group
+	const percentageKey = "percentage" as keyof Group
 
-	const data = useMemo(() => {
-		if (!props.data) {
-			return []
-		}
-
-		return props.data.filter((entry) => entry[props.dataKey] !== 0)
-	}, [props.data, props.dataKey])
-
-	if (props.data === undefined) {
+	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
 		return <Skeleton className="w-full h-[250px] mt-5" />
 	}
 
-	if (data.length < 1) {
+	if (props.data.length < 1) {
 		return (
 			<div className="h-[250px] flex items-center justify-center flex-col gap-2">
 				<h2>No {props.dataKey} data entered for this period.</h2>
@@ -97,8 +89,19 @@ function ChartDisplay(props: ChartDisplayProps) {
 					asChild
 					onClick={() => {
 						setData(undefined)
-						setOnSubmitSuccess(() => {
-							queryClient.invalidateQueries({ queryKey: ENTRY_QKEY })
+						setOnSubmitSuccess((data) => {
+							queryClient.invalidateQueries({
+								queryKey: QueryHelper.getEntryQueryKey(
+									data.ledger,
+									new Date(data.date)
+								)
+							})
+							queryClient.invalidateQueries({
+								queryKey: QueryHelper.getStatisticQueryKey(
+									data.ledger,
+									new Date(data.date)
+								)
+							})
 						})
 					}}
 				>
@@ -121,10 +124,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 								formatterOverride={false}
 								formatter={(value, name, item, index, payload: any) => {
 									let result = formatAmount(value as number)
-									if (
-										percentageKey !== "incomePercentage" &&
-										percentageKey !== "expensePercentage"
-									) {
+									if (percentageKey !== "percentage") {
 										return result
 									}
 
@@ -135,94 +135,110 @@ function ChartDisplay(props: ChartDisplayProps) {
 							/>
 						}
 					/>
-					<Pie data={data} isAnimationActive={false} dataKey={props.dataKey}>
-						{props.data.map((entry, index) => {
-							if (entry[props.dataKey] === 0) {
-								return undefined
-							}
-							return <Cell key={`cell-${index}`} fill={entry.fill} />
-						})}
+					<Pie
+						data={props.data}
+						isAnimationActive={false}
+						nameKey={props.nameKey}
+						dataKey={props.dataKey}
+						minAngle={15}
+					>
+						{props.data.map((entry, index) => (
+							<Cell key={`cell-${index}`} fill={entry.fillColor} />
+						))}
 					</Pie>
 				</PieChart>
 			</ChartContainer>
 			<ul className="grid gap-1.5">
 				{props.data
-					.toSorted((a, b) => b[percentageKey] - a[percentageKey])
+					.toSorted((a, b) => b.percentage - a.percentage)
 					.map((value: Group) => {
-						if (value[props.dataKey] === 0) {
-							return undefined
-						}
-
-						const entryData = value.data
-							.filter(
-								(entry) =>
-									(props.dataKey === "income" && entry.is_positive) ||
-									(props.dataKey === "expense" && !entry.is_positive)
-							)
-							.reverse()
-
-						const dialogTitle = (
-							<>
-								<span className="whitespace-nowrap">
-									{value.name} {props.dataKey}
-								</span>{" "}
-								<span className="whitespace-nowrap">
-									({MONTHS[period[0]]} {period[1]})
-								</span>
-							</>
-						)
+						const dialogTitle = <></>
 
 						return (
-							<li key={value.name}>
-								<Dialog>
-									<DialogTrigger asChild>
-										<button
-											className={cn(
-												buttonVariants({ variant: "ghost" }),
-												"w-full flex items-center py-2 gap-2.5 text-md"
-											)}
-										>
-											<div
-												style={{ background: value.fill }}
-												className={`w-6 aspect-square rounded-sm`}
-											/>
-											<span>
-												{value.name}{" "}
-												<span className="opacity-55">
-													({((value[percentageKey] as number) * 100).toFixed(2)}
-													%)
-												</span>
-											</span>
-											<span className="flex-1 text-right">
-												{formatAmount(value[props.dataKey] as number)}
-											</span>
-										</button>
-									</DialogTrigger>
-									<DialogContent
-										hideCloseButton
-										className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
-									>
-										<DialogHeader className="relative space-y-0 sm:text-center">
-											<DialogTitle
-												className="mx-auto w-2/3 leading-6 lg:w-full"
-												asChild
-											>
-												<h2 className="leading-6">{dialogTitle}</h2>
-											</DialogTitle>
-											<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
-												<X className="w-4 h-4" />
-											</DialogClose>
-										</DialogHeader>
-										<div className="overflow-y-auto pr-1">
-											<EntryList data={entryData} showButtons={false} />
-										</div>
-									</DialogContent>
-								</Dialog>
-							</li>
+							<CategoryItem
+								key={`${value.category}-${period.toDateString()}`}
+								value={value}
+								period={period}
+							/>
 						)
 					})}
 			</ul>
 		</div>
+	)
+}
+
+function CategoryItem(props: CategoryItemProps) {
+	const settingsQuery = useSettingsQuery()
+	const entryDataQuery = useEntryDataQuery(
+		settingsQuery.data?.current_ledger,
+		props.period
+	)
+
+	const formatAmount = useAmountFormatter()
+
+	return (
+		<li key={props.value.category}>
+			<Dialog>
+				<DialogTrigger asChild>
+					<button
+						className={cn(
+							buttonVariants({ variant: "ghost" }),
+							"w-full flex items-center py-2 gap-2.5 text-md"
+						)}
+					>
+						<div
+							style={{ background: props.value.fillColor }}
+							className={`w-6 aspect-square rounded-sm`}
+						/>
+						<span>
+							{props.value.category}{" "}
+							<span className="opacity-55">
+								({((props.value.percentage as number) * 100).toFixed(2)}
+								%)
+							</span>
+						</span>
+						<span className="flex-1 text-right">
+							{formatAmount(props.value.total_amount as number)}
+						</span>
+					</button>
+				</DialogTrigger>
+				<DialogContent
+					hideCloseButton
+					className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+				>
+					<DialogHeader className="relative space-y-0 sm:text-center">
+						<DialogTitle className="mx-auto w-2/3 leading-6 lg:w-full" asChild>
+							<h2 className="leading-6">
+								<span className="whitespace-nowrap">
+									{props.value.category}{" "}
+									{props.value.is_positive ? "Income" : "Expense"}
+								</span>{" "}
+								<span className="whitespace-nowrap">
+									({MONTHS[props.period.getMonth()]}{" "}
+									{props.period.getFullYear()})
+								</span>
+							</h2>
+						</DialogTitle>
+						<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
+							<X className="w-4 h-4" />
+						</DialogClose>
+					</DialogHeader>
+					<div className="h-full overflow-y-auto pr-1">
+						<EntryList
+							data={
+								entryDataQuery.data?.filter(
+									(value) =>
+										value.category === props.value.category &&
+										value.is_positive == props.value.is_positive
+								) ?? []
+							}
+							showButtons={false}
+							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
+						/>
+					</div>
+				</DialogContent>
+			</Dialog>
+		</li>
 	)
 }
 
@@ -253,7 +269,6 @@ function MobileStatsUI(props: StatsUIProps) {
 	}, [props.stats.totalIncome, props.stats.totalExpense])
 
 	const formatAmount = useAmountFormatter()
-	const entryDataQuery = useEntryDataQuery()
 
 	return (
 		<Tabs value={curTab} onValueChange={setCurTab}>
@@ -302,23 +317,21 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="expense">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={
-						entryDataQuery.data === undefined
-							? undefined
-							: props.stats.groupByCategory
-					}
-					dataKey="expense"
+					data={props.stats.groupByCategory.filter(
+						(value) => !value.is_positive
+					)}
+					nameKey="category"
+					dataKey="total_amount"
 				/>
 			</TabsContent>
 			<TabsContent value="income">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={
-						entryDataQuery.data === undefined
-							? undefined
-							: props.stats.groupByCategory
-					}
-					dataKey="income"
+					data={props.stats.groupByCategory.filter(
+						(value) => value.is_positive
+					)}
+					nameKey="category"
+					dataKey="total_amount"
 				/>
 			</TabsContent>
 		</Tabs>
@@ -337,12 +350,11 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={
-						props.stats.groupByCategory === undefined
-							? undefined
-							: props.stats.groupByCategory
-					}
-					dataKey="expense"
+					data={props.stats.groupByCategory.filter(
+						(value) => !value.is_positive
+					)}
+					nameKey="category"
+					dataKey="total_amount"
 				/>
 			</div>
 			<div className="flex-1 px-4 group border-l" data-is-positive="true">
@@ -352,12 +364,11 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={
-						props.stats.groupByCategory === undefined
-							? undefined
-							: props.stats.groupByCategory
-					}
-					dataKey="income"
+					data={props.stats.groupByCategory.filter(
+						(value) => value.is_positive
+					)}
+					nameKey="category"
+					dataKey="total_amount"
 				/>
 			</div>
 		</div>
@@ -365,68 +376,65 @@ function DesktopStatsUI(props: StatsUIProps) {
 }
 
 export default function DashboardStatistics() {
-	const [curPeriod, setCurPeriod] = useState<number[]>(() => {
-		const today = new Date()
-		return [today.getMonth(), today.getFullYear()]
-	})
+	const [curPeriod, setCurPeriod] = useState<Date>(new Date())
 
-	const entryDataQuery = useEntryDataQuery()
-	const { dataGroups } = useContext(DashboardContext)
-	const isDesktop = useMediaQuery({
-		minWidth: DESKTOP_BREAKPOINT
-	})
+	const settingsQuery = useSettingsQuery()
+	const statisticsQuery = useStatisticsQuery(
+		settingsQuery.data?.current_ledger,
+		curPeriod
+	)
+	const isDesktop = useMediaQuery({ minWidth: DESKTOP_BREAKPOINT })
 
-	const calculateStats = (group: MonthGroup | undefined) => {
+	const calculateStats = () => {
 		const result: Statistics = {
 			totalIncome: 0,
 			totalExpense: 0,
 			groupByCategory: []
 		}
 
-		if (group === undefined) {
+		if (!statisticsQuery.data) {
 			return result
 		}
 
 		let colorIndex = 1
-		const keyToIndex = new Map()
-		for (const entry of group.data) {
-			if (!keyToIndex.has(entry.category)) {
-				result.groupByCategory.push({
-					name: entry.category,
-					income: 0,
-					expense: 0,
-					incomePercentage: 0,
-					expensePercentage: 0,
-					data: [],
-					fill: `hsl(var(--chart-${colorIndex}))`
-				})
-
-				keyToIndex.set(entry.category, result.groupByCategory.length - 1)
-				colorIndex += 1
+		for (let i = 0; i < statisticsQuery.data.length; i++) {
+			const statistic: Statistic = statisticsQuery.data[i]
+			if (!isNonNullable(statistic.total_amount)) {
+				console.error("Expected a non-null value: statistic.total")
+				continue
 			}
 
-			const entryGroup = result.groupByCategory[keyToIndex.get(entry.category)]
-			entryGroup.data.push(entry)
-
-			if (entry.is_positive) {
-				result.totalIncome += entry.amount
-				entryGroup.income += entry.amount
+			if (statistic.is_positive) {
+				result.totalIncome += statistic.total_amount
 			} else {
-				result.totalExpense += entry.amount
-				entryGroup.expense += entry.amount
+				result.totalExpense += statistic.total_amount
 			}
+
+			result.groupByCategory.push({
+				...statistic,
+				fillColor: `hsl(var(--chart-${colorIndex++}))`,
+				percentage: 0
+			})
 		}
 
-		for (const group of result.groupByCategory) {
-			group.expensePercentage = group.expense / result.totalExpense
-			group.incomePercentage = group.income / result.totalIncome
+		for (let i = 0; i < result.groupByCategory.length; i++) {
+			const group: Group = result.groupByCategory[i]
+			if (!isNonNullable(group.total_amount)) {
+				console.error("Expected a non-null value: group.total_amount")
+				continue
+			}
+
+			const totalAmount = group.is_positive
+				? result.totalIncome
+				: result.totalExpense
+			group.percentage = group.total_amount / totalAmount
 		}
 
 		return result
 	}
 
 	const renderStatsUI = () => {
-		if (entryDataQuery.isFetching || !entryDataQuery.isFetched) {
+		if (statisticsQuery.isFetching || !statisticsQuery.isFetched) {
 			return (
 				<div className="w-full py-4 flex gap-2 ">
 					<div className="grid gap-2 flex-1">
@@ -441,16 +449,14 @@ export default function DashboardStatistics() {
 			)
 		}
 
-		const stats = calculateStats(
-			filterDataGroup(curPeriod[0], curPeriod[1], dataGroups)
-		)
-
+		const stats = calculateStats()
 		const chartConfig: ChartConfig = {}
-		const keys = Object.keys(stats.groupByCategory)
 
-		for (let i = 0; i < keys.length; i++) {
-			chartConfig[keys[i]] = {
-				label: keys[i]
+		for (let i = 0; i < stats.groupByCategory.length; i++) {
+			const group = stats.groupByCategory[i]
+
+			chartConfig[group.category!] = {
+				label: group.category!
 			}
 		}
 
@@ -459,69 +465,21 @@ export default function DashboardStatistics() {
 		return <StatsUI chartConfig={chartConfig} stats={stats} />
 	}
 
-	const renderMonthPicker = () => {
-		if (entryDataQuery.data === undefined) {
-			return (
-				<div className="w-full flex justify-between items-center py-4">
-					<Skeleton className="w-12 h-12 rounded-full" />
-					<Skeleton className="w-36 h-12" />
-					<Skeleton className="w-12 h-12 rounded-full" />
-				</div>
-			)
-		}
-
-		return (
-			<div className="flex justify-between items-center py-4 bg-background">
-				<Button
-					className="w-12 h-12 rounded-full"
-					variant="ghost"
-					onClick={() =>
-						setCurPeriod((c) => {
-							const result = [c[0] - 1, c[1]]
-							if (result[0] < 0) {
-								result[0] = 11
-								result[1] -= 1
-							}
-
-							return result
-						})
-					}
-				>
-					<ChevronLeft className="w-4 h-4" />
-				</Button>
-				<MonthPicker
-					key={`${curPeriod[0]}-${curPeriod[1]}`}
-					value={curPeriod}
-					onValueChange={(value) => {
-						setCurPeriod(value)
-					}}
-				/>
-				<Button
-					className="h-12 w-12 rounded-full"
-					variant="ghost"
-					onClick={() =>
-						setCurPeriod((c) => {
-							const result = [c[0] + 1, c[1]]
-							result[1] += Math.floor(result[0] / 12)
-							result[0] = result[0] % 12
-
-							return result
-						})
-					}
-				>
-					<ChevronRight className="w-4 h-4" />
-				</Button>
-			</div>
-		)
-	}
-
 	return (
 		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
 			<div className="w-full h-full">
 				<div className="w-full mb-4 flex justify-between items-center">
 					<h1 className="text-3xl">Statistics</h1>
 				</div>
-				{renderMonthPicker()}
+				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
+					<MonthPicker
+						key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
+						value={curPeriod}
+						onValueChange={(value) => {
+							setCurPeriod(value)
+						}}
+					/>
+				</div>
 				{renderStatsUI()}
 			</div>
 		</StatisticsPageContext.Provider>

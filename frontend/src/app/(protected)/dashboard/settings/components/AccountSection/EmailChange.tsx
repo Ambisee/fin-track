@@ -86,7 +86,7 @@ export default function EmailChange() {
 									<InputSkeleton />
 								) : (
 									<Input
-										placeholder={userQuery.data?.data.user?.email}
+										placeholder={userQuery.data?.email}
 										{...field}
 									/>
 								)}

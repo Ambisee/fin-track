@@ -60,10 +60,7 @@ export default function UsernameChange() {
 							return
 						}
 
-						if (
-							data.username ===
-							userQuery.data?.data.user?.user_metadata["username"]
-						) {
+						if (data.username === userQuery.data?.user_metadata["username"]) {
 							toast({
 								description: "Please enter a different username.",
 								variant: "destructive"
@@ -114,9 +111,7 @@ export default function UsernameChange() {
 								) : (
 									<Input
 										className="w-full"
-										placeholder={
-											userQuery.data?.data.user?.user_metadata["username"]
-										}
+										placeholder={userQuery.data?.user_metadata["username"]}
 										{...field}
 									/>
 								)}

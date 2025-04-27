@@ -39,8 +39,8 @@ export default function CurrencyChange() {
 	const settingsQuery = useSettingsQuery()
 	const currenciesQuery = useCurrenciesQuery()
 
-	const currencies = currenciesQuery.data?.data
-	const userSettings = settingsQuery.data?.data
+	const currencies = currenciesQuery.data
+	const userSettings = settingsQuery.data
 	const formDefaultValues = useCallback(
 		() => ({
 			currency: {
