@@ -115,49 +115,16 @@ function LedgerBadge() {
 	)
 }
 
-function DashboardContextProvider(props: { children: JSX.Element }) {
-	const settingsQuery = useSettingsQuery()
-	const entryQuery = useEntryDataQuery(settingsQuery.data?.current_ledger)
-
-	const searchRef = useRef(
-		new MiniSearch({ fields: ["index", "amount", "category", "note"] })
-		// new MiniSearch({
-		// 	fields: ["index", "amount", "category", "note"],
-		// 	storeFields: ["index"],
-		// 	idField: "index"
-		// })
-	)
-
-	// useEffect(() => {
-	// 	if (!entryQuery.data?.data) {
-	// 		return
-	// 	}
-
-	// 	searchRef.current.removeAll()
-	// 	searchRef.current.addAll(
-	// 		entryQuery.data.data.map((val, index) => ({ ...val, index: index }))
-	// 	)
-	// }, [entryQuery])
-
-	return (
-		<DashboardContext.Provider value={{ search: searchRef.current }}>
-			{props.children}
-		</DashboardContext.Provider>
-	)
-}
-
 export default function DashboardLayout(props: DashboardLayoutProps) {
 	return (
-		<DashboardContextProvider>
-			<LayoutEntryDialog>
-				<div className="dashboard-content" vaul-drawer-wrapper="">
-					<Suspense fallback={<Loading />}>{props.children}</Suspense>
-					<LayoutLedgerEditorDialog />
-				</div>
-				<ProtectedNavbar />
-				<LayoutEntryDialogContent />
-			</LayoutEntryDialog>
-		</DashboardContextProvider>
+		<LayoutEntryDialog>
+			<div className="dashboard-content">
+				<Suspense fallback={<Loading />}>{props.children}</Suspense>
+				<LayoutLedgerEditorDialog />
+			</div>
+			<ProtectedNavbar />
+			<LayoutEntryDialogContent />
+		</LayoutEntryDialog>
 	)
 }
 

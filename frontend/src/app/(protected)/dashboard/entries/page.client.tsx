@@ -22,7 +22,6 @@ export default function DashboardEntries() {
 		curPeriod
 	)
 
-	// TODO: Update the search function
 	const renderSearchResult = () => {
 		if (!isNonNullable(searchResult)) return
 
@@ -44,10 +43,6 @@ export default function DashboardEntries() {
 						key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
 						value={curPeriod}
 						onValueChange={(value) => {
-							// TODO: Cancel the currently running query if is ongoing
-							if (entryQuery.isFetching) {
-							}
-
 							setCurPeriod(value)
 						}}
 					/>
