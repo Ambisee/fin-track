@@ -1,7 +1,6 @@
 "use client"
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import MiniSearch from "minisearch"
 
 import { useToast } from "@/components/ui/use-toast"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
@@ -21,12 +20,6 @@ import Loading from "./loading"
 interface DashboardLayoutProps {
 	children: JSX.Element
 }
-
-interface DashboardContextObject {
-	search: MiniSearch
-}
-
-const DashboardContext = createContext<DashboardContextObject>(null!)
 
 function LayoutEntryDialog(props: { children?: JSX.Element | JSX.Element[] }) {
 	const open = useGlobalStore((state) => state.open)
@@ -127,5 +120,3 @@ export default function DashboardLayout(props: DashboardLayoutProps) {
 		</LayoutEntryDialog>
 	)
 }
-
-export { DashboardContext }
