@@ -3,14 +3,18 @@
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
+import EntrySearchBar from "@/components/user/EntrySearchBar"
 import MonthPicker from "@/components/user/MonthPicker"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
+import { isNonNullable } from "@/lib/utils"
+import { Entry } from "@/types/supabase"
 import { SearchIcon } from "lucide-react"
 import { useState } from "react"
 
 export default function DashboardEntries() {
 	const [curPeriod, setCurPeriod] = useState<Date>(new Date())
-	const [searchQuery, setSearchQuery] = useState<string>("")
+	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
 	const settingsQuery = useSettingsQuery()
 	const entryQuery = useEntryDataQuery(
@@ -20,7 +24,16 @@ export default function DashboardEntries() {
 
 	// TODO: Update the search function
 	const renderSearchResult = () => {
-		return []
+		if (!isNonNullable(searchResult)) return
+
+		return (
+			<div className="pt-2 pb-4">
+				<EntryList
+					data={searchResult}
+					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+				/>
+			</div>
+		)
 	}
 
 	const renderEntries = () => {
@@ -61,18 +74,17 @@ export default function DashboardEntries() {
 			</div>
 			<div className="sticky top-0 py-4 z-50 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
-				<Input
+				<EntrySearchBar
 					disabled={entryQuery.isLoading || !entryQuery.data}
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."
-					value={searchQuery}
-					onChange={(e) => {
-						setSearchQuery(e.target.value)
+					onSearchResult={(searchResult) => {
+						setSearchResult(searchResult)
 					}}
 				/>
 			</div>
-			{searchQuery !== "" ? renderSearchResult() : renderEntries()}
+			{isNonNullable(searchResult) ? renderSearchResult() : renderEntries()}
 		</div>
 	)
 }

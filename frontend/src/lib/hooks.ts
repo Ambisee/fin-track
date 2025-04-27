@@ -1,10 +1,10 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Category, Ledger } from "@/types/supabase"
+import { Category, Entry, Ledger } from "@/types/supabase"
 import {
     useMutation,
     useQuery
 } from "@tanstack/react-query"
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
     CATEGORIES_QKEY,
     CURRENCIES_QKEY,
@@ -14,6 +14,7 @@ import {
     USER_QKEY,
     USER_SETTINGS_QKEY
 } from "./constants"
+import { DatabaseHelper } from "./helper/DatabaseHelper"
 import { DateHelper } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { sbBrowser } from "./supabase"
@@ -509,6 +510,41 @@ function useDeleteCategoryMutation() {
 	})
 }
 
+function useSearch() {
+    const [searchQuery, setSearchQuery] = useState("")
+    const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
+
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchQuery === "") {
+                setSearchResult(null)
+                return
+            }
+    
+            const { data, error } = await sbBrowser.rpc("search_entry", {
+                query: DatabaseHelper.parseSearchQuery(searchQuery)
+            })
+    
+            if (error != null || !isNonNullable(data)) {
+                setSearchResult(null)
+                return
+            }
+    
+            setSearchResult(data)
+        }, 350)
+        
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [searchQuery])
+
+    return {
+        searchResult,
+        searchQuery,
+        setSearchQuery,
+    }
+}
+
 function useSetElementWindowHeight() {
 	const elementRef = useRef<HTMLDivElement>(null!)
 
@@ -561,11 +597,9 @@ export {
     useAmountFormatter,
     useCategoriesQuery,
     useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
-    useEntryDataQuery,
-    useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
+    useEntryDataQuery, useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
     useLedgersQuery,
-    useMonthGroupQuery,
-    useSetElementWindowHeight,
+    useMonthGroupQuery, useSearch, useSetElementWindowHeight,
     useSettingsQuery, useStatisticsQuery, useSwitchLedgerMutation,
     useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
     useUserQuery

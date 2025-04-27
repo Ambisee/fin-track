@@ -14,7 +14,7 @@ class QueryHelper {
         return queryKey
     }
 
-    static getStatisticQueryKey(ledger?: number, period?: Date) {    
+    static getStatisticQueryKey(ledger?: number, period?: Date) {
         const queryKey = [...STATISTICS_QKEY]
         queryKey.push(`${ledger}`)
         queryKey.push(`${period?.getMonth()}-${period?.getFullYear()}`)
