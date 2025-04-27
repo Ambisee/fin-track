@@ -305,7 +305,7 @@ function useUpdateEntryMutation() {
 				note = null
 			}
 
-			const {data, error} = await sbBrowser
+			const { data, error } = await sbBrowser
                 .from("entry")
                 .update({
                     date: DateHelper.toDatabaseString(entry.date),
@@ -318,10 +318,7 @@ function useUpdateEntryMutation() {
                 .eq("id", entry.id)
                 .select()
                 .single()
-			
-            if (error !== null) {
-                throw Error("Unable to update the entry", {cause: error})
-            }
+                .throwOnError()
 
 			return data
 		}
