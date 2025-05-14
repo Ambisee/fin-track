@@ -507,7 +507,8 @@ function useDeleteCategoryMutation() {
 	})
 }
 
-function useSearch() {
+function useSearchEntry() {
+    const [isSearching, setIsSearching] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
@@ -518,6 +519,7 @@ function useSearch() {
                 return
             }
     
+            setIsSearching(true)
             const { data, error } = await sbBrowser.rpc("search_entry", {
                 query: DatabaseHelper.parseSearchQuery(searchQuery)
             })
@@ -528,6 +530,7 @@ function useSearch() {
             }
     
             setSearchResult(data)
+            setIsSearching(false)
         }, 350)
         
         return () => {
@@ -536,6 +539,7 @@ function useSearch() {
     }, [searchQuery])
 
     return {
+        isSearching,
         searchResult,
         searchQuery,
         setSearchQuery,
@@ -596,7 +600,7 @@ export {
     useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
     useEntryDataQuery, useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
     useLedgersQuery,
-    useMonthGroupQuery, useSearch, useSetElementWindowHeight,
+    useMonthGroupQuery, useSearchEntry as useSearch, useSetElementWindowHeight,
     useSettingsQuery, useStatisticsQuery, useSwitchLedgerMutation,
     useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
     useUserQuery
