@@ -25,11 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-087iw2ikqyj&eqigdn8yy0)8q=n^kyqxrty3st3ap2*)%e@f6r'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-
-
 # Environment-determined variables
 
+# SECURITY WARNING: don't run with debug turned on in production!
 # Environment variables
 # Debug mode
 debug = os.getenv("DEBUG")
@@ -83,7 +81,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework',
 
-    'generation.apps.GenerationConfig'
+    'apps.generation.apps.GenerationConfig',
 ]
 
 MIDDLEWARE = [
