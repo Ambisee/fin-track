@@ -82,7 +82,6 @@ INSTALLED_APPS = [
 
     "corsheaders",
     'rest_framework',
-    'rest_framework_api_key',
 
     'generation.apps.GenerationConfig'
 ]
@@ -100,12 +99,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework_api_key.permissions.HasAPIKey",
-    ]
-}
 
 TEMPLATES = [
     {

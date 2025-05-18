@@ -5,13 +5,11 @@ from datetime import datetime
 from calendar import month_name
 from concurrent.futures import ThreadPoolExecutor
 
-from django.conf import settings
 from django.http.response import FileResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework_api_key.permissions import HasAPIKey
-
+from rest_framework.permissions import IsAdminUser
 
 from . import apps
 from .supabase import client
@@ -31,10 +29,7 @@ class UserView(BaseView):
 
 
 class AdminView(BaseView):
-    if settings.DEBUG:
-        permission_classes = []
-    else:
-        permission_classes = [HasAPIKey]
+    permission_classes = [IsAdminUser]
 
 
 class AllowReportUsersView(AdminView):
