@@ -9,117 +9,83 @@ from django.http.response import FileResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
 
 from . import apps
-from .supabase import client
+from ..common.supabase import SupabaseUser
+from ..common.authentication import SupabaseAuthentication, AdminAuthentication
+from .serializers import ReportRequestSerializer
 from .utils.fetcher.fetcher import DataFetcher
 from .utils.docgen.reportlab import ReportlabEngine
 from .utils.delivery.gmail import GmailDeliveryEngine
 
 
-class BaseView(APIView):
+class RequiresUserView(APIView):
+
+    authentication_classes = [SupabaseAuthentication]
+
     fetcher = DataFetcher
     document_engine = ReportlabEngine
     delivery_engine = GmailDeliveryEngine
 
 
-class UserView(BaseView):
-    permission_classes = []
-
-
-class AdminView(BaseView):
-    permission_classes = [IsAdminUser]
-
-
-class AllowReportUsersView(AdminView):
-
-    def get(self, request: Request) -> Response:
-        allow_report_users = self.fetcher().get_allow_report_users()
-
-        uids = []
-        for u in allow_report_users:
-            uids.append(u.id)
-
-        return Response({
-            'count': len(allow_report_users),
-            'uids': uids
-        })
-
-
-class GenerateReportView(UserView):
-
-    def _verify_user(self, request: Request):
-        data = request.data
-        headers = request._request.headers
-
-        # Check for the existence of the token in the payload
-        if headers.get("Authorization") is None:
-            return Response({"error": "The request doesn't have the required credentials"}, 400)
-
-        # Check if the token is valid
-        _, auth_token = headers.get("Authorization").split(" ")
-
-        user_response = client.auth.get_user(auth_token)
-        if isinstance(user_response, str):
-            return Response({"error": user_response}, 400)
-
-        # Add user into the processed data
-        data["uid"] = user_response.user.id
-        return request
-
-    def _verify_payload(self, request: Request):
-        data = request.data
-        month = data.get("month")
-        year = data.get("year")
-        ledger_id = data.get("ledger_id")
-
-        # Check for the existence of the month and year values
-        if month is None:
-            return Response({"error": "No month specified"}, 400)
-        if year is None:
-            return Response({"error": "No year specified"}, 400)
-        if ledger_id is None:
-            return Response({"error": "No ledger id specified"}, 400)
-
-        # Check if the month and year values are ints
-        if not isinstance(month, int) or (month < 1 or month > 12):
-            return Response({"error": "Expected month to be an integer between 1 and 12"}, 400)
-        if not isinstance(year, int):
-            return Response({"error": "Expected year to be an integer"}, 400)
-        if not isinstance(ledger_id, int):
-            return Response({"error": "Expected ledger id to be an integer"}, 400)
-            
-        return request
-
-    def _verify_request(self, request: Request):
-        user_verification = self._verify_user(request)
-        if not isinstance(user_verification, dict):
-            return user_verification
+class RequiresAdminView(RequiresUserView):
     
-        payload_verification = self._verify_payload(request)
-        if not isinstance(payload_verification, dict):
-            return payload_verification
-    
-        return request
+    authentication_classes = [AdminAuthentication]
+
+
+class GenerateReportView(RequiresUserView):
 
     def post(self, request: Request):
-        # Check if the request body has the required data
-        request_data = self._verify_request(request)
-        if not isinstance(request_data, Request):
-            return request_data
+        """Generate a monthly report for the given user
+        based on the given ledger and period.
 
-        # Get the user
-        request_data = request_data.data
+        Method
+        ------
+        POST
+
+        Request
+        -------
+        Header
+            - `Authentication` (Required): The token which identifies the user
+        Body (Content-Type: `application/json`)
+            - `month`: `int` - the month of the report period. Value must be an integer between 1 and 12
+            - `year`: `int` - the year of the report period
+            - `ledger`: `int` - the ledger id of the data
+            - `locale`: `str` - the locale to use when generating the report. Value must be in the format of <lang>-<region>. The default value is `"en-us"`
+            
+        Response
+        --------
+        - Success
+            - code: 200
+            - content-type: `application/pdf`
+            - body: *the PDF document of the monthly report*
+        - Authentication failed
+            - code: 400
+            - content-type: `application/json`
+            - body:
+            ```
+            {
+                "error": str | list[str]
+            }
+            ```
+        """
+
+        user: SupabaseUser = request.user
+
+        # Get the user and their associated data
+        payload_serializer = ReportRequestSerializer(data=request.data)
+        if not payload_serializer.is_valid():
+            return Response({'error': payload_serializer.errors}, status=400)
+
+        data = payload_serializer.create(payload_serializer.validated_data)
+        period = datetime(data.year, data.month, 1)
+        
         fetcher = self.fetcher()
-
-        period = datetime(request_data.get("year"), request_data.get("month"), 1)
-
-        user = fetcher.get_user(request_data.get("uid"))
+        user = fetcher.get_user(user.id)
         if isinstance(user, str):
             return Response({'error': user}, status=400)
 
-        ledger_data = fetcher.get_ledger(user.id, request_data.get("ledger_id"))
+        ledger_data = fetcher.get_ledger(user.id, data.ledger)
         if isinstance(ledger_data, str):
             return Response({'error': ledger_data}, status=400)
 
@@ -129,7 +95,7 @@ class GenerateReportView(UserView):
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
-        d_engine.set_locale(request_data.get("locale").replace('-', '_'))
+        d_engine.set_locale(data.locale.replace('-', '_'))
 
         filepath = d_engine.get_filepath(user)
         
@@ -145,17 +111,55 @@ class GenerateReportView(UserView):
         return response
 
 
-class AutomatedMonthlyReportView(AdminView):
+class AutomatedMonthlyReportView(RequiresAdminView):
 
     def _generate_report(self, period, user, ledger, data):
-        d_engine = ReportlabEngine((period.month, period.year))
-
+        d_engine = self.document_engine((period.month, period.year))
         return d_engine.generate_pdf(user, ledger, data)
 
     def _set_filepath(self, target, value):
         target["filepath"] = value
 
     def post(self, request: Request):
+        """Request the app to generate monthly reports for
+        all users who allowed automatic monthly reports and
+        send them to their email.
+
+        Method
+        ------
+        POST
+
+        Request
+        -------
+        Header
+            - `X-ADMIN-USERNAME` (Required): Admin username
+            - `X-ADMIN-PASSWORD` (Required): Admin password
+
+        Response
+        --------
+        - Success
+            - code: `200`
+            - content type: `application/json`
+            - body:
+            ```
+            {
+                "data": {
+                    "period": str,
+                    "count": int
+                }
+            }
+            ```
+        - Authentication failed
+            - code: `400`
+            - content type: `application/json`
+            - body:
+            ```
+            {
+                "error": str | list[str]
+            }
+            ```
+        """
+
         # Retrieve all users who allow monthly reports generation
         allow_report_users = self.fetcher().get_allow_report_users()
 
@@ -164,8 +168,8 @@ class AutomatedMonthlyReportView(AdminView):
 
         for u in allow_report_users:
             fetcher = self.fetcher()
-            user_data = fetcher.get_period_data(u.id, period.month, period.year)
             ledger_data = fetcher.get_ledger(u.id, u.current_ledger)
+            user_data = fetcher.get_period_data(u.id, ledger_data, period.month, period.year)
 
             if len(user_data) < 1:
                 continue
@@ -179,7 +183,8 @@ class AutomatedMonthlyReportView(AdminView):
                 # 2. Update the filepath to the document of the user
                 executor \
                     .submit(self._generate_report, period, d['user'], d['ledger'], d['data']) \
-                    .add_done_callback(lambda future: self._set_filepath(data[i], future.result()))
+                    .add_done_callback(lambda future: self._set_filepath(data[i], future.result())) \
+
 
         # Send the report by email
         deliv_eng = self.delivery_engine()
@@ -200,10 +205,15 @@ class AutomatedMonthlyReportView(AdminView):
                 f"Monthly Financial Report - {ledger_data.name} ({month_name[period.month]} {period.year}).pdf"
             )
 
-        return Response({'data': data})
+        return Response({
+            'data': {
+                'period': f"{month_name[period.month]} {period.year}",
+                'count': len(data)
+            }
+        })
 
 
-class ClearStorageView(AdminView):
+class ClearStorageView(RequiresUserView):
     
     def post(self, request: Request):
         shutil.rmtree(os.path.join(os.path.dirname(apps.__file__), "storage"))
