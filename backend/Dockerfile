@@ -1,11 +1,12 @@
-FROM python:3.11-slim-bullseye as base
+FROM python:3.12-alpine as base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-COPY . /app/
+COPY requirements.txt /app
+COPY src /app
 
 RUN pip install --no-cache -r requirements.txt
 

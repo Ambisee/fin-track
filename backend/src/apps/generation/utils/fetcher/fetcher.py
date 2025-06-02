@@ -5,7 +5,7 @@ from pydantic import TypeAdapter
 
 from supabase import Client
 
-from ...supabase import client
+from ....common.supabase import client
 from ...models import UserViewModel, EntryModel, LedgerModel
 
 
@@ -41,7 +41,13 @@ class DataFetcher:
         if not user_response.user:
             return "Unable to find the user with the given user id"
 
-        settings_response = self.client.table("settings").select("allow_report, current_ledger").eq("user_id", uid).single().execute()
+        settings_response = self.client \
+            .table("settings") \
+            .select("allow_report, current_ledger") \
+            .eq("user_id", uid) \
+            .single() \
+            .execute()
+        
         if not settings_response.data:
             return "Unable to retrieve the user's data"
     
@@ -93,8 +99,7 @@ class DataFetcher:
                  .table("ledger")
                  .select("*, currency (currency_name)")
                  .eq("id", ledger_id)
-                 .eq("created_by", uid)
-                 )
+                 .eq("created_by", uid))
 
         response = query.execute()
         if not response.data:

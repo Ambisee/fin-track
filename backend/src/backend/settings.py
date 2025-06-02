@@ -11,42 +11,45 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import secrets
 from pathlib import Path
 from dotenv import load_dotenv
 
+from django.contrib.auth.hashers import make_password
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-087iw2ikqyj&eqigdn8yy0)8q=n^kyqxrty3st3ap2*)%e@f6r'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
-
 # Environment-determined variables
 
+# SECURITY WARNING: don't run with debug turned on in production!
 # Environment variables
+
 # Debug mode
 debug = os.getenv("DEBUG")
-
 if debug is None:
     DEBUG = True
 else:
     DEBUG = (debug.lower() != "false")
 
-# Load a .env in a development environment
-os.unsetenv("RESEND_KEY")
-os.unsetenv("GMAIL_EMAIL")
-os.unsetenv("GMAIL_PASSWORD")
-os.unsetenv("SUPABASE_URL")
-os.unsetenv("SUPABASE_KEY")
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-087iw2ikqyj&eqigdn8yy0)8q=n^kyqxrty3st3ap2*)%e@f6r'
+if not DEBUG:
+    SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
 
+# Load a .env in a development environment
 if DEBUG is True:
+    os.unsetenv("RESEND_KEY")
+    os.unsetenv("GMAIL_EMAIL")
+    os.unsetenv("GMAIL_PASSWORD")
+    os.unsetenv("SUPABASE_URL")
+    os.unsetenv("SUPABASE_KEY")
+    os.unsetenv("ADMIN_USERNAME")
+    os.unsetenv("ADMIN_PASSWORD")
+
     load_dotenv('.env')
 else:
     load_dotenv("/run/secrets/backend_s")
@@ -59,6 +62,10 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 RESEND_KEY = os.getenv("RESEND_KEY")
 GMAIL_EMAIL = os.getenv("GMAIL_EMAIL")
 GMAIL_PASSWORD = os.getenv("GMAIL_PASSWORD")
+
+# Automation credentials
+ADMIN_USERNAME = make_password(os.getenv("ADMIN_USERNAME"))
+ADMIN_PASSWORD = make_password(os.getenv("ADMIN_PASSWORD"))
 
 # Allowed hosts for production environment
 ALLOWED_HOSTS = []
@@ -82,9 +89,8 @@ INSTALLED_APPS = [
 
     "corsheaders",
     'rest_framework',
-    'rest_framework_api_key',
 
-    'generation.apps.GenerationConfig'
+    'apps.generation.apps.GenerationConfig',
 ]
 
 MIDDLEWARE = [
@@ -100,12 +106,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework_api_key.permissions.HasAPIKey",
-    ]
-}
 
 TEMPLATES = [
     {
@@ -145,15 +145,40 @@ STORAGES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}][{levelname}] {message}",
+            "style": "{"
+        }
+    },
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "common_handler": {
+            "level": "DEBUG",
+            "formatter": "verbose",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "common": {
+            "handlers": ["common_handler"],
+            "level": "DEBUG",
+            "propagate": False,
+            "filters": ["require_debug_true"]
+        }
     },
     "root": {
         "handlers": ["console"],
         "level": "WARNING",
-    },
+    }
 }
 
 
