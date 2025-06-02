@@ -45,13 +45,13 @@ class GenerateReportView(RequiresUserView):
 
         Request
         -------
-        Header
+        - Header
             - `Authentication` (Required): The token which identifies the user
-        Body (Content-Type: `application/json`)
-            - `month`: `int` - the month of the report period. Value must be an integer between 1 and 12
-            - `year`: `int` - the year of the report period
-            - `ledger`: `int` - the ledger id of the data
-            - `locale`: `str` - the locale to use when generating the report. Value must be in the format of <lang>-<region>. The default value is `"en-us"`
+        - Body (Content-Type: `application/json`)
+            - `month: int` - the month of the report period. Value must be an integer between 1 and 12
+            - `year: int` - the year of the report period
+            - `ledger: int` - the ledger id of the data
+            - `locale: str` - the locale to use when generating the report. Value must be in the format of <lang>-<region>. The default value is `"en-us"`
             
         Response
         --------
@@ -63,11 +63,7 @@ class GenerateReportView(RequiresUserView):
             - code: 400
             - content-type: `application/json`
             - body:
-            ```
-            {
-                "error": str | list[str]
-            }
-            ```
+                - `error: str | list[str]`
         """
 
         user: SupabaseUser = request.user
@@ -141,23 +137,16 @@ class AutomatedMonthlyReportView(RequiresAdminView):
             - code: `200`
             - content type: `application/json`
             - body:
-            ```
-            {
-                "data": {
-                    "period": str,
-                    "count": int
-                }
-            }
-            ```
+                - `data`
+                    - `period: str` - The month-year period of the current request
+                    - `users`
+                        - `count: int` - Total number of users who allowed automatic monthly report
+                        - `sent: int` - Number of reports actually sent
         - Authentication failed
             - code: `400`
             - content type: `application/json`
             - body:
-            ```
-            {
-                "error": str | list[str]
-            }
-            ```
+                - `error: str | list[str]`
         """
 
         # Retrieve all users who allow monthly reports generation
@@ -208,7 +197,10 @@ class AutomatedMonthlyReportView(RequiresAdminView):
         return Response({
             'data': {
                 'period': f"{month_name[period.month]} {period.year}",
-                'count': len(data)
+                'users': {
+                    'count': len(allow_report_users),
+                    'sent': len(data)
+                }
             }
         })
 
