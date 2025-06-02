@@ -66,7 +66,7 @@ class GenerateReportView(RequiresUserView):
                 - `error: str | list[str]`
         """
 
-        user: SupabaseUser = request.user
+        supabaseUser: SupabaseUser = request.user
 
         # Get the user and their associated data
         payload_serializer = ReportRequestSerializer(data=request.data)
@@ -77,17 +77,23 @@ class GenerateReportView(RequiresUserView):
         period = datetime(data.year, data.month, 1)
         
         fetcher = self.fetcher()
-        user = fetcher.get_user(user.id)
+        user = fetcher.get_user(supabaseUser.id)
         if isinstance(user, str):
             return Response({'error': user}, status=400)
+        
+        logging.debug(f"User: username={user.username}.")
 
         ledger_data = fetcher.get_ledger(user.id, data.ledger)
         if isinstance(ledger_data, str):
             return Response({'error': ledger_data}, status=400)
+        
+        logging.debug(f"Fetched ledger: {ledger_data.name}.")
 
         entry_data = fetcher.get_period_data(user.id, ledger_data, period.month, period.year)
         if (len(entry_data) < 1):
             return Response({'error': "No transaction records available for the given period and ledger."}, status=400)
+
+        logging.debug(f"Fetched {len(entry_data)} entry data.")
 
         d_engine = self.document_engine()
         d_engine.set_period(period.month, period.year)
@@ -104,6 +110,7 @@ class GenerateReportView(RequiresUserView):
         response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
         response["Content-Disposition"] = "inline; filename=report.pdf"
 
+        logging.info(f"Generated report for user: username={user.username}, ledger={ledger_data.name}, period={month_name[period.month]}-{period.year}")
         return response
 
 
@@ -151,6 +158,7 @@ class AutomatedMonthlyReportView(RequiresAdminView):
 
         # Retrieve all users who allow monthly reports generation
         allow_report_users = self.fetcher().get_allow_report_users()
+        logging.debug(f"Fetched {len(allow_report_users)} users who allowed automatic monthly report")
 
         data = []
         period = datetime.now()
@@ -164,6 +172,8 @@ class AutomatedMonthlyReportView(RequiresAdminView):
                 continue
 
             data.append({'user': u, 'ledger': ledger_data, 'data': user_data})
+        
+        logging.debug(f"Fetched and processed {len(data)} data groups. {len(allow_report_users) - len(data)} users have no data in the current period.")
 
         # Generate monthly report
         with ThreadPoolExecutor(max_workers=10) as executor:
@@ -194,6 +204,7 @@ class AutomatedMonthlyReportView(RequiresAdminView):
                 f"Monthly Financial Report - {ledger_data.name} ({month_name[period.month]} {period.year}).pdf"
             )
 
+        logging.info(f"Report generated and sent for {len(data)}/{len(allow_report_users)} users.")
         return Response({
             'data': {
                 'period': f"{month_name[period.month]} {period.year}",
