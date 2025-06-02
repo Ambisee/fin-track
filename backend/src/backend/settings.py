@@ -145,15 +145,40 @@ STORAGES = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}][{levelname}] {message}",
+            "style": "{"
+        }
+    },
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "common_handler": {
+            "level": "DEBUG",
+            "formatter": "verbose",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "common": {
+            "handlers": ["common_handler"],
+            "level": "DEBUG",
+            "propagate": False,
+            "filters": ["require_debug_true"]
+        }
     },
     "root": {
         "handlers": ["console"],
         "level": "WARNING",
-    },
+    }
 }
 
 
