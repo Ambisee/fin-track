@@ -7,6 +7,7 @@ export const USER_SETTINGS_QKEY = ["settings"]
 export const CATEGORIES_QKEY = ["categories"]
 export const CURRENCIES_QKEY = ["currencies"]
 export const MONTH_GROUP_QKEY = ["monthGroup"]
+export const DOCUMENT_QKEY = ["document"]
 
 export const QUERY_STALE_TIME = 15 * 60 * 1000
 

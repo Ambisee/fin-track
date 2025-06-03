@@ -3,9 +3,9 @@ import {
 	useCurrenciesQuery,
 	useEntryDataQuery,
 	useLedgersQuery,
+	useMonthGroupQuery,
 	useStatisticsQuery
 } from "@/lib/hooks"
-import { PostgrestSingleResponse } from "@supabase/supabase-js"
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 import { Database } from "./supabase-auto"
 
@@ -18,6 +18,7 @@ type Statistic = InferQueryType<ReturnType<typeof useStatisticsQuery>>
 type Category = InferQueryType<ReturnType<typeof useCategoriesQuery>>
 type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
 type Currency = InferQueryType<ReturnType<typeof useCurrenciesQuery>>
+type MonthGroup = InferQueryType<ReturnType<typeof useMonthGroupQuery>>
 type UserSettings = Database["public"]["Tables"]["settings"]["Row"]
 type EntryDataCursor = {
     index: number
@@ -33,7 +34,9 @@ export {
 	type Entry,
 	type Ledger,
 	type Statistic,
+    type MonthGroup,
 	type UserSettings,
     
     type EntryDataCursor
 }
+

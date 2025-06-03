@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
+import { DOCUMENT_QKEY, MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
+import { FetchError } from "@/lib/errors/FetchError"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
 	useLedgersQuery,
@@ -21,14 +22,20 @@ import {
 	useUserQuery
 } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { Ledger } from "@/types/supabase"
+import { Ledger, MonthGroup } from "@/types/supabase"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { useQueryClient } from "@tanstack/react-query"
+import {
+	CancelledError,
+	useIsFetching,
+	useQueryClient
+} from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { Dispatch, SetStateAction, useState, type JSX } from "react"
 
 interface DocumentPageProps {
+	isFetchingReport: boolean
+	fetchFn: (monthGroup: MonthGroup) => Promise<Blob>
 	curPageState: {
 		curPage: number
 		setCurPage: Dispatch<SetStateAction<number>>
@@ -65,6 +72,7 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 				<li className="px-1" key={ledger.id}>
 					<Button
 						type="button"
+						disabled={props.isFetchingReport}
 						onClick={(e) => {
 							e.preventDefault()
 							setLedger(ledger)
@@ -178,7 +186,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 				<li className="px-1" key={`${value.month} ${value.year}`}>
 					<Button
 						type="button"
-						disabled={isPendingIndex !== -1}
+						disabled={props.isFetchingReport}
 						onClick={async (e) => {
 							e.preventDefault()
 							if (value.month === null || value.year === null) {
@@ -198,32 +206,27 @@ function MonthSelectorPage(props: DocumentPageProps) {
 
 							// Using fetch to handle redirection on iOS
 							try {
-								const response = await fetch("/api/documents", {
-									method: "POST",
-									body: JSON.stringify({
-										month: value.month,
-										year: value.year,
-										locale: navigator.language,
-										ledger_id: ledger?.id as number
-									})
-								})
-
+								const fileBlob = await props.fetchFn(value)
 								dismiss()
-								if (!response.ok) {
-									throw Error(
-										"Unable to connect to the server. Please try again later."
-									)
-								}
 
-								const fileBlob: Blob = await response.blob()
 								const url = window.URL.createObjectURL(fileBlob)
 								setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 
 								window.location.assign(url)
-							} catch (error: any) {
+							} catch (error: unknown) {
+								let errMessage = "Unknown error occured"
+
+								console.log(error)
+								if (error instanceof CancelledError) {
+									errMessage = "Operation cancelled by user."
+								} else if (error instanceof Error) {
+									errMessage = error.message
+								}
+
 								toast({
-									description: error.message,
-									variant: "destructive"
+									description: errMessage,
+									variant: "destructive",
+									duration: SHORT_TOAST_DURATION
 								})
 							}
 
@@ -287,6 +290,34 @@ export default function Documents() {
 	const [ledger, setLedger] = useState<Ledger | undefined>(undefined)
 
 	const userQuery = useUserQuery()
+	const queryClient = useQueryClient()
+
+	const isFetchingReport = useIsFetching({ queryKey: DOCUMENT_QKEY })
+	const fetchReport = (monthGroup: MonthGroup) => {
+		return queryClient.fetchQuery({
+			queryKey: DOCUMENT_QKEY,
+			queryFn: async () => {
+				const response = await fetch("/api/documents", {
+					method: "POST",
+					body: JSON.stringify({
+						month: monthGroup.month,
+						year: monthGroup.year,
+						locale: navigator.language,
+						ledger_id: ledger?.id as number
+					})
+				})
+
+				if (!response.ok) {
+					throw new FetchError(
+						"Unable to connect to the server. Please try again later."
+					)
+				}
+
+				const fileBlob: Blob = await response.blob()
+				return fileBlob
+			}
+		})
+	}
 
 	const renderPage = () => {
 		const pages = [LedgerSelectorPage, MonthSelectorPage]
@@ -297,14 +328,21 @@ export default function Documents() {
 		}
 		return (
 			<CurrentPage
+				isFetchingReport={isFetchingReport > 0}
 				curPageState={{ curPage, setCurPage }}
 				ledgerState={{ ledger, setLedger }}
+				fetchFn={fetchReport}
 			/>
 		)
 	}
 
 	return (
-		<Dialog>
+		<Dialog
+			onOpenChange={(open) => {
+				if (open) return
+				queryClient.cancelQueries({ queryKey: DOCUMENT_QKEY }, {})
+			}}
+		>
 			<div className="mt-8">
 				<div>
 					<Label>Documents</Label>
