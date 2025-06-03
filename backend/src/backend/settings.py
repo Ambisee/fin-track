@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework',
 
+    'apps.ping.apps.PingConfig',
     'apps.generation.apps.GenerationConfig',
 ]
 
