@@ -53,7 +53,7 @@ class GenerateReportView(RequiresUserView):
         - Body (Content-Type: `application/json`)
             - `month: int` - the month of the report period. Value must be an integer between 1 and 12
             - `year: int` - the year of the report period
-            - `ledger: int` - the ledger id of the data
+            - `ledger_id: int` - the ledger id of the data
             - `locale: str` - the locale to use when generating the report. Value must be in the format of <lang>-<region>. The default value is `"en-us"`
             
         Response
@@ -86,7 +86,7 @@ class GenerateReportView(RequiresUserView):
         
         self.logger.d(f"User: username={user.username}.")
 
-        ledger_data = fetcher.get_ledger(user.id, data.ledger)
+        ledger_data = fetcher.get_ledger(user.id, data.ledger_id)
         if isinstance(ledger_data, str):
             return Response({'error': ledger_data}, status=400)
         

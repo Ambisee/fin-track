@@ -1,4 +1,4 @@
-import { useSearch } from "@/lib/hooks"
+import { useSearchEntry } from "@/lib/hooks"
 import { Entry } from "@/types/supabase"
 import { ComponentProps, useEffect, useRef } from "react"
 import { Input } from "../ui/input"
@@ -38,7 +38,8 @@ interface EntrySearchBarProps
 }
 
 export default function EntrySearchBar(props: EntrySearchBarProps) {
-	const { searchQuery, searchResult, isSearching, setSearchQuery } = useSearch()
+	const { searchQuery, searchResult, isSearching, setSearchQuery } =
+		useSearchEntry()
 
 	useEffect(() => {
 		props.onSearchResult(searchResult)

@@ -12,12 +12,19 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { DOCUMENT_QKEY, MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
+import {
+	DOCUMENT_QKEY,
+	MONTHS,
+	SERVER_PING_QKEY,
+	SERVER_STATUS,
+	SHORT_TOAST_DURATION
+} from "@/lib/constants"
 import { FetchError } from "@/lib/errors/FetchError"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
 	useLedgersQuery,
 	useMonthGroupQuery,
+	useServerPingQuery,
 	useSettingsQuery,
 	useUserQuery
 } from "@/lib/hooks"
@@ -27,11 +34,20 @@ import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import {
 	CancelledError,
+	QueryClient,
 	useIsFetching,
 	useQueryClient
 } from "@tanstack/react-query"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
-import { Dispatch, SetStateAction, useState, type JSX } from "react"
+import { ChevronLeft, ChevronRight, Circle, X } from "lucide-react"
+import {
+	Dispatch,
+	ReactElement,
+	SetStateAction,
+	useState,
+	type JSX
+} from "react"
+
+import classNames from "@/styles/flicker-ellipse-animation.module.css"
 
 interface DocumentPageProps {
 	isFetchingReport: boolean
@@ -46,10 +62,68 @@ interface DocumentPageProps {
 	}
 }
 
+function refreshServerStatus(queryClient: QueryClient) {
+	queryClient.setQueryData(SERVER_PING_QKEY, () => SERVER_STATUS.LOADING)
+	queryClient.refetchQueries({ queryKey: SERVER_PING_QKEY })
+}
+
+function ServerStatusLabel() {
+	const queryClient = useQueryClient()
+	const serverPingQuery = useServerPingQuery()
+
+	let serverIconClassName: string
+	let serverStatusMessage: ReactElement
+
+	switch (serverPingQuery.data) {
+		case SERVER_STATUS.LOADING:
+			serverIconClassName = `${classNames["flicker-animation"]} fill-gray-50`
+			serverStatusMessage = <p>Checking for server response...</p>
+			break
+		case SERVER_STATUS.ONLINE:
+			serverIconClassName = "fill-green-500"
+			serverStatusMessage = <p>Server Online.</p>
+			break
+		case SERVER_STATUS.OFFLINE:
+			serverIconClassName = "fill-destructive"
+			serverStatusMessage = (
+				<p>
+					Server is unresponsive.{" "}
+					<Button
+						variant="link"
+						className="p-0 m-0 h-fit"
+						type="button"
+						onClick={() => refreshServerStatus(queryClient)}
+					>
+						Retry Connection
+					</Button>
+				</p>
+			)
+			break
+		default:
+			serverIconClassName = "fill-destructive"
+			serverStatusMessage = <p>Unknown error occured.</p>
+			break
+	}
+
+	return (
+		<div className="w-full flex gap-4 mt-2 items-center justify-center">
+			<Circle width={15} className={serverIconClassName} />
+			<span className="text-sm">{serverStatusMessage}</span>
+		</div>
+	)
+}
+
 function LedgerSelectorPage(props: DocumentPageProps) {
 	const { setCurPage } = props.curPageState
 	const { setLedger } = props.ledgerState
+
 	const ledgersQuery = useLedgersQuery()
+	const serverPingQuery = useServerPingQuery()
+
+	const isItemButtonEnabled =
+		props.isFetchingReport ||
+		serverPingQuery.isFetching ||
+		serverPingQuery.data !== SERVER_STATUS.ONLINE
 
 	const renderLedgerList = () => {
 		const result: JSX.Element[] = []
@@ -72,7 +146,7 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 				<li className="px-1" key={ledger.id}>
 					<Button
 						type="button"
-						disabled={props.isFetchingReport}
+						disabled={isItemButtonEnabled}
 						onClick={(e) => {
 							e.preventDefault()
 							setLedger(ledger)
@@ -108,6 +182,7 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 					<VisuallyHidden>
 						Select a ledger to download a report from.
 					</VisuallyHidden>
+					<ServerStatusLabel />
 				</DialogDescription>
 			</DialogHeader>
 			<ul className="max-h-full overflow-y-auto [&>:not(:first-child)]:mt-1.5">
@@ -124,12 +199,19 @@ function MonthSelectorPage(props: DocumentPageProps) {
 	const { setCurPage } = props.curPageState
 	const [isPendingIndex, setIsPendingIndex] = useState(-1)
 
+	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
 	const monthGroupQuery = useMonthGroupQuery(ledger?.id)
+	const serverPingQuery = useServerPingQuery()
+
+	const isItemButtonEnabled =
+		props.isFetchingReport ||
+		serverPingQuery.isFetching ||
+		serverPingQuery.data !== SERVER_STATUS.ONLINE
 
 	const renderDownloadList = () => {
 		const result: JSX.Element[] = []
@@ -153,7 +235,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 						No data found for this ledger. Please add some transaction records
 						to download its reports.
 					</p>
-					<DialogTrigger
+					<DialogClose
 						asChild
 						onClick={() => {
 							setData(undefined)
@@ -171,10 +253,11 @@ function MonthSelectorPage(props: DocumentPageProps) {
 									)
 								})
 							})
+							setOpen(true)
 						}}
 					>
 						<Button>Add an entry</Button>
-					</DialogTrigger>
+					</DialogClose>
 				</div>
 			)
 		}
@@ -186,7 +269,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 				<li className="px-1" key={`${value.month} ${value.year}`}>
 					<Button
 						type="button"
-						disabled={props.isFetchingReport}
+						disabled={isItemButtonEnabled}
 						onClick={async (e) => {
 							e.preventDefault()
 							if (value.month === null || value.year === null) {
@@ -223,6 +306,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 									errMessage = error.message
 								}
 
+								refreshServerStatus(queryClient)
 								toast({
 									description: errMessage,
 									variant: "destructive",
@@ -276,6 +360,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 					<VisuallyHidden>
 						Select a month to download the report PDF for that month
 					</VisuallyHidden>
+					<ServerStatusLabel />
 				</DialogDescription>
 			</DialogHeader>
 			<ul className="max-h-full relative overflow-y-auto [&>:not(:first-child)]:mt-1.5">
@@ -289,20 +374,27 @@ export default function Documents() {
 	const [curPage, setCurPage] = useState(0)
 	const [ledger, setLedger] = useState<Ledger | undefined>(undefined)
 
-	const userQuery = useUserQuery()
 	const queryClient = useQueryClient()
-
+	const userQuery = useUserQuery()
+	const serverPingQuery = useServerPingQuery()
 	const isFetchingReport = useIsFetching({ queryKey: DOCUMENT_QKEY })
+
 	const fetchReport = (monthGroup: MonthGroup) => {
 		return queryClient.fetchQuery({
 			queryKey: DOCUMENT_QKEY,
 			queryFn: async () => {
+				const locale =
+					navigator.languages.find((value) => {
+						const [region, language] = value.split("-")
+						return region !== undefined && language !== undefined
+					}) ?? "en-us"
+
 				const response = await fetch("/api/documents", {
 					method: "POST",
 					body: JSON.stringify({
 						month: monthGroup.month,
 						year: monthGroup.year,
-						locale: navigator.language,
+						locale: locale,
 						ledger_id: ledger?.id as number
 					})
 				})
@@ -340,7 +432,7 @@ export default function Documents() {
 		<Dialog
 			onOpenChange={(open) => {
 				if (open) return
-				queryClient.cancelQueries({ queryKey: DOCUMENT_QKEY }, {})
+				queryClient.cancelQueries({ queryKey: DOCUMENT_QKEY })
 			}}
 		>
 			<div className="mt-8">
@@ -351,7 +443,15 @@ export default function Documents() {
 					</p>
 				</div>
 				<DialogTrigger asChild>
-					<Button disabled={userQuery.isLoading} className="mt-4">
+					<Button
+						disabled={userQuery.isLoading}
+						className="mt-4"
+						onClick={() => {
+							if (serverPingQuery.data !== SERVER_STATUS.ONLINE) {
+								queryClient.invalidateQueries({ queryKey: SERVER_PING_QKEY })
+							}
+						}}
+					>
 						Download a report
 					</Button>
 				</DialogTrigger>
