@@ -7,8 +7,18 @@ export const USER_SETTINGS_QKEY = ["settings"]
 export const CATEGORIES_QKEY = ["categories"]
 export const CURRENCIES_QKEY = ["currencies"]
 export const MONTH_GROUP_QKEY = ["monthGroup"]
+export const DOCUMENT_QKEY = ["document"]
+export const SERVER_PING_QKEY = ["serverPing"]
 
 export const QUERY_STALE_TIME = 15 * 60 * 1000
+export const PING_QUERY_STALE_TIME = 15 * 60 * 1000
+
+// Server Ping Status
+export const SERVER_STATUS = {
+    LOADING: -1,
+    ONLINE: 0,
+    OFFLINE: 1
+}
 
 // Transition Components
 export const DEFAULT_LABEL = "DEFAULT_LABEL"
