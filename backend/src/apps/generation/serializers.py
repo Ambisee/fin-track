@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 class ReportRequestSerializer(serializers.Serializer):
 
-    ledger = serializers.IntegerField()
+    ledger_id = serializers.IntegerField()
     month = serializers.IntegerField(min_value=1, max_value=12)
     year = serializers.IntegerField()
     locale = serializers.CharField(max_length=30, default="en-us")
@@ -15,7 +15,7 @@ class ReportRequestSerializer(serializers.Serializer):
 
     class ReportRequest:
         def __init__(self, **kwargs):
-            self.ledger = kwargs.get("ledger")
+            self.ledger_id = kwargs.get("ledger_id")
             self.month = kwargs.get("month")
             self.year = kwargs.get("year")
             self.locale = kwargs.get("locale")

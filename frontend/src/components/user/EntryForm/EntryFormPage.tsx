@@ -281,7 +281,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								label="Notes"
 							>
 								<Textarea
-									className="max-h-none h-36 sm:max-h-28 sm:h-auto"
+									className="max-h-none h-36 sm:max-h-28 sm:h-auto webkit-textarea"
 									disabled={isFormLoading}
 									{...field}
 								/>
