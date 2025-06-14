@@ -9,10 +9,30 @@ import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
 import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
+import { ReloadIcon } from "@radix-ui/react-icons"
 import { SearchIcon } from "lucide-react"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
+
+function EntryContainer(props: {
+	isLoading?: boolean
+	searchResult?: Entry[] | null
+	loadingNode?: ReactNode
+	searchResultNode: ReactNode
+	entriesNode: ReactNode
+}) {
+	if (props.isLoading) {
+		return props.loadingNode
+	}
+
+	if (props.searchResult) {
+		return props.searchResultNode
+	}
+
+	return props.entriesNode
+}
 
 export default function DashboardEntries() {
+	const [isSearching, setIsSearching] = useState(false)
 	const [curPeriod, setCurPeriod] = useState<Date>(new Date())
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
@@ -21,46 +41,6 @@ export default function DashboardEntries() {
 		settingsQuery.data?.current_ledger,
 		curPeriod
 	)
-
-	const renderSearchResult = () => {
-		if (!isNonNullable(searchResult)) return
-
-		return (
-			<div className="pt-2 pb-4">
-				<EntryList
-					data={searchResult}
-					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
-				/>
-			</div>
-		)
-	}
-
-	const renderEntries = () => {
-		return (
-			<div>
-				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
-					<MonthPicker
-						key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
-						value={curPeriod}
-						onValueChange={(value) => {
-							setCurPeriod(value)
-						}}
-					/>
-				</div>
-				{entryQuery.isLoading || entryQuery.data === undefined ? (
-					<>
-						<Skeleton className="w-full h-[6.25rem] mb-4" />
-						<Skeleton className="w-full h-[6.25rem] mb-4" />{" "}
-					</>
-				) : (
-					<EntryList
-						data={entryQuery.data}
-						virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
-					/>
-				)}
-			</div>
-		)
-	}
 
 	return (
 		<div>
@@ -74,12 +54,51 @@ export default function DashboardEntries() {
 					type="search"
 					className="pl-10"
 					placeholder="Search for an entry..."
-					onSearchResult={(searchResult) => {
-						setSearchResult(searchResult)
-					}}
+					onSearchStateChange={(state) => setIsSearching(state)}
+					onSearchResult={(searchResult) => setSearchResult(searchResult)}
 				/>
 			</div>
-			{isNonNullable(searchResult) ? renderSearchResult() : renderEntries()}
+			<EntryContainer
+				isLoading={isSearching}
+				searchResult={searchResult}
+				loadingNode={
+					<div className="grid py-16 justify-center items-center">
+						<ReloadIcon className="w-4 h-4 animate-spin" />
+					</div>
+				}
+				searchResultNode={
+					<div className="pt-2 pb-4">
+						<EntryList
+							data={searchResult ?? []}
+							virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+						/>
+					</div>
+				}
+				entriesNode={
+					<div>
+						<div className="flex justify-between items-center pb-4 pt-2 bg-background">
+							<MonthPicker
+								key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
+								value={curPeriod}
+								onValueChange={(value) => {
+									setCurPeriod(value)
+								}}
+							/>
+						</div>
+						{entryQuery.isLoading || entryQuery.data === undefined ? (
+							<>
+								<Skeleton className="w-full h-[6.25rem] mb-4" />
+								<Skeleton className="w-full h-[6.25rem] mb-4" />{" "}
+							</>
+						) : (
+							<EntryList
+								data={entryQuery.data}
+								virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
+							/>
+						)}
+					</div>
+				}
+			/>
 		</div>
 	)
 }

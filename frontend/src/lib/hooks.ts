@@ -10,7 +10,10 @@ import {
     CURRENCIES_QKEY,
     LEDGER_QKEY,
     MONTH_GROUP_QKEY,
+    PING_QUERY_STALE_TIME,
     QUERY_STALE_TIME,
+    SERVER_PING_QKEY,
+    SERVER_STATUS,
     USER_QKEY,
     USER_SETTINGS_QKEY
 } from "./constants"
@@ -233,6 +236,33 @@ function useMonthGroupQuery(ledger_id?: number) {
 		enabled:
 			!!userQuery.data && !userQuery.isRefetching && !!ledger_id
 	})
+}
+
+function useServerPingQuery() {
+    const query = useQuery({
+        queryKey: SERVER_PING_QKEY,
+        queryFn: async () => {
+            const response = await fetch("/api/ping")
+            if (!response.ok) {
+                throw Error()
+            }
+
+            return SERVER_STATUS.ONLINE
+        },
+        retry: 3,
+        staleTime: PING_QUERY_STALE_TIME
+    })
+
+    let data: number
+    if (query.error !== null) {
+        data = SERVER_STATUS.OFFLINE
+    } else if (query.data === SERVER_STATUS.ONLINE) {
+        data = SERVER_STATUS.ONLINE
+    } else {
+        data = SERVER_STATUS.LOADING
+    }
+
+    return { ...query, data }
 }
 
 function useInsertEntryMutation() {
@@ -507,7 +537,8 @@ function useDeleteCategoryMutation() {
 	})
 }
 
-function useSearch() {
+function useSearchEntry() {
+    const [isSearching, setIsSearching] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
@@ -518,6 +549,7 @@ function useSearch() {
                 return
             }
     
+            setIsSearching(true)
             const { data, error } = await sbBrowser.rpc("search_entry", {
                 query: DatabaseHelper.parseSearchQuery(searchQuery)
             })
@@ -528,6 +560,7 @@ function useSearch() {
             }
     
             setSearchResult(data)
+            setIsSearching(false)
         }, 350)
         
         return () => {
@@ -536,6 +569,7 @@ function useSearch() {
     }, [searchQuery])
 
     return {
+        isSearching,
         searchResult,
         searchQuery,
         setSearchQuery,
@@ -595,8 +629,7 @@ export {
     useCategoriesQuery,
     useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
     useEntryDataQuery, useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
-    useLedgersQuery,
-    useMonthGroupQuery, useSearch, useSetElementWindowHeight,
+    useLedgersQuery, useMonthGroupQuery, useSearchEntry, useServerPingQuery, useSetElementWindowHeight,
     useSettingsQuery, useStatisticsQuery, useSwitchLedgerMutation,
     useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
     useUserQuery

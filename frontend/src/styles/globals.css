@@ -113,4 +113,8 @@
 			@apply border-none;
 		}
 	}
+
+    .webkit-textarea {
+        -webkit-touch-callout: default;
+    }
 }
