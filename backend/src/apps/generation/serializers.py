@@ -10,7 +10,7 @@ class ReportRequestSerializer(serializers.Serializer):
     year = serializers.IntegerField()
     locale = serializers.CharField(max_length=30, default="en-us")
 
-    INVALID_LOCALE_VALUE_MESSAGE = "Invalid locale string. "
+    INVALID_LOCALE_VALUE_MESSAGE = "Invalid locale string. Please provide a valid locale."
     INVALID_LOCALE_FORMAT_MESSAGE = "Invalid locale format. Locales should be provided in the format of XX-XX. i.e. en-us (US english), ja-jp (Japanese), de-de (German), etc."
 
     class ReportRequest:
@@ -30,8 +30,8 @@ class ReportRequestSerializer(serializers.Serializer):
         if len(value.split('-')) != 2:
             raise serializers.ValidationError(self.INVALID_LOCALE_FORMAT_MESSAGE)
         
-        parsed_locale = locale.locale_alias.get(value.replace('-', '_'))
+        parsed_locale = locale.locale_alias.get(value.replace('-', '_').lower())
         if parsed_locale is None:
-            raise serializers
+            raise serializers.ValidationError(self.INVALID_LOCALE_VALUE_MESSAGE)
 
         return parsed_locale
