@@ -1,0 +1,356 @@
+{
+	"initialStore": [
+		{
+			"id": 1,
+			"amount": 1410,
+			"category": "Food",
+			"created_by": "user1",
+			"date": "2025-05-26",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 2,
+			"amount": 1000,
+			"category": "Transportation",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 5,
+			"amount": 324,
+			"category": "Transportation",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 10,
+			"amount": 1000,
+			"category": "Telephone bill",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 6,
+			"amount": 10340,
+			"category": "Vacation",
+			"created_by": "user1",
+			"date": "2025-05-20",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		}
+	],
+	"testcases": [
+		{
+			"title": "should correctly insert the new data at the start of the local data store.",
+			"input": {
+				"id": 3,
+				"amount": 1410,
+				"category": "Rent",
+				"created_by": "user1",
+				"date": "2025-05-30",
+				"is_positive": false,
+				"ledger": 5,
+				"note": null
+			},
+			"expected": [
+				{
+					"id": 3,
+					"amount": 1410,
+					"category": "Rent",
+					"created_by": "user1",
+					"date": "2025-05-30",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 1,
+					"amount": 1410,
+					"category": "Food",
+					"created_by": "user1",
+					"date": "2025-05-26",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 2,
+					"amount": 1000,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 5,
+					"amount": 324,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 10,
+					"amount": 1000,
+					"category": "Telephone bill",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 6,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				}
+			]
+		},
+		{
+			"title": "should correctly insert the new data at the end of the local data store.",
+			"input": {
+				"id": 3,
+				"amount": 13.12,
+				"category": "Grocery",
+				"created_by": "user1",
+				"date": "2025-05-10",
+				"is_positive": false,
+				"ledger": 100,
+				"note": null
+			},
+			"expected": [
+				{
+					"id": 1,
+					"amount": 1410,
+					"category": "Food",
+					"created_by": "user1",
+					"date": "2025-05-26",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 2,
+					"amount": 1000,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 5,
+					"amount": 324,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 10,
+					"amount": 1000,
+					"category": "Telephone bill",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 6,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 3,
+					"amount": 13.12,
+					"category": "Grocery",
+					"created_by": "user1",
+					"date": "2025-05-10",
+					"is_positive": false,
+					"ledger": 100,
+					"note": null
+				}
+			]
+		},
+		{
+			"title": "should correctly insert data with similar date to an existing entry",
+			"input": {
+				"id": 3,
+				"amount": 10340,
+				"category": "Vacation",
+				"created_by": "user1",
+				"date": "2025-05-25",
+				"is_positive": false,
+				"ledger": 5,
+				"note": null
+			},
+			"expected": [
+				{
+					"id": 1,
+					"amount": 1410,
+					"category": "Food",
+					"created_by": "user1",
+					"date": "2025-05-26",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 3,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 2,
+					"amount": 1000,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 5,
+					"amount": 324,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 10,
+					"amount": 1000,
+					"category": "Telephone bill",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 6,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				}
+			]
+		},
+		{
+			"title": "should correctly insert data similar date and category to an existing entry",
+			"input": {
+				"id": 3,
+				"amount": 13.12,
+				"category": "Vacation",
+				"created_by": "user1",
+				"date": "2025-05-20",
+				"is_positive": false,
+				"ledger": 100,
+				"note": null
+			},
+			"expected": [
+				{
+					"id": 1,
+					"amount": 1410,
+					"category": "Food",
+					"created_by": "user1",
+					"date": "2025-05-26",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 2,
+					"amount": 1000,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 5,
+					"amount": 324,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 10,
+					"amount": 1000,
+					"category": "Telephone bill",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 3,
+					"amount": 13.12,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 100,
+					"note": null
+				},
+				{
+					"id": 6,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				}
+			]
+		}
+	]
+}

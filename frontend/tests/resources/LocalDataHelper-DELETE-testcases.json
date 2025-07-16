@@ -1,0 +1,111 @@
+{
+	"initialStore": [
+		{
+			"id": 1,
+			"amount": 1410,
+			"category": "Food",
+			"created_by": "user1",
+			"date": "2025-05-26",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 2,
+			"amount": 1000,
+			"category": "Transportation",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 5,
+			"amount": 324,
+			"category": "Transportation",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 10,
+			"amount": 1000,
+			"category": "Telephone bill",
+			"created_by": "user1",
+			"date": "2025-05-25",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		},
+		{
+			"id": 6,
+			"amount": 10340,
+			"category": "Vacation",
+			"created_by": "user1",
+			"date": "2025-05-20",
+			"is_positive": false,
+			"ledger": 5,
+			"note": null
+		}
+	],
+	"testcases": [
+		{
+			"title": "should correctly delete the corresponding data from the store.",
+			"input": {
+				"id": 1,
+				"amount": 1410,
+				"category": "Food",
+				"created_by": "user1",
+				"date": "2025-05-26",
+				"is_positive": false,
+				"ledger": 5,
+				"note": null
+			},
+			"expected": [
+				{
+					"id": 2,
+					"amount": 1000,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 5,
+					"amount": 324,
+					"category": "Transportation",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 10,
+					"amount": 1000,
+					"category": "Telephone bill",
+					"created_by": "user1",
+					"date": "2025-05-25",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				},
+				{
+					"id": 6,
+					"amount": 10340,
+					"category": "Vacation",
+					"created_by": "user1",
+					"date": "2025-05-20",
+					"is_positive": false,
+					"ledger": 5,
+					"note": null
+				}
+			]
+		}
+	]
+}

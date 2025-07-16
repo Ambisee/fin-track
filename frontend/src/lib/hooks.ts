@@ -1,21 +1,18 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
 import { Category, Entry, Ledger } from "@/types/supabase"
-import {
-    useMutation,
-    useQuery
-} from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
-    CATEGORIES_QKEY,
-    CURRENCIES_QKEY,
-    LEDGER_QKEY,
-    MONTH_GROUP_QKEY,
-    PING_QUERY_STALE_TIME,
-    QUERY_STALE_TIME,
-    SERVER_PING_QKEY,
-    SERVER_STATUS,
-    USER_QKEY,
-    USER_SETTINGS_QKEY
+	CATEGORIES_QKEY,
+	CURRENCIES_QKEY,
+	LEDGER_QKEY,
+	MONTH_GROUP_QKEY,
+	PING_QUERY_STALE_TIME,
+	QUERY_STALE_TIME,
+	SERVER_PING_QKEY,
+	SERVER_STATUS,
+	USER_QKEY,
+	USER_SETTINGS_QKEY
 } from "./constants"
 import { DatabaseHelper } from "./helper/DatabaseHelper"
 import { DateHelper } from "./helper/DateHelper"
@@ -27,7 +24,10 @@ function useUserQuery() {
 	return useQuery({
 		queryKey: USER_QKEY,
 		queryFn: async () => {
-			const { data: { user }, error } = await sbBrowser.auth.getUser()
+			const {
+				data: { user },
+				error
+			} = await sbBrowser.auth.getUser()
 
 			if (isNonNullable(error)) {
 				throw error
@@ -57,7 +57,7 @@ function useSettingsQuery() {
 				.eq("user_id", user.id)
 				.limit(1)
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		},
@@ -69,84 +69,89 @@ function useSettingsQuery() {
 }
 
 function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
-    const userQuery = useUserQuery()
-    const queryKey = QueryHelper.getStatisticQueryKey(ledger, period)
-    const { start, end } = DateHelper.getMonthStartEnd(period)
-
-    return useQuery({
-        queryKey,
-        queryFn: async () => {
-            const user = userQuery.data
-            if (!isNonNullable(user)) {
-                throw Error(QueryHelper.MESSAGE_NO_USER)
-            }
-
-            const { data } = await sbBrowser
-                .from("statistic")
-                .select("*")
-                .eq("ledger", ledger!)
-                .eq("created_by", user.id)
-                .lte("period", end.toDateString())
-                .gte("period", start.toDateString()) 
-
-            return data ?? []
-        },
-        staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
-        enabled:
-            !!ledger &&
-            !!userQuery.data &&
-            !userQuery.isRefetching
-    })
-}
-
-function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 	const userQuery = useUserQuery()
-
-    const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
-    const { start, end } = DateHelper.getMonthStartEnd(period)
+	const queryKey = QueryHelper.getStatisticQueryKey(ledger, period)
+	const { start, end } = DateHelper.getMonthStartEnd(period)
 
 	return useQuery({
 		queryKey,
 		queryFn: async () => {
 			const user = userQuery.data
-            if (!isNonNullable(user)) {
-                throw Error(QueryHelper.MESSAGE_NO_USER)
-            }
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
+			}
 
-            const { data } = await sbBrowser
-                .from("entry")
-                .select(`*`)
-                .eq("created_by", user.id)
-                .eq("ledger", ledger!)
-                .lte("date", end.toDateString())
-                .gte("date", start.toDateString())
-                .order("date", {ascending: false})
-                .order("category", {ascending: false})
-                .order("id", {ascending: true})
-                .throwOnError()
+			const { data } = await sbBrowser
+				.from("statistic")
+				.select("*")
+				.eq("ledger", ledger!)
+				.eq("created_by", user.id)
+				.lte("period", end.toDateString())
+				.gte("period", start.toDateString())
 
-            return data ?? []
-        },
-        staleTime: QUERY_STALE_TIME,
+			return data ?? []
+		},
+		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined,
-		enabled:
-			!!userQuery.data &&
-            !!ledger &&
-			!userQuery.isRefetching
+		enabled: !!ledger && !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
+/**
+ * Retrieve user entry data for a specific ledger and month/year period
+ *
+ * @param ledger The ledger id.
+ * @param period A Date object, the entries fetched will match the month and year only.
+ * @returns
+ *      A Query object containing the entries.
+ *      The entries will be ordered by descending dates - descending categories (alphabetically) - ascending ids.
+ */
+function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
+	const userQuery = useUserQuery()
+
+	const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
+	const { start, end } = DateHelper.getMonthStartEnd(period)
+
+	return useQuery({
+		queryKey,
+		queryFn: async () => {
+			const user = userQuery.data
+			if (!isNonNullable(user)) {
+				throw Error(QueryHelper.MESSAGE_NO_USER)
+			}
+
+			const { data } = await sbBrowser
+				.from("entry")
+				.select(`*`)
+				.eq("created_by", user.id)
+				.eq("ledger", ledger!)
+				.lte("date", end.toDateString())
+				.gte("date", start.toDateString())
+				.order("date", { ascending: false })
+				.order("category", { ascending: false })
+				.order("id", { ascending: true })
+				.throwOnError()
+
+			return data ?? []
+		},
+		staleTime: QUERY_STALE_TIME,
+		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.data === undefined,
+		enabled: !!userQuery.data && !!ledger && !userQuery.isRefetching
+	})
+}
 
 function useCurrenciesQuery() {
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => {
-            const { data } = await sbBrowser.from("currency").select("*").throwOnError()
-            return data ?? []
-        },
+			const { data } = await sbBrowser
+				.from("currency")
+				.select("*")
+				.throwOnError()
+			return data ?? []
+		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: (query) => query.state.data === undefined
@@ -169,7 +174,7 @@ function useCategoriesQuery() {
 				.select("*")
 				.eq("created_by", user.id)
 				.order("name")
-                .throwOnError()
+				.throwOnError()
 
 			return data ?? []
 		},
@@ -196,7 +201,7 @@ function useLedgersQuery() {
 				.select("*, currency (currency_name), entry(count)")
 				.eq("created_by", user.id)
 				.order("name")
-                .throwOnError()
+				.throwOnError()
 
 			return data ?? []
 		},
@@ -228,45 +233,44 @@ function useMonthGroupQuery(ledger_id?: number) {
 				.eq("created_by", user.id)
 				.eq("ledger_id", ledger_id)
 				.order("year, month", { ascending: true })
-                .throwOnError()
+				.throwOnError()
 
 			return data ?? []
 		},
 		refetchOnWindowFocus: false,
-		enabled:
-			!!userQuery.data && !userQuery.isRefetching && !!ledger_id
+		enabled: !!userQuery.data && !userQuery.isRefetching && !!ledger_id
 	})
 }
 
 function useServerPingQuery() {
-    const query = useQuery({
-        queryKey: SERVER_PING_QKEY,
-        queryFn: async () => {
-            const response = await fetch("/api/ping")
-            if (!response.ok) {
-                throw Error()
-            }
+	const query = useQuery({
+		queryKey: SERVER_PING_QKEY,
+		queryFn: async () => {
+			const response = await fetch("/api/ping")
+			if (!response.ok) {
+				throw Error()
+			}
 
-            return SERVER_STATUS.ONLINE
-        },
-        retry: 3,
-        staleTime: PING_QUERY_STALE_TIME
-    })
+			return SERVER_STATUS.ONLINE
+		},
+		retry: 3,
+		staleTime: PING_QUERY_STALE_TIME
+	})
 
-    let data: number
-    if (query.error !== null) {
-        data = SERVER_STATUS.OFFLINE
-    } else if (query.data === SERVER_STATUS.ONLINE) {
-        data = SERVER_STATUS.ONLINE
-    } else {
-        data = SERVER_STATUS.LOADING
-    }
+	let data: number
+	if (query.error !== null) {
+		data = SERVER_STATUS.OFFLINE
+	} else if (query.data === SERVER_STATUS.ONLINE) {
+		data = SERVER_STATUS.ONLINE
+	} else {
+		data = SERVER_STATUS.LOADING
+	}
 
-    return { ...query, data }
+	return { ...query, data }
 }
 
 function useInsertEntryMutation() {
-    const userQuery = useUserQuery()
+	const userQuery = useUserQuery()
 
 	return useMutation({
 		mutationFn: async (entry: EntryFormData) => {
@@ -294,7 +298,7 @@ function useInsertEntryMutation() {
 				})
 				.select()
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -321,7 +325,8 @@ function useDeleteEntryMutation() {
 				.throwOnError()
 
 			return data
-		}
+		},
+		onSettled: (data) => {}
 	})
 }
 
@@ -336,19 +341,19 @@ function useUpdateEntryMutation() {
 			}
 
 			const { data, error } = await sbBrowser
-                .from("entry")
-                .update({
-                    date: DateHelper.toDatabaseString(entry.date),
-                    category: entry.category,
-                    is_positive: isPositive,
-                    amount: Number(entry.amount),
-                    note: note,
-                    ledger: entry.ledger
-                })
-                .eq("id", entry.id)
-                .select()
-                .single()
-                .throwOnError()
+				.from("entry")
+				.update({
+					date: DateHelper.toDatabaseString(entry.date),
+					category: entry.category,
+					is_positive: isPositive,
+					amount: Number(entry.amount),
+					note: note,
+					ledger: entry.ledger
+				})
+				.eq("id", entry.id)
+				.select()
+				.single()
+				.throwOnError()
 
 			return data
 		}
@@ -360,7 +365,9 @@ function useInsertLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (ledger: Pick<Ledger, "created_by" | "name" | "currency_id">) => {
+		mutationFn: async (
+			ledger: Pick<Ledger, "created_by" | "name" | "currency_id">
+		) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
@@ -375,7 +382,7 @@ function useInsertLedgerMutation() {
 				})
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -387,9 +394,11 @@ function useUpdateLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (ledger: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">) => {
+		mutationFn: async (
+			ledger: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">
+		) => {
 			const user = userQuery.data
-            if (!isNonNullable(user)) {
+			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
@@ -400,7 +409,7 @@ function useUpdateLedgerMutation() {
 				.eq("created_by", ledger.created_by)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -428,7 +437,7 @@ function useDeleteLedgerMutation() {
 				.eq("id", ledger.id)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -442,7 +451,7 @@ function useSwitchLedgerMutation() {
 		mutationKey: USER_SETTINGS_QKEY,
 		mutationFn: async (ledger: Pick<Ledger, "id">) => {
 			const user = userQuery.data
-            if (!isNonNullable(user)) {
+			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
@@ -452,7 +461,7 @@ function useSwitchLedgerMutation() {
 				.eq("user_id", user.id)
 				.select("*, ledger (name)")
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -478,8 +487,7 @@ function useInsertCategoryMutation() {
 				})
 				.select("*")
 				.single()
-                .throwOnError()
-
+				.throwOnError()
 
 			return data
 		}
@@ -506,7 +514,7 @@ function useUpdateCategoryMutation() {
 				.eq("created_by", user.id)
 				.select("*")
 				.single()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -530,7 +538,7 @@ function useDeleteCategoryMutation() {
 				.eq("created_by", category.created_by)
 				.eq("name", category.name)
 				.select()
-                .throwOnError()
+				.throwOnError()
 
 			return data
 		}
@@ -538,42 +546,42 @@ function useDeleteCategoryMutation() {
 }
 
 function useSearchEntry() {
-    const [isSearching, setIsSearching] = useState(false)
-    const [searchQuery, setSearchQuery] = useState("")
-    const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
+	const [isSearching, setIsSearching] = useState(false)
+	const [searchQuery, setSearchQuery] = useState("")
+	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
-    useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (searchQuery === "") {
-                setSearchResult(null)
-                return
-            }
-    
-            setIsSearching(true)
-            const { data, error } = await sbBrowser.rpc("search_entry", {
-                query: DatabaseHelper.parseSearchQuery(searchQuery)
-            })
-    
-            if (error != null || !isNonNullable(data)) {
-                setSearchResult(null)
-                return
-            }
-    
-            setSearchResult(data)
-            setIsSearching(false)
-        }, 350)
-        
-        return () => {
-            clearTimeout(timer)
-        }
-    }, [searchQuery])
+	useEffect(() => {
+		const timer = setTimeout(async () => {
+			if (searchQuery === "") {
+				setSearchResult(null)
+				return
+			}
 
-    return {
-        isSearching,
-        searchResult,
-        searchQuery,
-        setSearchQuery,
-    }
+			setIsSearching(true)
+			const { data, error } = await sbBrowser.rpc("search_entry", {
+				query: DatabaseHelper.parseSearchQuery(searchQuery)
+			})
+
+			if (error != null || !isNonNullable(data)) {
+				setSearchResult(null)
+				return
+			}
+
+			setSearchResult(data)
+			setIsSearching(false)
+		}, 350)
+
+		return () => {
+			clearTimeout(timer)
+		}
+	}, [searchQuery])
+
+	return {
+		isSearching,
+		searchResult,
+		searchQuery,
+		setSearchQuery
+	}
 }
 
 function useSetElementWindowHeight() {
@@ -625,13 +633,26 @@ function useAmountFormatter() {
 }
 
 export {
-    useAmountFormatter,
-    useCategoriesQuery,
-    useCurrenciesQuery, useDeleteCategoryMutation, useDeleteEntryMutation, useDeleteLedgerMutation,
-    useEntryDataQuery, useInsertCategoryMutation, useInsertEntryMutation, useInsertLedgerMutation,
-    useLedgersQuery, useMonthGroupQuery, useSearchEntry, useServerPingQuery, useSetElementWindowHeight,
-    useSettingsQuery, useStatisticsQuery, useSwitchLedgerMutation,
-    useUpdateCategoryMutation, useUpdateEntryMutation, useUpdateLedgerMutation,
-    useUserQuery
+	useAmountFormatter,
+	useCategoriesQuery,
+	useCurrenciesQuery,
+	useDeleteCategoryMutation,
+	useDeleteEntryMutation,
+	useDeleteLedgerMutation,
+	useEntryDataQuery,
+	useInsertCategoryMutation,
+	useInsertEntryMutation,
+	useInsertLedgerMutation,
+	useLedgersQuery,
+	useMonthGroupQuery,
+	useSearchEntry,
+	useServerPingQuery,
+	useSetElementWindowHeight,
+	useSettingsQuery,
+	useStatisticsQuery,
+	useSwitchLedgerMutation,
+	useUpdateCategoryMutation,
+	useUpdateEntryMutation,
+	useUpdateLedgerMutation,
+	useUserQuery
 }
-

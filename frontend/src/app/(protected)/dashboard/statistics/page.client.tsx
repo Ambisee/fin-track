@@ -430,6 +430,7 @@ export default function DashboardStatistics() {
 			group.percentage = group.total_amount / totalAmount
 		}
 
+		console.log(`calculate stats...`)
 		return result
 	}
 
@@ -460,6 +461,7 @@ export default function DashboardStatistics() {
 			}
 		}
 
+		console.log("rendering...")
 		const StatsUI = isDesktop ? DesktopStatsUI : MobileStatsUI
 
 		return <StatsUI chartConfig={chartConfig} stats={stats} />

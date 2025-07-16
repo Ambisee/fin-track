@@ -71,18 +71,18 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getEntryQueryKey(
-													data.ledger,
-													new Date(data.date)
-												)
-											})
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getStatisticQueryKey(
-													data.ledger,
-													new Date(data.date)
-												)
-											})
+											// queryClient.invalidateQueries({
+											// 	queryKey: QueryHelper.getEntryQueryKey(
+											// 		data.ledger,
+											// 		new Date(data.date)
+											// 	)
+											// })
+											// queryClient.invalidateQueries({
+											// 	queryKey: QueryHelper.getStatisticQueryKey(
+											// 		data.ledger,
+											// 		new Date(data.date)
+											// 	)
+											// })
 										})
 										setOpen(true)
 									}}
