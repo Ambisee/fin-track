@@ -1,6 +1,7 @@
 import { sbServer } from "@/lib/supabase"
 import PublicNavbar from "@/components/user/PublicNavbar"
 import { cookies } from "next/headers"
+import { type JSX } from "react"
 
 interface PublicLayoutProps {
 	children: JSX.Element

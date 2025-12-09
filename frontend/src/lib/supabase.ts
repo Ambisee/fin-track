@@ -1,6 +1,8 @@
 import { Database } from "@/types/supabase"
 import { createBrowserClient, createServerClient } from "@supabase/ssr"
+import { createClient } from "@supabase/supabase-js"
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
+import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL! ?? ""
@@ -10,25 +12,25 @@ const supabaseServerKey = process.env.NEXT_SUPABASE_SERVER_KEY! ?? ""
 const sbBrowser = createBrowserClient<Database>(supabaseUrl, supabaseKey)
 
 const sbMiddleware = (request: NextRequest, response: NextResponse) => {
-    return createServerClient<Database>(supabaseUrl ,supabaseKey, {
-        cookies: {
-            getAll() {
-                return request.cookies.getAll()
-            },
-            setAll(cookiesToSet) {
-                cookiesToSet.forEach(({ name, value }) => 
-                    request.cookies.set(name, value)
-                )
-                cookiesToSet.forEach(({ name, value, options }) => 
-                    response.cookies.set(name, value, options)
-                )
-            },
-        }
-    })
+	return createServerClient(supabaseUrl, supabaseKey, {
+		cookies: {
+			getAll() {
+				return request.cookies.getAll()
+			},
+			setAll(cookiesToSet) {
+				cookiesToSet.forEach(({ name, value }) =>
+					request.cookies.set(name, value)
+				)
+				cookiesToSet.forEach(({ name, value, options }) =>
+					response.cookies.set(name, value, options)
+				)
+			}
+		}
+	})
 }
 
 const sbServer = (cookieStore: ReadonlyRequestCookies) => {
-    return createServerClient(supabaseUrl, supabaseServerKey, {
+	return createServerClient(supabaseUrl, supabaseServerKey, {
 		cookies: {
 			getAll() {
 				return cookieStore.getAll()
@@ -46,7 +48,6 @@ const sbServer = (cookieStore: ReadonlyRequestCookies) => {
 			}
 		}
 	})
-
 }
 
 export { sbBrowser, sbServer, sbMiddleware, supabaseKey, supabaseUrl }

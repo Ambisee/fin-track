@@ -12,7 +12,7 @@ import { useSetElementWindowHeight } from "@/lib/hooks"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { type JSX, useEffect, useState } from "react"
 
 import classNames from "@/styles/signup-transitions.module.css"
 

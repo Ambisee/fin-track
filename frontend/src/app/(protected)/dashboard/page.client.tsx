@@ -63,9 +63,9 @@ export default function DashboardHome() {
 				<div>
 					<Skeleton className="w-56 h-6 mb-4" />
 					<div className="grid gap-4">
-						<Skeleton className="w-full h-[6.25rem]" />
-						<Skeleton className="w-full h-[6.25rem]" />
-						<Skeleton className="w-full h-[6.25rem]" />
+						<Skeleton className="w-full h-25" />
+						<Skeleton className="w-full h-25" />
+						<Skeleton className="w-full h-25" />
 					</div>
 				</div>
 			)

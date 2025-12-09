@@ -309,7 +309,7 @@ function MobileStatsUI(props: StatsUIProps) {
 				</TabsTrigger>
 				<div
 					className="
-                        items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted 
+                        items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 font-medium ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-muted 
                         absolute top-1 left-1 w-[calc(50%-0.25rem)] h-[calc(100%-0.5rem)] peer-data-[state=active]/income:translate-x-full peer-data-[state=active]/expense:translate-x-0
                         duration-300"
 				></div>
@@ -342,7 +342,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 	const formatAmount = useAmountFormatter()
 
 	return (
-		<div className="flex py-4 w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-sm">
+		<div className="flex py-4 w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
 			<div className="flex-1 px-4 group" data-is-positive="false">
 				<h2 className="text-md">Total expense</h2>
 				<h3 className="text-3xl text-entry-item">

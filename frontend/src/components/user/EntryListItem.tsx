@@ -93,7 +93,7 @@ export default function EntryListItem({
 			<CardHeader className="p-0 h-[100px]">
 				<button
 					type="button"
-					className="h-full w-full p-4 text-left focus:bg-background focus:outline-none"
+					className="h-full w-full p-4 text-left focus:bg-background focus:outline-hidden"
 					onClick={() => {
 						setIsItemOpen((c) => {
 							props.onExpand?.(!c)
@@ -103,7 +103,7 @@ export default function EntryListItem({
 				>
 					<div className="flex justify-between items-center w-inherit">
 						<div className="grid max-w-[calc(50%-0.25rem)] text-entry-item">
-							<CardTitle className="text-lg whitespace-nowrap overflow-hidden overflow-ellipsis">
+							<CardTitle className="text-lg whitespace-nowrap overflow-hidden text-ellipsis">
 								{props.data.category}
 							</CardTitle>
 							<CardDescription>
