@@ -6,7 +6,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint",
+		"lint": "eslint .",
 		"gen-type": "npx supabase gen types typescript --project-id gjniozckblfslplhhzkc --schema public > src/types/supabase-auto.ts",
 		"test": "jest"
 	},
