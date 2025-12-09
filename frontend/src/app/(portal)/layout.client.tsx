@@ -6,6 +6,7 @@ import { Cross1Icon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { type JSX } from "react"
 
 interface PortalLayoutProps {
 	children: JSX.Element

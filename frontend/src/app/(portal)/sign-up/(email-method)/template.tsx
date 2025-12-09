@@ -1,5 +1,6 @@
 "use client"
 
+import { type JSX } from "react"
 import { SignupTransitionPage } from "./layout"
 
 interface SignUpTemplateProps {

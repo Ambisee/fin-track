@@ -1,13 +1,10 @@
 "use client"
 
-import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import EntrySearchBar from "@/components/user/EntrySearchBar"
 import MonthPicker from "@/components/user/MonthPicker"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
-import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { SearchIcon } from "lucide-react"
@@ -87,8 +84,8 @@ export default function DashboardEntries() {
 						</div>
 						{entryQuery.isLoading || entryQuery.data === undefined ? (
 							<>
-								<Skeleton className="w-full h-[6.25rem] mb-4" />
-								<Skeleton className="w-full h-[6.25rem] mb-4" />{" "}
+								<Skeleton className="w-full h-25 mb-4" />
+								<Skeleton className="w-full h-25 mb-4" />{" "}
 							</>
 						) : (
 							<EntryList

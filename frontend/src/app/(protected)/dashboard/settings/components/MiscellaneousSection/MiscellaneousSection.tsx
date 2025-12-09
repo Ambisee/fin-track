@@ -48,7 +48,7 @@ export default function MiscellaneousSection() {
 								<div className="mt-4 mb-4 flex items-start gap-2 text-left md:mt-2 md:items-center">
 									<Checkbox
 										id="delete-confirmation"
-										className="mt-[0.125rem] md:mt-0"
+										className="mt-0.5 md:mt-0"
 										checked={isDeleteChecked}
 										onCheckedChange={() => setIsDeleteChecked((c) => !c)}
 									/>

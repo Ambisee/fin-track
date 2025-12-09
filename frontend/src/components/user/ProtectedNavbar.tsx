@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
+import { type JSX } from "react"
 
 function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 	const pathname = usePathname()
@@ -86,7 +87,7 @@ export default function ProtectedNavbar() {
 										})
 										setOpen(true)
 									}}
-									className="absolute left-1/2 translate-x-[-50%] top-[-3.25rem] rounded-full aspect-square w-12 h-12 p-0
+									className="absolute left-1/2 translate-x-[-50%] -top-13 rounded-full aspect-square w-12 h-12 p-0
                                         md:bottom-8 md:top-auto md:left-1/2"
 								>
 									<PlusIcon className="block" width={30} height={30} />

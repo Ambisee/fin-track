@@ -17,7 +17,7 @@ const PasswordField = React.forwardRef<HTMLInputElement, InputProps>(
 			<div
 				className={cn(
 					`flex h-10 w-full rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground ${
-						focused ? "outline-none ring-2 ring-ring ring-offset-2" : ""
+						focused ? "outline-hidden ring-2 ring-ring ring-offset-2" : ""
 					} disabled:cursor-not-allowed disabled:opacity-50`,
 					className
 				)}
@@ -33,7 +33,7 @@ const PasswordField = React.forwardRef<HTMLInputElement, InputProps>(
 						setFocused(false)
 					}}
 					className={cn(
-						`flex w-full px-3 py-2 rounded-md bg-background text-base ring-offset-background file:border-0 file:bg-transparent border-none outline-none file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50`,
+						`flex w-full px-3 py-2 rounded-md bg-background text-base ring-offset-background file:border-0 file:bg-transparent border-none outline-hidden file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50`,
 						className
 					)}
 					ref={ref}
