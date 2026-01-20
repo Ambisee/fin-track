@@ -11,13 +11,9 @@ import { roboto } from "@/app/fonts"
 import googleIcon from "../../../../../public/google-icon.svg"
 
 import { MailIcon } from "lucide-react"
-import { useEffect, useState } from "react"
 
 export default function SignIn() {
-	const [origin, setOrigin] = useState<string>(null!)
-	useEffect(() => {
-		setOrigin(window.location.origin)
-	}, [])
+	const origin = window.location.origin
 
 	return (
 		<div className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center">

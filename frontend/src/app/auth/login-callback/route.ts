@@ -1,8 +1,7 @@
+import { sbServer } from '@/lib/supabase'
 import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { sbServer, supabaseKey, supabaseUrl } from '@/lib/supabase'
 import { redirect } from 'next/navigation'
+import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl
