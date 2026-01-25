@@ -6,7 +6,7 @@ import Link from "next/link"
 export default function HomePage() {
 	return (
 		<div className="px-6 max-w-container h-full relative mx-auto flex justify-center items-center md:px-0">
-			<div className="grid gap-8 translate-y-[-2.5rem]">
+			<div className="grid gap-8 -translate-y-10">
 				<h1 className="w-full text-4xl">
 					<b>FinTrack</b> helps track your finances.
 				</h1>

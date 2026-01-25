@@ -1,6 +1,5 @@
 "use client"
 
-import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { GearIcon, TableIcon } from "@radix-ui/react-icons"
@@ -40,8 +39,6 @@ function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
 
 export default function ProtectedNavbar() {
 	const queryClient = useQueryClient()
-
-	const settingsQuery = useSettingsQuery()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)

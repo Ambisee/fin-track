@@ -161,6 +161,11 @@
 		--chart-9: 260 65% 50%; /* Cool purple */
 		--chart-10: 320 70% 50%; /* Vibrant magenta */
 	}
+
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
 }
 
 @layer base {
