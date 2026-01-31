@@ -82,7 +82,7 @@ export default function EntryForm(props: EntryFormProps) {
 	})
 
 	useEffect(() => {
-		let defaultValues: EntryFormData = {
+		const defaultValues: EntryFormData = {
 			date: new Date(),
 			category: "Miscellaneous",
 			amount: "",

@@ -14,7 +14,7 @@ import {
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { useQueryClient } from "@tanstack/react-query"
-import { createContext, Suspense, useRef, useState, type JSX, use } from "react";
+import { createContext, Suspense, useRef, useState, type JSX, use } from "react"
 import Loading from "./loading"
 
 interface DashboardLayoutProps {
@@ -109,15 +109,14 @@ function LedgerBadge() {
 }
 
 export default function DashboardLayout(props: DashboardLayoutProps) {
-    const children = use(props.children);
-    return (
-        (<LayoutEntryDialog>
-            <div className="dashboard-content">
-				<Suspense fallback={<Loading />}>{children}</Suspense>
+	return (
+		<LayoutEntryDialog>
+			<div className="dashboard-content">
+				<Suspense fallback={<Loading />}>{props.children}</Suspense>
 				<LayoutLedgerEditorDialog />
 			</div>
-            <ProtectedNavbar />
-            <LayoutEntryDialogContent />
-        </LayoutEntryDialog>)
-    );
+			<ProtectedNavbar />
+			<LayoutEntryDialogContent />
+		</LayoutEntryDialog>
+	)
 }

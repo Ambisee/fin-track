@@ -1,34 +1,34 @@
 import { Category } from "@/types/supabase"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
+import { useState } from "react"
 import {
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
-	DialogClose
-} from "../ui/dialog"
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
+} from "../ui/alert-dialog"
+import { Button } from "../ui/button"
 import {
 	Command,
 	CommandEmpty,
-	CommandList,
-	CommandItem,
+	CommandGroup,
 	CommandInput,
-	CommandGroup
+	CommandItem,
+	CommandList
 } from "../ui/command"
-import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ReloadIcon } from "@radix-ui/react-icons"
-import { useEffect, useState } from "react"
-import { Button } from "../ui/button"
 import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogDescription,
-	AlertDialogTitle,
-	AlertDialogFooter
-} from "../ui/alert-dialog"
+	DialogClose,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle
+} from "../ui/dialog"
 import { useToast } from "../ui/use-toast"
 
 interface CommandGroupClass {
@@ -69,7 +69,9 @@ const selectModeClass: CommandGroupClass = {
 export default function CategoriesListPage(props: CategoriesListPageProps) {
 	const { toast } = useToast()
 
-	const [isLoading, setIsLoading] = useState(props.isLoading ?? false)
+	const [isPendingOperation, setIsPendingOperation] = useState(
+		props.isLoading ?? false
+	)
 	const [isEditMode, setIsEditMode] = useState(
 		!!props.isEditMode || !!props.editModeOnly
 	)
@@ -78,10 +80,7 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 	>(undefined)
 
 	const classGroup = isEditMode ? editModeClass : selectModeClass
-
-	useEffect(() => {
-		setIsLoading(props.isLoading ?? false)
-	}, [props.isLoading])
+	const isInputEnabled = props?.isLoading !== true && !isPendingOperation
 
 	return (
 		<div className="max-h-full relative grid grid-rows-[auto_1fr] gap-4">
@@ -133,16 +132,16 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 				</DialogDescription>
 			</DialogHeader>
 			<AlertDialog>
-				<Command className="h-full w-full gap-4 rounded-none">
+				<Command className="h-full w-full gap-4 rounded-none bg-background text-foreground">
 					<div className="grid grid-cols-[1fr_auto] border rounded-md cmdk-input-no-border ">
 						<CommandInput
-							disabled={isLoading}
+							disabled={!isInputEnabled}
 							className="text-base"
 							placeholder="Search for a category..."
 						/>
 					</div>
 					<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-						{props.isInitialized ?? true ? (
+						{(props.isInitialized ?? true) ? (
 							<>
 								<span className="text-center">No category found</span>
 								<div className="flex gap-2">
@@ -161,7 +160,7 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 						<CommandGroup className={classGroup.commandGroup}>
 							{props.categoriesList.map((val) => (
 								<CommandItem
-									disabled={isLoading}
+									disabled={!isInputEnabled}
 									className={classGroup.commandItem}
 									key={val.name}
 									value={val.name}
@@ -204,9 +203,9 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 									return
 								}
 
-								setIsLoading(true)
+								setIsPendingOperation(true)
 								await props.onDelete?.(categoryToBeDelete)
-								setIsLoading(false)
+								setIsPendingOperation(false)
 							}}
 							variant="destructive"
 						>

@@ -72,7 +72,7 @@ function ServerStatusLabel() {
 	const serverPingQuery = useServerPingQuery()
 
 	let serverIconClassName: string
-	let serverStatusMessage: ReactElement<any>
+	let serverStatusMessage: ReactElement<unknown>
 
 	switch (serverPingQuery.data) {
 		case SERVER_STATUS.LOADING:
@@ -182,8 +182,8 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 					<VisuallyHidden>
 						Select a ledger to download a report from.
 					</VisuallyHidden>
-					<ServerStatusLabel />
 				</DialogDescription>
+				<ServerStatusLabel />
 			</DialogHeader>
 			<ul className="max-h-full overflow-y-auto [&>:not(:first-child)]:mt-1.5">
 				{renderLedgerList()}
@@ -360,8 +360,8 @@ function MonthSelectorPage(props: DocumentPageProps) {
 					<VisuallyHidden>
 						Select a month to download the report PDF for that month
 					</VisuallyHidden>
-					<ServerStatusLabel />
 				</DialogDescription>
+				<ServerStatusLabel />
 			</DialogHeader>
 			<ul className="max-h-full relative overflow-y-auto [&>:not(:first-child)]:mt-1.5">
 				{renderDownloadList()}

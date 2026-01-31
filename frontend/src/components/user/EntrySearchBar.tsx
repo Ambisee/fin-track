@@ -1,10 +1,12 @@
 import { useSearchEntry } from "@/lib/hooks"
 import { Entry } from "@/types/supabase"
-import { ComponentProps, useEffect, useRef } from "react"
+import { ComponentProps, useEffect } from "react"
 import { Input } from "../ui/input"
 
-interface EntrySearchBarProps
-	extends Omit<ComponentProps<typeof Input>, "value" | "onChange"> {
+interface EntrySearchBarProps extends Omit<
+	ComponentProps<typeof Input>,
+	"value" | "onChange"
+> {
 	/**
 	 * Initial search value to be displayed on the search bar.
 	 */
@@ -38,17 +40,18 @@ interface EntrySearchBarProps
 }
 
 export default function EntrySearchBar(props: EntrySearchBarProps) {
+	const { onSearchResult, onSearchStateChange, ...inputProps } = props
 	const { searchQuery, searchResult, isSearching, setSearchQuery } =
 		useSearchEntry()
 
 	useEffect(() => {
-		props.onSearchResult(searchResult)
+		onSearchResult(searchResult)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchResult])
 
 	useEffect(() => {
-		props.onSearchStateChange?.(isSearching)
+		onSearchStateChange?.(isSearching)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isSearching])
@@ -60,7 +63,7 @@ export default function EntrySearchBar(props: EntrySearchBarProps) {
 				e.preventDefault()
 				setSearchQuery(e.target.value)
 			}}
-			{...props}
+			{...inputProps}
 		/>
 	)
 }

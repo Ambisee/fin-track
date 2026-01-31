@@ -28,7 +28,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Ledger } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 export interface LedgersListPageProps {
 	currentLedger?: Omit<Ledger, "entry">
@@ -47,15 +47,13 @@ export interface LedgersListPageProps {
 export default function LedgersListPage(props: LedgersListPageProps) {
 	const { toast } = useToast()
 
-	const [isLoading, setIsLoading] = useState(props.isLoading ?? false)
+	const [isPendingOperation, setIsPendingOperation] = useState(false)
 	const [isEditMode, setIsEditMode] = useState<boolean>(!!props.isEditMode)
 	const [ledgerToBeDelete, setLedgerToDelete] = useState<Ledger | undefined>(
 		undefined
 	)
 
-	useEffect(() => {
-		setIsLoading(props.isLoading ?? false)
-	}, [props.isLoading])
+	const isInputEnabled = props?.isLoading !== true && !isPendingOperation
 
 	return (
 		<div className="h-full grid gap-4 grid-rows-[auto_1fr]">
@@ -101,16 +99,16 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 				<DialogDescription></DialogDescription>
 			</DialogHeader>
 			<AlertDialog>
-				<Command className="h-full w-full gap-4 rounded-none">
+				<Command className="h-full w-full gap-4 rounded-none bg-background text-foreground">
 					<div className="grid grid-cols-[1fr_auto] border rounded-md cmdk-input-no-border ">
 						<CommandInput
-							disabled={isLoading}
+							disabled={!isInputEnabled}
 							className="text-base"
 							placeholder="Search for a ledger..."
 						/>
 					</div>
 					<CommandEmpty className="flex flex-col h-full items-center gap-2 py-4">
-						{props.isInitialized ?? true ? (
+						{(props.isInitialized ?? true) ? (
 							<>
 								<span className="text-center">No ledger found</span>
 								<div className="flex gap-2">
@@ -129,14 +127,14 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						<CommandGroup className="">
 							{props.ledgersList.map((val) => (
 								<CommandItem
-									className="border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
+									className="border flex justify-between items-center rounded-md wrap-break-word cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
 									key={val.name}
 									value={val.name}
-									disabled={!(props.isInitialized ?? true) || isLoading}
+									disabled={!(props.isInitialized ?? true) || !isInputEnabled}
 									onSelect={async () => {
-										setIsLoading(true)
+										setIsPendingOperation(true)
 										await props.onSelect?.(val, isEditMode)
-										setIsLoading(false)
+										setIsPendingOperation(false)
 									}}
 								>
 									<p className="w-full">{val.name} </p>
@@ -176,9 +174,9 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 									return
 								}
 
-								setIsLoading(true)
+								setIsPendingOperation(true)
 								await props.onDelete?.(ledgerToBeDelete)
-								setIsLoading(false)
+								setIsPendingOperation(false)
 							}}
 							variant="destructive"
 						>

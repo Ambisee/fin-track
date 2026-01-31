@@ -166,7 +166,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="mt-2">
 										<FormLabel>Ledger Name</FormLabel>
 										<FormControl>
-											{props.isInitialized ?? true ? (
+											{(props.isInitialized ?? false) ? (
 												<Input
 													placeholder="Enter a new ledger name"
 													disabled={isFormLoading}
@@ -189,7 +189,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 									<FormItem className="grid mt-8">
 										<FormLabel className="text-sm">Currency</FormLabel>
 										<FormControl>
-											{props.isInitialized ?? true ? (
+											{(props.isInitialized ?? true) ? (
 												<ComboBox
 													closeOnSelect
 													disabled={isFormLoading}

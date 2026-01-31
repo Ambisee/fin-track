@@ -1,8 +1,6 @@
 import { Database } from "@/types/supabase"
 import { createBrowserClient, createServerClient } from "@supabase/ssr"
-import { createClient } from "@supabase/supabase-js"
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
-import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL! ?? ""
@@ -50,4 +48,4 @@ const sbServer = (cookieStore: ReadonlyRequestCookies) => {
 	})
 }
 
-export { sbBrowser, sbServer, sbMiddleware, supabaseKey, supabaseUrl }
+export { sbBrowser, sbMiddleware, sbServer, supabaseKey, supabaseUrl }
