@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get('code')
 
     if (code) {
-        const cookieStore = cookies()
+        const cookieStore = await cookies()
         const supabase = sbServer(cookieStore)
         
         const { data, error  } = await supabase.auth.exchangeCodeForSession(code)

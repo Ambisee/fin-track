@@ -72,7 +72,7 @@ function ServerStatusLabel() {
 	const serverPingQuery = useServerPingQuery()
 
 	let serverIconClassName: string
-	let serverStatusMessage: ReactElement
+	let serverStatusMessage: ReactElement<any>
 
 	switch (serverPingQuery.data) {
 		case SERVER_STATUS.LOADING:

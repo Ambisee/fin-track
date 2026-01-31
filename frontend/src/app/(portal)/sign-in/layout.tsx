@@ -5,6 +5,6 @@ export const metadata: Metadata = {
 	title: "Sign In - FinTrack"
 }
 
-export default function Layout(props: { children: ReactElement }) {
+export default function Layout(props: { children: ReactElement<any> }) {
 	return props.children
 }

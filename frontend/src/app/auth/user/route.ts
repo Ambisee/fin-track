@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 export async function DELETE(request: NextRequest) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = sbServer(cookieStore)
 
     const userReq = await supabase.auth.getUser()

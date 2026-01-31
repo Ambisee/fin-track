@@ -7,7 +7,7 @@ function isProtectedUrl(url: NextURL) {
     return url.pathname.startsWith("/dashboard")
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const response = NextResponse.next({ request })
     const supabase = sbMiddleware(request, response)
 

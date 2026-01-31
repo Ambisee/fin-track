@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = sbServer(cookieStore)
 
     const payload = await request.json()

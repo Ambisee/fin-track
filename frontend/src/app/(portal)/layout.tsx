@@ -6,6 +6,6 @@ export const metadata: Metadata = {
 	title: "Sign Up - FinTrack"
 }
 
-export default function Layout(props: { children: ReactElement }) {
+export default function Layout(props: { children: ReactElement<any> }) {
 	return <PortalLayout>{props.children}</PortalLayout>
 }

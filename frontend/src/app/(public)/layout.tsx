@@ -8,7 +8,7 @@ interface PublicLayoutProps {
 }
 
 export default async function PublicLayout(props: PublicLayoutProps) {
-	const cookieStore = cookies()
+	const cookieStore = await cookies()
 	const supabase = sbServer(cookieStore)
 
 	const userResponse = await supabase.auth.getUser()

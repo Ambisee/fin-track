@@ -12,7 +12,7 @@ import { useSetElementWindowHeight } from "@/lib/hooks"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { type JSX, useEffect, useState } from "react"
+import { type JSX, useEffect, useState, use } from "react";
 
 import classNames from "@/styles/signup-transitions.module.css"
 
@@ -68,15 +68,16 @@ const {
 export { useSignupTransition, SignupTransitionPage }
 
 export default function SignUpLayout(props: SignUpLayoutProps) {
-	const router = useRouter()
-	const pathname = usePathname()
+    const children = use(props.children);
+    const router = useRouter()
+    const pathname = usePathname()
 
-	const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
-	const rootRef = useSetElementWindowHeight()
+    const rootRef = useSetElementWindowHeight()
 
-	let progressValue = -1
-	if (pathname.endsWith("/sign-up/email")) {
+    let progressValue = -1
+    if (pathname.endsWith("/sign-up/email")) {
 		progressValue = 0
 	} else if (pathname.endsWith("/sign-up/username")) {
 		progressValue = 33.3
@@ -84,13 +85,13 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 		progressValue = 66.6
 	}
 
-	useEffect(() => {
+    useEffect(() => {
 		router.prefetch(EMAIL_INPUT_PATH)
 		router.prefetch(USERNAME_INPUT_PATH)
 		router.prefetch(PASSWORD_INPUT_PATH)
 	}, [router])
 
-	useEffect(() => {
+    useEffect(() => {
 		const emailCookie = Cookies.get("reg-email")
 		const usernameCookie = Cookies.get("reg-username")
 
@@ -108,7 +109,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [pathname])
 
-	if (isLoading) {
+    if (isLoading) {
 		return (
 			<div className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center px-2 md:px-4">
 				<div className="w-full max-w-container flex justify-center items-center px-2 md:px-4">
@@ -123,12 +124,12 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 		)
 	}
 
-	return (
-		<div
+    return (
+        (<div
 			ref={rootRef}
 			className="w-full min-h-[inherit] grid grid-flow-col-dense justify-items-center"
 		>
-			<div className="w-full h-full max-w-container flex justify-center items-center px-2 overflow-x-hidden">
+            <div className="w-full h-full max-w-container flex justify-center items-center px-2 overflow-x-hidden">
 				<div className="min-h-fit w-[375px] px-0 md:px-0">
 					<div className="w-full px-2 mb-4">
 						{progressValue >= 0 && (
@@ -142,7 +143,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 							navigationGraph={navigationGraph}
 							transitionLabels={transitionLabels}
 						>
-							{props.children}
+							{children}
 						</SignupTransitionRoot>
 						<div className="w-full px-6 pb-6 flex flex-col gap-6 justify-end items-center">
 							<Separator className="w-full" />
@@ -158,6 +159,6 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 					</Card>
 				</div>
 			</div>
-		</div>
-	)
+        </div>)
+    );
 }
