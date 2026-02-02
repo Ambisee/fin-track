@@ -1,15 +1,11 @@
-import React, {
-	useState,
-	RefAttributes,
-	ForwardRefExoticComponent
-} from "react"
-import { type InputProps } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { EyeOpenIcon, EyeNoneIcon, EyeClosedIcon } from "@radix-ui/react-icons"
+import { type InputProps } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons"
+import React, { useState } from "react"
 
 const PasswordField = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, onFocus, onBlur, type, ...props }, ref) => {
+	({ className, onFocus, onBlur, ...props }, ref) => {
 		const [focused, setFocused] = useState(false)
 		const [showPassword, setShowPassword] = useState(false)
 

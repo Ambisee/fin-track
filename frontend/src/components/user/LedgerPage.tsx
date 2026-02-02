@@ -54,10 +54,10 @@ export default function LedgerPage(props: LedgerPageProps) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: props.data?.name,
+			name: props.data?.name ?? "",
 			currency: {
-				id: props.data?.currency_id,
-				currency_name: props.data?.currency?.currency_name
+				id: props.data?.currency_id ?? NaN,
+				currency_name: props.data?.currency?.currency_name ?? ""
 			}
 		}
 	})

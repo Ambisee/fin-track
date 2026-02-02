@@ -1,26 +1,22 @@
-import { useToast } from "@/components/ui/use-toast"
-import { useUserQuery } from "@/lib/hooks"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import InputSkeleton from "../InputSkeleton"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button, buttonVariants } from "@/components/ui/button"
-import { sbBrowser } from "@/lib/supabase"
-import {
-	FormControl,
-	FormField,
-	FormLabel,
-	FormDescription,
-	FormItem,
-	Form
-} from "@/components/ui/form"
-import { z } from "zod"
+import { useToast } from "@/components/ui/use-toast"
 import PasswordField from "@/components/user/PasswordField"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { ReloadIcon } from "@radix-ui/react-icons"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
+import { useUserQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { z } from "zod"
+import InputSkeleton from "../InputSkeleton"
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup
+} from "@/components/ui/field"
 
 const passwordChangeFormSchema = z
 	.object({
@@ -127,55 +123,53 @@ export default function PasswordChange() {
 		}
 
 		return (
-			<>
-				<FormField
+			<FieldGroup>
+				<Controller
 					control={form.control}
 					name="oldPassword"
-					render={({ field }) => (
-						<FormItem className="mt-2">
-							<FormControl>
-								<PasswordField placeholder="Old password" {...field} />
-							</FormControl>
-						</FormItem>
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid} className="-mb-4">
+							<PasswordField
+								aria-invalid={fieldState.invalid}
+								placeholder="Old password"
+								{...field}
+							/>
+						</Field>
 					)}
 				/>
-				<FormField
+				<Controller
 					control={form.control}
 					name="newPassword"
-					render={({ field }) => (
-						<FormItem className="mt-2">
-							<FormControl>
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<Field>
 								<PasswordField placeholder="New password" {...field} />
-							</FormControl>
-							{form.formState.errors.newPassword && (
-								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-									{form.formState.errors.newPassword.message}
-								</div>
-							)}
-							<FormDescription>
+							</Field>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+							<FieldDescription>
 								Passwords must have at least 8 characters and include lowercase,
 								uppercase, number, and special characters.
-							</FormDescription>
-						</FormItem>
+							</FieldDescription>
+						</Field>
 					)}
 				/>
-				<FormField
+				<Controller
 					control={form.control}
 					name="confirmNewPassword"
-					render={({ field }) => (
-						<FormItem className="mt-4">
-							<FormControl>
+					render={({ field, fieldState }) => (
+						<Field data-invalid={fieldState.invalid}>
+							<Field>
 								<PasswordField placeholder="Confirm new password" {...field} />
-							</FormControl>
+							</Field>
 							{form.formState.errors.confirmNewPassword && (
 								<div className="text-sm font-medium text-destructive">
 									{form.formState.errors.confirmNewPassword.message}
 								</div>
 							)}
-						</FormItem>
+						</Field>
 					)}
 				/>
-				<div className="flex justify-between items-center mt-4">
+				<div className="flex justify-between items-center">
 					<Button disabled={userQuery.isLoading || isPendingSubmit}>
 						Submit
 						{isPendingSubmit && (
@@ -188,8 +182,9 @@ export default function PasswordChange() {
 								return
 							}
 
-							const { data, error } =
-								await sbBrowser.auth.resetPasswordForEmail(userQuery.data.email)
+							const { error } = await sbBrowser.auth.resetPasswordForEmail(
+								userQuery.data.email
+							)
 
 							if (error !== null) {
 								toast({
@@ -214,47 +209,44 @@ export default function PasswordChange() {
 						Request a password reset link
 					</Button>
 				</div>
-			</>
+			</FieldGroup>
 		)
 	}
 
 	return (
-		<Form {...form}>
-			<form
-				className="mt-8"
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit(async (formData) => {
-						setIsPendingSubmit(true)
-						const { data, error } = await sbBrowser.rpc("update_password", {
-							old_password: formData.oldPassword,
-							new_password: formData.newPassword
-						})
+		<form
+			className="mt-8"
+			onSubmit={(e) => {
+				e.preventDefault()
+				form.handleSubmit(async (formData) => {
+					setIsPendingSubmit(true)
+					const { error } = await sbBrowser.rpc("update_password", {
+						old_password: formData.oldPassword,
+						new_password: formData.newPassword
+					})
 
-						if (error !== null) {
-							setIsPendingSubmit(false)
-							toast({
-								description: error?.message,
-								variant: "destructive",
-								duration: SHORT_TOAST_DURATION
-							})
-							return
-						}
-
+					if (error !== null) {
 						setIsPendingSubmit(false)
-
 						toast({
-							description: "Successfully updated the account's password",
+							description: error?.message,
+							variant: "destructive",
 							duration: SHORT_TOAST_DURATION
 						})
+						return
+					}
 
-						form.reset()
-					})()
-				}}
-			>
-				<FormLabel>Password</FormLabel>
-				{renderFormFields()}
-			</form>
-		</Form>
+					setIsPendingSubmit(false)
+
+					toast({
+						description: "Successfully updated the account's password",
+						duration: SHORT_TOAST_DURATION
+					})
+
+					form.reset()
+				})()
+			}}
+		>
+			{renderFormFields()}
+		</form>
 	)
 }

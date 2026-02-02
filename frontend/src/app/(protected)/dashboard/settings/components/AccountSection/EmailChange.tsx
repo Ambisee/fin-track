@@ -1,24 +1,21 @@
-import { z } from "zod"
-import {
-	Form,
-	FormControl,
-	FormItem,
-	FormDescription,
-	FormLabel,
-	FormField,
-	FormMessage
-} from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
-import { useUserQuery } from "@/lib/hooks"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { sbBrowser } from "@/lib/supabase"
-import InputSkeleton from "../InputSkeleton"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
+import { useUserQuery } from "@/lib/hooks"
+import { sbBrowser } from "@/lib/supabase"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { z } from "zod"
+import InputSkeleton from "../InputSkeleton"
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 
 const emailChangeFormSchema = z.object({
 	email: z.string().email("Please provide a valid email").default("")
@@ -36,77 +33,74 @@ export default function EmailChange() {
 	})
 
 	return (
-		<Form {...form}>
-			<form
-				className="mt-8"
-				onSubmit={(e) => {
-					e.preventDefault()
-					setIsPendingSubmit(true)
-					form.handleSubmit(
-						async (d) => {
-							const { data, error } = await sbBrowser.auth.updateUser(
-								{
-									email: d.email
-								},
-								{
-									emailRedirectTo: window.location.origin
-								}
-							)
-
-							if (error !== null) {
-								toast({
-									description: error.message,
-									variant: "destructive",
-									duration: SHORT_TOAST_DURATION
-								})
-								setIsPendingSubmit(false)
-								return
+		<form
+			className="mt-8"
+			onSubmit={(e) => {
+				e.preventDefault()
+				setIsPendingSubmit(true)
+				form.handleSubmit(
+					async (d) => {
+						const { error } = await sbBrowser.auth.updateUser(
+							{
+								email: d.email
+							},
+							{
+								emailRedirectTo: window.location.origin
 							}
+						)
 
-							setIsPendingSubmit(false)
+						if (error !== null) {
 							toast({
-								description:
-									"Please check your previous and new email's inbox to verify the email change."
+								description: error.message,
+								variant: "destructive",
+								duration: SHORT_TOAST_DURATION
 							})
-						},
-						(errors) => {
 							setIsPendingSubmit(false)
+							return
 						}
-					)()
-				}}
-			>
-				<FormField
+
+						setIsPendingSubmit(false)
+						toast({
+							description:
+								"Please check your previous and new email's inbox to verify the email change."
+						})
+					},
+					() => {
+						setIsPendingSubmit(false)
+					}
+				)()
+			}}
+		>
+			<FieldGroup>
+				<Controller
 					control={form.control}
 					name="email"
-					render={({ field }) => (
-						<FormItem className="w-full">
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								{userQuery.isLoading ? (
-									<InputSkeleton />
-								) : (
-									<Input
-										placeholder={userQuery.data?.email}
-										{...field}
-									/>
-								)}
-							</FormControl>
-							{form.formState.errors.email && (
-								<FormMessage>{form.formState.errors.email.message}</FormMessage>
+					render={({ field, fieldState }) => (
+						<Field className="w-full" data-invalid={fieldState.invalid}>
+							<FieldLabel>Email</FieldLabel>
+							{userQuery.isLoading ? (
+								<InputSkeleton />
+							) : (
+								<Input
+									{...field}
+									aria-invalid={fieldState.invalid}
+									placeholder={userQuery.data?.email}
+								/>
 							)}
-						</FormItem>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
 					)}
 				/>
-				<Button
-					disabled={userQuery.isLoading || isPendingSubmit}
-					className="mt-6"
-				>
-					Submit
-					{isPendingSubmit && (
-						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
-					)}
-				</Button>
-			</form>
-		</Form>
+			</FieldGroup>
+			<Button
+				disabled={userQuery.isLoading || isPendingSubmit}
+				className="mt-6"
+			>
+				Submit
+				{isPendingSubmit && (
+					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+				)}
+			</Button>
+		</form>
 	)
 }

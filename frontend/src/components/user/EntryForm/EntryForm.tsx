@@ -121,7 +121,7 @@ export default function EntryForm(props: EntryFormProps) {
 			key="ledger-group"
 			onBackButton={() => setCurPage(0)}
 			shouldUseSelectRequest={false}
-			onSelect={(ledger, isEditing) => {
+			onSelect={(ledger) => {
 				form.setValue("ledger", ledger.id)
 				setCurPage(0)
 			}}
@@ -132,10 +132,10 @@ export default function EntryForm(props: EntryFormProps) {
 
 				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			}}
-			onCreate={(ledger) => {
+			onCreate={() => {
 				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			}}
-			onDelete={(ledger) => {
+			onDelete={() => {
 				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			}}
 		/>,

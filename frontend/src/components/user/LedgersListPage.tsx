@@ -76,7 +76,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 							<ChevronLeft className="w-4 h-4" />
 						</button>
 					)}
-					<div className="absolute flex gap-6 right-0 top-1/2 translate-y-[-50%]">
+					<div className="absolute flex items-center gap-4.5 right-0 top-1/2 translate-y-[-50%]">
 						<button
 							onClick={() => {
 								if (isEditMode) {
