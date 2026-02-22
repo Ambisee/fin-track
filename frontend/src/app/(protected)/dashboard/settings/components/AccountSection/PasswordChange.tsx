@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button"
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup
+} from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
 import PasswordField from "@/components/user/PasswordField"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
@@ -9,14 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import InputSkeleton from "../InputSkeleton"
-import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldGroup
-} from "@/components/ui/field"
 
 const passwordChangeFormSchema = z
 	.object({
@@ -39,7 +39,6 @@ const passwordChangeFormSchema = z
 	})
 
 export default function PasswordChange() {
-	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const userQuery = useUserQuery()
@@ -101,19 +100,14 @@ export default function PasswordChange() {
 							)
 
 							if (error !== null) {
-								toast({
-									description: error.message,
-									variant: "destructive",
-									duration: SHORT_TOAST_DURATION
-								})
+								toast.error(error.message, { duration: SHORT_TOAST_DURATION })
 								return
 							}
 
-							toast({
-								description:
-									"Please check your inbox for a link to reset your password.",
-								duration: SHORT_TOAST_DURATION
-							})
+							toast.info(
+								"Please check your inbox for a link to reset your password.",
+								{ duration: SHORT_TOAST_DURATION }
+							)
 						}}
 					>
 						Reset Password
@@ -187,19 +181,14 @@ export default function PasswordChange() {
 							)
 
 							if (error !== null) {
-								toast({
-									description: error?.message,
-									variant: "destructive",
-									duration: SHORT_TOAST_DURATION
-								})
+								toast.error(error?.message, { duration: SHORT_TOAST_DURATION })
 								return
 							}
 
-							toast({
-								description:
-									"Please check your inbox and follow the instructions to reset your password.",
-								duration: SHORT_TOAST_DURATION
-							})
+							toast.info(
+								"Please check your inbox and follow the instructions to reset your password.",
+								{ duration: SHORT_TOAST_DURATION }
+							)
 							return
 						}}
 						variant="link"
@@ -220,25 +209,33 @@ export default function PasswordChange() {
 				e.preventDefault()
 				form.handleSubmit(async (formData) => {
 					setIsPendingSubmit(true)
-					const { error } = await sbBrowser.rpc("update_password", {
-						old_password: formData.oldPassword,
-						new_password: formData.newPassword
-					})
 
-					if (error !== null) {
+					const { error: confirmUserError } =
+						await sbBrowser.auth.signInWithPassword({
+							email: userQuery.data?.email ?? "",
+							password: formData.oldPassword
+						})
+
+					if (confirmUserError !== null) {
 						setIsPendingSubmit(false)
-						toast({
-							description: error?.message,
-							variant: "destructive",
+						toast.error(confirmUserError?.message, {
 							duration: SHORT_TOAST_DURATION
 						})
 						return
 					}
 
-					setIsPendingSubmit(false)
+					const { error: updatePasswordError } =
+						await sbBrowser.auth.updateUser({ password: formData.newPassword })
 
-					toast({
-						description: "Successfully updated the account's password",
+					setIsPendingSubmit(false)
+					if (confirmUserError !== null) {
+						toast.error(updatePasswordError?.message, {
+							duration: SHORT_TOAST_DURATION
+						})
+						return
+					}
+
+					toast.info("Successfully updated the account's password", {
 						duration: SHORT_TOAST_DURATION
 					})
 

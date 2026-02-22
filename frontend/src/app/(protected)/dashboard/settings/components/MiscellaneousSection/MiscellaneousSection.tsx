@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
 	CURRENCIES_QKEY,
 	ENTRY_QKEY,
@@ -28,7 +28,6 @@ import SettingsSection from "../SettingsSection"
 
 export default function MiscellaneousSection() {
 	const router = useRouter()
-	const { toast, dismiss } = useToast()
 	const queryClient = useQueryClient()
 	const [isDeleteChecked, setIsDeleteChecked] = useState(false)
 
@@ -65,28 +64,25 @@ export default function MiscellaneousSection() {
 									variant="destructive"
 									disabled={!isDeleteChecked}
 									onClick={async () => {
-										toast({
-											description: "Loading..."
-										})
+										const toastId = toast.loading("Loading...")
 
 										const response = await fetch("/auth/user", {
 											method: "DELETE"
 										})
 
 										if (response.status !== 200) {
-											toast({
-												description: (await response.json()).message,
-												variant: "destructive",
+											toast.dismiss(toastId)
+											toast.error((await response.json()).message, {
 												duration: SHORT_TOAST_DURATION
 											})
 											return
 										}
 
-										toast({
-											description:
-												"Successfully deleted your account. Redirecting to the home page...",
-											duration: 2500
-										})
+										toast.dismiss(toastId)
+										toast.info(
+											"Successfully deleted your account. Redirecting to the home page...",
+											{ duration: 2500 }
+										)
 										router.push("/")
 									}}
 								>
@@ -115,11 +111,12 @@ export default function MiscellaneousSection() {
 							className="mt-2"
 							variant="default"
 							onClick={async () => {
-								toast({ description: "Loading..." })
+								const toastId = toast.loading("Loading...")
 								const { error } = await sbBrowser.auth.signOut()
 
+								toast.dismiss(toastId)
 								if (error !== null) {
-									toast({ description: error.message })
+									toast.error(error.message)
 								}
 
 								queryClient.removeQueries({ queryKey: CURRENCIES_QKEY })

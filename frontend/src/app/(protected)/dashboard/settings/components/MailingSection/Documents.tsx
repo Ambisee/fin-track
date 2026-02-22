@@ -11,7 +11,7 @@ import {
 	DialogTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
 	DOCUMENT_QKEY,
 	MONTHS,
@@ -193,8 +193,6 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 }
 
 function MonthSelectorPage(props: DocumentPageProps) {
-	const { toast } = useToast()
-
 	const { ledger } = props.ledgerState
 	const { setCurPage } = props.curPageState
 	const [isPendingIndex, setIsPendingIndex] = useState(-1)
@@ -273,24 +271,19 @@ function MonthSelectorPage(props: DocumentPageProps) {
 						onClick={async (e) => {
 							e.preventDefault()
 							if (value.month === null || value.year === null) {
-								toast({
-									description: "No month/year provided.",
-									duration: SHORT_TOAST_DURATION,
-									variant: "destructive"
+								toast.error("No month/year provided.", {
+									duration: SHORT_TOAST_DURATION
 								})
 								return
 							}
 
 							setIsPendingIndex(i)
-							const { dismiss } = toast({
-								description: "Fetching document. Please wait...",
-								duration: Infinity
-							})
+							const toastId = toast.loading("Fetching document. Please wait...")
 
 							// Using fetch to handle redirection on iOS
 							try {
 								const fileBlob = await props.fetchFn(value)
-								dismiss()
+								toast.dismiss(toastId)
 
 								const url = window.URL.createObjectURL(fileBlob)
 								setTimeout(() => window.URL.revokeObjectURL(url), 1000)
@@ -307,11 +300,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 								}
 
 								refreshServerStatus(queryClient)
-								toast({
-									description: errMessage,
-									variant: "destructive",
-									duration: SHORT_TOAST_DURATION
-								})
+								toast.error(errMessage, { duration: SHORT_TOAST_DURATION })
 							}
 
 							setIsPendingIndex(-1)

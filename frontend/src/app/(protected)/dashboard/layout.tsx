@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
@@ -48,7 +48,6 @@ function LayoutEntryDialogContent() {
 function LayoutLedgerEditorDialog() {
 	const [open, setOpen] = useState(false)
 
-	const { toast } = useToast()
 	const queryClient = useQueryClient()
 
 	return (
@@ -75,14 +74,12 @@ function LayoutLedgerEditorDialog() {
 							queryKey: USER_SETTINGS_QKEY
 						})
 
-						toast({
-							description: (
-								<>
-									Switched to the ledger: <b>{data.name}</b>
-								</>
-							),
-							duration: SHORT_TOAST_DURATION
-						})
+						toast.info(
+							<>
+								Switched to the ledger: <b>{data.name}</b>
+							</>,
+							{ duration: SHORT_TOAST_DURATION }
+						)
 					}}
 				/>
 			</DialogContent>

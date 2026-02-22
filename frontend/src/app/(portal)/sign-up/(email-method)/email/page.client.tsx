@@ -19,12 +19,12 @@ import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FormEventHandler, useState } from "react"
 import { useSignupTransition } from "../layout"
+import { toast } from "sonner"
 
 const formSchema = z.object({
 	email: z.string().email("Please provide a valid email address")
@@ -32,7 +32,6 @@ const formSchema = z.object({
 
 export default function SignUpEmail() {
 	const router = useRouter()
-	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const { navigateTo } = useSignupTransition()
@@ -56,10 +55,7 @@ export default function SignUpEmail() {
 			},
 			(errors) => {
 				setIsPendingSubmit(false)
-				toast({
-					description: errors.email?.message,
-					variant: "destructive"
-				})
+				toast.error(errors.email?.message)
 			}
 		)()
 	}

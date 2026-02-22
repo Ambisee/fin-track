@@ -31,7 +31,7 @@ import {
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
-import { useToast } from "../ui/use-toast"
+import { toast } from "sonner"
 
 interface EntryListItemProps {
 	data: Entry
@@ -67,7 +67,6 @@ export default function EntryListItem({
 }: EntryListItemProps) {
 	const [isItemOpen, setIsItemOpen] = useState(props.expanded ?? false)
 
-	const { toast } = useToast()
 	const queryClient = useQueryClient()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
@@ -217,22 +216,19 @@ export default function EntryListItem({
 											onClick={() =>
 												deleteMutation.mutate(props.data.id, {
 													onSuccess: (data) => {
-														toast({
-															description: "Loading..."
-														})
+														const toastId = toast.loading("Loading...")
 
 														if (data.error !== null) {
-															toast({
-																description: data.error.message
-															})
+															toast.dismiss(toastId)
+															toast.error(data.error.message)
 															return
 														}
 
-														toast({
-															description:
-																"Successfully removed the transaction",
-															duration: 500
-														})
+														toast.dismiss(toastId)
+														toast.info(
+															"Successfully removed the transaction",
+															{ duration: 500 }
+														)
 
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getEntryQueryKey(

@@ -29,7 +29,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "../ui/dialog"
-import { useToast } from "../ui/use-toast"
+import { toast } from "sonner"
 
 interface CommandGroupClass {
 	commandItem: string
@@ -67,8 +67,6 @@ const selectModeClass: CommandGroupClass = {
 }
 
 export default function CategoriesListPage(props: CategoriesListPageProps) {
-	const { toast } = useToast()
-
 	const [isPendingOperation, setIsPendingOperation] = useState(
 		props.isLoading ?? false
 	)
@@ -197,9 +195,7 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 						<AlertDialogAction
 							onClick={async () => {
 								if (categoryToBeDelete === undefined) {
-									toast({
-										description: "No category provided"
-									})
+									toast.info("No category provided")
 									return
 								}
 

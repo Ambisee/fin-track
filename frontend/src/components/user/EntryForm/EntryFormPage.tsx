@@ -11,7 +11,7 @@ import { Form, FormField } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
 	useInsertEntryMutation,
 	useLedgersQuery,
@@ -52,7 +52,6 @@ const getErrors = (errors: FieldErrors<EntryFormData>) => {
 export default function EntryFormPage(props: EntryFormPageProps) {
 	const [isFormLoading, setIsFormLoading] = useState(false)
 
-	const { toast } = useToast()
 	const form = props.entryForm
 
 	const ledgerQuery = useLedgersQuery()
@@ -94,31 +93,24 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									)
 								}
 
-								toast({
-									description: !props.isEditForm
-										? "New entry added"
-										: "Entry updated",
-									duration: SHORT_TOAST_DURATION
-								})
+								toast.info(
+									!props.isEditForm ? "New entry added" : "Entry updated",
+									{ duration: SHORT_TOAST_DURATION }
+								)
 
 								form.reset()
 								props.onSubmitSuccess?.(result, props.data)
 							} catch (e) {
 								const errorData = e as Error
 
-								toast({
-									description: errorData.message,
-									variant: "destructive"
-								})
+								toast.error(errorData.message)
 							} finally {
 								setIsFormLoading(false)
 							}
 						},
 						(errors) => {
-							toast({
-								title: "Invalid data",
-								description: <ul>{getErrors(errors)}</ul>,
-								variant: "destructive"
+							toast.error("Invalid data", {
+								description: <ul>{getErrors(errors)}</ul>
 							})
 						}
 					)()

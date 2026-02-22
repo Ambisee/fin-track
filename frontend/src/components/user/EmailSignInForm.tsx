@@ -20,7 +20,7 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 
 import { sbBrowser } from "@/lib/supabase"
 import Link from "next/link"
-import { useToast } from "../ui/use-toast"
+import { toast } from "sonner"
 import PasswordField from "./PasswordField"
 
 const formSchema = z.object({
@@ -29,8 +29,6 @@ const formSchema = z.object({
 })
 
 function UnverifiedMesssage(props: { formData: z.infer<typeof formSchema> }) {
-	const { toast } = useToast()
-
 	return (
 		<>
 			<p>
@@ -42,19 +40,17 @@ function UnverifiedMesssage(props: { formData: z.infer<typeof formSchema> }) {
 					variant="link"
 					className="w-fit h-fit p-0 m-0"
 					onClick={async (e) => {
-						toast({
-							description: "Loading..."
-						})
+						const toastId = toast.loading("Loading...")
 
 						await sbBrowser.auth.resend({
 							type: "signup",
 							email: props.formData.email
 						})
 
-						toast({
-							description:
-								"The verification email has been sent. Please check your inbox to complete the verification process."
-						})
+						toast.dismiss(toastId)
+						toast.info(
+							"The verification email has been sent. Please check your inbox to complete the verification process."
+						)
 					}}
 				>
 					Click here to resend the verification email
@@ -80,7 +76,6 @@ const messageComponents = new Map([
 
 export default function EmailSignInForm() {
 	const router = useRouter()
-	const { toast } = useToast()
 	const [isFormLoading, setIsFormLoading] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
 		mode: "onSubmit",
@@ -143,14 +138,10 @@ export default function EmailSignInForm() {
 								}
 							}
 
-							toast({
-								description: <Message formData={formData} />,
-								variant: "destructive"
-							})
+							toast.error(<Message formData={formData} />)
 						},
 						(error) => {
-							toast({
-								title: "Invalid sign in credentials",
+							toast.error("Invalid sign in credentials", {
 								description: renderError()
 							})
 						}

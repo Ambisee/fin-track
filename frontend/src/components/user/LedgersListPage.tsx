@@ -24,7 +24,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { Ledger } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
@@ -45,8 +45,6 @@ export interface LedgersListPageProps {
 }
 
 export default function LedgersListPage(props: LedgersListPageProps) {
-	const { toast } = useToast()
-
 	const [isPendingOperation, setIsPendingOperation] = useState(false)
 	const [isEditMode, setIsEditMode] = useState<boolean>(!!props.isEditMode)
 	const [ledgerToBeDelete, setLedgerToDelete] = useState<Ledger | undefined>(
@@ -168,9 +166,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						<AlertDialogAction
 							onClick={async () => {
 								if (ledgerToBeDelete === undefined) {
-									toast({
-										description: "No ledger provided"
-									})
+									toast.info("No ledger provided")
 									return
 								}
 

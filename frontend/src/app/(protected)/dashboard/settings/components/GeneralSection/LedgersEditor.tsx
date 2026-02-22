@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
@@ -12,7 +12,6 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 export default function LedgersEditor() {
-	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 
 	const userQuery = useUserQuery()
@@ -53,14 +52,12 @@ export default function LedgersEditor() {
 					<LedgerGroup
 						onSelect={(ledger) => {
 							setOpen(false)
-							toast({
-								description: (
-									<>
-										Switched to the ledger: <b>{ledger.name}</b>
-									</>
-								),
-								duration: SHORT_TOAST_DURATION
-							})
+							toast.info(
+								<>
+									Switched to the ledger: <b>{ledger.name}</b>
+								</>,
+								{ duration: SHORT_TOAST_DURATION }
+							)
 						}}
 					/>
 				</DialogContent>

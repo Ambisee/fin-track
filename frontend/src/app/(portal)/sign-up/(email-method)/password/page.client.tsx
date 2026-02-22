@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormEventHandler, useState } from "react"
+import { SubmitEventHandler, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -14,7 +14,6 @@ import {
 	FormField,
 	FormItem
 } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
 import PasswordField from "@/components/user/PasswordField"
 import { MAX_USERNAME_LENGTH, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
@@ -22,6 +21,7 @@ import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
 import { useSignupTransition } from "../layout"
+import { toast } from "sonner"
 
 const formSchema = z
 	.object({
@@ -44,7 +44,6 @@ const formSchema = z
 
 export default function SignUpPassword() {
 	const router = useRouter()
-	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const { navigateTo } = useSignupTransition()
@@ -61,17 +60,15 @@ export default function SignUpPassword() {
 		}
 	})
 
-	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+	const handleOnSubmit: SubmitEventHandler = (e) => {
 		e.preventDefault()
 		form.handleSubmit(
 			async (formData) => {
 				setIsPendingSubmit(true)
 				Cookies.set("reg-password", formData.password)
 				if (email === undefined) {
-					toast({
-						title: "Signup Error",
-						description: "Missing signup information",
-						variant: "destructive"
+					toast.error("Signup Error", {
+						description: "Missing signup information"
 					})
 					return
 				}
@@ -94,16 +91,11 @@ export default function SignUpPassword() {
 
 				if (error !== null) {
 					setIsPendingSubmit(false)
-					toast({
-						title: "Signup Error",
-						description: error.message,
-						variant: "destructive"
-					})
+					toast.error("Signup Error", { description: error.message })
 					return
 				}
 
-				toast({
-					title: "Signup Success",
+				toast.info("Signup Success", {
 					description: (
 						<p>
 							The accont has been successfully created. Please check your inbox

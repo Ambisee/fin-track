@@ -17,7 +17,7 @@ import { Ledger } from "@/types/supabase"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { useToast } from "../ui/use-toast"
+import { toast } from "sonner"
 import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
 import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
 import { isNonNullable } from "@/lib/utils"
@@ -57,7 +57,6 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	const ledgersQuery = useLedgersQuery()
 	const settingsQuery = useSettingsQuery()
 
-	const { toast } = useToast()
 	const queryClient = useQueryClient()
 
 	const isLedgerMutating = useIsMutating({ mutationKey: LEDGER_QKEY })
@@ -67,7 +66,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	const onCreateCallback = async (ledger: LedgerFormData) => {
 		const userID = userQuery.data?.id
 		if (!userID) {
-			toast({ description: "No user ID found" })
+			toast.info("No user ID found")
 			return
 		}
 
@@ -82,10 +81,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				throw Error("An unexpected error occured: Inserted entry is null")
 			}
 
-			toast({
-				description: "New ledger created",
-				duration: SHORT_TOAST_DURATION
-			})
+			toast.info("New ledger created", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			props.onCreate?.(successData)
@@ -95,18 +91,13 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 			// Hard-coded error handler for duplicate ledger name
 			if (errorData.cause == undefined) {
-				toast({
-					description: errorData.message,
-					variant: "destructive"
-				})
+				toast.error(errorData.message)
 			}
 
 			if ((errorData.cause as PostgrestError).code === "23505") {
-				toast({
-					description:
-						"The ledger name has been used. Please enter another one",
-					variant: "destructive"
-				})
+				toast.error(
+					"The ledger name has been used. Please enter another one"
+				)
 			}
 		}
 
@@ -117,7 +108,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 	const onUpdateCallback = async (ledger: LedgerFormData) => {
 		const userID = userQuery.data?.id
 		if (!userID) {
-			toast({ description: "No user ID found" })
+			toast.info("No user ID found")
 			return
 		}
 
@@ -132,10 +123,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				throw Error("An unexpected error occured: Inserted entry is null")
 			}
 
-			toast({
-				description: "Ledger updated",
-				duration: SHORT_TOAST_DURATION
-			})
+			toast.info("Ledger updated", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			props.onUpdate?.(successData)
@@ -145,18 +133,13 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 			// Hard-coded error handler for duplicate ledger name
 			if (errorData.cause == undefined) {
-				toast({
-					description: errorData.message,
-					variant: "destructive"
-				})
+				toast.error(errorData.message)
 			}
 
 			if ((errorData.cause as PostgrestError).code === "23505") {
-				toast({
-					description:
-						"The ledger name has been used. Please enter another one",
-					variant: "destructive"
-				})
+				toast.error(
+					"The ledger name has been used. Please enter another one"
+				)
 			}
 		}
 
@@ -173,20 +156,14 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				throw Error("An unexpected error occured: Inserted entry is null")
 			}
 
-			toast({
-				description: "Ledger deleted",
-				duration: SHORT_TOAST_DURATION
-			})
+			toast.info("Ledger deleted", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			props.onDelete?.(successData)
 		} catch (e) {
 			const errorData = e as Error
 
-			toast({
-				description: errorData.message,
-				variant: "destructive"
-			})
+			toast.error(errorData.message)
 		}
 	}
 
@@ -211,10 +188,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				id: ledger.id
 			})
 			if (successData === undefined) {
-				toast({
-					description: "Failed to switch to the specified ledger.",
-					variant: "destructive"
-				})
+				toast.error("Failed to switch to the specified ledger.")
 				return
 			}
 
@@ -222,23 +196,18 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				queryKey: USER_SETTINGS_QKEY
 			})
 
-			toast({
-				description: (
-					<>
-						Switched to the ledger: <b>{successData?.ledger?.name}</b>
-					</>
-				),
-				duration: SHORT_TOAST_DURATION
-			})
+			toast.info(
+				<>
+					Switched to the ledger: <b>{successData?.ledger?.name}</b>
+				</>,
+				{ duration: SHORT_TOAST_DURATION }
+			)
 
 			props.onSelect?.(ledger, isEditing)
 		} catch (e) {
 			const errorData = e as Error
 
-			toast({
-				description: errorData.message,
-				variant: "destructive"
-			})
+			toast.error(errorData.message)
 		}
 	}
 

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSetElementWindowHeight } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
@@ -28,7 +28,6 @@ const formSchema = z.object({
 })
 
 export default function ForgotPassword() {
-	const { toast } = useToast()
 	const rootRef = useSetElementWindowHeight()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -66,20 +65,17 @@ export default function ForgotPassword() {
 												)
 											if (error !== null) {
 												setIsPendingSubmit(false)
-												toast({
-													description: error?.message,
-													variant: "destructive",
+												toast.error(error?.message, {
 													duration: SHORT_TOAST_DURATION
 												})
 												return
 											}
 
 											setIsPendingSubmit(false)
-											toast({
-												description:
-													"Please check your inbox and follow the instructions to reset your password.",
-												duration: SHORT_TOAST_DURATION
-											})
+											toast.info(
+												"Please check your inbox and follow the instructions to reset your password.",
+												{ duration: SHORT_TOAST_DURATION }
+											)
 										},
 										(errors) => {}
 									)()

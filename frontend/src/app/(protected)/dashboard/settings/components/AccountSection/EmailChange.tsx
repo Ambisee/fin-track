@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
@@ -22,7 +22,6 @@ const emailChangeFormSchema = z.object({
 })
 
 export default function EmailChange() {
-	const { toast } = useToast()
 	const userQuery = useUserQuery()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const form = useForm<z.infer<typeof emailChangeFormSchema>>({
@@ -41,29 +40,20 @@ export default function EmailChange() {
 				form.handleSubmit(
 					async (d) => {
 						const { error } = await sbBrowser.auth.updateUser(
-							{
-								email: d.email
-							},
-							{
-								emailRedirectTo: window.location.origin
-							}
+							{ email: d.email },
+							{ emailRedirectTo: window.location.origin }
 						)
 
 						if (error !== null) {
-							toast({
-								description: error.message,
-								variant: "destructive",
-								duration: SHORT_TOAST_DURATION
-							})
+							toast.error(error.message, { duration: SHORT_TOAST_DURATION })
 							setIsPendingSubmit(false)
 							return
 						}
 
 						setIsPendingSubmit(false)
-						toast({
-							description:
-								"Please check your previous and new email's inbox to verify the email change."
-						})
+						toast.info(
+							"Please check your previous and new email's inbox to continue with the process."
+						)
 					},
 					() => {
 						setIsPendingSubmit(false)

@@ -24,7 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "../ui/select"
-import { useToast } from "../ui/use-toast"
+import { toast } from "sonner"
 
 interface MonthPickerProps {
 	value: Date
@@ -37,7 +37,6 @@ const monthPickerFormSchema = z.object({
 })
 
 export default function MonthPicker(props: MonthPickerProps) {
-	const { toast } = useToast()
 	const [open, setOpen] = useState(false)
 
 	const form = useForm<z.infer<typeof monthPickerFormSchema>>({
@@ -66,15 +65,12 @@ export default function MonthPicker(props: MonthPickerProps) {
 									setOpen(false)
 								},
 								(error) => {
-									toast({
-										variant: "destructive",
-										description: (
-											<div>
-												{error.month?.message && <p>{error.month.message}</p>}
-												{error.year?.message && <p>{error.year.message}</p>}
-											</div>
-										)
-									})
+									toast.error(
+										<div>
+											{error.month?.message && <p>{error.month.message}</p>}
+											{error.year?.message && <p>{error.year.message}</p>}
+										</div>
+									)
 								}
 							)()
 						}}

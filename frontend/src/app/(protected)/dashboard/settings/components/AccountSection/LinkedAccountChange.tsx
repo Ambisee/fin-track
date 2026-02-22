@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { USER_QKEY } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
@@ -13,7 +13,6 @@ import googleIcon from "../../../../../../../public/google-icon.svg"
 import { Label } from "@/components/ui/label"
 
 export default function LinkedAccountChange() {
-	const { toast } = useToast()
 	const userQuery = useUserQuery()
 	const queryClient = useQueryClient()
 
@@ -55,10 +54,7 @@ export default function LinkedAccountChange() {
 						const { error } = await sbBrowser.auth.unlinkIdentity(identity)
 
 						if (error !== null) {
-							toast({
-								description: error.message,
-								variant: "destructive"
-							})
+							toast.error(error.message)
 							return
 						}
 
@@ -83,10 +79,7 @@ export default function LinkedAccountChange() {
 					})
 
 					if (error !== null) {
-						toast({
-							description: error.message,
-							variant: "destructive"
-						})
+						toast.error(error.message)
 						return
 					}
 

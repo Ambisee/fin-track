@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useCurrenciesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { sbBrowser } from "@/lib/supabase"
 import { useCallback, useEffect, useState } from "react"
 import {
@@ -61,10 +61,7 @@ export default function CurrencyChange() {
 	) => {
 		setIsPendingSubmit(true)
 		if (!userSettings) {
-			toast({
-				description: "User information unavailable. Please try again later",
-				variant: "destructive"
-			})
+			toast.error("User information unavailable. Please try again later")
 			setIsPendingSubmit(false)
 			return
 		}
@@ -77,11 +74,7 @@ export default function CurrencyChange() {
 			.single()
 
 		if (error !== null) {
-			toast({
-				description: error.message,
-				variant: "destructive",
-				duration: SHORT_TOAST_DURATION
-			})
+			toast.error(error.message, { duration: SHORT_TOAST_DURATION })
 			setIsPendingSubmit(false)
 			return
 		}
@@ -92,15 +85,13 @@ export default function CurrencyChange() {
 			.then(() => form.reset())
 		setIsPendingSubmit(false)
 
-		toast({
-			description: (
-				<>
-					The currency for the ledger <b>{result.name}</b> has been switched to{" "}
-					<b>{data.currency.currency_name}</b>
-				</>
-			),
-			duration: SHORT_TOAST_DURATION
-		})
+		toast.info(
+			<>
+				The currency for the ledger <b>{result.name}</b> has been switched to{" "}
+				<b>{data.currency.currency_name}</b>
+			</>,
+			{ duration: SHORT_TOAST_DURATION }
+		)
 	}
 
 	useEffect(() => {

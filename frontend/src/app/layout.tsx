@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { inter } from "@/app/fonts"
 import { ThemeProvider } from "@/components/ui/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import DataProvider from "@/components/user/DataProvider"
@@ -27,8 +27,10 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<main className="min-h-screen">{children}</main>
-						<Toaster />
+						<main className="min-h-screen">
+							{children}
+							<Toaster />
+						</main>
 					</ThemeProvider>
 					<ReactQueryDevtools initialIsOpen={false} />
 				</body>

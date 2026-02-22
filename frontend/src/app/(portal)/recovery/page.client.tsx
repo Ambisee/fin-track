@@ -9,7 +9,7 @@ import {
 	FormField,
 	FormItem
 } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import PasswordField from "@/components/user/PasswordField"
 import { USER_QKEY } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
@@ -42,7 +42,7 @@ const recoveryFormSchema = z
 
 export default function Recovery() {
 	const router = useRouter()
-	const { toast } = useToast()
+
 	const [isFormLoading, setIsPendingSubmit] = useState(false)
 
 	const queryClient = useQueryClient()
@@ -71,16 +71,11 @@ export default function Recovery() {
 
 										if (error !== null) {
 											setIsPendingSubmit(false)
-											toast({
-												description: error.message,
-												variant: "destructive"
-											})
+											toast.error(error.message)
 											return
 										}
 
-										toast({
-											description: "Successfully changed the password"
-										})
+										toast.info("Successfully changed the password")
 										await sbBrowser.auth.signOut()
 										queryClient.invalidateQueries({ queryKey: USER_QKEY })
 										router.push("/sign-in/email")

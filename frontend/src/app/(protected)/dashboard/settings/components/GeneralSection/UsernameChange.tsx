@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
 	MAX_USERNAME_LENGTH,
 	SHORT_TOAST_DURATION,
@@ -34,7 +34,6 @@ const formSchema = z.object({
 export default function UsernameChange() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
-	const { toast } = useToast()
 	const userQuery = useUserQuery()
 	const queryClient = useQueryClient()
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -47,54 +46,44 @@ export default function UsernameChange() {
 	return (
 		<>
 			<form
-				onSubmit={form.handleSubmit(async (data) => {
-					setIsPendingSubmit(true)
-					if (data.username === "") {
-						toast({
-							description: "Please enter a valid username.",
-							variant: "destructive"
-						})
-						setIsPendingSubmit(false)
-						return
-					}
-
-					if (data.username === userQuery.data?.user_metadata["username"]) {
-						toast({
-							description: "Please enter a different username.",
-							variant: "destructive"
-						})
-						setIsPendingSubmit(false)
-						return
-					}
-
-					const { error } = await sbBrowser.auth.updateUser({
-						data: {
-							username: data.username
+				onSubmit={(e) => {
+					e.preventDefault()
+					form.handleSubmit(async (data) => {
+						setIsPendingSubmit(true)
+						if (data.username === "") {
+							toast.error("Please enter a valid username.")
+							setIsPendingSubmit(false)
+							return
 						}
-					})
 
-					if (error !== null) {
-						toast({
-							title: error.message,
-							variant: "destructive",
-							duration: SHORT_TOAST_DURATION
+						if (data.username === userQuery.data?.user_metadata["username"]) {
+							toast.error("Please enter a different username.")
+							setIsPendingSubmit(false)
+							return
+						}
+
+						const { error } = await sbBrowser.auth.updateUser({
+							data: {
+								username: data.username
+							}
 						})
+
+						if (error !== null) {
+							toast.error(error.message, { duration: SHORT_TOAST_DURATION })
+							setIsPendingSubmit(false)
+
+							return
+						}
+
+						queryClient
+							.invalidateQueries({ queryKey: USER_QKEY })
+							.then(() => form.reset())
+						queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
 						setIsPendingSubmit(false)
 
-						return
-					}
-
-					queryClient
-						.invalidateQueries({ queryKey: USER_QKEY })
-						.then(() => form.reset())
-					queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
-					setIsPendingSubmit(false)
-
-					toast({
-						description: "Username updated",
-						duration: SHORT_TOAST_DURATION
-					})
-				})}
+						toast.info("Username updated.", { duration: SHORT_TOAST_DURATION })
+					})()
+				}}
 			>
 				<FieldGroup>
 					<Controller

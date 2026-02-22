@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { sbBrowser } from "@/lib/supabase"
@@ -24,7 +24,6 @@ const mailingSectionFormSchema = z.object({
 })
 
 export default function AutomaticMonthlyReport() {
-	const { toast } = useToast()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const userQuery = useUserQuery()
@@ -50,18 +49,13 @@ export default function AutomaticMonthlyReport() {
 							.eq("user_id", userSettingsQuery.data?.user_id as string)
 
 						if (error !== null) {
-							toast({
-								description: error.message,
-								variant: "destructive",
-								duration: SHORT_TOAST_DURATION
-							})
+							toast.error(error.message, { duration: SHORT_TOAST_DURATION })
 							setIsPendingSubmit(false)
 							return
 						}
 
 						setIsPendingSubmit(false)
-						toast({
-							description: "New settings data saved.",
+						toast.info("New settings data saved.", {
 							duration: SHORT_TOAST_DURATION
 						})
 					})()
