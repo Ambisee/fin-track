@@ -3,6 +3,7 @@ import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { MONTHS } from "./constants"
+import { SetStateAction } from "react"
 
 interface MonthGroup {
 	month: string
@@ -289,7 +290,9 @@ function isNonNullable<T>(value: T): value is NonNullable<T> {
 	return value !== null && value !== undefined
 }
 
-function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+function isSetStateFunction<T>(
+	value: SetStateAction<T>
+): value is (prev: T) => T {
 	return typeof value === "function"
 }
 
@@ -300,7 +303,7 @@ export {
 	groupData,
 	groupDataByMonth,
 	handleDataChange,
-	isFunction,
+	isSetStateFunction,
 	isNonNullable
 }
 export type { MonthGroup }

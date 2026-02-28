@@ -6,14 +6,14 @@ import { Cross1Icon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { type JSX } from "react"
+import { ReactNode } from "react"
 
 interface PortalLayoutProps {
-	children: JSX.Element
+	children: ReactNode
 }
 
 interface CloseButtonProps {
-	children: JSX.Element
+	children: ReactNode
 	isTrigger?: boolean
 }
 

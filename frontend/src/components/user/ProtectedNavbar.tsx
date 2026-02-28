@@ -10,9 +10,9 @@ import { usePathname } from "next/navigation"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
-import { type JSX } from "react"
+import { ReactNode } from "react"
 
-function NavLink(props: { href: string; icon?: JSX.Element; label: string }) {
+function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 	const pathname = usePathname()
 
 	return (

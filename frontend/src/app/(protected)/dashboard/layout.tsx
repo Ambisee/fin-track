@@ -2,7 +2,6 @@
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
-import { toast } from "sonner"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
@@ -11,17 +10,18 @@ import {
 	SHORT_TOAST_DURATION,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
-import { useEntryDataQuery, useSettingsQuery } from "@/lib/hooks"
+import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { useQueryClient } from "@tanstack/react-query"
-import { createContext, Suspense, useRef, useState, type JSX, use } from "react"
+import { ReactNode, Suspense, useState } from "react"
+import { toast } from "sonner"
 import Loading from "./loading"
 
 interface DashboardLayoutProps {
-	children: JSX.Element
+	children: ReactNode
 }
 
-function LayoutEntryDialog(props: { children?: JSX.Element | JSX.Element[] }) {
+function LayoutEntryDialog(props: { children?: ReactNode | ReactNode[] }) {
 	const open = useGlobalStore((state) => state.open)
 	const setOpen = useGlobalStore((state) => state.setOpen)
 

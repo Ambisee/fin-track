@@ -1,10 +1,10 @@
 "use client"
 
-import { type JSX } from "react"
+import { ReactNode } from "react"
 import { SignupTransitionPage } from "./layout"
 
 interface SignUpTemplateProps {
-	children: JSX.Element
+	children: ReactNode
 }
 
 export default function SignUpTemplate(props: SignUpTemplateProps) {

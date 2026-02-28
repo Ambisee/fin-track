@@ -1,10 +1,10 @@
-import { sbServer } from "@/lib/supabase"
 import PublicNavbar from "@/components/user/PublicNavbar"
+import { sbServer } from "@/lib/supabase"
 import { cookies } from "next/headers"
-import { type JSX } from "react"
+import { ReactNode } from "react"
 
 interface PublicLayoutProps {
-	children: JSX.Element
+	children: ReactNode
 }
 
 export default async function PublicLayout(props: PublicLayoutProps) {

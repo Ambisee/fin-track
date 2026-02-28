@@ -12,7 +12,7 @@ import { useSetElementWindowHeight } from "@/lib/hooks"
 import Cookies from "js-cookie"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { type JSX, useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 
 import classNames from "@/styles/signup-transitions.module.css"
 
@@ -22,7 +22,7 @@ export type EmailSignupPaths =
 	| "/sign-up/password"
 
 interface SignUpLayoutProps {
-	children: JSX.Element
+	children: ReactNode
 }
 
 export const EMAIL_INPUT_PATH = "/sign-up/email"

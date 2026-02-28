@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils"
-import { JSX } from "react"
+import { ReactNode } from "react"
 
 export default function SettingsSection(props: {
-	children?: JSX.Element
+	children?: ReactNode
 	className?: string
 	name?: string
 }) {

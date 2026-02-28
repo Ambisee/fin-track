@@ -126,7 +126,7 @@ export default function MiscellaneousSection() {
 								queryClient.removeQueries({ queryKey: USER_QKEY })
 
 								router.push("/")
-								dismiss()
+								toast.dismiss()
 							}}
 						>
 							Logout

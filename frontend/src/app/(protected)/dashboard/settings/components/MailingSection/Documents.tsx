@@ -11,7 +11,6 @@ import {
 	DialogTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
 import {
 	DOCUMENT_QKEY,
 	MONTHS,
@@ -42,10 +41,11 @@ import { ChevronLeft, ChevronRight, Circle, X } from "lucide-react"
 import {
 	Dispatch,
 	ReactElement,
+	ReactNode,
 	SetStateAction,
-	useState,
-	type JSX
+	useState
 } from "react"
+import { toast } from "sonner"
 
 import classNames from "@/styles/flicker-ellipse-animation.module.css"
 
@@ -72,7 +72,7 @@ function ServerStatusLabel() {
 	const serverPingQuery = useServerPingQuery()
 
 	let serverIconClassName: string
-	let serverStatusMessage: ReactElement<unknown>
+	let serverStatusMessage: ReactElement
 
 	switch (serverPingQuery.data) {
 		case SERVER_STATUS.LOADING:
@@ -126,7 +126,7 @@ function LedgerSelectorPage(props: DocumentPageProps) {
 		serverPingQuery.data !== SERVER_STATUS.ONLINE
 
 	const renderLedgerList = () => {
-		const result: JSX.Element[] = []
+		const result: ReactNode[] = []
 		if (!ledgersQuery.isFetched && ledgersQuery.isFetching) {
 			return (
 				<div className="h-full w-full flex justify-center items-center">
@@ -212,7 +212,7 @@ function MonthSelectorPage(props: DocumentPageProps) {
 		serverPingQuery.data !== SERVER_STATUS.ONLINE
 
 	const renderDownloadList = () => {
-		const result: JSX.Element[] = []
+		const result: ReactNode[] = []
 		if (
 			!monthGroupQuery.data ||
 			!monthGroupQuery.isFetched ||

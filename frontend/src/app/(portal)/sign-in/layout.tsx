@@ -1,10 +1,10 @@
 import { Metadata } from "next"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 
 export const metadata: Metadata = {
 	title: "Sign In - FinTrack"
 }
 
-export default function Layout(props: { children: ReactElement<any> }) {
+export default function Layout(props: { children: ReactNode }) {
 	return props.children
 }

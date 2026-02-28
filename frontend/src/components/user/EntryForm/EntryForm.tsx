@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
-import { type JSX, useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
@@ -45,7 +45,7 @@ export type EntryFormData = z.infer<typeof formSchema>
 export function EntryFormItem(props: {
 	className?: string
 	label: string
-	children: JSX.Element
+	children: ReactNode
 }) {
 	return (
 		<FormItem

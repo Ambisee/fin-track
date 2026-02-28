@@ -50,14 +50,19 @@ export function DatePicker(props: DatePickerProps) {
 							required={props.required ?? false}
 							defaultMonth={props.value}
 							mode="single"
+							classNames={{
+								root: "mt-4",
+								month_grid: "mt-4",
+								weekday: "w-12 text-center",
+								day: "size-12"
+							}}
 							selected={props.value}
-							onSelect={(e) => {
+							onSelect={(e: SetStateAction<Date | undefined>) => {
 								props.onChange(e)
 								if (props.closeOnSelect === true) {
 									setIsOpen(false)
 								}
 							}}
-							initialFocus
 						/>
 					</DialogDescription>
 				</DialogHeader>
