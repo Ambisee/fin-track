@@ -1,5 +1,14 @@
-import { clsx, type ClassValue } from "clsx"
+import { Entry } from "@/types/supabase"
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MONTHS } from "./constants"
+
+interface MonthGroup {
+	month: string
+	year: number
+	data: Entry[]
+}
 
 function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
@@ -209,7 +218,7 @@ function groupDataByMonth(data: Entry[]) {
 	}
 
 	Array.from(map.keys()).forEach((key) => {
-		let group: MonthGroup = { month: "", year: 0, data: [] }
+		const group: MonthGroup = { month: "", year: 0, data: [] }
 
 		if (map.get(key) === undefined) {
 			return
@@ -233,7 +242,7 @@ function getUsernameFromEmail(email: string) {
 		return ""
 	}
 
-	let username = email.slice(0, atSymbol)
+	const username = email.slice(0, atSymbol)
 	return username.replace(/[^a-zA-Z0-9]/g, "")
 }
 
@@ -280,7 +289,7 @@ function isNonNullable<T>(value: T): value is NonNullable<T> {
 	return value !== null && value !== undefined
 }
 
-function isFunction(value: any): value is Function {
+function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
 	return typeof value === "function"
 }
 
