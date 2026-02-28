@@ -92,7 +92,7 @@ export default function EntryListItem({
 			<CardHeader className="p-0 h-[100px]">
 				<button
 					type="button"
-					className="h-full w-full p-4 text-left focus:bg-background focus:outline-hidden"
+					className="h-full w-full p-4 text-left focus:outline-hidden"
 					onClick={() => {
 						setIsItemOpen((c) => {
 							props.onExpand?.(!c)
@@ -225,10 +225,9 @@ export default function EntryListItem({
 														}
 
 														toast.dismiss(toastId)
-														toast.info(
-															"Successfully removed the transaction",
-															{ duration: 500 }
-														)
+														toast.info("Successfully removed the transaction", {
+															duration: 500
+														})
 
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getEntryQueryKey(

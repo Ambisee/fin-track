@@ -412,7 +412,7 @@ export default function DashboardStatistics() {
 
 			result.groupByCategory.push({
 				...statistic,
-				fillColor: `hsl(var(--chart-${colorIndex++}))`,
+				fillColor: `var(--chart-${colorIndex++})`,
 				percentage: 0
 			})
 		}
