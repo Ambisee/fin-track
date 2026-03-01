@@ -51,8 +51,13 @@ export const createTransitionRoot = (
 	context: Context<TransitionContextObject>
 ) => {
 	return function TransitionRoot(props: TransitionRootProps) {
-		const { navigationGraph, transitionLabels, className, ...elementProps } =
-			props
+		const {
+			navigationGraph,
+			transitionLabels,
+			className,
+			onNavigate,
+			...elementProps
+		} = props
 
 		const [isExiting, setIsExiting] = useState<boolean>(false)
 		const [curPath, setCurPath] = useState<string>("")
@@ -62,7 +67,6 @@ export const createTransitionRoot = (
 		const transitionLabelRef = useRef(transitionLabels)
 
 		const pathname = usePathname()
-		const router = useRouter()
 
 		useEffect(() => {
 			if (curPath === "") {
@@ -82,14 +86,14 @@ export const createTransitionRoot = (
 			// Apply the animation
 			if (label === undefined) {
 				setIsExiting(false)
-				props.onNavigate(nextPath)
+				onNavigate(nextPath)
 				return
 			}
 
 			const animationClassName = transitionLabelRef.current?.[label]?.exit
 			if (animationClassName === undefined) {
 				setIsExiting(false)
-				props.onNavigate(nextPath)
+				onNavigate(nextPath)
 				return
 			}
 
@@ -100,7 +104,7 @@ export const createTransitionRoot = (
 
 			if (!pageComponent) {
 				setIsExiting(false)
-				props.onNavigate(nextPath)
+				onNavigate(nextPath)
 				return
 			}
 
@@ -108,7 +112,7 @@ export const createTransitionRoot = (
 			pageComponent.classList.add(animationClassName)
 			pageComponent.addEventListener("animationend", () => {
 				setIsExiting(false)
-				props.onNavigate(nextPath)
+				onNavigate(nextPath)
 			})
 		}
 
