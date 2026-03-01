@@ -114,7 +114,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 				<div className="w-full max-w-container flex justify-center items-center px-2 md:px-4">
 					<div className="min-h-fit w-full max-w-[375px] px-0 md:px-0">
 						<div className="w-full px-2 mb-4">
-							<Skeleton className="h-[2px] w-full" />
+							<Skeleton className="h-0.5 w-full" />
 						</div>
 						<Skeleton className="registration-card" />
 					</div>
@@ -132,7 +132,7 @@ export default function SignUpLayout(props: SignUpLayoutProps) {
 				<div className="min-h-fit w-[375px] px-0 md:px-0">
 					<div className="w-full px-2 mb-4">
 						{progressValue >= 0 && (
-							<Progress className="h-[2px] w-full" value={progressValue} />
+							<Progress className="h-0.5 w-full" value={progressValue} />
 						)}
 					</div>
 					<Card className="flex flex-col justify-between registration-card">
