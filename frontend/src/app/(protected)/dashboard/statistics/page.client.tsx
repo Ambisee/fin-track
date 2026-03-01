@@ -36,13 +36,15 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 
+type NonNullableFields<T> = { [key in keyof T]: Exclude<T[key], null> }
+
 interface Statistics {
 	totalIncome: number
 	totalExpense: number
 	groupByCategory: Group[]
 }
 
-interface Group extends Statistic {
+interface Group extends NonNullableFields<Statistic> {
 	fillColor: string
 	percentage: number
 }
@@ -122,14 +124,15 @@ function ChartDisplay(props: ChartDisplayProps) {
 						content={
 							<ChartTooltipContent
 								formatterOverride={false}
-								formatter={(value, name, item, index, payload: any) => {
-									let result = formatAmount(value as number)
+								formatter={(value, name, item, index, payload: unknown) => {
+									const data = payload as Pick<Group, "percentage">
+									const result = formatAmount(value as number)
 									if (percentageKey !== "percentage") {
 										return result
 									}
 
 									return (
-										result + ` (${(payload[percentageKey] * 100).toFixed(2)}%)`
+										result + ` (${(data[percentageKey] * 100).toFixed(2)}%)`
 									)
 								}}
 							/>
@@ -151,17 +154,13 @@ function ChartDisplay(props: ChartDisplayProps) {
 			<ul className="grid gap-1.5">
 				{props.data
 					.toSorted((a, b) => b.percentage - a.percentage)
-					.map((value: Group) => {
-						const dialogTitle = <></>
-
-						return (
-							<CategoryItem
-								key={`${value.category}-${period.toDateString()}`}
-								value={value}
-								period={period}
-							/>
-						)
-					})}
+					.map((value: Group) => (
+						<CategoryItem
+							key={`${value.category}-${period.toDateString()}`}
+							value={value}
+							period={period}
+						/>
+					))}
 			</ul>
 		</div>
 	)
@@ -411,7 +410,7 @@ export default function DashboardStatistics() {
 			}
 
 			result.groupByCategory.push({
-				...statistic,
+				...(statistic as NonNullableFields<Statistic>),
 				fillColor: `var(--chart-${colorIndex++})`,
 				percentage: 0
 			})
