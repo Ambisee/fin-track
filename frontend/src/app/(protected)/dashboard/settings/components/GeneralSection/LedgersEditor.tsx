@@ -8,7 +8,6 @@ import { toast } from "sonner"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 export default function LedgersEditor() {
