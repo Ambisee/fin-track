@@ -3,14 +3,10 @@
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { sbBrowser } from "@/lib/supabase"
-import Image from "next/image"
 import Link from "next/link"
 
-import { roboto } from "@/app/fonts"
-import googleIcon from "../../../../public/google-icon.svg"
-
 import { MailIcon } from "lucide-react"
+import GoogleAuthButton from "../sign-in/(home)/components/LoginWithGoogleButton"
 
 export default function SignUp() {
 	return (
@@ -19,27 +15,7 @@ export default function SignUp() {
 				<Card className="w-[320px]">
 					<CardHeader className="w-full text-center">Sign up</CardHeader>
 					<CardContent className="w-full grid grid-flow-row gap-4">
-						<Button
-							variant="default"
-							className={roboto.className}
-							onClick={() => {
-								sbBrowser.auth.signInWithOAuth({
-									provider: "google",
-									options: {
-										redirectTo: `${origin}/auth/login-callback`
-									}
-								})
-							}}
-						>
-							<Image
-								src={googleIcon}
-								alt="Google Icon.svg"
-								width={20}
-								height={20}
-								className="mr-2"
-							/>
-							Sign up with Google
-						</Button>
+						<GoogleAuthButton type="signup" />
 						<Link
 							href="/sign-up/email"
 							className={buttonVariants({ variant: "default" })}

@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
 
 import { MailIcon } from "lucide-react"
-import LoginWithGoogleButton from "./components/LoginWithGoogleButton"
+import GoogleAuthButton from "./components/LoginWithGoogleButton"
 
 export default function SignIn() {
 	return (
@@ -18,7 +18,7 @@ export default function SignIn() {
 						Sign in to your account
 					</CardHeader>
 					<CardContent className="w-full grid grid-flow-row gap-4">
-						<LoginWithGoogleButton />
+						<GoogleAuthButton type="signin" />
 						<Link
 							href="/sign-in/email"
 							className={buttonVariants({ variant: "default" })}

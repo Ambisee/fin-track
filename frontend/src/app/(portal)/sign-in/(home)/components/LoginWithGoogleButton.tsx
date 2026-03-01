@@ -3,13 +3,16 @@
 import { sbBrowser } from "@/lib/supabase"
 import Image from "next/image"
 
+import googleIcon from "@/../public/google-icon.svg"
 import { roboto } from "@/app/fonts"
 import { Button } from "@/components/ui/button"
-import googleIcon from "@/../public/google-icon.svg"
-import dynamic from "next/dynamic"
 
-function LoginWithGoogleButton() {
-	const origin = window.location.origin
+interface GoogleAuthButtonProps {
+	type?: "signup" | "signin"
+}
+
+export default function GoogleAuthButton(props: GoogleAuthButtonProps) {
+	const { type = "signin", ...restProps } = props
 
 	return (
 		<Button
@@ -19,7 +22,7 @@ function LoginWithGoogleButton() {
 				sbBrowser.auth.signInWithOAuth({
 					provider: "google",
 					options: {
-						redirectTo: `${origin}/auth/login-callback`
+						redirectTo: `${window.location.origin}/auth/login-callback`
 					}
 				})
 			}}
@@ -30,12 +33,9 @@ function LoginWithGoogleButton() {
 				width={20}
 				height={20}
 				className="mr-2"
+				preload
 			/>
-			Sign in with Google
+			Sign {type === "signin" ? "in" : "up"} with Google
 		</Button>
 	)
 }
-
-export default dynamic(() => Promise.resolve(LoginWithGoogleButton), {
-	ssr: false
-})
