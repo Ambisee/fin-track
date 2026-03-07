@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button"
 import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel
-} from "@/components/ui/form"
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
@@ -16,7 +15,7 @@ import { sbBrowser } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 const mailingSectionFormSchema = z.object({
@@ -37,68 +36,70 @@ export default function AutomaticMonthlyReport() {
 	})
 
 	return (
-		<Form {...form}>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit(async (formData) => {
-						setIsPendingSubmit(true)
-						const { error } = await sbBrowser
-							.from("settings")
-							.update({ allow_report: formData.allowReport })
-							.eq("user_id", userSettingsQuery.data?.user_id as string)
+		<form
+			onSubmit={(e) => {
+				e.preventDefault()
+				form.handleSubmit(async (formData) => {
+					setIsPendingSubmit(true)
+					const { error } = await sbBrowser
+						.from("settings")
+						.update({ allow_report: formData.allowReport })
+						.eq("user_id", userSettingsQuery.data?.user_id as string)
 
-						if (error !== null) {
-							toast.error(error.message, { duration: SHORT_TOAST_DURATION })
-							setIsPendingSubmit(false)
-							return
-						}
-
+					if (error !== null) {
+						toast.error(error.message, { duration: SHORT_TOAST_DURATION })
 						setIsPendingSubmit(false)
-						toast.info("New settings data saved.", {
-							duration: SHORT_TOAST_DURATION
-						})
-					})()
-				}}
-			>
-				<FormField
+						return
+					}
+
+					setIsPendingSubmit(false)
+					toast.info("New settings data saved.", {
+						duration: SHORT_TOAST_DURATION
+					})
+				})()
+			}}
+		>
+			<FieldGroup>
+				<Controller
 					control={form.control}
 					name="allowReport"
-					render={({ field }) => (
-						<FormItem className="flex gap-4 items-center space-y-0">
+					render={({ field, fieldState }) => (
+						<Field
+							className="flex gap-4 items-center space-y-0"
+							data-invalid={fieldState.invalid}
+						>
 							<div>
-								<FormLabel>Automatic Monthly Report</FormLabel>
-								<FormDescription>
+								<FieldLabel>Automatic Monthly Report</FieldLabel>
+								<FieldDescription>
 									Allow the app to send automatic transaction reports every
 									month.
-								</FormDescription>
+								</FieldDescription>
 							</div>
-							<FormControl>
-								<div className="w-11">
-									{userQuery.isLoading || userSettingsQuery.isLoading ? (
-										<Skeleton className="h-6 w-11 rounded-full" />
-									) : (
-										<Switch
-											className="m-0"
-											checked={field.value}
-											onCheckedChange={field.onChange}
-										/>
-									)}
-								</div>
-							</FormControl>
-						</FormItem>
+							<div className="w-11">
+								{userQuery.isLoading || userSettingsQuery.isLoading ? (
+									<Skeleton className="h-6 w-11 rounded-full" />
+								) : (
+									<Switch
+										className="m-0"
+										checked={field.value}
+										onCheckedChange={field.onChange}
+									/>
+								)}
+							</div>
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
 					)}
 				/>
-				<Button
-					className="mt-4"
-					disabled={userQuery.isLoading || isPendingSubmit}
-				>
-					Save Settings
-					{isPendingSubmit && (
-						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
-					)}
-				</Button>
-			</form>
-		</Form>
+			</FieldGroup>
+			<Button
+				className="mt-4"
+				disabled={userQuery.isLoading || isPendingSubmit}
+			>
+				Save Settings
+				{isPendingSubmit && (
+					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+				)}
+			</Button>
+		</form>
 	)
 }

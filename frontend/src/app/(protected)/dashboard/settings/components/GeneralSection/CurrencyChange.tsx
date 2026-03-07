@@ -1,14 +1,13 @@
 import ComboBox from "@/components/ui/combobox"
 import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel
-} from "@/components/ui/form"
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import InputSkeleton from "../InputSkeleton"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useCurrenciesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
@@ -99,55 +98,54 @@ export default function CurrencyChange() {
 	}, [form, formDefaultValues])
 
 	return (
-		<Form {...form}>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit(onFormSubmit)()
-				}}
-			>
-				<FormField
+		<form
+			onSubmit={(e) => {
+				e.preventDefault()
+				form.handleSubmit(onFormSubmit)()
+			}}
+		>
+			<FieldGroup>
+				<Controller
 					control={form.control}
 					name="currency"
-					render={({ field }) => (
-						<FormItem className="grid mt-8">
-							<FormLabel className="text-sm">Currency</FormLabel>
-							<FormDescription>
+					render={({ field, fieldState }) => (
+						<Field className="mt-8" data-invalid={fieldState.invalid}>
+							<FieldLabel className="text-sm">Currency</FieldLabel>
+							<FieldDescription>
 								Change the currency for the current ledger.
-							</FormDescription>
-							<FormControl>
-								{!field.value.id ? (
-									<InputSkeleton />
-								) : (
-									<ComboBox
-										closeOnSelect
-										value={field.value.currency_name}
-										onChange={(e) => {
-											form.setValue(field.name, JSON.parse(e))
-										}}
-										values={
-											currencies?.map((val) => ({
-												label: val.currency_name,
-												value: JSON.stringify(val)
-											})) ?? []
-										}
-									/>
-								)}
-							</FormControl>
-						</FormItem>
+							</FieldDescription>
+							{!field.value.id ? (
+								<InputSkeleton />
+							) : (
+								<ComboBox
+									closeOnSelect
+									value={field.value.currency_name}
+									onChange={(e) => {
+										form.setValue(field.name, JSON.parse(e))
+									}}
+									values={
+										currencies?.map((val) => ({
+											label: val.currency_name,
+											value: JSON.stringify(val)
+										})) ?? []
+									}
+								/>
+							)}
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+						</Field>
 					)}
 				/>
-				<Button
-					className="mt-6"
-					variant="default"
-					disabled={userQuery.isLoading || isPendingSubmit}
-				>
-					Save Settings
-					{isPendingSubmit && (
-						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
-					)}
-				</Button>
-			</form>
-		</Form>
+			</FieldGroup>
+			<Button
+				className="mt-6"
+				variant="default"
+				disabled={userQuery.isLoading || isPendingSubmit}
+			>
+				Save Settings
+				{isPendingSubmit && (
+					<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+				)}
+			</Button>
+		</form>
 	)
 }

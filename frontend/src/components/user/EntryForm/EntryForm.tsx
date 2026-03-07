@@ -8,10 +8,10 @@ import { Entry } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { ReactNode, useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { ControllerFieldState, useForm } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
-import { FormControl, FormItem, FormLabel } from "../../ui/form"
+import { Field, FieldContent, FieldGroup, FieldLabel } from "../../ui/field"
 import CategoryGroup from "../CategoryGroup"
 import LedgerGroup from "../LedgerGroup"
 import EntryFormPage from "./EntryFormPage"
@@ -45,18 +45,22 @@ export type EntryFormData = z.infer<typeof formSchema>
 export function EntryFormItem(props: {
 	className?: string
 	label: string
+	fieldState: ControllerFieldState
 	children: ReactNode
 }) {
 	return (
-		<FormItem
-			className={cn(
-				"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
-				props.className
-			)}
-		>
-			<FormLabel>{props.label}</FormLabel>
-			<FormControl>{props.children}</FormControl>
-		</FormItem>
+		<FieldGroup>
+			<Field
+				data-invalid={props.fieldState.invalid}
+				className={cn(
+					"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
+					props.className
+				)}
+			>
+				<FieldLabel>{props.label}</FieldLabel>
+				<FieldContent>{props.children}</FieldContent>
+			</Field>
+		</FieldGroup>
 	)
 }
 

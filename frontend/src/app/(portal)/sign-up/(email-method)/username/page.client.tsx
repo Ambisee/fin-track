@@ -2,17 +2,21 @@
 
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import { MAX_USERNAME_LENGTH } from "@/lib/constants"
 import { getUsernameFromEmail } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { ChevronRight } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { FormEventHandler, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { useSignupTransition } from "../layout"
 
@@ -28,7 +32,6 @@ const formSchema = z.object({
 })
 
 export default function SignUpUsername() {
-	const router = useRouter()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const { navigateTo } = useSignupTransition()
@@ -68,50 +71,52 @@ export default function SignUpUsername() {
 	}
 
 	return (
-		<Form {...form}>
-			<form className="w-full h-full" onSubmit={handleOnSubmit}>
-				<CardHeader>Username (Optional)</CardHeader>
-				<CardContent className="flex flex-col">
-					<FormField
+		<form className="w-full h-full" onSubmit={handleOnSubmit}>
+			<CardHeader>Username (Optional)</CardHeader>
+			<CardContent className="flex flex-col">
+				<FieldGroup>
+					<Controller
 						control={form.control}
 						name="username"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<Input
-										autoFocus
-										placeholder={getUsernameFromEmail(email as string)}
-										{...field}
-									/>
-								</FormControl>
-								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-									{form.formState.errors.username?.message}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<FieldLabel>Username</FieldLabel>
+								<Input
+									autoFocus
+									placeholder={getUsernameFromEmail(email as string)}
+									aria-invalid={fieldState.invalid}
+									{...field}
+								/>
+								<div className="min-h-5 min-w-1">
+									{fieldState.invalid && (
+										<FieldError errors={[fieldState.error]} />
+									)}
 								</div>
-							</FormItem>
+							</Field>
 						)}
 					/>
-				</CardContent>
-				<CardFooter className="flex justify-between">
-					<Button
-						variant="ghost"
-						className="aspect-square p-0 flex gap-2"
-						type="button"
-						onClick={(e) => {
-							navigateTo("/sign-up/email")
-						}}
-					>
-						<ArrowLeftIcon />
-					</Button>
-					<Button disabled={isPendingSubmit}>
-						Next
-						{isPendingSubmit ? (
-							<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
-						) : (
-							<ChevronRight className="ml-2" />
-						)}
-					</Button>
-				</CardFooter>
-			</form>
-		</Form>
+				</FieldGroup>
+			</CardContent>
+			<CardFooter className="flex justify-between">
+				<Button
+					variant="ghost"
+					className="aspect-square p-0 flex gap-2"
+					type="button"
+					onClick={() => {
+						navigateTo("/sign-up/email")
+					}}
+				>
+					<ArrowLeftIcon />
+				</Button>
+				<Button disabled={isPendingSubmit}>
+					Next
+					{isPendingSubmit ? (
+						<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+					) : (
+						<ChevronRight className="ml-2" />
+					)}
+				</Button>
+			</CardFooter>
+		</form>
 	)
 }

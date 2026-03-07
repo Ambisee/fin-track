@@ -2,26 +2,25 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SubmitEventHandler, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem
-} from "@/components/ui/form"
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup
+} from "@/components/ui/field"
 import PasswordField from "@/components/user/PasswordField"
 import { MAX_USERNAME_LENGTH, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
-import { useSignupTransition } from "../layout"
 import { toast } from "sonner"
+import { useSignupTransition } from "../layout"
 
 const formSchema = z
 	.object({
@@ -111,67 +110,80 @@ export default function SignUpPassword() {
 				setIsPendingSubmit(false)
 				router.push("/sign-in")
 			},
-			(error) => {}
+			() => {}
 		)()
 	}
 
 	return (
-		<Form {...form}>
-			<form className="w-full h-full" onSubmit={handleOnSubmit}>
-				<CardHeader>Password</CardHeader>
-				<CardContent className="flex flex-col md:justify-start justify-end gap-4">
-					<FormField
+		<form className="w-full h-full" onSubmit={handleOnSubmit}>
+			<CardHeader>Password</CardHeader>
+			<CardContent className="flex flex-col md:justify-start justify-end gap-4">
+				<FieldGroup>
+					<Controller
 						control={form.control}
 						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<PasswordField autoFocus placeholder="Password" {...field} />
-								</FormControl>
-								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-									{form.formState.errors.password?.message}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<PasswordField
+									autoFocus
+									placeholder="Password"
+									aria-invalid={fieldState.invalid}
+									{...field}
+								/>
+								<div className="min-h-5 min-w-1">
+									{fieldState.error && (
+										<FieldError
+											className="text-sm font-medium"
+											errors={[fieldState.error]}
+										/>
+									)}
 								</div>
-								<FormDescription>
+								<FieldDescription>
 									Passwords must have at least 8 characters and include
 									lowercase, uppercase, number, and special characters.
-								</FormDescription>
-							</FormItem>
+								</FieldDescription>
+							</Field>
 						)}
 					/>
-					<FormField
+					<Controller
 						control={form.control}
 						name="confirmPassword"
-						render={({ field }) => (
-							<FormItem>
-								<FormControl>
-									<PasswordField placeholder="Confirm Password" {...field} />
-								</FormControl>
-								<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-									{form.formState.errors.confirmPassword?.message}
+						render={({ field, fieldState }) => (
+							<Field data-invalid={fieldState.invalid}>
+								<PasswordField
+									placeholder="Confirm Password"
+									aria-invalid={fieldState.invalid}
+									{...field}
+								/>
+								<div className="min-h-5 min-w-1">
+									{fieldState.error && (
+										<FieldError
+											className="text-sm font-medium"
+											errors={[fieldState.error]}
+										/>
+									)}
 								</div>
-							</FormItem>
+							</Field>
 						)}
 					/>
-				</CardContent>
-				<CardFooter className="flex justify-between">
-					<Button
-						variant="ghost"
-						type="button"
-						className="aspect-square p-0 flex gap-2"
-						onClick={(e) => {
-							navigateTo("/sign-up/username")
-						}}
-					>
-						<ArrowLeftIcon />
-					</Button>
-					<Button disabled={isPendingSubmit}>
-						{isPendingSubmit && (
-							<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-						)}
-						{isPendingSubmit ? "Loading" : "Submit"}
-					</Button>
-				</CardFooter>
-			</form>
-		</Form>
+				</FieldGroup>
+			</CardContent>
+			<CardFooter className="flex justify-between">
+				<Button
+					variant="ghost"
+					type="button"
+					className="aspect-square p-0 flex gap-2"
+					onClick={() => navigateTo("/sign-up/username")}
+				>
+					<ArrowLeftIcon />
+				</Button>
+				<Button disabled={isPendingSubmit}>
+					{isPendingSubmit && (
+						<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+					)}
+					{isPendingSubmit ? "Loading" : "Submit"}
+				</Button>
+			</CardFooter>
+		</form>
 	)
 }

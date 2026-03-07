@@ -14,8 +14,9 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "../ui/dialog"
-import { Form, FormControl, FormField } from "../ui/form"
 import { Input } from "../ui/input"
+import { Controller } from "react-hook-form"
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import {
 	Select,
 	SelectContent,
@@ -50,43 +51,44 @@ export default function MonthPicker(props: MonthPickerProps) {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
-				<Form {...form}>
-					<form
-						onSubmit={(e) => {
-							e.preventDefault()
-							form.handleSubmit(
-								(formData) => {
-									const value = new Date()
-									value.setDate(1)
-									value.setMonth(MONTHS.indexOf(formData.month))
-									value.setFullYear(formData.year)
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit(
+							(formData) => {
+								const value = new Date()
+								value.setDate(1)
+								value.setMonth(MONTHS.indexOf(formData.month))
+								value.setFullYear(formData.year)
 
-									props.onValueChange(value)
-									setOpen(false)
-								},
-								(error) => {
-									toast.error(
-										<div>
-											{error.month?.message && <p>{error.month.message}</p>}
-											{error.year?.message && <p>{error.year.message}</p>}
-										</div>
-									)
-								}
-							)()
-						}}
-					>
-						<DialogHeader>
-							<DialogTitle>Select a month</DialogTitle>
-							<DialogDescription>
-								Specify a month to view its data
-							</DialogDescription>
-						</DialogHeader>
+								props.onValueChange(value)
+								setOpen(false)
+							},
+							(error) => {
+								toast.error(
+									<div>
+										{error.month?.message && <p>{error.month.message}</p>}
+										{error.year?.message && <p>{error.year.message}</p>}
+									</div>
+								)
+							}
+						)()
+					}}
+				>
+					<DialogHeader>
+						<DialogTitle>Select a month</DialogTitle>
+						<DialogDescription>
+							Specify a month to view its data
+						</DialogDescription>
+					</DialogHeader>
+					<FieldGroup>
 						<div className="w-full my-4 flex items-center justify-between gap-4">
-							<FormField
+							<Controller
 								control={form.control}
 								name="month"
-								render={({ field }) => (
-									<FormControl>
+								render={({ field, fieldState }) => (
+									<Field className="flex-1" data-invalid={fieldState.invalid}>
+										<FieldLabel className="sr-only">Month</FieldLabel>
 										<Select
 											defaultValue={field.value}
 											onValueChange={field.onChange}
@@ -96,7 +98,7 @@ export default function MonthPicker(props: MonthPickerProps) {
 											</SelectTrigger>
 											<SelectContent className="max-h-60">
 												<SelectGroup>
-													{MONTHS.map((value, index) => {
+													{MONTHS.map((value) => {
 														return (
 															<SelectItem key={value} value={value}>
 																{value}
@@ -106,24 +108,31 @@ export default function MonthPicker(props: MonthPickerProps) {
 												</SelectGroup>
 											</SelectContent>
 										</Select>
-									</FormControl>
+										{fieldState.invalid && (
+											<FieldError errors={[fieldState.error]} />
+										)}
+									</Field>
 								)}
 							/>
-							<FormField
+							<Controller
 								control={form.control}
 								name="year"
-								render={({ field }) => (
-									<FormControl>
+								render={({ field, fieldState }) => (
+									<Field className="w-24" data-invalid={fieldState.invalid}>
+										<FieldLabel className="sr-only">Year</FieldLabel>
 										<Input inputMode="numeric" {...field} />
-									</FormControl>
+										{fieldState.invalid && (
+											<FieldError errors={[fieldState.error]} />
+										)}
+									</Field>
 								)}
 							/>
 						</div>
-						<DialogFooter>
-							<Button className="w-full">Update</Button>
-						</DialogFooter>
-					</form>
-				</Form>
+					</FieldGroup>
+					<DialogFooter>
+						<Button className="w-full">Update</Button>
+					</DialogFooter>
+				</form>
 			</DialogContent>
 			<Button
 				className="w-12 h-12 rounded-full"

@@ -6,15 +6,15 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "../ui/dialog"
-import { Form, FormField, FormControl, FormItem } from "../ui/form"
 import { ChevronLeft, X } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
 import { ReloadIcon } from "@radix-ui/react-icons"
 
@@ -83,63 +83,62 @@ export default function CategoryPage(props: CategoryPageProps) {
 					Enter the name of the {props.data === undefined && "new"} category.
 					Please note that no two categories may share the same name.
 				</p>
-				<Form {...form}>
-					<form
-						className="h-full grid grid-rows-[1fr_auto]"
-						onSubmit={(e) => {
-							e.preventDefault()
-							form.handleSubmit(async (formData) => {
-								setIsFormLoading(true)
+				<form
+					className="h-full grid grid-rows-[1fr_auto]"
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit(async (formData) => {
+							setIsFormLoading(true)
 
-								if (props.data !== undefined) {
-									await props.onUpdate?.({
-										oldName: props.data.name,
-										...formData
-									})
-								} else {
-									await props.onCreate?.({
-										oldName: "",
-										...formData
-									})
-								}
+							if (props.data !== undefined) {
+								await props.onUpdate?.({
+									oldName: props.data.name,
+									...formData
+								})
+							} else {
+								await props.onCreate?.({
+									oldName: "",
+									...formData
+								})
+							}
 
-								setIsFormLoading(false)
-							})()
-						}}
-					>
-						<FormField
+							setIsFormLoading(false)
+						})()
+					}}
+				>
+					<FieldGroup>
+						<Controller
 							control={form.control}
 							name="name"
-							render={({ field }) => (
-								<FormItem className="mt-2">
-									<FormControl>
-										{props.isInitialized ?? true ? (
-											<Input
-												disabled={isFormLoading}
-												placeholder="Enter a new category name"
-												{...field}
-											/>
-										) : (
-											<InputSkeleton />
-										)}
-									</FormControl>
-								</FormItem>
+							render={({ field, fieldState }) => (
+								<Field data-invalid={fieldState.invalid} className="mt-2">
+									<FieldLabel className="sr-only">Category name</FieldLabel>
+									{(props.isInitialized ?? true) ? (
+										<Input
+											disabled={isFormLoading}
+											placeholder="Enter a new category name"
+											aria-invalid={fieldState.invalid}
+											{...field}
+										/>
+									) : (
+										<InputSkeleton />
+									)}
+									{form.formState.errors.name && (
+										<FieldError errors={[form.formState.errors.name]} />
+									)}
+								</Field>
 							)}
 						/>
-						<DialogFooter>
-							<Button
-								disabled={!(props.isInitialized ?? true) || isFormLoading}
-							>
-								{props.data === undefined
-									? "Create category"
-									: "Update category"}
-								{isFormLoading && (
-									<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
-								)}
-							</Button>
-						</DialogFooter>
-					</form>
-				</Form>
+					</FieldGroup>
+					<DialogFooter>
+						<Button disabled={!(props.isInitialized ?? true) || isFormLoading}>
+							{props.data === undefined ? "Create category" : "Update category"}
+							{isFormLoading && (
+								<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
+							)}
+						</Button>
+					</DialogFooter>
+				</form>
 			</div>
 		</div>
 	)

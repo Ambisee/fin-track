@@ -2,15 +2,14 @@
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel
-} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSetElementWindowHeight } from "@/lib/hooks"
@@ -20,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 const formSchema = z.object({
@@ -48,63 +47,65 @@ export default function ForgotPassword() {
 						Enter your email to reset your password
 					</CardHeader>
 					<CardContent className="w-full grid grid-flow-row gap-4">
-						<Form {...form}>
-							<form
-								className="grid gap-4"
-								onSubmit={(e) => {
-									e.preventDefault()
-									form.handleSubmit(
-										async (formData) => {
-											setIsPendingSubmit(true)
-											const { data, error } =
-												await sbBrowser.auth.resetPasswordForEmail(
-													formData.email,
-													{
-														redirectTo: `${window.location.origin}/recovery`
-													}
-												)
-											if (error !== null) {
-												setIsPendingSubmit(false)
-												toast.error(error?.message, {
-													duration: SHORT_TOAST_DURATION
-												})
-												return
-											}
-
-											setIsPendingSubmit(false)
-											toast.info(
-												"Please check your inbox and follow the instructions to reset your password.",
-												{ duration: SHORT_TOAST_DURATION }
+						<form
+							className="grid gap-4"
+							onSubmit={(e) => {
+								e.preventDefault()
+								form.handleSubmit(
+									async (formData) => {
+										setIsPendingSubmit(true)
+										const { error } =
+											await sbBrowser.auth.resetPasswordForEmail(
+												formData.email,
+												{
+													redirectTo: `${window.location.origin}/recovery`
+												}
 											)
-										},
-										(errors) => {}
-									)()
-								}}
-							>
-								<FormField
+										if (error !== null) {
+											setIsPendingSubmit(false)
+											toast.error(error?.message, {
+												duration: SHORT_TOAST_DURATION
+											})
+											return
+										}
+
+										setIsPendingSubmit(false)
+										toast.info(
+											"Please check your inbox and follow the instructions to reset your password.",
+											{ duration: SHORT_TOAST_DURATION }
+										)
+									},
+									() => {}
+								)()
+							}}
+						>
+							<FieldGroup>
+								<Controller
 									control={form.control}
 									name="email"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Email</FormLabel>
-											<FormControl>
-												<Input
-													inputMode="email"
-													placeholder="Email"
-													{...field}
-												/>
-											</FormControl>
-										</FormItem>
+									render={({ field, fieldState }) => (
+										<Field data-invalid={fieldState.invalid}>
+											<FieldLabel>Email</FieldLabel>
+											<Input
+												inputMode="email"
+												placeholder="Email"
+												{...field}
+												aria-invalid={fieldState.invalid}
+											/>
+											{fieldState.invalid && (
+												<FieldError errors={[fieldState.error]} />
+											)}
+										</Field>
 									)}
 								/>
-								<Button disabled={isPendingSubmit}>
-									{isPendingSubmit && (
-										<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-									)}
-									Submit
-								</Button>
-							</form>
-						</Form>
+							</FieldGroup>
+							<Button disabled={isPendingSubmit}>
+								{isPendingSubmit && (
+									<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+								)}
+								Submit
+							</Button>
+						</form>
 						<Separator className="w-full mt-4" />
 						<div className="text-center">
 							<span className="text-sm">Remember your password?</span>

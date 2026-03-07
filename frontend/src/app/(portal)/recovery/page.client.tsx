@@ -2,13 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem
-} from "@/components/ui/form"
 import { toast } from "sonner"
 import PasswordField from "@/components/user/PasswordField"
 import { USER_QKEY } from "@/lib/constants"
@@ -18,7 +11,14 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import { z } from "zod"
 
 const recoveryFormSchema = z
@@ -57,85 +57,95 @@ export default function Recovery() {
 		<div className="w-full min-h-screen grid grid-flow-col-dense justify-items-center">
 			<div className="w-full max-w-container flex justify-center items-center">
 				<Card className="w-full max-w-[360px] grid grid-flow-row">
-					<Form {...form}>
-						<form
-							className="w-full h-full"
-							onSubmit={(e) => {
-								e.preventDefault()
-								form.handleSubmit(
-									async (formData) => {
-										setIsPendingSubmit(true)
-										const { data, error } = await sbBrowser.auth.updateUser({
-											password: formData.password
-										})
+					<form
+						className="w-full h-full"
+						onSubmit={(e) => {
+							e.preventDefault()
+							form.handleSubmit(
+								async (formData) => {
+									setIsPendingSubmit(true)
+									const { error } = await sbBrowser.auth.updateUser({
+										password: formData.password
+									})
 
-										if (error !== null) {
-											setIsPendingSubmit(false)
-											toast.error(error.message)
-											return
-										}
+									if (error !== null) {
+										setIsPendingSubmit(false)
+										toast.error(error.message)
+										return
+									}
 
-										toast.info("Successfully changed the password")
-										await sbBrowser.auth.signOut()
-										queryClient.invalidateQueries({ queryKey: USER_QKEY })
-										router.push("/sign-in/email")
-									},
-									(error) => {}
-								)()
-							}}
-						>
-							<CardHeader>Reset Password</CardHeader>
-							<CardContent className="flex flex-col md:justify-start justify-end gap-4">
-								<FormField
+									toast.info("Successfully changed the password")
+									await sbBrowser.auth.signOut()
+									queryClient.invalidateQueries({ queryKey: USER_QKEY })
+									router.push("/sign-in/email")
+								},
+								() => {}
+							)()
+						}}
+					>
+						<CardHeader>Reset Password</CardHeader>
+						<CardContent className="flex flex-col md:justify-start justify-end gap-4">
+							<FieldGroup>
+								<Controller
 									control={form.control}
 									name="password"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<PasswordField
-													autoFocus
-													placeholder="Password"
-													{...field}
-												/>
-											</FormControl>
-											<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-												{form.formState.errors.password?.message}
+									render={({ field, fieldState }) => (
+										<Field data-invalid={fieldState.invalid}>
+											<FieldLabel>Password</FieldLabel>
+											<PasswordField
+												autoFocus
+												placeholder="Password"
+												aria-invalid={fieldState.invalid}
+												{...field}
+											/>
+											<div className="min-h-5 min-w-1">
+												{fieldState.invalid && (
+													<FieldError
+														className="text-sm font-medium"
+														errors={[fieldState.error]}
+													/>
+												)}
 											</div>
-											<FormDescription>
+											<FieldDescription>
 												Passwords must have at least 8 characters and include
 												lowercase, uppercase, number, and special characters.
-											</FormDescription>
-										</FormItem>
+											</FieldDescription>
+										</Field>
 									)}
 								/>
-								<FormField
+								<Controller
 									control={form.control}
 									name="confirmPassword"
-									render={({ field }) => (
-										<FormItem>
-											<FormControl>
-												<PasswordField
-													placeholder="Confirm Password"
-													{...field}
-												/>
-											</FormControl>
-											<div className="min-h-5 min-w-1 text-sm font-medium text-destructive">
-												{form.formState.errors.confirmPassword?.message}
+									render={({ field, fieldState }) => (
+										<Field data-invalid={fieldState.invalid}>
+											<FieldLabel>Confirm Password</FieldLabel>
+											<PasswordField
+												placeholder="Confirm Password"
+												aria-invalid={fieldState.invalid}
+												{...field}
+											/>
+											<div className="min-h-5 min-w-1">
+												{fieldState.invalid && (
+													<FieldError
+														className="text-sm font-medium"
+														errors={[fieldState.error]}
+													/>
+												)}
 											</div>
-										</FormItem>
+										</Field>
 									)}
 								/>
-							</CardContent>
-							<CardFooter>
-								<Button className="w-full" disabled={isFormLoading}>
-									{isFormLoading && (
-										<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-									)}
-									{isFormLoading ? "Loading" : "Submit"}
-								</Button>
-							</CardFooter>
-						</form>
-					</Form>
+							</FieldGroup>
+						</CardContent>
+						<CardFooter>
+							<Button className="w-full" disabled={isFormLoading}>
+								{isFormLoading && (
+									<ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+								)}
+								{isFormLoading ? "Loading" : "Submit"}
+							</Button>
+						</CardFooter>
+					</form>
 				</Card>
 			</div>
 		</div>

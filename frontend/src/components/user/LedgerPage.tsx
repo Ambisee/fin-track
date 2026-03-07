@@ -8,15 +8,14 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel
-} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel
+} from "@/components/ui/field"
 import { Currency, Ledger } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -133,97 +132,77 @@ export default function LedgerPage(props: LedgerPageProps) {
 				</DialogDescription>
 			</DialogHeader>
 			<div className="flex flex-col h-full">
-				<Form {...form}>
-					<form
-						className="h-full mt-4 grid grid-rows-[1fr_auto]"
-						onSubmit={(e) => {
-							e.preventDefault()
-							form.handleSubmit(async (formData) => {
-								setIsFormLoading(true)
+				<form
+					className="h-full mt-4 grid grid-rows-[1fr_auto]"
+					onSubmit={(e) => {
+						e.preventDefault()
+						form.handleSubmit(async (formData) => {
+							setIsFormLoading(true)
 
-								const isUpdate = props.data !== undefined
-								const ledgerData: LedgerFormData = {
-									id: props.data?.id ?? -1,
-									name: formData.name,
-									currency_id: formData.currency.id
-								}
+							const isUpdate = props.data !== undefined
+							const ledgerData: LedgerFormData = {
+								id: props.data?.id ?? -1,
+								name: formData.name,
+								currency_id: formData.currency.id
+							}
 
-								if (isUpdate) {
-									await props.onUpdate?.(ledgerData)
-								} else {
-									await props.onCreate?.(ledgerData)
-								}
+							if (isUpdate) {
+								await props.onUpdate?.(ledgerData)
+							} else {
+								await props.onCreate?.(ledgerData)
+							}
 
-								setIsFormLoading(false)
-							})()
-						}}
-					>
-						<div>
-							<FormField
-								control={form.control}
-								name="name"
-								render={({ field }) => (
-									<FormItem className="mt-2">
-										<FormLabel>Ledger Name</FormLabel>
-										<FormControl>
-											{(props.isInitialized ?? false) ? (
-												<Input
-													placeholder="Enter a new ledger name"
-													disabled={isFormLoading}
-													{...field}
-												/>
-											) : (
-												<InputSkeleton />
-											)}
-										</FormControl>
-										<FormDescription>
-											Please note that no two ledgers can share the same name.
-										</FormDescription>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="currency"
-								render={({ field }) => (
-									<FormItem className="grid mt-8">
-										<FormLabel className="text-sm">Currency</FormLabel>
-										<FormControl>
-											{(props.isInitialized ?? true) ? (
-												<ComboBox
-													closeOnSelect
-													disabled={isFormLoading}
-													value={field.value.currency_name}
-													onChange={(e) => {
-														form.setValue("currency", JSON.parse(e))
-													}}
-													values={
-														props.currencyList.map((val) => ({
-															label: val.currency_name,
-															value: JSON.stringify(val)
-														})) ?? []
-													}
-												/>
-											) : (
-												<InputSkeleton />
-											)}
-										</FormControl>
-									</FormItem>
-								)}
-							/>
-						</div>
-						<DialogFooter>
-							<Button
-								disabled={!(props.isInitialized ?? true) || isFormLoading}
-							>
-								{props.data ? "Update ledger" : "Create new ledger"}
-								{isFormLoading && (
-									<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
-								)}
-							</Button>
-						</DialogFooter>
-					</form>
-				</Form>
+							setIsFormLoading(false)
+						})()
+					}}
+				>
+					<FieldGroup>
+						<Field>
+							<FieldLabel>Ledger Name</FieldLabel>
+							{(props.isInitialized ?? false) ? (
+								<Input
+									placeholder="Enter a new ledger name"
+									disabled={isFormLoading}
+									{...form.register("name")}
+								/>
+							) : (
+								<InputSkeleton />
+							)}
+							<FieldDescription>
+								Please note that no two ledgers can share the same name.
+							</FieldDescription>
+						</Field>
+						<Field>
+							<FieldLabel className="text-sm">Currency</FieldLabel>
+							{(props.isInitialized ?? true) ? (
+								<ComboBox
+									closeOnSelect
+									disabled={isFormLoading}
+									value={form.getValues("currency").currency_name}
+									onChange={(e) => {
+										form.setValue("currency", JSON.parse(e))
+									}}
+									values={
+										props.currencyList.map((val) => ({
+											label: val.currency_name,
+											value: JSON.stringify(val)
+										})) ?? []
+									}
+								/>
+							) : (
+								<InputSkeleton />
+							)}
+						</Field>
+					</FieldGroup>
+					<DialogFooter>
+						<Button disabled={!(props.isInitialized ?? true) || isFormLoading}>
+							{props.data ? "Update ledger" : "Create new ledger"}
+							{isFormLoading && (
+								<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
+							)}
+						</Button>
+					</DialogFooter>
+				</form>
 			</div>
 		</div>
 	)
