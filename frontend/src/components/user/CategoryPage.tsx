@@ -11,7 +11,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
@@ -38,7 +38,7 @@ const formSchema = z.object({
 })
 
 export default function CategoryPage(props: CategoryPageProps) {
-	const [isFormLoading, setIsFormLoading] = useState(props.isLoading ?? false)
+	const [isFormLoading, setIsFormLoading] = useState(false)
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -47,9 +47,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 		}
 	})
 
-	useEffect(() => {
-		setIsFormLoading(props.isLoading ?? false)
-	}, [props.isLoading])
+	const isInputEnabled = props.isLoading !== true && !isFormLoading
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
@@ -78,7 +76,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<div className="flex flex-col h-full">
+			<div className="flex flex-col h-full gap-4">
 				<p className="text-sm text-muted-foreground mt-8">
 					Enter the name of the {props.data === undefined && "new"} category.
 					Please note that no two categories may share the same name.
@@ -115,7 +113,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 									<FieldLabel className="sr-only">Category name</FieldLabel>
 									{(props.isInitialized ?? true) ? (
 										<Input
-											disabled={isFormLoading}
+											disabled={!isInputEnabled}
 											placeholder="Enter a new category name"
 											aria-invalid={fieldState.invalid}
 											{...field}
@@ -131,9 +129,11 @@ export default function CategoryPage(props: CategoryPageProps) {
 						/>
 					</FieldGroup>
 					<DialogFooter>
-						<Button disabled={!(props.isInitialized ?? true) || isFormLoading}>
+						<Button
+							disabled={!(props.isInitialized ?? true) || !isInputEnabled}
+						>
 							{props.data === undefined ? "Create category" : "Update category"}
-							{isFormLoading && (
+							{!isInputEnabled && (
 								<ReloadIcon className="ml-2 h-4 w-4 relative animate-spin" />
 							)}
 						</Button>
