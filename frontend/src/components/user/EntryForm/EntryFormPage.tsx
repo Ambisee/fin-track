@@ -83,6 +83,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						try {
 							if (!props.isEditForm) {
 								result = await insertEntryMutation.mutateAsync(formData)
+								form.reset()
 							} else if (props.data?.id !== undefined) {
 								result = await updateEntryMutation.mutateAsync({
 									id: props.data.id,
@@ -105,7 +106,6 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								{ duration: SHORT_TOAST_DURATION }
 							)
 
-							form.reset()
 							props.onSubmitSuccess?.(result, props.data)
 						} catch (e) {
 							const errorData = e as Error

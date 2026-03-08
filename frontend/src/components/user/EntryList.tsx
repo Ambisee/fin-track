@@ -131,7 +131,6 @@ function VirtualizedList(props: EntryListProps) {
 
 function WindowVirtualizedList(props: EntryListProps) {
 	const { data, onScrollToBottom } = props
-	// const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
 	const [expanded, setExpanded] = useState(Array(data.length ?? 0).fill(false))
 
@@ -142,10 +141,6 @@ function WindowVirtualizedList(props: EntryListProps) {
 		gap: 16,
 		scrollMargin: 0
 	})
-
-	// useEffect(() => {
-	// 	expandedRef.current = Array(data.length ?? 0).fill(false)
-	// }, [data])
 
 	const virtualItems = virtualizer.getVirtualItems()
 	const y = (virtualItems[0]?.start ?? 0) - virtualizer.options.scrollMargin
@@ -248,13 +243,7 @@ export default function EntryList({
 	}
 
 	const Component = Components[virtualizerType]
-	return (
-		<Component
-			key={props.data.toString()}
-			showButtons={showButtons}
-			{...props}
-		/>
-	)
+	return <Component showButtons={showButtons} {...props} />
 }
 
 EntryList.VirtualizerType = EntryListVirtualizerType

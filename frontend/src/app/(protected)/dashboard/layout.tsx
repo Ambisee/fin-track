@@ -59,13 +59,13 @@ function LayoutLedgerEditorDialog() {
 				className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 			>
 				<LedgerGroup
-					onCreate={(data) => {
+					onCreate={() => {
 						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 					}}
-					onUpdate={(data) => {
+					onUpdate={() => {
 						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 					}}
-					onDelete={(data) => {
+					onDelete={() => {
 						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 					}}
 					onSelect={async (data) => {
