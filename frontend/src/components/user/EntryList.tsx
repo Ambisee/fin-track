@@ -1,11 +1,11 @@
 "use client"
 
 import useGlobalStore from "@/lib/store"
-import { cn, isNonNullable } from "@/lib/utils"
+import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import EntryListItem from "./EntryListItem"
@@ -74,6 +74,8 @@ function VirtualizedList(props: EntryListProps) {
 	const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
 
+	// [TEMPORARY] Disable memoization warning for this API.
+	// eslint-disable-next-line react-hooks/incompatible-library
 	const virtualizer = useVirtualizer({
 		count: data.length,
 		estimateSize: () => 100,
@@ -129,20 +131,21 @@ function VirtualizedList(props: EntryListProps) {
 
 function WindowVirtualizedList(props: EntryListProps) {
 	const { data, onScrollToBottom } = props
-	const expandedRef = useRef<boolean[]>([])
+	// const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
+	const [expanded, setExpanded] = useState(Array(data.length ?? 0).fill(false))
 
 	const virtualizer = useWindowVirtualizer({
 		count: data.length,
 		estimateSize: () => 100,
 		overscan: 3,
 		gap: 16,
-		scrollMargin: listRef.current?.offsetTop ?? 0
+		scrollMargin: 0
 	})
 
-	useEffect(() => {
-		expandedRef.current = Array(data.length ?? 0).fill(false)
-	}, [data])
+	// useEffect(() => {
+	// 	expandedRef.current = Array(data.length ?? 0).fill(false)
+	// }, [data])
 
 	const virtualItems = virtualizer.getVirtualItems()
 	const y = (virtualItems[0]?.start ?? 0) - virtualizer.options.scrollMargin
@@ -181,13 +184,17 @@ function WindowVirtualizedList(props: EntryListProps) {
 							ref={virtualizer.measureElement}
 						>
 							<EntryListItem
-								expanded={expandedRef.current[it.index]}
+								expand={expanded[it.index]}
 								showButtons={props.showButtons}
 								data={data!.at(it.index)!}
 								onEdit={props.onEditItem}
-								onExpand={(value) => {
-									expandedRef.current[it.index] = value
-								}}
+								onExpand={(value) =>
+									setExpanded((cur) => {
+										const newExpanded = [...cur]
+										newExpanded[it.index] = value
+										return newExpanded
+									})
+								}
 							/>
 						</div>
 					))}
@@ -209,8 +216,6 @@ export default function EntryList({
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
 	if (props.data.length < 1) {
-		const dataCopy = [...props.data]
-
 		return (
 			<div className="px-0 py-12 grid gap-2 items-center justify-center">
 				<p className="text-center">No entry data available for this period.</p>
@@ -243,7 +248,13 @@ export default function EntryList({
 	}
 
 	const Component = Components[virtualizerType]
-	return <Component showButtons={showButtons} {...props} />
+	return (
+		<Component
+			key={props.data.toString()}
+			showButtons={showButtons}
+			{...props}
+		/>
+	)
 }
 
 EntryList.VirtualizerType = EntryListVirtualizerType

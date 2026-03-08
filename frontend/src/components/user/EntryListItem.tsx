@@ -35,7 +35,7 @@ import { toast } from "sonner"
 
 interface EntryListItemProps {
 	data: Entry
-	expanded?: boolean
+	expand?: boolean
 	showButtons?: boolean
 	onEdit?: (data: Entry) => void
 	onExpand?: (value: boolean) => void
@@ -65,7 +65,7 @@ export default function EntryListItem({
 	showButtons = true,
 	...props
 }: EntryListItemProps) {
-	const [isItemOpen, setIsItemOpen] = useState(props.expanded ?? false)
+	const [internalOpen, setInternalOpen] = useState(false)
 
 	const queryClient = useQueryClient()
 
@@ -81,10 +81,11 @@ export default function EntryListItem({
 	})
 
 	const formatAmount = useAmountFormatter()
+	const isItemExpanded = props.expand ?? internalOpen
 
 	return (
 		<Card
-			data-open={isItemOpen}
+			data-open={isItemExpanded}
 			data-is-positive={props.data.is_positive}
 			className="data-[open='true']:max-h-none 
                     data-[open='false']:max-h-[100px] overflow-hidden group"
@@ -94,10 +95,9 @@ export default function EntryListItem({
 					type="button"
 					className="h-full w-full p-4 text-left focus:outline-hidden"
 					onClick={() => {
-						setIsItemOpen((c) => {
-							props.onExpand?.(!c)
-							return !c
-						})
+						const curOpen = props.expand ?? internalOpen
+						setInternalOpen(!curOpen)
+						props.onExpand?.(!curOpen)
 					}}
 				>
 					<div className="flex justify-between items-center w-inherit">
@@ -120,7 +120,7 @@ export default function EntryListItem({
 									</p>
 								</div>
 							)}
-							{isItemOpen ? (
+							{internalOpen ? (
 								<ChevronUpIcon width={25} height={25} />
 							) : (
 								<ChevronDownIcon width={25} height={25} />
@@ -183,7 +183,7 @@ export default function EntryListItem({
 											setOpen(false)
 										})
 									}}
-									onFocus={() => setIsItemOpen(true)}
+									onFocus={() => setInternalOpen(true)}
 									variant="default"
 								>
 									Edit
@@ -196,7 +196,7 @@ export default function EntryListItem({
 									<Button
 										className="min-w-24"
 										type="button"
-										onFocus={() => setIsItemOpen(true)}
+										onFocus={() => setInternalOpen(true)}
 										variant="destructive"
 									>
 										Delete
