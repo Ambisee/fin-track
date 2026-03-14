@@ -1,5 +1,6 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
 import { Category, Entry, Ledger } from "@/types/supabase"
+import { PostgrestError } from "@supabase/supabase-js"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
@@ -51,13 +52,16 @@ function useSettingsQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("settings")
 				.select(`*, ledger (*, currency (currency_name))`)
 				.eq("user_id", user.id)
 				.limit(1)
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		},
@@ -81,13 +85,17 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("statistic")
 				.select("*")
 				.eq("ledger", ledger!)
 				.eq("created_by", user.id)
 				.lte("period", end.toDateString())
 				.gte("period", start.toDateString())
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data ?? []
 		},
@@ -112,7 +120,7 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("entry")
 				.select(`*`)
 				.eq("created_by", user.id)
@@ -122,7 +130,10 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 				.order("date", { ascending: false })
 				.order("category", { ascending: false })
 				.order("id", { ascending: true })
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data ?? []
 		},
@@ -137,10 +148,11 @@ function useCurrenciesQuery() {
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => {
-			const { data } = await sbBrowser
-				.from("currency")
-				.select("*")
-				.throwOnError()
+			const { data, error } = await sbBrowser.from("currency").select("*")
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 			return data ?? []
 		},
 		staleTime: QUERY_STALE_TIME,
@@ -160,12 +172,15 @@ function useCategoriesQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("category")
 				.select("*")
 				.eq("created_by", user.id)
 				.order("name")
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data ?? []
 		},
@@ -187,12 +202,15 @@ function useLedgersQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("ledger")
 				.select("*, currency (currency_name), entry(count)")
 				.eq("created_by", user.id)
 				.order("name")
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data ?? []
 		},
@@ -218,13 +236,16 @@ function useMonthGroupQuery(ledger_id?: number) {
 				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("month_groups")
 				.select("*")
 				.eq("created_by", user.id)
 				.eq("ledger_id", ledger_id)
 				.order("year, month", { ascending: true })
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data ?? []
 		},
@@ -272,11 +293,11 @@ function useInsertEntryMutation() {
 
 			const isPositive = entry.type === "Income"
 			let note: string | null = entry.note
-			if (note === "") {
+			if (note.length === 0) {
 				note = null
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("entry")
 				.insert({
 					date: DateHelper.toDatabaseString(entry.date),
@@ -289,7 +310,10 @@ function useInsertEntryMutation() {
 				})
 				.select()
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -306,14 +330,17 @@ function useDeleteEntryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("entry")
 				.delete()
 				.eq("created_by", user.id)
 				.eq("id", id)
 				.select("*")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -326,7 +353,7 @@ function useUpdateEntryMutation() {
 			const isPositive = entry.type === "Income"
 
 			let note: string | null = entry.note
-			if (note === "") {
+			if (note.length === 0) {
 				note = null
 			}
 
@@ -343,7 +370,10 @@ function useUpdateEntryMutation() {
 				.eq("id", entry.id)
 				.select()
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -363,7 +393,11 @@ function useInsertLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			if (ledger.name.length === 0) {
+				throw Error(QueryHelper.MESSAGE_EMPTY_LEDGER_NAME)
+			}
+
+			const { data, error } = await sbBrowser
 				.from("ledger")
 				.insert({
 					created_by: user.id,
@@ -372,7 +406,10 @@ function useInsertLedgerMutation() {
 				})
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -392,14 +429,21 @@ function useUpdateLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			if (ledger.name.length === 0) {
+				throw Error(QueryHelper.MESSAGE_EMPTY_LEDGER_NAME)
+			}
+
+			const { data, error } = await sbBrowser
 				.from("ledger")
 				.update({ name: ledger.name, currency_id: ledger.currency_id })
 				.eq("id", ledger.id)
 				.eq("created_by", ledger.created_by)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -421,13 +465,16 @@ function useDeleteLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_REQUIRE_AT_LEAST_ONE_LEDGER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("ledger")
 				.delete()
 				.eq("id", ledger.id)
 				.select("*, currency (currency_name), entry(count)")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -445,13 +492,16 @@ function useSwitchLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("settings")
 				.update({ current_ledger: ledger.id })
 				.eq("user_id", user.id)
 				.select("*, ledger (name)")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -469,7 +519,11 @@ function useInsertCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			if (category.name.length === 0) {
+				throw Error(QueryHelper.MESSAGE_EMPTY_CATEGORY_NAME)
+			}
+
+			const { data, error } = await sbBrowser
 				.from("category")
 				.insert({
 					created_by: user.id,
@@ -477,7 +531,10 @@ function useInsertCategoryMutation() {
 				})
 				.select("*")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -495,7 +552,11 @@ function useUpdateCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			if (category.name.length === 0) {
+				throw Error(QueryHelper.MESSAGE_EMPTY_CATEGORY_NAME)
+			}
+
+			const { data, error } = await sbBrowser
 				.from("category")
 				.update({
 					name: category.name
@@ -504,7 +565,10 @@ function useUpdateCategoryMutation() {
 				.eq("created_by", user.id)
 				.select("*")
 				.single()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -522,13 +586,16 @@ function useDeleteCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data } = await sbBrowser
+			const { data, error } = await sbBrowser
 				.from("category")
 				.delete()
 				.eq("created_by", category.created_by)
 				.eq("name", category.name)
 				.select()
-				.throwOnError()
+
+			if (error !== null) {
+				throw new PostgrestError(error)
+			}
 
 			return data
 		}
@@ -578,7 +645,7 @@ function useSetElementWindowHeight() {
 	const elementRef = useRef<HTMLDivElement>(null!)
 
 	useEffect(() => {
-		const resizeObserver = new ResizeObserver((entries) => {
+		const resizeObserver = new ResizeObserver(() => {
 			if (elementRef.current === undefined || elementRef.current === null) {
 				return
 			}
