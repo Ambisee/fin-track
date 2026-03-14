@@ -29,7 +29,7 @@ export default function RootLayout({
 					>
 						<main className="min-h-screen">
 							{children}
-							<Toaster />
+							<Toaster className="pointer-events-auto" />
 						</main>
 					</ThemeProvider>
 					<ReactQueryDevtools initialIsOpen={false} />

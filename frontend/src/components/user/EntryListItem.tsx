@@ -164,6 +164,7 @@ export default function EntryListItem({
 												data.date === oldData?.date
 
 											if (!oldDataExists || similarLedgerAndDate) {
+												setData(data)
 												return
 											}
 

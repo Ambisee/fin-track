@@ -36,13 +36,7 @@ function LayoutEntryDialogContent() {
 	const data = useGlobalStore((state) => state.data)
 	const onSubmitSuccess = useGlobalStore((state) => state.onSubmitSuccess)
 
-	return (
-		<EntryForm
-			key={JSON.stringify(data)}
-			data={data}
-			onSubmitSuccess={onSubmitSuccess}
-		/>
-	)
+	return <EntryForm data={data} onSubmitSuccess={onSubmitSuccess} />
 }
 
 function LayoutLedgerEditorDialog() {
