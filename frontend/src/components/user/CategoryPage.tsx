@@ -1,4 +1,13 @@
+import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
 import { Category } from "@/types/supabase"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { ChevronLeft, X } from "lucide-react"
+import { useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from "../ui/button"
 import {
 	DialogClose,
 	DialogDescription,
@@ -6,17 +15,8 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "../ui/dialog"
-import { ChevronLeft, X } from "lucide-react"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { Button } from "../ui/button"
+import { Field, FieldGroup, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
-import { useState } from "react"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
-import { ReloadIcon } from "@radix-ui/react-icons"
 
 export type CategoryFormData = Pick<Category, "name"> & {
 	oldName: string
@@ -43,7 +43,7 @@ export default function CategoryPage(props: CategoryPageProps) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: ""
+			name: props.data?.name ?? ""
 		}
 	})
 
@@ -120,9 +120,6 @@ export default function CategoryPage(props: CategoryPageProps) {
 										/>
 									) : (
 										<InputSkeleton />
-									)}
-									{form.formState.errors.name && (
-										<FieldError errors={[form.formState.errors.name]} />
 									)}
 								</Field>
 							)}

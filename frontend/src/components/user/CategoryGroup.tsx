@@ -1,13 +1,4 @@
-import { useState } from "react"
-import CategoriesListPage, {
-	CategoriesListPageProps
-} from "./CategoriesListPage"
-import CategoryPage, {
-	CategoryFormData,
-	CategoryPageProps
-} from "./CategoryPage"
-import LedgersListPage from "./LedgersListPage"
-import { Category } from "@/types/supabase"
+import { CATEGORIES_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
 import {
 	useCategoriesQuery,
 	useDeleteCategoryMutation,
@@ -15,25 +6,32 @@ import {
 	useUpdateCategoryMutation,
 	useUserQuery
 } from "@/lib/hooks"
-import { toast } from "sonner"
+import { Category } from "@/types/supabase"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
-import { CATEGORIES_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
+import { useState } from "react"
+import { toast } from "sonner"
+import CategoriesListPage, {
+	CategoriesListPageProps
+} from "./CategoriesListPage"
+import CategoryPage, {
+	CategoryFormData,
+	CategoryPageProps
+} from "./CategoryPage"
 
-interface CategoryGroupProps
-	extends Omit<
-		CategoriesListPageProps & CategoryPageProps,
-		| "data"
-		| "isEditMode"
-		| "isInitialized"
-		| "isLoading"
-		| "categoriesList"
-		| "currentCategory"
-		| "onAddButton"
-		| "onCreate"
-		| "onDelete"
-		| "onUpdate"
-		| "onSelect"
-	> {
+interface CategoryGroupProps extends Omit<
+	CategoriesListPageProps & CategoryPageProps,
+	| "data"
+	| "isEditMode"
+	| "isInitialized"
+	| "isLoading"
+	| "categoriesList"
+	| "currentCategory"
+	| "onAddButton"
+	| "onCreate"
+	| "onDelete"
+	| "onUpdate"
+	| "onSelect"
+> {
 	onCreate?: (category: Category) => void
 	onSelect?: (category: Category, isEditing: boolean) => void
 	onDelete?: (category: Category) => void
@@ -41,7 +39,6 @@ interface CategoryGroupProps
 }
 
 export default function CategoryGroup(props: CategoryGroupProps) {
-
 	const [curPage, setCurPage] = useState(0)
 	const [isEditMode, setIsEditMode] = useState(false || !!props.editModeOnly)
 	const [curCategory, setCurCategory] = useState<Category | undefined>(
@@ -97,14 +94,15 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 				name: category.name
 			})
 
-			toast.info("Category deleted", { duration: SHORT_TOAST_DURATION })
+			toast.info("Category updated", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({
 				queryKey: CATEGORIES_QKEY
 			})
 			props.onDelete?.({ created_by: userData.id, name: category.name })
 		} catch (e) {
-			toast.error(`Unable to update the category: ${category.name}`)
+			const errorData = e as Error
+			toast.error(errorData.message)
 		}
 	}
 
@@ -128,7 +126,8 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 			})
 			props.onDelete?.({ created_by: userData.id, name: category.name })
 		} catch (e) {
-			toast.error(`Unable to delete the category: ${category.name}`)
+			const errorData = e as Error
+			toast.error(errorData.message)
 		}
 	}
 
