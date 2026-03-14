@@ -14,8 +14,10 @@ import { Button } from "./button"
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 
-interface ComboBoxProps
-	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface ComboBoxProps extends Omit<
+	React.InputHTMLAttributes<HTMLInputElement>,
+	"onChange"
+> {
 	values: { value: string; label: string }[]
 	onChange: (e: string) => void
 	closeOnSelect?: boolean
@@ -48,6 +50,7 @@ export default function ComboBox(props: ComboBoxProps) {
 						<CommandGroup>
 							{props.values.map((val) => (
 								<CommandItem
+									className="hover:not-disabled:cursor-pointer"
 									value={val.value}
 									key={val.value}
 									onSelect={(e) => {

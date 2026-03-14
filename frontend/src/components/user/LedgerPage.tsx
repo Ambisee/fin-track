@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input"
 import {
 	Field,
 	FieldDescription,
-	FieldError,
 	FieldGroup,
 	FieldLabel
 } from "@/components/ui/field"
@@ -22,7 +21,7 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 export type LedgerFormData = Pick<Ledger, "id" | "currency_id" | "name">
@@ -157,42 +156,53 @@ export default function LedgerPage(props: LedgerPageProps) {
 					}}
 				>
 					<FieldGroup>
-						<Field>
-							<FieldLabel>Ledger Name</FieldLabel>
-							{(props.isInitialized ?? false) ? (
-								<Input
-									placeholder="Enter a new ledger name"
-									disabled={isFormLoading}
-									{...form.register("name")}
-								/>
-							) : (
-								<InputSkeleton />
+						<Controller
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<Field>
+									<FieldLabel>Ledger Name</FieldLabel>
+									{(props.isInitialized ?? false) ? (
+										<Input
+											placeholder="Enter a new ledger name"
+											disabled={isFormLoading}
+											{...field}
+										/>
+									) : (
+										<InputSkeleton />
+									)}
+									<FieldDescription>
+										Please note that no two ledgers can share the same name.
+									</FieldDescription>
+								</Field>
 							)}
-							<FieldDescription>
-								Please note that no two ledgers can share the same name.
-							</FieldDescription>
-						</Field>
-						<Field>
-							<FieldLabel className="text-sm">Currency</FieldLabel>
-							{(props.isInitialized ?? true) ? (
-								<ComboBox
-									closeOnSelect
-									disabled={isFormLoading}
-									value={form.getValues("currency").currency_name}
-									onChange={(e) => {
-										form.setValue("currency", JSON.parse(e))
-									}}
-									values={
-										props.currencyList.map((val) => ({
-											label: val.currency_name,
-											value: JSON.stringify(val)
-										})) ?? []
-									}
-								/>
-							) : (
-								<InputSkeleton />
+						/>
+						<Controller
+							control={form.control}
+							name="currency"
+							render={({ field: { value, onChange, ...restFields } }) => (
+								<Field>
+									<FieldLabel className="text-sm">Currency</FieldLabel>
+									{(props.isInitialized ?? true) ? (
+										<ComboBox
+											closeOnSelect
+											disabled={isFormLoading}
+											value={value.currency_name}
+											onChange={(e) => onChange(JSON.parse(e))}
+											values={
+												props.currencyList.map((val) => ({
+													label: val.currency_name,
+													value: JSON.stringify(val)
+												})) ?? []
+											}
+											{...restFields}
+										/>
+									) : (
+										<InputSkeleton />
+									)}
+								</Field>
 							)}
-						</Field>
+						/>
 					</FieldGroup>
 					<DialogFooter>
 						<Button disabled={!(props.isInitialized ?? true) || isFormLoading}>

@@ -22,19 +22,18 @@ import LedgerPage, { LedgerFormData, LedgerPageProps } from "./LedgerPage"
 import LedgersListPage, { LedgersListPageProps } from "./LedgersListPage"
 import { isNonNullable } from "@/lib/utils"
 
-interface LedgerGroupProps
-	extends Omit<
-		LedgersListPageProps & LedgerPageProps,
-		| "onCreate"
-		| "onUpdate"
-		| "onDelete"
-		| "onSelect"
-		| "onAddButton"
-		| "currencyList"
-		| "ledgersList"
-		| "isLoading"
-		| "data"
-	> {
+interface LedgerGroupProps extends Omit<
+	LedgersListPageProps & LedgerPageProps,
+	| "onCreate"
+	| "onUpdate"
+	| "onDelete"
+	| "onSelect"
+	| "onAddButton"
+	| "currencyList"
+	| "ledgersList"
+	| "isLoading"
+	| "data"
+> {
 	/**
 	 * Set this flag to `false` to directly call the `props.onSelect`
 	 * callback, skipping the HTTP request to switch the current ledger.
@@ -90,15 +89,25 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			const errorData = e as Error
 
 			// Hard-coded error handler for duplicate ledger name
-			if (errorData.cause == undefined) {
-				toast.error(errorData.message)
+			if (errorData instanceof PostgrestError) {
+				let message: string = `Unknown error: ${errorData.message}`
+				switch (errorData.code) {
+					case "23505":
+						message = "The ledger name has been used. Please enter another one"
+						break
+					case "23514":
+						message =
+							"The ledger name must not be empty. Please enter a valid name"
+						break
+					default:
+						break
+				}
+
+				toast.error(message)
+				return
 			}
 
-			if ((errorData.cause as PostgrestError).code === "23505") {
-				toast.error(
-					"The ledger name has been used. Please enter another one"
-				)
-			}
+			toast.error(errorData.message)
 		}
 
 		return
@@ -132,15 +141,26 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			const errorData = e as Error
 
 			// Hard-coded error handler for duplicate ledger name
-			if (errorData.cause == undefined) {
-				toast.error(errorData.message)
+			if (errorData instanceof PostgrestError) {
+				let message: string = `Unknown error: ${errorData.message}`
+				switch (errorData.code) {
+					case "23505":
+						message =
+							"The ledger name has been used. Please enter a different name"
+						break
+					case "23514":
+						message =
+							"The ledger name must not be empty. Please enter a valid name"
+						break
+					default:
+						break
+				}
+
+				toast.error(message)
+				return
 			}
 
-			if ((errorData.cause as PostgrestError).code === "23505") {
-				toast.error(
-					"The ledger name has been used. Please enter another one"
-				)
-			}
+			toast.error(errorData.message)
 		}
 
 		return
