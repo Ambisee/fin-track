@@ -1,6 +1,6 @@
 "use client"
 
-import { LEDGER_QKEY, USER_SETTINGS_QKEY } from "@/lib/constants"
+import { LEDGER_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import { EntryFormState } from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -129,11 +129,7 @@ export default function EntryForm(props: EntryFormProps) {
 				form.setValue("ledger", ledger.id)
 				setCurPage(0)
 			}}
-			onUpdate={(ledger) => {
-				if (ledger.id === currentLedger) {
-					queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
-				}
-
+			onUpdate={() => {
 				queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 			}}
 			onCreate={() => {

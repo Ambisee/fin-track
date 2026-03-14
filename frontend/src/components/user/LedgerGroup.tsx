@@ -135,6 +135,10 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			toast.info("Ledger updated", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			if (ledger.id === settingsQuery.data?.current_ledger) {
+				await queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
+			}
+
 			props.onUpdate?.(successData)
 			setCurrentPage(0)
 		} catch (e) {
@@ -212,9 +216,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 				return
 			}
 
-			queryClient.invalidateQueries({
-				queryKey: USER_SETTINGS_QKEY
-			})
+			queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
 
 			toast.info(
 				<>
