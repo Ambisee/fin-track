@@ -11,19 +11,12 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
-import {
-	CURRENCIES_QKEY,
-	ENTRY_QKEY,
-	SHORT_TOAST_DURATION,
-	STATISTICS_QKEY,
-	USER_QKEY,
-	USER_SETTINGS_QKEY
-} from "@/lib/constants"
+import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { sbBrowser } from "@/lib/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import SettingsSection from "../SettingsSection"
 
 export default function MiscellaneousSection() {
@@ -119,11 +112,7 @@ export default function MiscellaneousSection() {
 									toast.error(error.message)
 								}
 
-								queryClient.removeQueries({ queryKey: CURRENCIES_QKEY })
-								queryClient.removeQueries({ queryKey: ENTRY_QKEY })
-								queryClient.removeQueries({ queryKey: STATISTICS_QKEY })
-								queryClient.removeQueries({ queryKey: USER_SETTINGS_QKEY })
-								queryClient.removeQueries({ queryKey: USER_QKEY })
+								queryClient.removeQueries()
 
 								router.push("/")
 								toast.dismiss()
