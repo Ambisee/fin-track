@@ -40,10 +40,14 @@ interface LedgerGroupProps extends Omit<
 	 */
 	shouldUseSelectRequest?: boolean
 
-	onDelete?: (ledger: Ledger) => void
+	/**
+	 * By default, this function updates the user's current ledger.
+	 */
 	onSelect?: (ledger: Ledger, isEditing: boolean) => void
+
 	onCreate?: (ledger: LedgerFormData) => void
 	onUpdate?: (ledger: LedgerFormData) => void
+	onDelete?: (ledger: Ledger) => void
 }
 
 export default function LedgerGroup(props: LedgerGroupProps) {

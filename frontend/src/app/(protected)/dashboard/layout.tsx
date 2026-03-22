@@ -5,16 +5,11 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import EntryForm from "@/components/user/EntryForm/EntryForm"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import ProtectedNavbar from "@/components/user/ProtectedNavbar"
-import {
-	LEDGER_QKEY,
-	SHORT_TOAST_DURATION,
-	USER_SETTINGS_QKEY
-} from "@/lib/constants"
+import { LEDGER_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
 import { useQueryClient } from "@tanstack/react-query"
 import { ReactNode, Suspense, useState } from "react"
-import { toast } from "sonner"
 import Loading from "./loading"
 
 interface DashboardLayoutProps {
@@ -62,19 +57,7 @@ function LayoutLedgerEditorDialog() {
 					onDelete={() => {
 						queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
 					}}
-					onSelect={async (data) => {
-						setOpen(false)
-						await queryClient.invalidateQueries({
-							queryKey: USER_SETTINGS_QKEY
-						})
-
-						toast.info(
-							<>
-								Switched to the ledger: <b>{data.name}</b>
-							</>,
-							{ duration: SHORT_TOAST_DURATION }
-						)
-					}}
+					onSelect={async () => setOpen(false)}
 				/>
 			</DialogContent>
 		</Dialog>

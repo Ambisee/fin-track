@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
 import LedgerGroup from "@/components/user/LedgerGroup"
-import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { useState } from "react"
 
@@ -48,17 +46,7 @@ export default function LedgersEditor() {
 					onSubmit={(e) => e.stopPropagation()}
 					className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
 				>
-					<LedgerGroup
-						onSelect={(ledger) => {
-							setOpen(false)
-							toast.info(
-								<>
-									Switched to the ledger: <b>{ledger.name}</b>
-								</>,
-								{ duration: SHORT_TOAST_DURATION }
-							)
-						}}
-					/>
+					<LedgerGroup onSelect={() => setOpen(false)} />
 				</DialogContent>
 			</div>
 		</Dialog>
