@@ -33,9 +33,9 @@ export default function DashboardHome() {
 			return (
 				<div className="mb-8">
 					<div className="w-full mb-4 flex justify-between items-center">
-						<h1 className="text-3xl">Home</h1>
+						<h1>Home</h1>
 					</div>
-					<h2 className="text-2xl mt-4">
+					<h2 className="mt-4">
 						Welcome back, {userQuery.data.user_metadata.username}
 					</h2>
 				</div>
@@ -44,7 +44,7 @@ export default function DashboardHome() {
 			return (
 				<div className="mb-8">
 					<div className="w-full mb-4 flex justify-between items-center">
-						<h1 className="text-3xl">Home</h1>
+						<h1>Home</h1>
 					</div>
 					<Alert variant="destructive">
 						<AlertTitle>User data not found</AlertTitle>
@@ -84,7 +84,7 @@ export default function DashboardHome() {
 
 		return (
 			<div>
-				<h2 className="text-xl mb-4">
+				<h2 className="mb-4">
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
 				</h2>
 				<EntryList
