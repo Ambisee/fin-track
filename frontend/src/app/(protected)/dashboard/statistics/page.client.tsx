@@ -86,7 +86,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	if (props.data.length < 1) {
 		return (
 			<div className="h-[250px] flex items-center justify-center flex-col gap-2">
-				<h2>No {props.dataKey} data entered for this period.</h2>
+				<h4>No {props.dataKey} data entered for this period.</h4>
 				<DialogTrigger
 					asChild
 					onClick={() => {

@@ -1,4 +1,4 @@
-import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 import { Category } from "@/types/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"

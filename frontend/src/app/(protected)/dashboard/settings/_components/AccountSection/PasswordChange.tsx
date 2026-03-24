@@ -16,7 +16,7 @@ import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-import InputSkeleton from "../InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 
 const passwordChangeFormSchema = z
 	.object({

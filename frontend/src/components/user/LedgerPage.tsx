@@ -1,4 +1,4 @@
-import InputSkeleton from "@/app/(protected)/dashboard/settings/components/InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 import { Button } from "@/components/ui/button"
 import ComboBox from "@/components/ui/combobox"
 import {

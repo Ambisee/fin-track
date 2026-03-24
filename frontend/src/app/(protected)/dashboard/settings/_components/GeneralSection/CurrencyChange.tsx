@@ -6,7 +6,7 @@ import {
 	FieldGroup,
 	FieldLabel
 } from "@/components/ui/field"
-import InputSkeleton from "../InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"

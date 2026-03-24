@@ -23,7 +23,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
-import InputSkeleton from "../InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 
 const formSchema = z.object({
 	username: z

@@ -1,9 +1,9 @@
 "use client"
 
-import AccountSection from "./components/AccountSection/AccountSection"
-import GeneralSection from "./components/GeneralSection/GeneralSection"
-import MailingSection from "./components/MailingSection/MailingSection"
-import MiscellaneousSection from "./components/MiscellaneousSection/MiscellaneousSection"
+import AccountSection from "./_components/AccountSection/AccountSection"
+import GeneralSection from "./_components/GeneralSection/GeneralSection"
+import MailingSection from "./_components/MailingSection/MailingSection"
+import MiscellaneousSection from "./_components/MiscellaneousSection/MiscellaneousSection"
 
 export default function DashboardSettings() {
 	return (

@@ -9,7 +9,7 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
-import InputSkeleton from "../InputSkeleton"
+import InputSkeleton from "@/components/user/InputSkeleton"
 import {
 	Field,
 	FieldError,
