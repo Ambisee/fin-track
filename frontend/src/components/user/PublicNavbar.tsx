@@ -10,7 +10,7 @@ import {
 	NavigationMenuItem,
 	NavigationMenuList
 } from "@/components/ui/navigation-menu"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 
 interface PublicNavbarProps {
@@ -19,10 +19,11 @@ interface PublicNavbarProps {
 
 export default function PublicNavbar(props: PublicNavbarProps) {
 	const [isSignedIn, setIsSignedIn] = useState(props.user !== null)
+	const [supabase] = useState(supabaseClient())
 
 	useEffect(() => {
 		const isUserSignedIn = async () => {
-			const { data } = await sbBrowser.auth.getUser()
+			const { data } = await supabase.auth.getUser()
 			setIsSignedIn(data.user !== null)
 		}
 

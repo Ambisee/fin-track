@@ -7,9 +7,13 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL! ?? ""
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY! ?? ""
 const supabaseServerKey = process.env.NEXT_SUPABASE_SERVER_KEY! ?? ""
 
-const sbBrowser = createBrowserClient<Database>(supabaseUrl, supabaseKey)
+const supabaseClient = () =>
+	createBrowserClient<Database>(supabaseUrl, supabaseKey)
 
-const sbMiddleware = (request: NextRequest, response: NextResponse) => {
+const supabaseMiddlewareClient = (
+	request: NextRequest,
+	response: NextResponse
+) => {
 	return createServerClient(supabaseUrl, supabaseKey, {
 		cookies: {
 			getAll() {
@@ -48,4 +52,10 @@ const sbServer = (cookieStore: ReadonlyRequestCookies) => {
 	})
 }
 
-export { sbBrowser, sbMiddleware, sbServer, supabaseKey, supabaseUrl }
+export {
+	supabaseClient,
+	supabaseMiddlewareClient,
+	sbServer,
+	supabaseKey,
+	supabaseUrl
+}

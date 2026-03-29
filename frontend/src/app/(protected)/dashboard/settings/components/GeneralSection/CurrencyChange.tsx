@@ -12,7 +12,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useCurrenciesQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { toast } from "sonner"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { useCallback, useEffect, useState } from "react"
 import {
 	SHORT_TOAST_DURATION,
@@ -32,6 +32,7 @@ const formSchema = z.object({
 
 export default function CurrencyChange() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const [supabase] = useState(supabaseClient())
 
 	const queryClient = useQueryClient()
 	const userQuery = useUserQuery()
@@ -65,7 +66,7 @@ export default function CurrencyChange() {
 			return
 		}
 
-		const { data: result, error } = await sbBrowser
+		const { data: result, error } = await supabase
 			.from("ledger")
 			.update({ currency_id: data.currency.id })
 			.eq("id", userSettings.current_ledger)

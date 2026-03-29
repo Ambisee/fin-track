@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/field"
 import PasswordField from "@/components/user/PasswordField"
 import { MAX_USERNAME_LENGTH, SHORT_TOAST_DURATION } from "@/lib/constants"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
@@ -43,6 +43,7 @@ const formSchema = z
 
 export default function SignUpPassword() {
 	const router = useRouter()
+	const [supabase] = useState(supabaseClient())
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const { navigateTo } = useSignupTransition()
@@ -73,7 +74,7 @@ export default function SignUpPassword() {
 				}
 
 				const recipient = email.substring(0, email.search("@"))
-				const { error } = await sbBrowser.auth.signUp({
+				const { error } = await supabase.auth.signUp({
 					email: email,
 					password: formData.password,
 					options: {

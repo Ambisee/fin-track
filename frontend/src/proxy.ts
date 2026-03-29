@@ -1,15 +1,14 @@
-import { NextURL } from "next/dist/server/web/next-url";
-import { NextRequest, NextResponse } from "next/server";
-import { sbMiddleware } from "./lib/supabase";
-
+import { NextURL } from "next/dist/server/web/next-url"
+import { NextRequest, NextResponse } from "next/server"
+import { supabaseMiddlewareClient } from "./lib/supabase"
 
 function isProtectedUrl(url: NextURL) {
     return url.pathname.startsWith("/dashboard")
 }
 
 export async function proxy(request: NextRequest) {
-    const response = NextResponse.next({ request })
-    const supabase = sbMiddleware(request, response)
+	const response = NextResponse.next({ request })
+	const supabase = supabaseMiddlewareClient(request, response)
 
     /**
      * Redirect unauthorized user to the signin page when accessing the password recovery page

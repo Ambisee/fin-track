@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSetElementWindowHeight } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -28,6 +28,7 @@ const formSchema = z.object({
 
 export default function ForgotPassword() {
 	const rootRef = useSetElementWindowHeight()
+	const [supabase] = useState(supabaseClient())
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -54,13 +55,12 @@ export default function ForgotPassword() {
 								form.handleSubmit(
 									async (formData) => {
 										setIsPendingSubmit(true)
-										const { error } =
-											await sbBrowser.auth.resetPasswordForEmail(
-												formData.email,
-												{
-													redirectTo: `${window.location.origin}/recovery`
-												}
-											)
+										const { error } = await supabase.auth.resetPasswordForEmail(
+											formData.email,
+											{
+												redirectTo: `${window.location.origin}/recovery`
+											}
+										)
 										if (error !== null) {
 											setIsPendingSubmit(false)
 											toast.error(error?.message, {

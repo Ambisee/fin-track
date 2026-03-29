@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import PasswordField from "@/components/user/PasswordField"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
@@ -39,6 +39,7 @@ const passwordChangeFormSchema = z
 	})
 
 export default function PasswordChange() {
+	const [supabase] = useState(supabaseClient())
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const userQuery = useUserQuery()
@@ -92,7 +93,7 @@ export default function PasswordChange() {
 						type="button"
 						onClick={async (e) => {
 							e.preventDefault()
-							const { error } = await sbBrowser.auth.resetPasswordForEmail(
+							const { error } = await supabase.auth.resetPasswordForEmail(
 								userQuery.data?.email as string,
 								{
 									redirectTo: `${window.location.origin}/recovery`
@@ -176,7 +177,7 @@ export default function PasswordChange() {
 								return
 							}
 
-							const { error } = await sbBrowser.auth.resetPasswordForEmail(
+							const { error } = await supabase.auth.resetPasswordForEmail(
 								userQuery.data.email
 							)
 
@@ -211,7 +212,7 @@ export default function PasswordChange() {
 					setIsPendingSubmit(true)
 
 					const { error: confirmUserError } =
-						await sbBrowser.auth.signInWithPassword({
+						await supabase.auth.signInWithPassword({
 							email: userQuery.data?.email ?? "",
 							password: formData.oldPassword
 						})
@@ -224,8 +225,11 @@ export default function PasswordChange() {
 						return
 					}
 
-					const { error: updatePasswordError } =
-						await sbBrowser.auth.updateUser({ password: formData.newPassword })
+					const { error: updatePasswordError } = await supabase.auth.updateUser(
+						{
+							password: formData.newPassword
+						}
+					)
 
 					setIsPendingSubmit(false)
 					if (confirmUserError !== null) {

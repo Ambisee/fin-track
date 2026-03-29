@@ -18,7 +18,7 @@ import {
 import { Controller } from "react-hook-form"
 import { ReloadIcon } from "@radix-ui/react-icons"
 
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import Link from "next/link"
 import { toast } from "sonner"
 import PasswordField from "./PasswordField"
@@ -29,6 +29,7 @@ const formSchema = z.object({
 })
 
 function UnverifiedMesssage(props: { formData: z.infer<typeof formSchema> }) {
+	const [supabase] = useState(supabaseClient())
 	return (
 		<>
 			<p>
@@ -42,7 +43,7 @@ function UnverifiedMesssage(props: { formData: z.infer<typeof formSchema> }) {
 					onClick={async () => {
 						const toastId = toast.loading("Loading...")
 
-						await sbBrowser.auth.resend({
+						await supabase.auth.resend({
 							type: "signup",
 							email: props.formData.email
 						})
@@ -77,6 +78,7 @@ const messageComponents = new Map([
 export default function EmailSignInForm() {
 	const router = useRouter()
 	const [isFormLoading, setIsFormLoading] = useState(false)
+	const [supabase] = useState(supabaseClient())
 	const form = useForm<z.infer<typeof formSchema>>({
 		mode: "onSubmit",
 		resolver: zodResolver(formSchema),
@@ -115,7 +117,7 @@ export default function EmailSignInForm() {
 				form.handleSubmit(
 					async (formData) => {
 						setIsFormLoading(true)
-						const { data, error } = await sbBrowser.auth.signInWithPassword({
+						const { data, error } = await supabase.auth.signInWithPassword({
 							email: formData.email,
 							password: formData.password
 						})

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
@@ -24,6 +24,7 @@ const emailChangeFormSchema = z.object({
 export default function EmailChange() {
 	const userQuery = useUserQuery()
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const [supabase] = useState(supabaseClient())
 	const form = useForm<z.infer<typeof emailChangeFormSchema>>({
 		resolver: zodResolver(emailChangeFormSchema),
 		defaultValues: {
@@ -39,7 +40,7 @@ export default function EmailChange() {
 				setIsPendingSubmit(true)
 				form.handleSubmit(
 					async (d) => {
-						const { error } = await sbBrowser.auth.updateUser(
+						const { error } = await supabase.auth.updateUser(
 							{ email: d.email },
 							{ emailRedirectTo: window.location.origin }
 						)
