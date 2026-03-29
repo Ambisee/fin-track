@@ -37,7 +37,8 @@ function useUserQuery() {
 			return user
 		},
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !isNonNullable(query.state.data)
+		refetchOnMount: (query) =>
+			!isNonNullable(query.state.data) || query.state.isInvalidated
 	})
 }
 
@@ -67,7 +68,8 @@ function useSettingsQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !isNonNullable(query.state.data),
+		refetchOnMount: (query) =>
+			!isNonNullable(query.state.data) || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
@@ -101,7 +103,8 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!ledger && !!userQuery.data && !userQuery.isRefetching
 	})
 }
@@ -139,7 +142,8 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!userQuery.data && !!ledger && !userQuery.isRefetching
 	})
 }
@@ -157,7 +161,8 @@ function useCurrenciesQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated
 	})
 }
 
@@ -186,7 +191,7 @@ function useCategoriesQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !!query.state.data,
+		refetchOnMount: (query) => !!query.state.data || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
@@ -216,7 +221,7 @@ function useLedgersQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !!query.state.data,
+		refetchOnMount: (query) => !!query.state.data || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
@@ -250,6 +255,7 @@ function useMonthGroupQuery(ledger_id?: number) {
 			return data ?? []
 		},
 		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching && !!ledger_id
 	})
 }
@@ -266,7 +272,8 @@ function useServerPingQuery() {
 			return SERVER_STATUS.ONLINE
 		},
 		retry: 3,
-		staleTime: PING_QUERY_STALE_TIME
+		staleTime: PING_QUERY_STALE_TIME,
+		refetchOnMount: (query) => query.state.isInvalidated
 	})
 
 	let data: number
