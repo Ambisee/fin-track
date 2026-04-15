@@ -16,7 +16,7 @@ import {
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
@@ -32,6 +32,7 @@ const formSchema = z.object({
 })
 
 export default function UsernameChange() {
+	const [supabase] = useState(supabaseClient())
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
 	const userQuery = useUserQuery()
@@ -62,7 +63,7 @@ export default function UsernameChange() {
 							return
 						}
 
-						const { error } = await sbBrowser.auth.updateUser({
+						const { error } = await supabase.auth.updateUser({
 							data: {
 								username: data.username
 							}

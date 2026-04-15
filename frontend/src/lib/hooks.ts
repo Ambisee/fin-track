@@ -18,17 +18,19 @@ import {
 import { DatabaseHelper } from "./helper/DatabaseHelper"
 import { DateHelper } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
-import { sbBrowser } from "./supabase"
+import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
 
 function useUserQuery() {
+	const [supabase] = useState(supabaseClient())
+
 	return useQuery({
 		queryKey: USER_QKEY,
 		queryFn: async () => {
 			const {
 				data: { user },
 				error
-			} = await sbBrowser.auth.getUser()
+			} = await supabase.auth.getUser()
 
 			if (isNonNullable(error)) {
 				throw error
@@ -37,11 +39,13 @@ function useUserQuery() {
 			return user
 		},
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !isNonNullable(query.state.data)
+		refetchOnMount: (query) =>
+			!isNonNullable(query.state.data) || query.state.isInvalidated
 	})
 }
 
 function useSettingsQuery() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useQuery({
@@ -52,7 +56,7 @@ function useSettingsQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("settings")
 				.select(`*, ledger (*, currency (currency_name))`)
 				.eq("user_id", user.id)
@@ -67,12 +71,14 @@ function useSettingsQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !isNonNullable(query.state.data),
+		refetchOnMount: (query) =>
+			!isNonNullable(query.state.data) || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
 function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 	const queryKey = QueryHelper.getStatisticQueryKey(ledger, period)
 	const { start, end } = DateHelper.getMonthStartEnd(period)
@@ -85,7 +91,7 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("statistic")
 				.select("*")
 				.eq("ledger", ledger!)
@@ -101,12 +107,14 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!ledger && !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
 function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
@@ -120,7 +128,7 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("entry")
 				.select(`*`)
 				.eq("created_by", user.id)
@@ -139,16 +147,18 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined,
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!userQuery.data && !!ledger && !userQuery.isRefetching
 	})
 }
 
 function useCurrenciesQuery() {
+	const [supabase] = useState(supabaseClient())
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => {
-			const { data, error } = await sbBrowser.from("currency").select("*")
+			const { data, error } = await supabase.from("currency").select("*")
 
 			if (error !== null) {
 				throw new PostgrestError(error)
@@ -157,11 +167,13 @@ function useCurrenciesQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => query.state.data === undefined
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated
 	})
 }
 
 function useCategoriesQuery() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useQuery({
@@ -172,7 +184,7 @@ function useCategoriesQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("category")
 				.select("*")
 				.eq("created_by", user.id)
@@ -186,12 +198,13 @@ function useCategoriesQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !!query.state.data,
+		refetchOnMount: (query) => !!query.state.data || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
 function useLedgersQuery() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useQuery({
@@ -202,7 +215,7 @@ function useLedgersQuery() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("ledger")
 				.select("*, currency (currency_name), entry(count)")
 				.eq("created_by", user.id)
@@ -216,12 +229,13 @@ function useLedgersQuery() {
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
-		refetchOnMount: (query) => !!query.state.data,
+		refetchOnMount: (query) => !!query.state.data || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
 function useMonthGroupQuery(ledger_id?: number) {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useQuery({
@@ -236,7 +250,7 @@ function useMonthGroupQuery(ledger_id?: number) {
 				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("month_groups")
 				.select("*")
 				.eq("created_by", user.id)
@@ -250,6 +264,7 @@ function useMonthGroupQuery(ledger_id?: number) {
 			return data ?? []
 		},
 		refetchOnWindowFocus: false,
+		refetchOnMount: (query) => query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching && !!ledger_id
 	})
 }
@@ -266,7 +281,8 @@ function useServerPingQuery() {
 			return SERVER_STATUS.ONLINE
 		},
 		retry: 3,
-		staleTime: PING_QUERY_STALE_TIME
+		staleTime: PING_QUERY_STALE_TIME,
+		refetchOnMount: (query) => query.state.isInvalidated
 	})
 
 	let data: number
@@ -282,6 +298,7 @@ function useServerPingQuery() {
 }
 
 function useInsertEntryMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -297,7 +314,7 @@ function useInsertEntryMutation() {
 				note = null
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("entry")
 				.insert({
 					date: DateHelper.toDatabaseString(entry.date),
@@ -321,6 +338,7 @@ function useInsertEntryMutation() {
 }
 
 function useDeleteEntryMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -330,7 +348,7 @@ function useDeleteEntryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("entry")
 				.delete()
 				.eq("created_by", user.id)
@@ -348,6 +366,7 @@ function useDeleteEntryMutation() {
 }
 
 function useUpdateEntryMutation() {
+	const [supabase] = useState(supabaseClient())
 	return useMutation({
 		mutationFn: async (entry: EntryFormData & { id: number }) => {
 			const isPositive = entry.type === "Income"
@@ -357,7 +376,7 @@ function useUpdateEntryMutation() {
 				note = null
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("entry")
 				.update({
 					date: DateHelper.toDatabaseString(entry.date),
@@ -381,6 +400,7 @@ function useUpdateEntryMutation() {
 }
 
 function useInsertLedgerMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -397,7 +417,7 @@ function useInsertLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_EMPTY_LEDGER_NAME)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("ledger")
 				.insert({
 					created_by: user.id,
@@ -417,6 +437,7 @@ function useInsertLedgerMutation() {
 }
 
 function useUpdateLedgerMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -433,7 +454,7 @@ function useUpdateLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_EMPTY_LEDGER_NAME)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("ledger")
 				.update({ name: ledger.name, currency_id: ledger.currency_id })
 				.eq("id", ledger.id)
@@ -451,6 +472,7 @@ function useUpdateLedgerMutation() {
 }
 
 function useDeleteLedgerMutation() {
+	const [supabase] = useState(supabaseClient())
 	const ledgersQuery = useLedgersQuery()
 
 	return useMutation({
@@ -465,7 +487,7 @@ function useDeleteLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_REQUIRE_AT_LEAST_ONE_LEDGER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("ledger")
 				.delete()
 				.eq("id", ledger.id)
@@ -482,6 +504,7 @@ function useDeleteLedgerMutation() {
 }
 
 function useSwitchLedgerMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -492,7 +515,7 @@ function useSwitchLedgerMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("settings")
 				.update({ current_ledger: ledger.id })
 				.eq("user_id", user.id)
@@ -509,6 +532,7 @@ function useSwitchLedgerMutation() {
 }
 
 function useInsertCategoryMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -523,7 +547,7 @@ function useInsertCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_EMPTY_CATEGORY_NAME)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("category")
 				.insert({
 					created_by: user.id,
@@ -542,6 +566,7 @@ function useInsertCategoryMutation() {
 }
 
 function useUpdateCategoryMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -556,7 +581,7 @@ function useUpdateCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_EMPTY_CATEGORY_NAME)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("category")
 				.update({
 					name: category.name
@@ -576,6 +601,7 @@ function useUpdateCategoryMutation() {
 }
 
 function useDeleteCategoryMutation() {
+	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	return useMutation({
@@ -586,7 +612,7 @@ function useDeleteCategoryMutation() {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await sbBrowser
+			const { data, error } = await supabase
 				.from("category")
 				.delete()
 				.eq("created_by", category.created_by)
@@ -608,6 +634,7 @@ function useSearchEntry() {
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
 	useEffect(() => {
+		const supabase = supabaseClient()
 		const timer = setTimeout(async () => {
 			if (searchQuery === "") {
 				setSearchResult(null)
@@ -615,7 +642,7 @@ function useSearchEntry() {
 			}
 
 			setIsSearching(true)
-			const { data, error } = await sbBrowser.rpc("search_entry", {
+			const { data, error } = await supabase.rpc("search_entry", {
 				query: DatabaseHelper.parseSearchQuery(searchQuery)
 			})
 

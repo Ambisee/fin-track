@@ -10,7 +10,7 @@ import {
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
 import useGlobalStore from "@/lib/store"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
@@ -68,6 +68,7 @@ export default function EntryListItem({
 	const [internalOpen, setInternalOpen] = useState(false)
 
 	const queryClient = useQueryClient()
+	const [supabase] = useState(supabaseClient())
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
@@ -76,7 +77,7 @@ export default function EntryListItem({
 	const userSettingsQuery = useSettingsQuery()
 	const deleteMutation = useMutation({
 		mutationFn: (id: number) => {
-			return Promise.resolve(sbBrowser.from("entry").delete().eq("id", id))
+			return Promise.resolve(supabase.from("entry").delete().eq("id", id))
 		}
 	})
 

@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { toast } from "sonner"
 import PasswordField from "@/components/user/PasswordField"
 import { USER_QKEY } from "@/lib/constants"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
@@ -43,6 +43,7 @@ const recoveryFormSchema = z
 export default function Recovery() {
 	const router = useRouter()
 
+	const [supabase] = useState(supabaseClient())
 	const [isFormLoading, setIsPendingSubmit] = useState(false)
 
 	const queryClient = useQueryClient()
@@ -64,7 +65,7 @@ export default function Recovery() {
 							form.handleSubmit(
 								async (formData) => {
 									setIsPendingSubmit(true)
-									const { error } = await sbBrowser.auth.updateUser({
+									const { error } = await supabase.auth.updateUser({
 										password: formData.password
 									})
 
@@ -75,7 +76,7 @@ export default function Recovery() {
 									}
 
 									toast.info("Successfully changed the password")
-									await sbBrowser.auth.signOut()
+									await supabase.auth.signOut()
 									queryClient.invalidateQueries({ queryKey: USER_QKEY })
 									router.push("/sign-in/email")
 								},

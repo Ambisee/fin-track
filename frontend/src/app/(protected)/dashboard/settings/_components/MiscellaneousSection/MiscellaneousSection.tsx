@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -22,6 +22,7 @@ import SettingsSection from "../SettingsSection"
 export default function MiscellaneousSection() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
+	const [supabase] = useState(supabaseClient())
 	const [isDeleteChecked, setIsDeleteChecked] = useState(false)
 
 	return (
@@ -105,7 +106,7 @@ export default function MiscellaneousSection() {
 							variant="default"
 							onClick={async () => {
 								const toastId = toast.loading("Loading...")
-								const { error } = await sbBrowser.auth.signOut()
+								const { error } = await supabase.auth.signOut()
 
 								toast.dismiss(toastId)
 								if (error !== null) {

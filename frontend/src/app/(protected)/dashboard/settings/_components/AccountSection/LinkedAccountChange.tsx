@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import { USER_QKEY } from "@/lib/constants"
 import { useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { Provider } from "@supabase/supabase-js"
 import { useQueryClient } from "@tanstack/react-query"
 
@@ -11,10 +11,13 @@ import Image from "next/image"
 
 import googleIcon from "../../../../../../../public/google-icon.svg"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
 
 export default function LinkedAccountChange() {
 	const userQuery = useUserQuery()
 	const queryClient = useQueryClient()
+
+	const [supabase] = useState(supabaseClient())
 
 	const getIdentityProviders = () => {
 		const result = new Set()
@@ -51,7 +54,7 @@ export default function LinkedAccountChange() {
 					disabled={identityProviders.size === 1}
 					onClick={async (e) => {
 						e.preventDefault()
-						const { error } = await sbBrowser.auth.unlinkIdentity(identity)
+						const { error } = await supabase.auth.unlinkIdentity(identity)
 
 						if (error !== null) {
 							toast.error(error.message)
@@ -71,7 +74,7 @@ export default function LinkedAccountChange() {
 				variant="default"
 				onClick={async (e) => {
 					e.preventDefault()
-					const { error } = await sbBrowser.auth.linkIdentity({
+					const { error } = await supabase.auth.linkIdentity({
 						provider: provider as Provider,
 						options: {
 							redirectTo: `${window.location.origin}/dashboard/settings`

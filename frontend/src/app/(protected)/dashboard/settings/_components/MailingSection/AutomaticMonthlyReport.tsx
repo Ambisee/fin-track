@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useSettingsQuery, useUserQuery } from "@/lib/hooks"
-import { sbBrowser } from "@/lib/supabase"
+import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
@@ -24,6 +24,7 @@ const mailingSectionFormSchema = z.object({
 
 export default function AutomaticMonthlyReport() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
+	const [supabase] = useState(supabaseClient())
 
 	const userQuery = useUserQuery()
 	const userSettingsQuery = useSettingsQuery()
@@ -41,7 +42,7 @@ export default function AutomaticMonthlyReport() {
 				e.preventDefault()
 				form.handleSubmit(async (formData) => {
 					setIsPendingSubmit(true)
-					const { error } = await sbBrowser
+					const { error } = await supabase
 						.from("settings")
 						.update({ allow_report: formData.allowReport })
 						.eq("user_id", userSettingsQuery.data?.user_id as string)
