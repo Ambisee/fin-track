@@ -47,9 +47,9 @@ export default function ProtectedNavbar() {
 	return (
 		<>
 			<div className="dashboard-navbar">
-				<h1 className="hidden text-xl p-4 pb-8 font-bold md:block md:text-center">
+				<h3 className="hidden p-4 pb-8 font-bold md:block md:text-center">
 					FinTrack
-				</h1>
+				</h3>
 				<nav className="w-full h-full md:h-auto">
 					<ul className="w-full h-full list-none flex justify-between items-center md:grid md:justify-center md:gap-1">
 						<NavLink
