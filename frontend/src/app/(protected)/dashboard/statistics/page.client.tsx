@@ -35,6 +35,7 @@ import { X } from "lucide-react"
 import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
+import { DashboardPageLayout } from "../_components/DashboardPageLayout"
 
 type NonNullableFields<T> = { [key in keyof T]: Exclude<T[key], null> }
 
@@ -466,10 +467,7 @@ export default function DashboardStatistics() {
 
 	return (
 		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
-			<div className="w-full h-full">
-				<div className="w-full mb-4 flex justify-between items-center">
-					<h1 className="text-3xl">Statistics</h1>
-				</div>
+			<DashboardPageLayout title="Statistics">
 				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
 					<MonthPicker
 						key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
@@ -480,7 +478,7 @@ export default function DashboardStatistics() {
 					/>
 				</div>
 				{renderStatsUI()}
-			</div>
+			</DashboardPageLayout>
 		</StatisticsPageContext.Provider>
 	)
 }

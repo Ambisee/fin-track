@@ -6,6 +6,7 @@ import EntryList from "@/components/user/EntryList"
 import { MONTHS } from "@/lib/constants"
 import { useEntryDataQuery, useSettingsQuery, useUserQuery } from "@/lib/hooks"
 import { isNonNullable } from "@/lib/utils"
+import { DashboardPageLayout } from "./_components/DashboardPageLayout"
 
 export default function DashboardHome() {
 	const today = new Date()
@@ -96,9 +97,8 @@ export default function DashboardHome() {
 	}
 
 	return (
-		<div>
-			{renderWelcomeMessage()}
+		<DashboardPageLayout title="Home">
 			{renderThisMonthEntries()}
-		</div>
+		</DashboardPageLayout>
 	)
 }

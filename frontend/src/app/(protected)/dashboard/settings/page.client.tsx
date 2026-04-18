@@ -1,5 +1,6 @@
 "use client"
 
+import { DashboardPageLayout } from "../_components/DashboardPageLayout"
 import AccountSection from "./_components/AccountSection/AccountSection"
 import GeneralSection from "./_components/GeneralSection/GeneralSection"
 import MailingSection from "./_components/MailingSection/MailingSection"
@@ -7,14 +8,11 @@ import MiscellaneousSection from "./_components/MiscellaneousSection/Miscellaneo
 
 export default function DashboardSettings() {
 	return (
-		<div className="w-full">
-			<div className="w-full mb-4 flex justify-between items-center">
-				<h1 className="text-3xl">Settings</h1>
-			</div>
+		<DashboardPageLayout title="Settings">
 			<GeneralSection />
 			<AccountSection />
 			<MailingSection />
 			<MiscellaneousSection />
-		</div>
+		</DashboardPageLayout>
 	)
 }

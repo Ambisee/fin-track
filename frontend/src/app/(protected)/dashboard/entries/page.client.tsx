@@ -9,6 +9,7 @@ import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { SearchIcon } from "lucide-react"
 import { ReactNode, useState } from "react"
+import { DashboardPageLayout } from "../_components/DashboardPageLayout"
 
 function EntryContainer(props: {
 	isLoading?: boolean
@@ -40,10 +41,7 @@ export default function DashboardEntries() {
 	)
 
 	return (
-		<div>
-			<div className="w-full mb-4 flex justify-between items-center">
-				<h1 className="text-3xl">Entries</h1>
-			</div>
+		<DashboardPageLayout title="Entries">
 			<div className="sticky top-0 py-4 z-50 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<EntrySearchBar
@@ -96,6 +94,6 @@ export default function DashboardEntries() {
 					</div>
 				}
 			/>
-		</div>
+		</DashboardPageLayout>
 	)
 }
