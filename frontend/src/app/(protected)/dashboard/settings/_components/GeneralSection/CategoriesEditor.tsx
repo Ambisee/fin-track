@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import CategoryGroup from "@/components/user/CategoryGroup"
 
-import { useCategoriesQuery } from "@/lib/hooks"
+import { useCategoriesQuery } from "@/lib/queries"
 
 export default function CategoriesEditor() {
 	const categoriesQuery = useCategoriesQuery()

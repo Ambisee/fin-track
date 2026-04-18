@@ -11,12 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
-import {
-	useCategoriesQuery,
-	useInsertEntryMutation,
-	useLedgersQuery,
-	useUpdateEntryMutation
-} from "@/lib/hooks"
+import { useInsertEntryMutation, useUpdateEntryMutation } from "@/lib/mutations"
+import { useCategoriesQuery, useLedgersQuery } from "@/lib/queries"
 import { Entry } from "@/types/supabase"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronRight, X } from "lucide-react"

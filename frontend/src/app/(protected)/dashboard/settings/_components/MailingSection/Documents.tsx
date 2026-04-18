@@ -24,9 +24,9 @@ import {
 	useLedgersQuery,
 	useMonthGroupQuery,
 	useServerPingQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/hooks"
+	useSettingsQuery
+} from "@/lib/queries"
+import { useUserQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { Ledger, MonthGroup } from "@/types/supabase"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"

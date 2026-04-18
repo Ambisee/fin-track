@@ -15,7 +15,7 @@ import {
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
-import { useUserQuery } from "@/lib/hooks"
+import { useUserQuery } from "@/lib/queries"
 import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"

@@ -8,7 +8,8 @@ import {
 	CardTitle
 } from "@/components/ui/card"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
-import { useAmountFormatter, useSettingsQuery } from "@/lib/hooks"
+import { useAmountFormatter } from "@/lib/hooks"
+import { useSettingsQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { supabaseClient } from "@/lib/supabase"
 import { isNonNullable } from "@/lib/utils"

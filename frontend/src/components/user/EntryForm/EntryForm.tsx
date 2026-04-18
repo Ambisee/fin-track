@@ -1,7 +1,7 @@
 "use client"
 
 import { LEDGER_QKEY } from "@/lib/constants"
-import { useSettingsQuery } from "@/lib/hooks"
+import { useSettingsQuery } from "@/lib/queries"
 import { EntryFormState } from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { Entry } from "@/types/supabase"

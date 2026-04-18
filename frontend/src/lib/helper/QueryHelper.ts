@@ -11,19 +11,19 @@ class QueryHelper {
 		"User must have at least one ledger."
 
 	static getEntryQueryKey(ledger?: number, period: Date = new Date()) {
-		const queryKey = [...ENTRY_QKEY]
-		queryKey.push(`${ledger}`)
-		queryKey.push(`${period.getMonth() + 1}-${period.getFullYear()}`)
-
-		return queryKey
+		return [
+			...ENTRY_QKEY,
+			`${ledger}`,
+			`${period.getMonth() + 1}-${period.getFullYear()}`
+		] as const
 	}
 
 	static getStatisticQueryKey(ledger?: number, period?: Date) {
-		const queryKey = [...STATISTICS_QKEY]
-		queryKey.push(`${ledger}`)
-		queryKey.push(`${period?.getMonth()}-${period?.getFullYear()}`)
-
-		return queryKey
+		return [
+			...STATISTICS_QKEY,
+			`${ledger}`,
+			`${period?.getMonth()}-${period?.getFullYear()}`
+		] as const
 	}
 }
 

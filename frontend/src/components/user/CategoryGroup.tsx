@@ -1,11 +1,11 @@
 import { CATEGORIES_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
 import {
-	useCategoriesQuery,
 	useDeleteCategoryMutation,
 	useInsertCategoryMutation,
-	useUpdateCategoryMutation,
-	useUserQuery
-} from "@/lib/hooks"
+	useUpdateCategoryMutation
+} from "@/lib/mutations"
+import { useCategoriesQuery } from "@/lib/queries"
+import { useUserQuery } from "@/lib/queries"
 import { Category } from "@/types/supabase"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"

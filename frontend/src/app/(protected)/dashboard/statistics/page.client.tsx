@@ -21,12 +21,12 @@ import EntryList from "@/components/user/EntryList"
 import MonthPicker from "@/components/user/MonthPicker"
 import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
+import { useAmountFormatter } from "@/lib/hooks"
 import {
-	useAmountFormatter,
 	useEntryDataQuery,
 	useSettingsQuery,
 	useStatisticsQuery
-} from "@/lib/hooks"
+} from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { cn, isNonNullable } from "@/lib/utils"
 import { Statistic } from "@/types/supabase"

@@ -1,5 +1,5 @@
 import { DialogTrigger } from "@/components/ui/dialog"
-import { useSettingsQuery } from "@/lib/hooks"
+import { useSettingsQuery } from "@/lib/queries"
 
 export default function LedgerBadge() {
 	const settingsQuery = useSettingsQuery()

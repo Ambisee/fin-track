@@ -4,15 +4,17 @@ import {
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
 import {
-	useCurrenciesQuery,
 	useDeleteLedgerMutation,
 	useInsertLedgerMutation,
-	useLedgersQuery,
-	useSettingsQuery,
 	useSwitchLedgerMutation,
-	useUpdateLedgerMutation,
-	useUserQuery
-} from "@/lib/hooks"
+	useUpdateLedgerMutation
+} from "@/lib/mutations"
+import {
+	useCurrenciesQuery,
+	useLedgersQuery,
+	useSettingsQuery
+} from "@/lib/queries"
+import { useUserQuery } from "@/lib/queries"
 import { Ledger } from "@/types/supabase"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
