@@ -4,60 +4,20 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import { MONTHS } from "@/lib/constants"
+import { DateHelper } from "@/lib/helper/DateHelper"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
-import { useUserQuery } from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
 import { DashboardPageLayout } from "./_components/DashboardPageLayout"
 
 export default function DashboardHome() {
 	const today = new Date()
 
-	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
-	const entryDataQuery = useEntryDataQuery(
-		settingsQuery.data?.current_ledger,
-		today
-	)
 
-	const renderWelcomeMessage = () => {
-		if (
-			userQuery.isLoading ||
-			!userQuery.isFetched ||
-			userQuery.data === undefined
-		) {
-			return (
-				<div className="mb-8">
-					<Skeleton className="w-24 h-9" />
-					<Skeleton className="min-w-36 w-3/4 h-8 mt-4" />
-				</div>
-			)
-		} else if (userQuery.data !== null) {
-			return (
-				<div className="mb-8">
-					<div className="w-full mb-4 flex justify-between items-center">
-						<h1>Home</h1>
-					</div>
-					<h2 className="mt-4">
-						Welcome back, {userQuery.data.user_metadata.username}
-					</h2>
-				</div>
-			)
-		} else {
-			return (
-				<div className="mb-8">
-					<div className="w-full mb-4 flex justify-between items-center">
-						<h1>Home</h1>
-					</div>
-					<Alert variant="destructive">
-						<AlertTitle>User data not found</AlertTitle>
-						<AlertDescription>
-							{userQuery.failureReason?.message}
-						</AlertDescription>
-					</Alert>
-				</div>
-			)
-		}
-	}
+	const currentLedgerId = settingsQuery.data?.current_ledger
+	const dateRange = DateHelper.getMonthStartEnd(today)
+
+	const entryDataQuery = useEntryDataQuery(currentLedgerId, dateRange)
 
 	const renderThisMonthEntries = () => {
 		if (entryDataQuery.isLoading || !entryDataQuery.isFetched) {

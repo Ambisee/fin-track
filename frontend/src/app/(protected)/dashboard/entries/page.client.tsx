@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import EntryList from "@/components/user/EntryList"
 import EntrySearchBar from "@/components/user/EntrySearchBar"
 import MonthPicker from "@/components/user/MonthPicker"
+import { DateHelper } from "@/lib/helper/DateHelper"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -35,10 +36,11 @@ export default function DashboardEntries() {
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
 	const settingsQuery = useSettingsQuery()
-	const entryQuery = useEntryDataQuery(
-		settingsQuery.data?.current_ledger,
-		curPeriod
-	)
+
+	const currentLedgerId = settingsQuery.data?.current_ledger
+	const dateRange = DateHelper.getMonthStartEnd(curPeriod)
+
+	const entryQuery = useEntryDataQuery(currentLedgerId, dateRange)
 
 	return (
 		<DashboardPageLayout title="Entries">

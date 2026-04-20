@@ -10,6 +10,7 @@ import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import EntryListItem from "./EntryListItem"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
+import { DateHelper } from "@/lib/helper/DateHelper"
 
 enum EntryListVirtualizerType {
 	NONE,
@@ -220,12 +221,12 @@ export default function EntryList({
 						onClick={() => {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
-								queryClient.invalidateQueries({
-									queryKey: QueryHelper.getEntryQueryKey(
-										data.ledger,
-										new Date(data.date)
-									)
-								})
+								const entryQueryKey = QueryHelper.getEntryQueryKey(
+									data.ledger,
+									DateHelper.getWeekStartEnd(new Date(data.date))
+								)
+
+								queryClient.invalidateQueries({ queryKey: entryQueryKey })
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,

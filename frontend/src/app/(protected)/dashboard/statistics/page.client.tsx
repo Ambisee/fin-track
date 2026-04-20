@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EntryList from "@/components/user/EntryList"
 import MonthPicker from "@/components/user/MonthPicker"
 import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
+import { DateHelper } from "@/lib/helper/DateHelper"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter } from "@/lib/hooks"
 import {
@@ -93,12 +94,12 @@ function ChartDisplay(props: ChartDisplayProps) {
 					onClick={() => {
 						setData(undefined)
 						setOnSubmitSuccess((data) => {
-							queryClient.invalidateQueries({
-								queryKey: QueryHelper.getEntryQueryKey(
-									data.ledger,
-									new Date(data.date)
-								)
-							})
+							const entryQueryKey = QueryHelper.getEntryQueryKey(
+								data.ledger,
+								DateHelper.getWeekStartEnd(new Date(data.date))
+							)
+
+							queryClient.invalidateQueries({ queryKey: entryQueryKey })
 							queryClient.invalidateQueries({
 								queryKey: QueryHelper.getStatisticQueryKey(
 									data.ledger,
@@ -169,10 +170,11 @@ function ChartDisplay(props: ChartDisplayProps) {
 
 function CategoryItem(props: CategoryItemProps) {
 	const settingsQuery = useSettingsQuery()
-	const entryDataQuery = useEntryDataQuery(
-		settingsQuery.data?.current_ledger,
-		props.period
-	)
+
+	const currentLedgerId = settingsQuery.data?.current_ledger
+	const dateRange = DateHelper.getMonthStartEnd(props.period)
+
+	const entryDataQuery = useEntryDataQuery(currentLedgerId, dateRange)
 
 	const formatAmount = useAmountFormatter()
 

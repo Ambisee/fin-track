@@ -13,7 +13,7 @@ import {
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "./constants"
-import { DateHelper } from "./helper/DateHelper"
+import { DateHelper, DateRange } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
@@ -40,6 +40,7 @@ function useUserQuery() {
 			!isNonNullable(query.state.data) || query.state.isInvalidated
 	})
 }
+
 function useSettingsQuery() {
 	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
@@ -109,28 +110,34 @@ function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
 	})
 }
 
-function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
+function useEntryDataQuery(
+	ledger: number | undefined = undefined,
+	dateRange: DateRange
+) {
 	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
-	const queryKey = QueryHelper.getEntryQueryKey(ledger, period)
-	const { from: start, to: end } = DateHelper.getMonthStartEnd(period)
+	const isLedgerDefined = ledger !== undefined
+	const isUserAuthenticated = !userQuery.isError && !!userQuery.data?.id
 
 	return useQuery({
-		queryKey,
-		queryFn: async () => {
+		queryKey: QueryHelper.getEntryQueryKey(ledger, dateRange),
+		queryFn: async ({ queryKey }) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
+
+			const from = queryKey[2].from
+			const to = queryKey[2].to
 
 			const { data, error } = await supabase
 				.from("entry")
 				.select(`*`)
 				.eq("created_by", user.id)
 				.eq("ledger", ledger!)
-				.lte("date", end.toDateString())
-				.gte("date", start.toDateString())
+				.gte("date", from.toDateString())
+				.lte("date", to.toDateString())
 				.order("date", { ascending: false })
 				.order("category", { ascending: false })
 				.order("id", { ascending: true })
@@ -141,11 +148,7 @@ function useEntryDataQuery(ledger?: number, period: Date = new Date()) {
 
 			return data ?? []
 		},
-		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
-		refetchOnMount: (query) =>
-			query.state.data === undefined || query.state.isInvalidated,
-		enabled: !!userQuery.data && !!ledger && !userQuery.isRefetching
+		enabled: isLedgerDefined && isUserAuthenticated
 	})
 }
 

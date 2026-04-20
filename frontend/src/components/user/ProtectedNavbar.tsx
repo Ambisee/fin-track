@@ -11,6 +11,7 @@ import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { ReactNode } from "react"
+import { DateHelper } from "@/lib/helper/DateHelper"
 
 function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 	const pathname = usePathname()
@@ -69,12 +70,12 @@ export default function ProtectedNavbar() {
 									onClick={() => {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getEntryQueryKey(
-													data.ledger,
-													new Date(data.date)
-												)
-											})
+											const entryQueryKey = QueryHelper.getEntryQueryKey(
+												data.ledger,
+												DateHelper.getWeekStartEnd(new Date(data.date))
+											)
+
+											queryClient.invalidateQueries({ queryKey: entryQueryKey })
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,

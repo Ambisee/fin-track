@@ -48,6 +48,7 @@ import {
 import { toast } from "sonner"
 
 import classNames from "@/styles/flicker-ellipse-animation.module.css"
+import { DateHelper } from "@/lib/helper/DateHelper"
 
 interface DocumentPageProps {
 	isFetchingReport: boolean
@@ -238,12 +239,12 @@ function MonthSelectorPage(props: DocumentPageProps) {
 						onClick={() => {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
-								queryClient.invalidateQueries({
-									queryKey: QueryHelper.getEntryQueryKey(
-										data.ledger,
-										new Date(data.date)
-									)
-								})
+								const entryQueryKey = QueryHelper.getEntryQueryKey(
+									data.ledger,
+									DateHelper.getMonthStartEnd(new Date(data.date))
+								)
+
+								queryClient.invalidateQueries({ queryKey: entryQueryKey })
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,

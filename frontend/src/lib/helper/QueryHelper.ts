@@ -1,4 +1,5 @@
 import { ENTRY_QKEY, STATISTICS_QKEY } from "../constants"
+import { DateRange } from "./DateHelper"
 
 class QueryHelper {
 	static readonly MESSAGE_NO_USER = "No user data found."
@@ -10,12 +11,8 @@ class QueryHelper {
 	static readonly MESSAGE_REQUIRE_AT_LEAST_ONE_LEDGER =
 		"User must have at least one ledger."
 
-	static getEntryQueryKey(ledger?: number, period: Date = new Date()) {
-		return [
-			...ENTRY_QKEY,
-			`${ledger}`,
-			`${period.getMonth() + 1}-${period.getFullYear()}`
-		] as const
+	static getEntryQueryKey(ledger: number | undefined, dateRange: DateRange) {
+		return [...ENTRY_QKEY, ledger, dateRange] as const
 	}
 
 	static getStatisticQueryKey(ledger?: number, period?: Date) {

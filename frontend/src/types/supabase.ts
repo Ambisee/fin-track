@@ -37,9 +37,9 @@ export {
 	type Currency,
 	type Database,
 	type Entry,
+	type EntryDataCursor,
 	type Ledger,
-	type Statistic,
 	type MonthGroup,
-	type UserSettings,
-	type EntryDataCursor
+	type Statistic,
+	type UserSettings
 }

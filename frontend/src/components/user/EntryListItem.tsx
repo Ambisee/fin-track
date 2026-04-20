@@ -33,6 +33,7 @@ import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { toast } from "sonner"
+import { DateHelper } from "@/lib/helper/DateHelper"
 
 interface EntryListItemProps {
 	data: Entry
@@ -146,12 +147,12 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data, oldData) => {
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getEntryQueryKey(
-													data.ledger,
-													new Date(data.date)
-												)
-											})
+											const entryQueryKey = QueryHelper.getEntryQueryKey(
+												data.ledger,
+												DateHelper.getMonthStartEnd(new Date(data.date))
+											)
+
+											queryClient.invalidateQueries({ queryKey: entryQueryKey })
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,
@@ -170,12 +171,7 @@ export default function EntryListItem({
 												return
 											}
 
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getEntryQueryKey(
-													oldData.ledger,
-													new Date(oldData.date)
-												)
-											})
+											queryClient.invalidateQueries({ queryKey: entryQueryKey })
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													oldData.ledger,
@@ -232,11 +228,15 @@ export default function EntryListItem({
 															duration: 500
 														})
 
-														queryClient.invalidateQueries({
-															queryKey: QueryHelper.getEntryQueryKey(
-																props.data.ledger,
+														const entryQueryKey = QueryHelper.getEntryQueryKey(
+															props.data.ledger,
+															DateHelper.getWeekStartEnd(
 																new Date(props.data.date)
 															)
+														)
+
+														queryClient.invalidateQueries({
+															queryKey: entryQueryKey
 														})
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getStatisticQueryKey(
