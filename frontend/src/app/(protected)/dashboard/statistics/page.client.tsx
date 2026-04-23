@@ -11,6 +11,7 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger
@@ -37,6 +38,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 type NonNullableFields<T> = { [key in keyof T]: Exclude<T[key], null> }
 
@@ -268,6 +270,13 @@ function CategoryItem(props: CategoryItemProps) {
 								</span>
 							</h2>
 						</DialogTitle>
+						<DialogDescription>
+							<VisuallyHidden>
+								{props.value.category} entries for{" "}
+								{new Date(props.value.start).toDateString()}-
+								{new Date(props.value.end).toDateString()}
+							</VisuallyHidden>
+						</DialogDescription>
 						<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
 							<X className="w-4 h-4" />
 						</DialogClose>
