@@ -147,16 +147,19 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data, oldData) => {
+											const monthStartEnd = DateHelper.getMonthStartEnd(
+												new Date(data.date)
+											)
 											const entryQueryKey = QueryHelper.getEntryQueryKey(
 												data.ledger,
-												DateHelper.getMonthStartEnd(new Date(data.date))
+												monthStartEnd
 											)
 
 											queryClient.invalidateQueries({ queryKey: entryQueryKey })
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,
-													new Date(data.date)
+													monthStartEnd
 												)
 											})
 
@@ -175,7 +178,7 @@ export default function EntryListItem({
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													oldData.ledger,
-													new Date(oldData.date)
+													DateHelper.getMonthStartEnd(new Date(data.date))
 												)
 											})
 
@@ -228,11 +231,12 @@ export default function EntryListItem({
 															duration: 500
 														})
 
+														const monthStartEnd = DateHelper.getMonthStartEnd(
+															new Date(props.data.date)
+														)
 														const entryQueryKey = QueryHelper.getEntryQueryKey(
 															props.data.ledger,
-															DateHelper.getWeekStartEnd(
-																new Date(props.data.date)
-															)
+															monthStartEnd
 														)
 
 														queryClient.invalidateQueries({
@@ -241,7 +245,7 @@ export default function EntryListItem({
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getStatisticQueryKey(
 																props.data.ledger,
-																new Date(props.data.date)
+																monthStartEnd
 															)
 														})
 													}

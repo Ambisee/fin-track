@@ -3,8 +3,7 @@ import {
 	useCurrenciesQuery,
 	useEntryDataQuery,
 	useLedgersQuery,
-	useMonthGroupQuery,
-	useStatisticsQuery
+	useMonthGroupQuery
 } from "@/lib/queries"
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 import { Database } from "./supabase-auto"
@@ -16,8 +15,12 @@ type InferQueryType<T> =
 			: U
 		: never
 
+type Statistic =
+	Database["public"]["Functions"]["calculate_statistics"]["Returns"] extends (infer U)[]
+		? U
+		: never
+
 type Entry = InferQueryType<ReturnType<typeof useEntryDataQuery>>
-type Statistic = InferQueryType<ReturnType<typeof useStatisticsQuery>>
 type Category = InferQueryType<ReturnType<typeof useCategoriesQuery>>
 type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
 type Currency = InferQueryType<ReturnType<typeof useCurrenciesQuery>>

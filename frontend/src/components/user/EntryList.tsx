@@ -221,16 +221,20 @@ export default function EntryList({
 						onClick={() => {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
+								const monthStartEnd = DateHelper.getMonthStartEnd(
+									new Date(data.date)
+								)
+
 								const entryQueryKey = QueryHelper.getEntryQueryKey(
 									data.ledger,
-									DateHelper.getWeekStartEnd(new Date(data.date))
+									monthStartEnd
 								)
 
 								queryClient.invalidateQueries({ queryKey: entryQueryKey })
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
-										new Date(data.date)
+										monthStartEnd
 									)
 								})
 							})

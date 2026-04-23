@@ -67,43 +67,51 @@ function useSettingsQuery() {
 			return data
 		},
 		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		refetchOnMount: (query) =>
-			!isNonNullable(query.state.data) || query.state.isInvalidated,
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
-function useStatisticsQuery(ledger?: number, period: Date = new Date()) {
+function useStatisticsQuery(
+	ledger: number | undefined = undefined,
+	dateRange: DateRange
+) {
 	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
-	const queryKey = QueryHelper.getStatisticQueryKey(ledger, period)
-	const { from: start, to: end } = DateHelper.getMonthStartEnd(period)
 
 	return useQuery({
-		queryKey,
-		queryFn: async () => {
+		queryKey: QueryHelper.getStatisticQueryKey(ledger, dateRange),
+		queryFn: async ({ queryKey }) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const { data, error } = await supabase
-				.from("statistic")
-				.select("*")
-				.eq("ledger", ledger!)
-				.eq("created_by", user.id)
-				.lte("period", end.toDateString())
-				.gte("period", start.toDateString())
+			const ledger = queryKey[1]
+			const { from, to } = queryKey[2]
+
+			if (!isNonNullable(ledger)) {
+				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
+			}
+
+			const { data, error } = await supabase.rpc("calculate_statistics", {
+				p_start_ts: from.toDateString(),
+				p_end_ts: to.toDateString(),
+				p_ledger_id: ledger
+			})
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data ?? []
+			return data
 		},
 		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		refetchOnMount: (query) =>
 			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!ledger && !!userQuery.data && !userQuery.isRefetching
@@ -165,7 +173,8 @@ function useCurrenciesQuery() {
 			return data ?? []
 		},
 		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		refetchOnMount: (query) =>
 			query.state.data === undefined || query.state.isInvalidated
 	})

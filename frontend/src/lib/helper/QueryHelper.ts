@@ -15,12 +15,11 @@ class QueryHelper {
 		return [...ENTRY_QKEY, ledger, dateRange] as const
 	}
 
-	static getStatisticQueryKey(ledger?: number, period?: Date) {
-		return [
-			...STATISTICS_QKEY,
-			`${ledger}`,
-			`${period?.getMonth()}-${period?.getFullYear()}`
-		] as const
+	static getStatisticQueryKey(
+		ledger: number | undefined,
+		dateRange: DateRange
+	) {
+		return [...STATISTICS_QKEY, ledger, dateRange] as const
 	}
 }
 

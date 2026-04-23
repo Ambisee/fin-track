@@ -70,6 +70,50 @@ interface ChartDisplayProps {
 
 const StatisticsPageContext = createContext<{ period: Date }>(null!)
 
+const calculateStatistics = (categoryGroups: Statistic[]) => {
+	const result: Statistics = {
+		totalIncome: 0,
+		totalExpense: 0,
+		groupByCategory: []
+	}
+
+	let colorIndex = 1
+	for (let i = 0; i < categoryGroups.length; i++) {
+		const statistic: Statistic = categoryGroups[i]
+		if (!isNonNullable(statistic.total_amount)) {
+			console.error("Expected a non-null value: statistic.total")
+			continue
+		}
+
+		if (statistic.is_positive) {
+			result.totalIncome += statistic.total_amount
+		} else {
+			result.totalExpense += statistic.total_amount
+		}
+
+		result.groupByCategory.push({
+			...statistic,
+			fillColor: `var(--chart-${colorIndex++})`,
+			percentage: 0
+		})
+	}
+
+	for (let i = 0; i < result.groupByCategory.length; i++) {
+		const group: Group = result.groupByCategory[i]
+		if (!isNonNullable(group.total_amount)) {
+			console.error("Expected a non-null value: group.total_amount")
+			continue
+		}
+
+		const totalAmount = group.is_positive
+			? result.totalIncome
+			: result.totalExpense
+		group.percentage = group.total_amount / totalAmount
+	}
+
+	return result
+}
+
 function ChartDisplay(props: ChartDisplayProps) {
 	const { period } = useContext(StatisticsPageContext)
 
@@ -94,16 +138,19 @@ function ChartDisplay(props: ChartDisplayProps) {
 					onClick={() => {
 						setData(undefined)
 						setOnSubmitSuccess((data) => {
+							const monthStartEnd = DateHelper.getMonthStartEnd(
+								new Date(data.date)
+							)
 							const entryQueryKey = QueryHelper.getEntryQueryKey(
 								data.ledger,
-								DateHelper.getWeekStartEnd(new Date(data.date))
+								monthStartEnd
 							)
 
 							queryClient.invalidateQueries({ queryKey: entryQueryKey })
 							queryClient.invalidateQueries({
 								queryKey: QueryHelper.getStatisticQueryKey(
 									data.ledger,
-									new Date(data.date)
+									monthStartEnd
 								)
 							})
 						})
@@ -383,57 +430,9 @@ export default function DashboardStatistics() {
 	const settingsQuery = useSettingsQuery()
 	const statisticsQuery = useStatisticsQuery(
 		settingsQuery.data?.current_ledger,
-		curPeriod
+		DateHelper.getMonthStartEnd(curPeriod)
 	)
 	const isDesktop = useMediaQuery({ minWidth: DESKTOP_BREAKPOINT })
-
-	const calculateStats = () => {
-		const result: Statistics = {
-			totalIncome: 0,
-			totalExpense: 0,
-			groupByCategory: []
-		}
-
-		if (!statisticsQuery.data) {
-			return result
-		}
-
-		let colorIndex = 1
-		for (let i = 0; i < statisticsQuery.data.length; i++) {
-			const statistic: Statistic = statisticsQuery.data[i]
-			if (!isNonNullable(statistic.total_amount)) {
-				console.error("Expected a non-null value: statistic.total")
-				continue
-			}
-
-			if (statistic.is_positive) {
-				result.totalIncome += statistic.total_amount
-			} else {
-				result.totalExpense += statistic.total_amount
-			}
-
-			result.groupByCategory.push({
-				...(statistic as NonNullableFields<Statistic>),
-				fillColor: `var(--chart-${colorIndex++})`,
-				percentage: 0
-			})
-		}
-
-		for (let i = 0; i < result.groupByCategory.length; i++) {
-			const group: Group = result.groupByCategory[i]
-			if (!isNonNullable(group.total_amount)) {
-				console.error("Expected a non-null value: group.total_amount")
-				continue
-			}
-
-			const totalAmount = group.is_positive
-				? result.totalIncome
-				: result.totalExpense
-			group.percentage = group.total_amount / totalAmount
-		}
-
-		return result
-	}
 
 	const renderStatsUI = () => {
 		if (statisticsQuery.isFetching || !statisticsQuery.isFetched) {
@@ -451,7 +450,7 @@ export default function DashboardStatistics() {
 			)
 		}
 
-		const stats = calculateStats()
+		const stats = calculateStatistics(statisticsQuery.data ?? [])
 		const chartConfig: ChartConfig = {}
 
 		for (let i = 0; i < stats.groupByCategory.length; i++) {

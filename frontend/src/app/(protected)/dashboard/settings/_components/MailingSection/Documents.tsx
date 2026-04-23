@@ -239,16 +239,19 @@ function MonthSelectorPage(props: DocumentPageProps) {
 						onClick={() => {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
+								const monthStartEnd = DateHelper.getMonthStartEnd(
+									new Date(data.date)
+								)
 								const entryQueryKey = QueryHelper.getEntryQueryKey(
 									data.ledger,
-									DateHelper.getMonthStartEnd(new Date(data.date))
+									monthStartEnd
 								)
 
 								queryClient.invalidateQueries({ queryKey: entryQueryKey })
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
-										new Date(data.date)
+										monthStartEnd
 									)
 								})
 							})
