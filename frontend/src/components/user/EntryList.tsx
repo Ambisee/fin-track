@@ -5,7 +5,7 @@ import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import EntryListItem from "./EntryListItem"
@@ -133,14 +133,21 @@ function VirtualizedList(props: EntryListProps) {
 function WindowVirtualizedList(props: EntryListProps) {
 	const { data, onScrollToBottom } = props
 	const listRef = useRef<HTMLDivElement>(null)
+	const listOffsetRef = useRef<number>(0)
 	const [expanded, setExpanded] = useState(Array(data.length ?? 0).fill(false))
+
+	useLayoutEffect(() => {
+		listOffsetRef.current = listRef.current?.offsetTop ?? 0
+	}, [])
 
 	const virtualizer = useWindowVirtualizer({
 		count: data.length,
 		estimateSize: () => 100,
 		overscan: 3,
 		gap: 16,
-		scrollMargin: 0
+
+		// eslint-disable-next-line react-hooks/refs
+		scrollMargin: listOffsetRef.current
 	})
 
 	const virtualItems = virtualizer.getVirtualItems()

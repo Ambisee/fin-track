@@ -79,6 +79,14 @@ class DateHelper {
 
 		return { from, to }
 	}
+
+	static isDateEqual(d1: Date, d2: Date): boolean {
+		let answer = true
+		answer &&= d1.getDate() == d2.getDate()
+		answer &&= d1.getMonth() == d2.getMonth()
+		answer &&= d1.getFullYear() == d2.getFullYear()
+		return answer
+	}
 }
 
 export { type DateRange, DateHelper }

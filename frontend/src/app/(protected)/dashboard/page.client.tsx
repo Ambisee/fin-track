@@ -8,6 +8,7 @@ import { DateHelper } from "@/lib/helper/DateHelper"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
 import { DashboardPageLayout } from "./_components/DashboardPageLayout"
+import SummarySection from "./_components/SummarySection"
 
 export default function DashboardHome() {
 	const today = new Date()
@@ -22,8 +23,8 @@ export default function DashboardHome() {
 	const renderThisMonthEntries = () => {
 		if (entryDataQuery.isLoading || !entryDataQuery.isFetched) {
 			return (
-				<div>
-					<Skeleton className="w-56 h-6 mb-4" />
+				<div className="mt-4 pt-4">
+					<Skeleton className="w-56 h-7 mb-4" />
 					<div className="grid gap-4">
 						<Skeleton className="w-full h-25" />
 						<Skeleton className="w-full h-25" />
@@ -45,10 +46,10 @@ export default function DashboardHome() {
 		}
 
 		return (
-			<div>
-				<h2 className="mb-4">
+			<div className="pt-4 mt-4">
+				<h4 className="mb-4">
 					Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
-				</h2>
+				</h4>
 				<EntryList
 					data={entryDataQuery.data}
 					virtualizerType={EntryList.VirtualizerType.WINDOW_VIRTUALIZER}
@@ -59,6 +60,7 @@ export default function DashboardHome() {
 
 	return (
 		<DashboardPageLayout title="Home">
+			<SummarySection />
 			{renderThisMonthEntries()}
 		</DashboardPageLayout>
 	)
