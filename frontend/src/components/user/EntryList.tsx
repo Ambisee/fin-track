@@ -11,6 +11,14 @@ import { DialogTrigger } from "../ui/dialog"
 import EntryListItem from "./EntryListItem"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { DateHelper } from "@/lib/helper/DateHelper"
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle
+} from "../ui/empty"
+import ConditionalWrapper from "./ConditionalWrapper"
 
 enum EntryListVirtualizerType {
 	NONE,
@@ -25,6 +33,53 @@ interface EntryListProps {
 
 	onEditItem?: (data: Entry) => void
 	onScrollToBottom?: () => void
+}
+
+function EmptyEntryList() {
+	const queryClient = useQueryClient()
+	const setData = useGlobalStore((state) => state.setData)
+	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
+
+	return (
+		<Empty className="border border-dashed">
+			<EmptyHeader>
+				<EmptyTitle>No transaction entries.</EmptyTitle>
+				<EmptyDescription>
+					Transaction entries added will be shown here.
+				</EmptyDescription>
+			</EmptyHeader>
+			<EmptyContent>
+				<DialogTrigger asChild>
+					<Button
+						className="w-fit justify-self-center"
+						onClick={() => {
+							setData(undefined)
+							setOnSubmitSuccess((data) => {
+								const monthStartEnd = DateHelper.getMonthStartEnd(
+									new Date(data.date)
+								)
+
+								const entryQueryKey = QueryHelper.getEntryQueryKey(
+									data.ledger,
+									monthStartEnd
+								)
+
+								queryClient.invalidateQueries({ queryKey: entryQueryKey })
+								queryClient.invalidateQueries({
+									queryKey: QueryHelper.getStatisticQueryKey(
+										data.ledger,
+										monthStartEnd
+									)
+								})
+							})
+						}}
+					>
+						Add an entry
+					</Button>
+				</DialogTrigger>
+			</EmptyContent>
+		</Empty>
+	)
 }
 
 function NormalList(props: EntryListProps) {
@@ -214,48 +269,55 @@ export default function EntryList({
 	virtualizerType = EntryListVirtualizerType.NONE,
 	...props
 }: EntryListProps) {
-	const queryClient = useQueryClient()
-	const setData = useGlobalStore((state) => state.setData)
-	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
+	// const queryClient = useQueryClient()
+	// const setData = useGlobalStore((state) => state.setData)
+	// const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
-	if (props.data.length < 1) {
-		return (
-			<div className="px-0 py-12 grid gap-2 items-center justify-center">
-				<p className="text-center">No entry data available for this period.</p>
-				<DialogTrigger asChild>
-					<Button
-						className="w-fit justify-self-center"
-						onClick={() => {
-							setData(undefined)
-							setOnSubmitSuccess((data) => {
-								const monthStartEnd = DateHelper.getMonthStartEnd(
-									new Date(data.date)
-								)
+	// if (props.data.length < 1) {
+	// 	return (
+	// 		<div className="px-0 py-12 grid gap-2 items-center justify-center">
+	// 			<p className="text-center">No entry data available for this period.</p>
+	// 			<DialogTrigger asChild>
+	// 				<Button
+	// 					className="w-fit justify-self-center"
+	// 					onClick={() => {
+	// 						setData(undefined)
+	// 						setOnSubmitSuccess((data) => {
+	// 							const monthStartEnd = DateHelper.getMonthStartEnd(
+	// 								new Date(data.date)
+	// 							)
 
-								const entryQueryKey = QueryHelper.getEntryQueryKey(
-									data.ledger,
-									monthStartEnd
-								)
+	// 							const entryQueryKey = QueryHelper.getEntryQueryKey(
+	// 								data.ledger,
+	// 								monthStartEnd
+	// 							)
 
-								queryClient.invalidateQueries({ queryKey: entryQueryKey })
-								queryClient.invalidateQueries({
-									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
-										monthStartEnd
-									)
-								})
-							})
-						}}
-					>
-						Add an entry
-					</Button>
-				</DialogTrigger>
-			</div>
-		)
-	}
+	// 							queryClient.invalidateQueries({ queryKey: entryQueryKey })
+	// 							queryClient.invalidateQueries({
+	// 								queryKey: QueryHelper.getStatisticQueryKey(
+	// 									data.ledger,
+	// 									monthStartEnd
+	// 								)
+	// 							})
+	// 						})
+	// 					}}
+	// 				>
+	// 					Add an entry
+	// 				</Button>
+	// 			</DialogTrigger>
+	// 		</div>
+	// 	)
+	// }
 
 	const Component = Components[virtualizerType]
-	return <Component showButtons={showButtons} {...props} />
+	return (
+		<ConditionalWrapper
+			showContent={props.data.length > 0}
+			fallback={<EmptyEntryList />}
+		>
+			<Component showButtons={showButtons} {...props} />
+		</ConditionalWrapper>
+	)
 }
 
 EntryList.VirtualizerType = EntryListVirtualizerType
