@@ -24,6 +24,7 @@ import { ReloadIcon, ResetIcon } from "@radix-ui/react-icons"
 import { ReactNode, useState } from "react"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
 import { isNonNullable } from "@/lib/utils"
+import { FieldGroup } from "@/components/ui/field"
 
 interface EntryFormPageProps {
 	data?: Entry
@@ -148,7 +149,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<div className="h-fit *:text-left grid gap-4">
+			<FieldGroup className="h-fit *:text-left grid gap-4">
 				<Controller
 					control={form.control}
 					name="type"
@@ -297,7 +298,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 						</EntryFormItem>
 					)}
 				/>
-			</div>
+			</FieldGroup>
 			<DialogFooter className="h-fit gap-2">
 				<Button disabled={isFormLoading}>
 					Submit

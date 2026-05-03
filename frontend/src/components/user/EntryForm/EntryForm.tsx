@@ -49,18 +49,16 @@ export function EntryFormItem(props: {
 	children: ReactNode
 }) {
 	return (
-		<FieldGroup>
-			<Field
-				data-invalid={props.fieldState.invalid}
-				className={cn(
-					"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
-					props.className
-				)}
-			>
-				<FieldLabel>{props.label}</FieldLabel>
-				<FieldContent>{props.children}</FieldContent>
-			</Field>
-		</FieldGroup>
+		<Field
+			data-invalid={props.fieldState.invalid}
+			className={cn(
+				"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
+				props.className
+			)}
+		>
+			<FieldLabel>{props.label}</FieldLabel>
+			<FieldContent>{props.children}</FieldContent>
+		</Field>
 	)
 }
 
