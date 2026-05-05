@@ -11,7 +11,7 @@ import { ReactNode, useEffect, useState } from "react"
 import { ControllerFieldState, useForm } from "react-hook-form"
 import { z } from "zod"
 import { DialogContent } from "../../ui/dialog"
-import { Field, FieldContent, FieldGroup, FieldLabel } from "../../ui/field"
+import { Field, FieldContent, FieldLabel } from "../../ui/field"
 import CategoryGroup from "../CategoryGroup"
 import LedgerGroup from "../LedgerGroup"
 import EntryFormPage from "./EntryFormPage"
@@ -25,16 +25,14 @@ const formSchema = z.object({
 	date: z.date(),
 	category: z.string(),
 	amount: z
-		.preprocess((arg) => (arg === "" ? NaN : Number(arg)), z.coerce.string())
-		.pipe(
+		.preprocess(
+			(arg) => (arg === "" ? NaN : Number.parseInt(arg as string)),
 			z.coerce
-				.number({
-					invalid_type_error: "Please provide a valid transaction amount"
-				})
-				.nonnegative("Please provide a non-negative amount")
-				.step(0.01, "Please ensure that the value is a multiple of 0.01")
+				.number("Please provide a valid amount.")
+				.nonnegative("Please provide a non-negative amount.")
+				.multipleOf(0.01, "Please ensure that the value is a multiple of 0.01.")
 		)
-		.pipe(z.coerce.string()),
+		.transform((arg) => String(arg)),
 	type: z.enum(["Income", "Expense"]),
 	note: z.string(),
 	ledger: z.number()
@@ -152,7 +150,7 @@ export default function EntryForm(props: EntryFormProps) {
 	return (
 		<DialogContent
 			hideCloseButton
-			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-[460px] sm:max-w-lg"
+			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-115 sm:max-w-lg"
 			onOpenAutoFocus={() => {
 				form.reset()
 				setCurPage(0)

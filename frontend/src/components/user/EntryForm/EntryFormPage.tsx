@@ -43,9 +43,9 @@ const getErrors: <T extends FieldValues>(
 
 	for (const key in errors) {
 		const error = errors[key]
-		if (error === undefined) continue
+		if (error?.message === undefined) continue
 
-		const errorMessage = error.message?.toString()
+		const errorMessage = error.message.toString()
 		result.push(<li key={errorMessage}>{errorMessage}</li>)
 	}
 
