@@ -1,26 +1,23 @@
 "use client"
 
 import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { Dispatch, SetStateAction, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { Dispatch, SetStateAction, useState } from "react"
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger
-} from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
+} from "./dialog"
 
 interface DatePickerProps {
 	value: Date
 	required?: boolean
 	disabled?: boolean
-	onChange: Dispatch<SetStateAction<Date | undefined>>
+	onChange: Dispatch<SetStateAction<Date>>
 	closeOnSelect?: boolean
 }
 
@@ -31,41 +28,35 @@ export function DatePicker(props: DatePickerProps) {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button
-					disabled={props.disabled ?? false}
-					variant={"outline"}
-					className={cn(
-						"w-full justify-start text-left font-normal text-base",
-						!props.value && "text-muted-foreground"
-					)}
+					variant="outline"
+					id="date-picker-simple"
+					className="justify-start font-medium text-md text-muted-foreground"
 				>
-					<CalendarIcon className="mr-2 h-4 w-4" />
-					{props.value ? format(props.value, "PPP") : <span>Pick a date</span>}
+					{format(props.value, "PPP")}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="w-auto p-4">
-				<DialogHeader>
-					<DialogTitle>Pick a date</DialogTitle>
-					<DialogDescription asChild>
-						<Calendar
-							required={props.required ?? false}
-							defaultMonth={props.value}
-							mode="single"
-							classNames={{
-								root: "mt-4",
-								month_grid: "mt-4",
-								weekday: "w-12 text-center",
-								day: "size-12"
-							}}
-							selected={props.value}
-							onSelect={(e: SetStateAction<Date | undefined>) => {
-								props.onChange(e)
-								if (props.closeOnSelect === true) {
-									setIsOpen(false)
-								}
-							}}
-						/>
-					</DialogDescription>
+			<DialogContent
+				className="max-w-screen w-auto max-h-screen p-0 rounded-lg overflow-clip"
+				hideCloseButton
+			>
+				<DialogHeader className="pt-4">
+					<DialogTitle className="text-center">Pick a Date</DialogTitle>
 				</DialogHeader>
+				<Calendar
+					required
+					mode="single"
+					classNames={{
+						weeks: "h-[calc(6*(var(--cell-size)+8px))]"
+					}}
+					defaultMonth={props.value}
+					selected={props.value}
+					onSelect={(e: SetStateAction<Date>) => {
+						props.onChange(e)
+						if (props.closeOnSelect === true) {
+							setIsOpen(false)
+						}
+					}}
+				/>
 			</DialogContent>
 		</Dialog>
 	)
