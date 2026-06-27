@@ -1,4 +1,4 @@
-type DateRange = { from: Date; to: Date }
+type DateRange = { from?: Date | undefined; to?: Date | undefined }
 
 interface UTS35WeekElement {
 	firstDay: number
@@ -12,6 +12,29 @@ class DateHelper {
 		const day = String(date.getDate()).padStart(2, "0")
 
 		return `${year}-${month}-${day}`
+	}
+
+	static toLocaleString(
+		date: Date,
+		locale: Intl.DateTimeFormat = new Intl.DateTimeFormat(navigator.language, {
+			day: "2-digit",
+			month: "short",
+			year: "numeric"
+		})
+	): string {
+		return locale.format(date)
+	}
+
+	static getYearStartEnd(date: Date): DateRange {
+		const from = new Date(date)
+		from.setMonth(0)
+		from.setDate(1)
+
+		const to = new Date(date)
+		to.setMonth(12)
+		to.setDate(0)
+
+		return { from, to }
 	}
 
 	/**

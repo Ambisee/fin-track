@@ -29,6 +29,33 @@ describe("DateHelper tests", () => {
 		)
 	})
 
+	describe("getYearStartEnd tests", () => {
+		const testcases: TestCase<Date, DateRange>[] = [
+			{
+				input: new Date("2025-12-12"),
+				expected: {
+					from: new Date("2025-01-01"),
+					to: new Date("2025-12-31")
+				}
+			},
+			{
+				input: new Date("2024-04-26"),
+				expected: {
+					from: new Date("2024-01-01"),
+					to: new Date("2024-12-31")
+				}
+			}
+		]
+
+		it.each(testcases)(
+			"should return the correct timestamp for input [date]: $input",
+			({ input, expected }) => {
+				const actual = DateHelper.getYearStartEnd(input)
+				expect(actual).toEqual(expected)
+			}
+		)
+	})
+
 	describe("getMonthStartEnd tests", () => {
 		const testcases: TestCase<Date, DateRange>[] = [
 			{

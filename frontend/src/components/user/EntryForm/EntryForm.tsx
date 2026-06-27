@@ -53,12 +53,12 @@ export type EntryFormData = z.infer<typeof formSchema>
 export function EntryFormItem(props: {
 	className?: string
 	label: string
-	fieldState: ControllerFieldState
+	fieldState?: ControllerFieldState
 	children: ReactNode
 }) {
 	return (
 		<Field
-			data-invalid={props.fieldState.invalid}
+			data-invalid={props.fieldState?.invalid}
 			className={cn(
 				"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
 				props.className

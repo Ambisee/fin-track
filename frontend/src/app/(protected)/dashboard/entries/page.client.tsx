@@ -1,14 +1,25 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Dialog } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
+import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import EntryList from "@/components/user/EntryList"
 import EntrySearchBar from "@/components/user/EntrySearchBar"
-import MonthPicker from "@/components/user/MonthPicker"
+import TimeFilterControlPanel, {
+	changePeriod,
+	EntryDisplaySettings
+} from "@/components/user/TimeFilterControlPanel"
 import { DateHelper } from "@/lib/helper/DateHelper"
-import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
+import {
+	useCategoriesQuery,
+	useEntryDataQuery,
+	useSettingsQuery
+} from "@/lib/queries"
+import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { SearchIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
 import { ReactNode, useState } from "react"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
 
@@ -32,15 +43,26 @@ function EntryContainer(props: {
 
 export default function DashboardEntries() {
 	const [isSearching, setIsSearching] = useState(false)
-	const [curPeriod, setCurPeriod] = useState<Date>(new Date())
+	const [entryDisplaySettings, setEntryDisplaySettings] =
+		useState<EntryDisplaySettings>({
+			period: {
+				type: "MONTHLY",
+				timeRange: DateHelper.getMonthStartEnd(new Date())
+			},
+			filter: { type: "All", amountRange: undefined, categories: undefined }
+		})
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
 	const settingsQuery = useSettingsQuery()
+	const categoriesQuery = useCategoriesQuery()
 
 	const currentLedgerId = settingsQuery.data?.current_ledger
-	const dateRange = DateHelper.getMonthStartEnd(curPeriod)
+	const dateRange = DateHelper.getMonthStartEnd(new Date())
 
 	const entryQuery = useEntryDataQuery(currentLedgerId, dateRange)
+	const showButton = ["WEEKLY", "MONTHLY", "YEARLY"].includes(
+		entryDisplaySettings.period.type
+	)
 
 	return (
 		<DashboardPageLayout title="Entries">
@@ -73,14 +95,67 @@ export default function DashboardEntries() {
 				}
 				entriesNode={
 					<div>
-						<div className="flex justify-between items-center pb-4 pt-2 bg-background">
-							<MonthPicker
-								key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
-								value={curPeriod}
-								onValueChange={(value) => {
-									setCurPeriod(value)
-								}}
-							/>
+						<div className="flex justify-center items-center pb-4 pt-2 bg-background">
+							<ConditionalWrapper showContent={showButton} fallback={null}>
+								<Button
+									variant="ghost"
+									className="aspect-square"
+									onClick={() => {
+										const type = entryDisplaySettings.period.type
+										const currentDate =
+											entryDisplaySettings.period.timeRange?.from
+										if (
+											!(type in changePeriod) ||
+											!isNonNullable(currentDate)
+										) {
+											return
+										}
+										setEntryDisplaySettings((cur) => ({
+											...cur,
+											period: {
+												...cur.period,
+												timeRange: changePeriod[type]?.(currentDate, -1)
+											}
+										}))
+									}}
+								>
+									<ChevronLeft />
+								</Button>
+							</ConditionalWrapper>
+							<Dialog>
+								<div className="w-full flex justify-center">
+									<TimeFilterControlPanel
+										settings={entryDisplaySettings}
+										setSettings={setEntryDisplaySettings}
+										availableCategories={categoriesQuery.data?.map((value) => ({
+											...value,
+											count: -1
+										}))}
+									/>
+								</div>
+							</Dialog>
+							<ConditionalWrapper showContent={showButton} fallback={null}>
+								<Button
+									variant="ghost"
+									className="aspect-square"
+									onClick={() => {
+										const type = entryDisplaySettings.period.type
+										const currentDate =
+											entryDisplaySettings.period.timeRange?.from
+										if (!(type in changePeriod) || !isNonNullable(currentDate))
+											return
+										setEntryDisplaySettings((cur) => ({
+											...cur,
+											period: {
+												...cur.period,
+												timeRange: changePeriod[type]?.(currentDate, 1)
+											}
+										}))
+									}}
+								>
+									<ChevronRight />
+								</Button>
+							</ConditionalWrapper>
 						</div>
 						{entryQuery.isLoading || entryQuery.data === undefined ? (
 							<>
