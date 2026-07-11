@@ -2,7 +2,7 @@ import { Entry } from "@/types/supabase"
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { MONTHS } from "./constants"
+import { DEFAULT_TRUNCATE_MAX_LENGTH, MONTHS } from "./constants"
 import { SetStateAction } from "react"
 
 interface MonthGroup {
@@ -247,6 +247,15 @@ function getUsernameFromEmail(email: string) {
 	return username.replace(/[^a-zA-Z0-9]/g, "")
 }
 
+function truncate(
+	value: string,
+	maxLen: number = DEFAULT_TRUNCATE_MAX_LENGTH,
+	lastChar: string = "\u2026"
+): string {
+	if (value.length < maxLen) return value
+	return value.substring(0, maxLen - 1) + lastChar
+}
+
 function filterDataGroup(
 	month: number,
 	year: number,
@@ -300,6 +309,7 @@ export {
 	cn,
 	filterDataGroup,
 	getUsernameFromEmail,
+	truncate,
 	groupData,
 	groupDataByMonth,
 	handleDataChange,

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
+import { MONTHS } from "@/lib/constants"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import {
 	StatisticsHelper,
@@ -20,7 +21,7 @@ import {
 } from "@/lib/helper/StatisticsHelper"
 import { useAmountFormatter } from "@/lib/hooks"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
-import { isNonNullable } from "@/lib/utils"
+import { isNonNullable, truncate } from "@/lib/utils"
 import { useMemo, useState } from "react"
 import { Area, AreaChart, Cell, Pie, PieChart, XAxis } from "recharts"
 
@@ -120,12 +121,13 @@ function SpendingByDateAreaChart() {
 							config={chartConfig}
 						>
 							<AreaChart accessibilityLayer data={totalSpendingByDay}>
-								<Area dataKey="totalSpending" />
+								<Area type="monotone" dataKey="totalSpending" />
 								<XAxis
 									dataKey="date"
-									minTickGap={100}
+									padding={{ left: 5, right: 5 }}
+									minTickGap={10}
 									tickFormatter={(tick: Date) =>
-										DateHelper.toDatabaseString(tick)
+										DateHelper.toShortDateString(tick)
 									}
 								/>
 								<ChartTooltip content={tooltipContent()} />
@@ -149,15 +151,26 @@ function SpendingByCategoryPieChart() {
 	const formatAmount = useAmountFormatter()
 	const entryDataQuery = useEntryDataQuery(ledgerId, thisMonthRange)
 	const totalSpendingByCategory = useMemo(() => {
-		return entryDataQuery.data === undefined
-			? undefined
-			: StatisticsHelper.groupTotalSpendingByCategory(entryDataQuery.data)
+		if (entryDataQuery.data === undefined) {
+			return undefined
+		}
+
+		const groups = StatisticsHelper.groupTotalSpendingByCategory(
+			entryDataQuery.data
+		)
+		const groupSize = groups.length
+		for (let i = 0; i < groupSize; i++) {
+			groups[i].category = truncate(groups[i].category)
+		}
+		return groups
 	}, [entryDataQuery.data])
 
 	const tooltipContent = () => (
 		<ChartTooltipContent
 			formatterOverride={false}
-			formatter={(value) => formatAmount(Number(value))}
+			formatter={(value) => {
+				return formatAmount(Number(value))
+			}}
 		/>
 	)
 
@@ -184,6 +197,7 @@ function SpendingByCategoryPieChart() {
 									nameKey="category"
 									dataKey="totalSpending"
 									data={totalSpendingByCategory}
+									minAngle={10}
 								>
 									{totalSpendingByCategory?.map((value, index) => (
 										<Cell
@@ -204,9 +218,16 @@ function SpendingByCategoryPieChart() {
 }
 
 export default function SummarySection() {
+	const [curMonthText] = useState(() => {
+		const today = new Date()
+		return `${MONTHS[today.getMonth()]} ${today.getFullYear()}`
+	})
 	return (
 		<div className="w-full mb-4">
-			<h4 className="pb-4">Spending this month</h4>
+			<div className="pb-4">
+				<h4>Overview</h4>
+				<p className="text-muted-foreground text-xs">{curMonthText}</p>
+			</div>
 			<div className="w-full gap-4 grid sm:grid-cols-[repeat(auto-fit,minmax(21rem,1fr))]">
 				<SpendingByDateAreaChart />
 				<SpendingByCategoryPieChart />

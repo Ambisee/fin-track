@@ -53,9 +53,7 @@ export default function RecentTransactionSection() {
 
 	return (
 		<div className="mt-4 pt-4">
-			<h4 className="mb-4">
-				Transactions in {MONTHS[today.getMonth()]} {today.getFullYear()}
-			</h4>
+			<h4 className="mb-4">Recent Transactions</h4>
 			<ConditionalWrapper
 				showContent={!entryDataQuery.isLoading && entryDataQuery.isFetched}
 				fallback={<EntryListSkeleton />}
