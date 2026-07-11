@@ -61,6 +61,13 @@ function SpendingByDateAreaChart() {
 			return undefined
 		}
 
+		if (
+			!isNonNullable(thisMonthRange.from) ||
+			!isNonNullable(thisMonthRange.to)
+		) {
+			return undefined
+		}
+
 		const calculatedGroups = StatisticsHelper.groupTotalSpendingByDate(
 			entryDataQuery.data
 		)
