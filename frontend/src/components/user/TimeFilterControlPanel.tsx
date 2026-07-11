@@ -1,20 +1,11 @@
 import { MONTHS } from "@/lib/constants"
 import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
+import { useIsSmallMobile } from "@/lib/hooks"
 import { isNonNullable, isSetStateFunction } from "@/lib/utils"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { CommandGroup, useCommandState } from "cmdk"
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react"
-import {
-	Dispatch,
-	ReactNode,
-	SetStateAction,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState
-} from "react"
-import { useMediaQuery } from "react-responsive"
+import { Dispatch, ReactNode, SetStateAction, useMemo, useState } from "react"
 import { Button } from "../ui/button"
 import {
 	Command,
@@ -32,12 +23,8 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "../ui/dialog"
-import { FieldGroup } from "../ui/field"
-import { InputGroup, InputGroupButton, InputGroupText } from "../ui/input-group"
 import { Item, ItemContent, ItemTitle } from "../ui/item"
-import { Separator } from "../ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { EntryFormItem } from "./EntryForm/EntryForm"
 
 const PERIOD_TYPE = {
 	TODAY: { label: "Today" },
@@ -127,16 +114,12 @@ const defaultSettings: EntryDisplaySettings = {
 	filter: { type: "All", categories: undefined, amountRange: undefined }
 }
 
-function useTinyScreenMediaQuery() {
-	return useMediaQuery({ maxWidth: "375px" })
-}
-
 function TimeRangeSelector(props: {
 	value: DateRange | undefined
 	valueOverride?: string
 	onChange: (arg: number) => void
 }) {
-	const shouldUseShort = useTinyScreenMediaQuery()
+	const shouldUseShort = useIsSmallMobile()
 
 	let startDateString: string
 	let endDateString: string
@@ -354,113 +337,14 @@ function FilterCommandInput(props: {
 	)
 }
 
-function TransactionTypeSelector(props: {
-	value: TransactionType
-	onChange: Dispatch<SetStateAction<TransactionType>>
-}) {
-	const [firstType] = useState(props.value)
-
-	const hoverBgRef = useRef<HTMLDivElement>(null)
-	const typeAllRef = useRef<HTMLButtonElement>(null)
-	const typeExpenseRef = useRef<HTMLButtonElement>(null)
-	const typeIncomeRef = useRef<HTMLButtonElement>(null)
-
-	const computeXPos = (type: TransactionType) => {
-		switch (type) {
-			case TRANSACTION_TYPE[0]:
-				return typeAllRef?.current?.offsetLeft ?? 0
-			case TRANSACTION_TYPE[1]:
-				return typeExpenseRef?.current?.offsetLeft ?? 0
-			case TRANSACTION_TYPE[2]:
-				return typeIncomeRef?.current?.offsetLeft ?? 0
-			default:
-				return 0
-		}
-	}
-
-	const computeWidth = (type: TransactionType) => {
-		switch (type) {
-			case TRANSACTION_TYPE[0]:
-				return typeAllRef?.current?.offsetWidth ?? 0
-			case TRANSACTION_TYPE[1]:
-				return typeExpenseRef?.current?.offsetWidth ?? 0
-			case TRANSACTION_TYPE[2]:
-				return typeIncomeRef?.current?.offsetWidth ?? 0
-			default:
-				return 0
-		}
-	}
-
-	useLayoutEffect(() => {
-		const hoverBg = hoverBgRef.current as HTMLDivElement
-		hoverBg.style.width = `${computeWidth(firstType)}px`
-		hoverBg.style.translate = `${computeXPos(firstType)}px 0`
-	}, [firstType])
-
-	useEffect(() => {
-		const hoverBg = hoverBgRef.current as HTMLDivElement
-		const resizeCallback = () => {
-			hoverBg.style.width = `${computeWidth(props.value)}px`
-			hoverBg.style.translate = `${computeXPos(props.value)}px 0`
-		}
-
-		hoverBg.classList.add("transition-all")
-		window.addEventListener("resize", resizeCallback)
-
-		return () => {
-			window.removeEventListener("resize", resizeCallback)
-		}
-	}, [props.value])
-
-	return (
-		<Tabs
-			value={props.value}
-			onValueChange={(value) => props.onChange(value as TransactionType)}
-			defaultValue={TRANSACTION_TYPE[0]}
-		>
-			<TabsList className="w-full relative">
-				<TabsTrigger
-					className="data-[state=active]:bg-transparent z-2 w-full"
-					ref={typeAllRef}
-					value={TRANSACTION_TYPE[0]}
-				>
-					{TRANSACTION_TYPE[0]}
-				</TabsTrigger>
-				<TabsTrigger
-					className="data-[state=active]:bg-transparent z-2 w-full"
-					ref={typeExpenseRef}
-					value={TRANSACTION_TYPE[1]}
-				>
-					{TRANSACTION_TYPE[1]}
-				</TabsTrigger>
-				<TabsTrigger
-					className="data-[state=active]:bg-transparent z-2 w-full"
-					ref={typeIncomeRef}
-					value={TRANSACTION_TYPE[2]}
-				>
-					{TRANSACTION_TYPE[2]}
-				</TabsTrigger>
-				<div
-					ref={hoverBgRef}
-					className="absolute top-1 left-0 bg-background rounded-md h-[calc(100%-0.5rem)]"
-					style={{
-						// eslint-disable-next-line react-hooks/refs
-						translate: `${computeXPos(props.value)}px 0`,
-						// eslint-disable-next-line react-hooks/refs
-						width: `${computeWidth(props.value)}px`
-					}}
-				/>
-			</TabsList>
-		</Tabs>
-	)
-}
-
 function FilterControlTab(props: {
 	tabValue: string
 	categories?: string[]
 	filterSettings: FilterSettings
 	onFilterSettings: Dispatch<SetStateAction<FilterSettings>>
 }) {
+	const [searchValue, setSearchValue] = useState("")
+
 	const availableCategories = props?.categories ?? [
 		"Miscellaneous",
 		"Food",
@@ -472,94 +356,98 @@ function FilterControlTab(props: {
 		"Utilities",
 		"Rent"
 	]
-
-	const [searchValue, setSearchValue] = useState("")
 	const categories = props.filterSettings.categories
+	const isNotAllCategory =
+		categories && categories.length !== availableCategories.length
+	const onTransactionTypeChange = (type: TransactionType) => {
+		props.onFilterSettings((c) => ({
+			...c,
+			type: isSetStateFunction(type) ? type(c.type) : type
+		}))
+	}
 
 	return (
-		<TabsContent value={props.tabValue}>
-			<form onSubmit={(e) => e.preventDefault()}>
-				<FieldGroup className="h-fit *:text-left grid gap-4">
-					<EntryFormItem
-						label="Type"
-						className="items-start [&_label]:h-8 [&_label]:align-middle [&_label]:leading-8"
+		<TabsContent value={props.tabValue} className="grid gap-4 min-h-0 h-full">
+			<section className="grid gap-2">
+				<h6>Type</h6>
+				<div className="grid grid-rows-3 gap-2">
+					{TRANSACTION_TYPE.map((type) => (
+						<Button
+							key={type}
+							variant="outline"
+							className="flex justify-between"
+							onClick={() => onTransactionTypeChange(type)}
+						>
+							<span>{type}</span>
+							{props.filterSettings.type === type && <Check />}
+						</Button>
+					))}
+				</div>
+			</section>
+			<section className="grid gap-2 min-h-0 h-full">
+				<div className="flex justify-between items-center">
+					<h6>Categories</h6>
+					<Button
+						disabled={!isNotAllCategory}
+						className="text-sm p-0 not-disabled:px-2 text-muted-foreground disabled:opacity-100"
+						variant={isNotAllCategory ? "outline" : "ghost"}
+						onClick={() => {
+							props.onFilterSettings((cur) => ({
+								...cur,
+								categories: undefined
+							}))
+						}}
 					>
-						<TransactionTypeSelector
-							value={props.filterSettings.type}
-							onChange={(v) => {
-								props.onFilterSettings((c) => ({
-									...c,
-									type: isSetStateFunction(v) ? v(c.type) : v
-								}))
-							}}
-						/>
-					</EntryFormItem>
-					<EntryFormItem
-						label="Categories"
-						className="items-start [&_label]:h-10 [&_label]:align-middle [&_label]:leading-10"
-					>
-						<InputGroup className="overflow-hidden">
-							<InputGroupText className="w-full pl-2">
-								{categories && categories.length !== availableCategories.length
-									? `${categories.length} selected.`
-									: "All selected."}
-							</InputGroupText>
-							<Separator orientation="vertical" />
-							<InputGroupButton
-								onClick={() =>
-									props.onFilterSettings((cur) => ({
-										...cur,
-										categories: undefined
-									}))
-								}
-								className="h-full rounded-none"
-							>
-								Clear
-							</InputGroupButton>
-						</InputGroup>
-						<Command className="bg-transparent outline-1">
-							<FilterCommandInput
-								value={searchValue}
-								onChange={setSearchValue}
-							/>
-							<CommandList className="h-48 relative overflow-y-scroll pointer-events-auto">
-								<CommandEmpty>No category found.</CommandEmpty>
-								<CommandGroup>
-									{availableCategories.map((value) => (
-										<CommandItem
-											className="justify-between cursor-pointer"
-											value={value}
-											key={value}
-											onSelect={(v) =>
-												props.onFilterSettings((cur) => {
-													const categories = cur.categories
-													if (categories === undefined) {
-														return { ...cur, categories: [v] }
-													}
-
-													if (categories.includes(v)) {
-														const newValue = categories.filter(
-															(val) => val !== v
-														)
-														if (newValue.length === 0)
-															return { ...cur, categories: undefined }
-														return { ...cur, categories: newValue }
-													}
-
-													return { ...cur, categories: [...categories, v] }
-												})
+						{isNotAllCategory
+							? `${categories.length} selected`
+							: "All selected"}
+						{isNotAllCategory && <X />}
+					</Button>
+				</div>
+				<Command className="h-full min-h-0 grid grid-rows-[auto_1fr]">
+					<FilterCommandInput value={searchValue} onChange={setSearchValue} />
+					<CommandList>
+						<CommandEmpty>No categories found.</CommandEmpty>
+						<CommandGroup>
+							{availableCategories.map((value) => (
+								<CommandItem
+									className="justify-between cursor-pointer"
+									value={value}
+									key={value}
+									onSelect={(v) =>
+										props.onFilterSettings((cur) => {
+											const categories = cur.categories
+											if (categories === undefined) {
+												return { ...cur, categories: [v] }
 											}
-										>
-											<span>{value}</span>
-											{(categories ?? []).includes(value) && <Check />}
-										</CommandItem>
-									))}
-								</CommandGroup>
-							</CommandList>
-						</Command>
-					</EntryFormItem>
-				</FieldGroup>
-			</form>
+
+											if (categories.includes(v)) {
+												const newValue = categories.filter((val) => val !== v)
+												if (newValue.length === 0)
+													return { ...cur, categories: undefined }
+												return { ...cur, categories: newValue }
+											}
+
+											return { ...cur, categories: [...categories, v] }
+										})
+									}
+								>
+									<span className="overflow-hidden text-ellipsis text-nowrap">
+										{value}
+									</span>
+									<Check
+										className={
+											(categories ?? []).includes(value)
+												? "visible"
+												: "invisible"
+										}
+									/>
+								</CommandItem>
+							))}
+						</CommandGroup>
+					</CommandList>
+				</Command>
+			</section>
 		</TabsContent>
 	)
 }
@@ -592,7 +480,7 @@ function TimeFilterControlDialogContent(props: {
 	return (
 		<DialogContent
 			hideCloseButton
-			className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-115 sm:max-w-lg"
+			className="grid grid-rows-[auto_1fr] overflow-hidden h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-115 sm:max-w-lg"
 			onCloseAutoFocus={() =>
 				props.onSettingsChange({ period: timeSettings, filter: filterSettings })
 			}
@@ -608,8 +496,11 @@ function TimeFilterControlDialogContent(props: {
 					<X className="w-4 h-4" />
 				</DialogClose>
 			</DialogHeader>
-			<Tabs defaultValue="timePeriod">
-				<TabsList className="w-full relative mb-4">
+			<Tabs
+				defaultValue="timePeriod"
+				className="grid h-full min-h-0 grid-rows-[auto_1fr]"
+			>
+				<TabsList className="w-full relative mb-2">
 					<TabsTrigger
 						className="
                             peer/timePeriod
@@ -672,7 +563,7 @@ export default function TimeFilterControlPanel(props: {
 		props.setSettings
 	)
 
-	const shouldUseShort = useTinyScreenMediaQuery()
+	const shouldUseShort = useIsSmallMobile()
 	const triggerText = useMemo(() => {
 		let result: ReactNode = ""
 		const period = entryDisplaySettings.period
@@ -713,7 +604,7 @@ export default function TimeFilterControlPanel(props: {
 		}
 
 		return result
-	}, [entryDisplaySettings.period])
+	}, [entryDisplaySettings.period, shouldUseShort])
 
 	return (
 		<Dialog>
@@ -731,4 +622,4 @@ export default function TimeFilterControlPanel(props: {
 	)
 }
 
-export { PERIOD_TYPE, changePeriod, type EntryDisplaySettings }
+export { changePeriod, PERIOD_TYPE, type EntryDisplaySettings }

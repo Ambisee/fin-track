@@ -29,6 +29,7 @@ export const TRANSITION_ROOT_CLASSNAME = "transition-root"
 export const TRANSITION_PAGE_CLASSNAME = "transition-page"
 
 // General Components
+export const SMALL_MOBILE_BREKPOINT = 348
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_USERNAME_LENGTH = 20
 export const DEFAULT_TRUNCATE_MAX_LENGTH = 20

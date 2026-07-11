@@ -4,6 +4,8 @@ import { DatabaseHelper } from "./helper/DatabaseHelper"
 import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
 import { useSettingsQuery } from "./queries"
+import { SMALL_MOBILE_BREKPOINT } from "./constants"
+import { useMediaQuery } from "react-responsive"
 
 function useSearchEntry() {
 	const [isSearching, setIsSearching] = useState(false)
@@ -93,4 +95,13 @@ function useAmountFormatter() {
 	return formatAmount
 }
 
-export { useAmountFormatter, useSearchEntry, useSetElementWindowHeight }
+function useIsSmallMobile() {
+	return useMediaQuery({ maxWidth: SMALL_MOBILE_BREKPOINT })
+}
+
+export {
+	useAmountFormatter,
+	useSearchEntry,
+	useSetElementWindowHeight,
+	useIsSmallMobile
+}
