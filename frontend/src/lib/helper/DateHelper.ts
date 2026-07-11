@@ -1,3 +1,5 @@
+import { isNonNullable } from "../utils"
+
 type DateRange = { from: Date; to: Date }
 
 interface UTS35WeekElement {
@@ -6,12 +8,23 @@ interface UTS35WeekElement {
 }
 
 class DateHelper {
+	private static formatter: Intl.DateTimeFormat = new Intl.DateTimeFormat(
+		navigator.language,
+		{
+			day: "2-digit"
+		}
+	)
+
 	static toDatabaseString(date: Date): string {
 		const year = String(date.getFullYear())
 		const month = String(date.getMonth() + 1).padStart(2, "0")
 		const day = String(date.getDate()).padStart(2, "0")
 
 		return `${year}-${month}-${day}`
+	}
+
+	static toShortDateString(date: Date): string {
+		return DateHelper.formatter.format(date)
 	}
 
 	/**
