@@ -25,12 +25,18 @@ class DateHelper {
 		return DateHelper.formatter.format(date)
 	}
 
-	static toLocaleString(
+	static toShortString(date: Date): string {
+		const formatter = new Intl.DateTimeFormat(navigator.language, {
+			dateStyle: "short"
+		})
+
+		return formatter.format(date)
+	}
+
+	static toFullString(
 		date: Date,
 		locale: Intl.DateTimeFormat = new Intl.DateTimeFormat(navigator.language, {
-			day: "2-digit",
-			month: "short",
-			year: "numeric"
+			dateStyle: "long"
 		})
 	): string {
 		return locale.format(date)

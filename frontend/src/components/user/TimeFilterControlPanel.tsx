@@ -1,6 +1,6 @@
 import { MONTHS } from "@/lib/constants"
 import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
-import { isSetStateFunction } from "@/lib/utils"
+import { isNonNullable, isSetStateFunction } from "@/lib/utils"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { CommandGroup, useCommandState } from "cmdk"
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react"
@@ -10,6 +10,7 @@ import {
 	SetStateAction,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState
 } from "react"
@@ -94,13 +95,12 @@ const changePeriod: {
 	MONTHLY: (curDate, offset) => {
 		const curMonth = DateHelper.getMonthStartEnd(curDate)
 
-		let newMonthDate = new Date(curDate)
+		const newMonthDate = new Date(curMonth?.from ?? new Date())
+		newMonthDate.setDate(15)
 		if (offset < 0) {
-			newMonthDate = new Date(curMonth?.from ?? new Date())
-			newMonthDate.setDate(newMonthDate.getDate() - 1)
+			newMonthDate.setMonth(newMonthDate.getMonth() - 1)
 		} else if (offset > 0) {
-			newMonthDate = new Date(curMonth?.to ?? new Date())
-			newMonthDate.setDate(newMonthDate.getDate() + 1)
+			newMonthDate.setMonth(newMonthDate.getMonth() + 1)
 		}
 
 		const answer = DateHelper.getMonthStartEnd(newMonthDate)
@@ -109,13 +109,12 @@ const changePeriod: {
 	YEARLY: (curDate, offset) => {
 		const curYear = DateHelper.getYearStartEnd(curDate)
 
-		let newYearDate = new Date(curDate)
+		const newYearDate = new Date(curYear?.from ?? new Date())
+		newYearDate.setDate(15)
 		if (offset < 0) {
-			newYearDate = new Date(curYear?.from ?? new Date())
-			newYearDate.setDate(newYearDate.getDate() - 1)
+			newYearDate.setFullYear(newYearDate.getFullYear() - 1)
 		} else if (offset > 0) {
-			newYearDate = new Date(curYear?.to ?? new Date())
-			newYearDate.setDate(newYearDate.getDate() + 1)
+			newYearDate.setFullYear(newYearDate.getFullYear() + 1)
 		}
 
 		const answer = DateHelper.getYearStartEnd(newYearDate)
@@ -128,12 +127,16 @@ const defaultSettings: EntryDisplaySettings = {
 	filter: { type: "All", categories: undefined, amountRange: undefined }
 }
 
+function useTinyScreenMediaQuery() {
+	return useMediaQuery({ maxWidth: "375px" })
+}
+
 function TimeRangeSelector(props: {
 	value: DateRange | undefined
 	valueOverride?: string
 	onChange: (arg: number) => void
 }) {
-	const shouldUseShort = useMediaQuery({ maxWidth: "350px" })
+	const shouldUseShort = useTinyScreenMediaQuery()
 
 	let startDateString: string
 	let endDateString: string
@@ -141,11 +144,11 @@ function TimeRangeSelector(props: {
 	const start = props.value?.from ?? new Date()
 	const end = props.value?.to ?? new Date()
 	if (shouldUseShort) {
-		startDateString = start.toLocaleDateString()
-		endDateString = end.toLocaleDateString()
+		startDateString = DateHelper.toShortString(start)
+		endDateString = DateHelper.toShortString(end)
 	} else {
-		startDateString = DateHelper.toLocaleString(start)
-		endDateString = DateHelper.toLocaleString(end)
+		startDateString = DateHelper.toFullString(start)
+		endDateString = DateHelper.toFullString(end)
 	}
 
 	return (
@@ -180,21 +183,21 @@ function TimePeriodControlTabHeader(props: {
 
 	switch (props.value.type) {
 		case "TODAY":
-			header = DateHelper.toLocaleString(today)
+			header = DateHelper.toFullString(today)
 			break
 		case "YESTERDAY":
 			const yesterday = new Date()
 			yesterday.setDate(yesterday.getDate() - 1)
-			header = DateHelper.toLocaleString(yesterday)
+			header = DateHelper.toFullString(yesterday)
 			break
 		case "LAST_7_DAYS":
 			const startDate = new Date()
 			startDate.setDate(startDate.getDate() - 7)
 			header = (
 				<div className="flex justify-between items-center w-full">
-					<span>{DateHelper.toLocaleString(startDate)}</span>
+					<span>{DateHelper.toFullString(startDate)}</span>
 					<span>-</span>
-					<span> {DateHelper.toLocaleString(today)}</span>
+					<span> {DateHelper.toFullString(today)}</span>
 				</div>
 			)
 			break
@@ -546,18 +549,6 @@ function FilterControlTab(props: {
 													return { ...cur, categories: [...categories, v] }
 												})
 											}
-											// onSelect={(v) =>
-											// 	setCategories((cur) => {
-											// 		if (cur === undefined) return [v]
-											// 		if (cur.includes(v)) {
-											// 			const newValue = cur.filter((val) => val !== v)
-
-											// 			if (newValue.length === 0) return undefined
-											// 			return newValue
-											// 		}
-											// 		return [...cur, v]
-											// 	})
-											// }
 										>
 											<span>{value}</span>
 											{(categories ?? []).includes(value) && <Check />}
@@ -681,27 +672,48 @@ export default function TimeFilterControlPanel(props: {
 		props.setSettings
 	)
 
-	let triggerText: ReactNode = ""
-	const period = entryDisplaySettings.period
-	switch (period.type) {
-		case "TODAY":
-			triggerText = PERIOD_TYPE.TODAY.label
-			break
-		case "YESTERDAY":
-			triggerText = PERIOD_TYPE.YESTERDAY.label
-			break
-		case "LAST_7_DAYS":
-			triggerText = PERIOD_TYPE.LAST_7_DAYS.label
-			break
-		case "MONTHLY":
-			const monthDate = new Date(period.timeRange?.from ?? 0)
-			triggerText = `${MONTHS[monthDate.getMonth()]} ${monthDate.getFullYear()}`
-			break
-		case "YEARLY":
-			const yearDate = new Date(period.timeRange?.from ?? 0)
-			triggerText = `${yearDate.getFullYear()}`
-			break
-	}
+	const shouldUseShort = useTinyScreenMediaQuery()
+	const triggerText = useMemo(() => {
+		let result: ReactNode = ""
+		const period = entryDisplaySettings.period
+		switch (period.type) {
+			case "TODAY":
+				result = PERIOD_TYPE.TODAY.label
+				break
+			case "YESTERDAY":
+				result = PERIOD_TYPE.YESTERDAY.label
+				break
+			case "LAST_7_DAYS":
+				result = PERIOD_TYPE.LAST_7_DAYS.label
+				break
+			case "WEEKLY":
+				let timeRange: DateRange
+				if (isNonNullable(period.timeRange)) {
+					timeRange = period.timeRange
+				} else {
+					timeRange = DateHelper.getWeekStartEnd(new Date())
+				}
+
+				const from = timeRange.from!
+				const to = timeRange.to!
+				if (shouldUseShort) {
+					result = `${DateHelper.toShortString(from)} - ${DateHelper.toShortString(to)}`
+				} else {
+					result = `${DateHelper.toFullString(from)} - ${DateHelper.toFullString(to)}`
+				}
+				break
+			case "MONTHLY":
+				const monthDate = new Date(period.timeRange?.from ?? 0)
+				result = `${MONTHS[monthDate.getMonth()]} ${monthDate.getFullYear()}`
+				break
+			case "YEARLY":
+				const yearDate = new Date(period.timeRange?.from ?? 0)
+				result = `${yearDate.getFullYear()}`
+				break
+		}
+
+		return result
+	}, [entryDisplaySettings.period])
 
 	return (
 		<Dialog>

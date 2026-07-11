@@ -13,7 +13,7 @@ import TimeFilterControlPanel, {
 import { DateHelper } from "@/lib/helper/DateHelper"
 import {
 	useCategoriesQuery,
-	useEntryDataQuery,
+	useFilterEntryDataQuery,
 	useSettingsQuery
 } from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
@@ -57,9 +57,11 @@ export default function DashboardEntries() {
 	const categoriesQuery = useCategoriesQuery()
 
 	const currentLedgerId = settingsQuery.data?.current_ledger
-	const dateRange = DateHelper.getMonthStartEnd(new Date())
 
-	const entryQuery = useEntryDataQuery(currentLedgerId, dateRange)
+	const entryQuery = useFilterEntryDataQuery(
+		currentLedgerId,
+		entryDisplaySettings
+	)
 	const showButton = ["WEEKLY", "MONTHLY", "YEARLY"].includes(
 		entryDisplaySettings.period.type
 	)

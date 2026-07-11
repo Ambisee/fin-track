@@ -4,6 +4,7 @@ import { useState } from "react"
 import {
 	CATEGORIES_QKEY,
 	CURRENCIES_QKEY,
+	ENTRY_QKEY,
 	LEDGER_QKEY,
 	MONTH_GROUP_QKEY,
 	PING_QUERY_STALE_TIME,
@@ -17,6 +18,10 @@ import { DateHelper, DateRange } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
+import {
+	EntryDisplaySettings,
+	PERIOD_TYPE
+} from "@/components/user/TimeFilterControlPanel"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -91,7 +96,7 @@ function useStatisticsQuery(
 			}
 
 			const ledger = queryKey[1]
-			const { from, to } = queryKey[2]
+			const { from = new Date(), to = new Date() } = queryKey[2]
 
 			if (!isNonNullable(ledger)) {
 				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
@@ -136,8 +141,8 @@ function useEntryDataQuery(
 				throw Error(QueryHelper.MESSAGE_NO_USER)
 			}
 
-			const from = queryKey[2].from
-			const to = queryKey[2].to
+			const from = queryKey[2].from ?? new Date()
+			const to = queryKey[2].to ?? new Date()
 
 			const { data, error } = await supabase
 				.from("entry")
@@ -156,6 +161,95 @@ function useEntryDataQuery(
 
 			return data ?? []
 		},
+		enabled: isLedgerDefined && isUserAuthenticated
+	})
+}
+
+function useFilterEntryDataQuery(
+	ledger: number | undefined = undefined,
+	filters: EntryDisplaySettings
+) {
+	const [supabase] = useState(supabaseClient())
+	const userQuery = useUserQuery()
+
+	const isLedgerDefined = ledger !== undefined
+	const isUserAuthenticated = !userQuery.isError && !!userQuery.data?.id
+
+	return useQuery({
+		queryKey: QueryHelper.getFilterEntryQueryKey(ledger, filters),
+		queryFn: async ({ queryKey }) => {
+			const filters = queryKey[2]
+
+			let dateRange: DateRange
+			const today = new Date()
+
+			switch (filters.period.type) {
+				case "LAST_7_DAYS":
+					const from = new Date(today)
+					from.setDate(today.getDate() - 7)
+
+					const to = today
+					dateRange = { from, to }
+					break
+				case "YESTERDAY":
+					const yesterday = new Date(today)
+					yesterday.setDate(today.getDate() - 1)
+					dateRange = { from: yesterday, to: yesterday }
+					break
+				case "MONTHLY":
+				case "WEEKLY":
+				case "YEARLY":
+					if (isNonNullable(filters.period.timeRange)) {
+						dateRange = filters.period.timeRange
+						break
+					}
+				case "TODAY":
+				default:
+					dateRange = { from: today, to: today }
+					break
+			}
+
+			const ledgerId = queryKey[1]
+			if (!isNonNullable(ledgerId)) {
+				throw Error("Invalid ledger ID.")
+			}
+
+			let query = supabase.from("entry").select("*").eq("ledger", ledgerId)
+
+			const { from: dateFrom, to: dateTo } = dateRange
+			if (isNonNullable(dateFrom))
+				query = query.gte("date", dateFrom.toDateString())
+			if (isNonNullable(dateTo))
+				query = query.lte("date", dateTo.toDateString())
+
+			const type = filters.filter.type
+			if (type !== "All") {
+				query = query.eq("is_positive", type === "Income")
+			}
+
+			const categories = filters.filter.categories
+			if (isNonNullable(categories) && categories.length > 0) {
+				query = query.in("category", categories)
+			}
+
+			query = query
+				.order("date", { ascending: false })
+				.order("category", { ascending: false })
+				.order("id", { ascending: true })
+
+			const { data, error } = await query
+
+			if (isNonNullable(error)) {
+				throw new PostgrestError(error)
+			}
+
+			return data ?? []
+		},
+		staleTime: QUERY_STALE_TIME,
+		refetchOnWindowFocus: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
+		refetchOnMount: (query) =>
+			query.state.data === undefined || query.state.isInvalidated,
 		enabled: isLedgerDefined && isUserAuthenticated
 	})
 }
@@ -309,6 +403,7 @@ export {
 	useCategoriesQuery,
 	useCurrenciesQuery,
 	useEntryDataQuery,
+	useFilterEntryDataQuery,
 	useLedgersQuery,
 	useMonthGroupQuery,
 	useServerPingQuery,
