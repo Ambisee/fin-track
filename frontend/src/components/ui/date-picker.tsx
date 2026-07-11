@@ -37,10 +37,10 @@ export function DatePicker(props: DatePickerProps) {
 				</Button>
 			</DialogTrigger>
 			<DialogContent
-				className="max-w-screen w-auto max-h-screen p-0 rounded-lg overflow-clip"
+				className="max-w-screen w-auto max-h-screen p-4 rounded-lg overflow-clip"
 				hideCloseButton
 			>
-				<DialogHeader className="pt-4">
+				<DialogHeader>
 					<DialogTitle>Pick a Date</DialogTitle>
 				</DialogHeader>
 				<Calendar
