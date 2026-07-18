@@ -126,7 +126,6 @@ function NormalList(props: EntryListProps) {
 
 function VirtualizedList(props: EntryListProps) {
 	const { data, onScrollToBottom } = props
-	const expandedRef = useRef<boolean[]>([])
 	const listRef = useRef<HTMLDivElement>(null)
 
 	// [TEMPORARY] Disable memoization warning for this API.
@@ -134,14 +133,11 @@ function VirtualizedList(props: EntryListProps) {
 	const virtualizer = useVirtualizer({
 		count: data.length,
 		estimateSize: () => 100,
+		getItemKey: (index) => data[index].id,
 		getScrollElement: () => listRef.current,
 		overscan: 5,
 		gap: 16
 	})
-
-	useEffect(() => {
-		expandedRef.current = Array(data.length).fill(false)
-	}, [data])
 
 	useEffect(() => {
 		if (virtualizer.getVirtualIndexes().at(-1) === data.length - 1) {
@@ -188,7 +184,7 @@ function WindowVirtualizedList(props: EntryListProps) {
 	const { data, onScrollToBottom } = props
 	const listRef = useRef<HTMLDivElement>(null)
 	const listOffsetRef = useRef<number>(0)
-	const [expanded, setExpanded] = useState(Array(data.length ?? 0).fill(false))
+	const [expanded, setExpanded] = useState(new Set<number>())
 
 	useLayoutEffect(() => {
 		listOffsetRef.current = listRef.current?.offsetTop ?? 0
@@ -196,6 +192,7 @@ function WindowVirtualizedList(props: EntryListProps) {
 
 	const virtualizer = useWindowVirtualizer({
 		count: data.length,
+		getItemKey: (index) => data[index].id,
 		estimateSize: () => 100,
 		overscan: 3,
 		gap: 16,
@@ -241,17 +238,22 @@ function WindowVirtualizedList(props: EntryListProps) {
 							ref={virtualizer.measureElement}
 						>
 							<EntryListItem
-								expand={expanded[it.index]}
+								expand={expanded.has(data[it.index].id)}
 								showButtons={props.showButtons}
 								data={data!.at(it.index)!}
 								onEdit={props.onEditItem}
-								onExpand={(value) =>
+								onExpand={(value) => {
+									const id = data[it.index].id
 									setExpanded((cur) => {
-										const newExpanded = [...cur]
-										newExpanded[it.index] = value
-										return newExpanded
+										const next = new Set(cur)
+										if (value) {
+											next.add(id)
+										} else {
+											next.delete(id)
+										}
+										return next
 									})
-								}
+								}}
 							/>
 						</div>
 					))}
