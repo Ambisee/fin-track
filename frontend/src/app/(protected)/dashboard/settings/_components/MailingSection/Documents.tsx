@@ -21,6 +21,7 @@ import {
 import { FetchError } from "@/lib/errors/FetchError"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
+	useInvalidateEntryDataQuery,
 	useLedgersQuery,
 	useMonthGroupQuery,
 	useServerPingQuery,
@@ -207,6 +208,8 @@ function MonthSelectorPage(props: DocumentPageProps) {
 	const monthGroupQuery = useMonthGroupQuery(ledger?.id)
 	const serverPingQuery = useServerPingQuery()
 
+	const invalidateEntryQuery = useInvalidateEntryDataQuery()
+
 	const isItemButtonEnabled =
 		props.isFetchingReport ||
 		serverPingQuery.isFetching ||
@@ -242,12 +245,9 @@ function MonthSelectorPage(props: DocumentPageProps) {
 								const monthStartEnd = DateHelper.getMonthStartEnd(
 									new Date(data.date)
 								)
-								const entryQueryKey = QueryHelper.getEntryQueryKey(
-									data.ledger,
-									monthStartEnd
-								)
 
-								queryClient.invalidateQueries({ queryKey: entryQueryKey })
+								invalidateEntryQuery(data.ledger, monthStartEnd)
+
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
@@ -452,7 +452,7 @@ export default function Documents() {
 			<DialogContent
 				hideCloseButton
 				onOpenAutoFocus={() => setCurPage(0)}
-				className="h-dvh grid-rows-[auto_1fr] max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+				className="h-dvh grid-rows-[auto_1fr] max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-115 sm:max-w-lg"
 			>
 				{renderPage()}
 			</DialogContent>

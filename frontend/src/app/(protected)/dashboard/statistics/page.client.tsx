@@ -26,6 +26,7 @@ import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter } from "@/lib/hooks"
 import {
 	useEntryDataQuery,
+	useInvalidateEntryDataQuery,
 	useSettingsQuery,
 	useStatisticsQuery
 } from "@/lib/queries"
@@ -124,16 +125,19 @@ function ChartDisplay(props: ChartDisplayProps) {
 
 	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
+
+	const invalidateEntryQuery = useInvalidateEntryDataQuery()
+
 	const formatAmount = useAmountFormatter()
 	const percentageKey = "percentage" as keyof Group
 
 	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
-		return <Skeleton className="w-full h-[250px] mt-5" />
+		return <Skeleton className="w-full h-62.5 mt-5" />
 	}
 
 	if (props.data.length < 1) {
 		return (
-			<div className="h-[250px] flex items-center justify-center flex-col gap-2">
+			<div className="h-62.5 flex items-center justify-center flex-col gap-2">
 				<h4>No {props.dataKey} data entered for this period.</h4>
 				<DialogTrigger
 					asChild
@@ -143,12 +147,9 @@ function ChartDisplay(props: ChartDisplayProps) {
 							const monthStartEnd = DateHelper.getMonthStartEnd(
 								new Date(data.date)
 							)
-							const entryQueryKey = QueryHelper.getEntryQueryKey(
-								data.ledger,
-								monthStartEnd
-							)
 
-							queryClient.invalidateQueries({ queryKey: entryQueryKey })
+							invalidateEntryQuery(data.ledger, monthStartEnd)
+
 							queryClient.invalidateQueries({
 								queryKey: QueryHelper.getStatisticQueryKey(
 									data.ledger,
@@ -168,7 +169,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 		<div>
 			<ChartContainer
 				config={props.chartConfig}
-				className="mx-auto aspect-square w-fit max-w-[250px] min-h-[250px]"
+				className="mx-auto aspect-square w-fit max-w-62.5 min-h-62.5"
 			>
 				<PieChart>
 					<ChartTooltip
@@ -284,11 +285,13 @@ function CategoryItem(props: CategoryItemProps) {
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
 							data={
-								entryDataQuery.data?.filter(
-									(value) =>
-										value.category === props.value.category &&
-										value.is_positive == props.value.is_positive
-								) ?? []
+								entryDataQuery
+									.flatMap((v) => v.data ?? [])
+									.filter(
+										(v) =>
+											v?.category === props.value.category &&
+											v?.is_positive == props.value.is_positive
+									) ?? []
 							}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}

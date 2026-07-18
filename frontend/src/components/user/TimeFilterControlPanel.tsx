@@ -175,7 +175,7 @@ function TimePeriodControlTabHeader(props: {
 			break
 		case "LAST_7_DAYS":
 			const startDate = new Date()
-			startDate.setDate(startDate.getDate() - 7)
+			startDate.setDate(startDate.getDate() - 6)
 			header = (
 				<div className="flex justify-between items-center w-full">
 					<span>{DateHelper.toFullString(startDate)}</span>

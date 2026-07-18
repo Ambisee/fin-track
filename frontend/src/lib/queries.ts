@@ -1,10 +1,14 @@
 import { PostgrestError } from "@supabase/supabase-js"
-import { useQuery } from "@tanstack/react-query"
+import {
+	queryOptions,
+	useQueries,
+	useQuery,
+	useQueryClient
+} from "@tanstack/react-query"
 import { useState } from "react"
 import {
 	CATEGORIES_QKEY,
 	CURRENCIES_QKEY,
-	ENTRY_QKEY,
 	LEDGER_QKEY,
 	MONTH_GROUP_QKEY,
 	PING_QUERY_STALE_TIME,
@@ -14,14 +18,10 @@ import {
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "./constants"
-import { DateHelper, DateRange } from "./helper/DateHelper"
+import { DateRange } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
-import { isNonNullable } from "./utils"
-import {
-	EntryDisplaySettings,
-	PERIOD_TYPE
-} from "@/components/user/TimeFilterControlPanel"
+import { getMonthSpansForDateRange, isNonNullable } from "./utils"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -123,134 +123,54 @@ function useStatisticsQuery(
 	})
 }
 
-function useEntryDataQuery(
-	ledger: number | undefined = undefined,
-	dateRange: DateRange
-) {
+function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 	const [supabase] = useState(supabaseClient())
 	const userQuery = useUserQuery()
 
 	const isLedgerDefined = ledger !== undefined
 	const isUserAuthenticated = !userQuery.isError && !!userQuery.data?.id
 
-	return useQuery({
-		queryKey: QueryHelper.getEntryQueryKey(ledger, dateRange),
-		queryFn: async ({ queryKey }) => {
-			const user = userQuery.data
-			if (!isNonNullable(user)) {
-				throw Error(QueryHelper.MESSAGE_NO_USER)
-			}
+	const queryKeys = QueryHelper.getEntryQueryKeys(ledger, dateRange)
 
-			const from = queryKey[2].from ?? new Date()
-			const to = queryKey[2].to ?? new Date()
+	const entryOption = (queryKey: (typeof queryKeys)[number]) =>
+		queryOptions({
+			queryKey: queryKey,
+			queryFn: async ({ queryKey }) => {
+				const user = userQuery.data
+				if (!isNonNullable(user)) {
+					throw Error(QueryHelper.MESSAGE_NO_USER)
+				}
 
-			const { data, error } = await supabase
-				.from("entry")
-				.select(`*`)
-				.eq("created_by", user.id)
-				.eq("ledger", ledger!)
-				.gte("date", from.toDateString())
-				.lte("date", to.toDateString())
-				.order("date", { ascending: false })
-				.order("category", { ascending: false })
-				.order("id", { ascending: true })
+				const from = queryKey[2].from ?? new Date()
+				const to = queryKey[2].to ?? new Date()
 
-			if (error !== null) {
-				throw new PostgrestError(error)
-			}
+				const { data, error } = await supabase
+					.from("entry")
+					.select(`*`)
+					.eq("created_by", user.id)
+					.eq("ledger", ledger!)
+					.gte("date", from.toDateString())
+					.lte("date", to.toDateString())
+					.order("date", { ascending: false })
+					.order("category", { ascending: false })
+					.order("id", { ascending: true })
 
-			return data ?? []
-		},
-		enabled: isLedgerDefined && isUserAuthenticated
-	})
-}
+				if (error !== null) {
+					throw new PostgrestError(error)
+				}
 
-function useFilterEntryDataQuery(
-	ledger: number | undefined = undefined,
-	filters: EntryDisplaySettings
-) {
-	const [supabase] = useState(supabaseClient())
-	const userQuery = useUserQuery()
+				return data ?? []
+			},
+			staleTime: QUERY_STALE_TIME,
+			refetchOnWindowFocus: (query) =>
+				query.state.data === undefined || query.state.isInvalidated,
+			refetchOnMount: (query) =>
+				query.state.data === undefined || query.state.isInvalidated,
+			enabled: isLedgerDefined && isUserAuthenticated
+		})
 
-	const isLedgerDefined = ledger !== undefined
-	const isUserAuthenticated = !userQuery.isError && !!userQuery.data?.id
-
-	return useQuery({
-		queryKey: QueryHelper.getFilterEntryQueryKey(ledger, filters),
-		queryFn: async ({ queryKey }) => {
-			const filters = queryKey[2]
-
-			let dateRange: DateRange
-			const today = new Date()
-
-			switch (filters.period.type) {
-				case "LAST_7_DAYS":
-					const from = new Date(today)
-					from.setDate(today.getDate() - 7)
-
-					const to = today
-					dateRange = { from, to }
-					break
-				case "YESTERDAY":
-					const yesterday = new Date(today)
-					yesterday.setDate(today.getDate() - 1)
-					dateRange = { from: yesterday, to: yesterday }
-					break
-				case "MONTHLY":
-				case "WEEKLY":
-				case "YEARLY":
-					if (isNonNullable(filters.period.timeRange)) {
-						dateRange = filters.period.timeRange
-						break
-					}
-				case "TODAY":
-				default:
-					dateRange = { from: today, to: today }
-					break
-			}
-
-			const ledgerId = queryKey[1]
-			if (!isNonNullable(ledgerId)) {
-				throw Error("Invalid ledger ID.")
-			}
-
-			let query = supabase.from("entry").select("*").eq("ledger", ledgerId)
-
-			const { from: dateFrom, to: dateTo } = dateRange
-			if (isNonNullable(dateFrom))
-				query = query.gte("date", dateFrom.toDateString())
-			if (isNonNullable(dateTo))
-				query = query.lte("date", dateTo.toDateString())
-
-			const type = filters.filter.type
-			if (type !== "All") {
-				query = query.eq("is_positive", type === "Income")
-			}
-
-			const categories = filters.filter.categories
-			if (isNonNullable(categories) && categories.length > 0) {
-				query = query.in("category", categories)
-			}
-
-			query = query
-				.order("date", { ascending: false })
-				.order("category", { ascending: false })
-				.order("id", { ascending: true })
-
-			const { data, error } = await query
-
-			if (isNonNullable(error)) {
-				throw new PostgrestError(error)
-			}
-
-			return data ?? []
-		},
-		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: (query) =>
-			query.state.data === undefined || query.state.isInvalidated,
-		refetchOnMount: (query) =>
-			query.state.data === undefined || query.state.isInvalidated,
-		enabled: isLedgerDefined && isUserAuthenticated
+	return useQueries({
+		queries: queryKeys.map((qKey) => entryOption(qKey))
 	})
 }
 
@@ -399,11 +319,30 @@ function useServerPingQuery() {
 	return { ...query, data }
 }
 
+function useInvalidateUserQuery() {
+	const queryClient = useQueryClient()
+	return () => queryClient.invalidateQueries({ queryKey: USER_QKEY })
+}
+
+function useInvalidateEntryDataQuery() {
+	const queryClient = useQueryClient()
+	return (ledger: number, dateRange: DateRange) => {
+		return Promise.all(
+			getMonthSpansForDateRange(dateRange).map((span) => {
+				return queryClient.invalidateQueries({
+					queryKey: QueryHelper.getEntryQueryKey(ledger, span)
+				})
+			})
+		)
+	}
+}
+
 export {
 	useCategoriesQuery,
 	useCurrenciesQuery,
 	useEntryDataQuery,
-	useFilterEntryDataQuery,
+	useInvalidateEntryDataQuery,
+	useInvalidateUserQuery,
 	useLedgersQuery,
 	useMonthGroupQuery,
 	useServerPingQuery,

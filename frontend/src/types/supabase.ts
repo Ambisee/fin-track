@@ -1,10 +1,4 @@
-import {
-	useCategoriesQuery,
-	useCurrenciesQuery,
-	useEntryDataQuery,
-	useLedgersQuery,
-	useMonthGroupQuery
-} from "@/lib/queries"
+import { useMonthGroupQuery } from "@/lib/queries"
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 import { Database } from "./supabase-auto"
 
@@ -15,17 +9,20 @@ type InferQueryType<T> =
 			: U
 		: never
 
+type EntityNames = keyof Database["public"]["Tables"]
+type Entity<T extends EntityNames> = Database["public"]["Tables"][T]["Row"]
+
 type Statistic =
 	Database["public"]["Functions"]["calculate_statistics"]["Returns"] extends (infer U)[]
 		? U
 		: never
 
-type Entry = InferQueryType<ReturnType<typeof useEntryDataQuery>>
-type Category = InferQueryType<ReturnType<typeof useCategoriesQuery>>
-type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
-type Currency = InferQueryType<ReturnType<typeof useCurrenciesQuery>>
+type Entry = Entity<"entry">
+type Category = Entity<"category">
+type Ledger = Entity<"ledger">
+type Currency = Entity<"currency">
 type MonthGroup = InferQueryType<ReturnType<typeof useMonthGroupQuery>>
-type UserSettings = Database["public"]["Tables"]["settings"]["Row"]
+type UserSettings = Entity<"settings">
 type EntryDataCursor =
 	| {
 			index: number

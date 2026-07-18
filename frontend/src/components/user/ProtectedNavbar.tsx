@@ -12,6 +12,7 @@ import { DialogTrigger } from "../ui/dialog"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { ReactNode } from "react"
 import { DateHelper } from "@/lib/helper/DateHelper"
+import { useInvalidateEntryDataQuery } from "@/lib/queries"
 
 function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 	const pathname = usePathname()
@@ -40,6 +41,7 @@ function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 
 export default function ProtectedNavbar() {
 	const queryClient = useQueryClient()
+	const invalidateUserQuery = useInvalidateEntryDataQuery()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
@@ -73,12 +75,9 @@ export default function ProtectedNavbar() {
 											const monthStartEnd = DateHelper.getMonthStartEnd(
 												new Date(data.date)
 											)
-											const entryQueryKey = QueryHelper.getEntryQueryKey(
-												data.ledger,
-												monthStartEnd
-											)
 
-											queryClient.invalidateQueries({ queryKey: entryQueryKey })
+											invalidateUserQuery(data.ledger, monthStartEnd)
+
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,

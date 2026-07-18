@@ -19,6 +19,7 @@ import {
 	EmptyTitle
 } from "../ui/empty"
 import ConditionalWrapper from "./ConditionalWrapper"
+import { useInvalidateEntryDataQuery } from "@/lib/queries"
 
 enum EntryListVirtualizerType {
 	NONE,
@@ -37,6 +38,8 @@ interface EntryListProps {
 
 function EmptyEntryList() {
 	const queryClient = useQueryClient()
+	const invaldiateEntryQuery = useInvalidateEntryDataQuery()
+
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
@@ -59,12 +62,8 @@ function EmptyEntryList() {
 									new Date(data.date)
 								)
 
-								const entryQueryKey = QueryHelper.getEntryQueryKey(
-									data.ledger,
-									monthStartEnd
-								)
+								invaldiateEntryQuery(data.ledger, monthStartEnd)
 
-								queryClient.invalidateQueries({ queryKey: entryQueryKey })
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
 										data.ledger,
@@ -269,46 +268,6 @@ export default function EntryList({
 	virtualizerType = EntryListVirtualizerType.NONE,
 	...props
 }: EntryListProps) {
-	// const queryClient = useQueryClient()
-	// const setData = useGlobalStore((state) => state.setData)
-	// const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
-
-	// if (props.data.length < 1) {
-	// 	return (
-	// 		<div className="px-0 py-12 grid gap-2 items-center justify-center">
-	// 			<p className="text-center">No entry data available for this period.</p>
-	// 			<DialogTrigger asChild>
-	// 				<Button
-	// 					className="w-fit justify-self-center"
-	// 					onClick={() => {
-	// 						setData(undefined)
-	// 						setOnSubmitSuccess((data) => {
-	// 							const monthStartEnd = DateHelper.getMonthStartEnd(
-	// 								new Date(data.date)
-	// 							)
-
-	// 							const entryQueryKey = QueryHelper.getEntryQueryKey(
-	// 								data.ledger,
-	// 								monthStartEnd
-	// 							)
-
-	// 							queryClient.invalidateQueries({ queryKey: entryQueryKey })
-	// 							queryClient.invalidateQueries({
-	// 								queryKey: QueryHelper.getStatisticQueryKey(
-	// 									data.ledger,
-	// 									monthStartEnd
-	// 								)
-	// 							})
-	// 						})
-	// 					}}
-	// 				>
-	// 					Add an entry
-	// 				</Button>
-	// 			</DialogTrigger>
-	// 		</div>
-	// 	)
-	// }
-
 	const Component = Components[virtualizerType]
 	return (
 		<ConditionalWrapper

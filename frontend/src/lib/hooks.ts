@@ -1,11 +1,17 @@
+import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
 import { Entry } from "@/types/supabase"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { DatabaseHelper } from "./helper/DatabaseHelper"
-import { supabaseClient } from "./supabase"
-import { isNonNullable } from "./utils"
-import { useSettingsQuery } from "./queries"
-import { SMALL_MOBILE_BREKPOINT } from "./constants"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
+import { SMALL_MOBILE_BREKPOINT } from "./constants"
+import { DatabaseHelper } from "./helper/DatabaseHelper"
+import { useEntryDataQuery, useSettingsQuery } from "./queries"
+import { supabaseClient } from "./supabase"
+import {
+	findBoundIndicies,
+	getDateRangeFromDisplaySettings,
+	isNonNullable
+} from "./utils"
+import { DateHelper } from "./helper/DateHelper"
 
 function useSearchEntry() {
 	const [isSearching, setIsSearching] = useState(false)
@@ -95,13 +101,84 @@ function useAmountFormatter() {
 	return formatAmount
 }
 
+function useDashboardTransactionEntries(
+	ledgerId: number | undefined,
+	viewOptions: EntryDisplaySettings
+) {
+	const [today] = useState(new Date())
+	const dateRange = getDateRangeFromDisplaySettings(today, viewOptions)
+
+	const entryDataQueries = useEntryDataQuery(ledgerId, dateRange)
+	return useMemo(() => {
+		const queryResults = {
+			data: entryDataQueries.flatMap((q) => q.data?.toReversed() ?? []),
+			errors: entryDataQueries.flatMap((q) => q.error),
+			isPending: entryDataQueries.reduce((acc, q) => q.isPending || acc, false),
+			isFetching: entryDataQueries.reduce(
+				(acc, q) => q.isFetching || acc,
+				false
+			),
+			isLoading: entryDataQueries.reduce((acc, q) => q.isLoading || acc, false),
+			isError: entryDataQueries.reduce((acc, q) => q.isError || acc, false)
+		}
+
+		const timeRange = getDateRangeFromDisplaySettings(today, viewOptions)
+		if (
+			queryResults.isPending ||
+			queryResults.isLoading ||
+			queryResults.isError ||
+			timeRange === undefined
+		) {
+			return {
+				...queryResults,
+				data: undefined
+			}
+		}
+
+		let typeChecker: (value: Entry) => boolean
+		switch (viewOptions.filter.type) {
+			case "All":
+				typeChecker = () => true
+				break
+			case "Expense":
+				typeChecker = (value: Entry) => !value.is_positive
+				break
+			case "Income":
+				typeChecker = (value: Entry) => value.is_positive
+				break
+		}
+
+		const entryRangeIndicies = findBoundIndicies(
+			queryResults.data.map((val) => new Date(val.date)),
+			timeRange.from,
+			timeRange.to,
+			(a, b) => !a || !b || a < b || DateHelper.isDateEqual(a, b)
+		)
+		console.log(timeRange, entryRangeIndicies)
+
+		const targetCategories = new Set(viewOptions.filter.categories)
+		const combineResult = queryResults.data
+			.slice(entryRangeIndicies[0], entryRangeIndicies[1] + 1)
+			.filter(
+				(value) =>
+					(targetCategories.has(value.category) ||
+						targetCategories.size == 0) &&
+					typeChecker(value)
+			)
+			.toReversed()
+
+		return { ...queryResults, data: combineResult }
+	}, [today, entryDataQueries, viewOptions])
+}
+
 function useIsSmallMobile() {
 	return useMediaQuery({ maxWidth: SMALL_MOBILE_BREKPOINT })
 }
 
 export {
 	useAmountFormatter,
+	useDashboardTransactionEntries,
+	useIsSmallMobile,
 	useSearchEntry,
-	useSetElementWindowHeight,
-	useIsSmallMobile
+	useSetElementWindowHeight
 }

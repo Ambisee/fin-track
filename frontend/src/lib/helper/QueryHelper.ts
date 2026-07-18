@@ -1,6 +1,7 @@
 import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
 import { ENTRY_QKEY, STATISTICS_QKEY } from "../constants"
-import { DateRange } from "./DateHelper"
+import { DateHelper, DateRange } from "./DateHelper"
+import { getMonthSpansForDateRange, isNonNullable } from "../utils"
 
 class QueryHelper {
 	static readonly MESSAGE_NO_USER = "No user data found."
@@ -14,6 +15,17 @@ class QueryHelper {
 
 	static getEntryQueryKey(ledger: number | undefined, dateRange: DateRange) {
 		return [...ENTRY_QKEY, ledger, dateRange] as const
+	}
+
+	static getEntryQueryKeys(ledger: number | undefined, dateRange: DateRange) {
+		const monthSpans = getMonthSpansForDateRange(dateRange)
+
+		const result = []
+		for (const span of monthSpans) {
+			result.push(QueryHelper.getEntryQueryKey(ledger, span))
+		}
+
+		return result
 	}
 
 	static getFilterEntryQueryKey(

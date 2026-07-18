@@ -120,6 +120,24 @@ class DateHelper {
 		return { from, to }
 	}
 
+	static getDateStartEnd(date: Date): DateRange {
+		return { from: date, to: date }
+	}
+
+	static getYesterdayStartEnd(today: Date): DateRange {
+		const yesterday = new Date(today)
+		yesterday.setDate(today.getDate() - 1)
+		return { from: yesterday, to: yesterday }
+	}
+
+	static getLast7DaysStartEnd(today: Date): DateRange {
+		const to = new Date(today)
+		const from = new Date(today)
+		from.setDate(today.getDate() - 6)
+
+		return { from, to }
+	}
+
 	static isDateEqual(d1: Date, d2: Date): boolean {
 		let answer = true
 		answer &&= d1.getDate() == d2.getDate()

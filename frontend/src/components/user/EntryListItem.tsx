@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
 import { useAmountFormatter } from "@/lib/hooks"
-import { useSettingsQuery } from "@/lib/queries"
+import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { supabaseClient } from "@/lib/supabase"
 import { isNonNullable } from "@/lib/utils"
@@ -68,9 +68,10 @@ export default function EntryListItem({
 	...props
 }: EntryListItemProps) {
 	const [internalOpen, setInternalOpen] = useState(false)
+	const [supabase] = useState(supabaseClient())
 
 	const queryClient = useQueryClient()
-	const [supabase] = useState(supabaseClient())
+	const invalidateEntryQuery = useInvalidateEntryDataQuery()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
@@ -91,9 +92,9 @@ export default function EntryListItem({
 			data-open={isItemExpanded}
 			data-is-positive={props.data.is_positive}
 			className="data-[open='true']:max-h-none 
-                    data-[open='false']:max-h-[100px] overflow-hidden group"
+                    data-[open='false']:max-h-25 overflow-hidden group"
 		>
-			<CardHeader className="p-0 h-[100px]">
+			<CardHeader className="p-0 h-25">
 				<button
 					type="button"
 					className="h-full w-full p-4 text-left focus:outline-hidden"
@@ -147,19 +148,16 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data, oldData) => {
-											const monthStartEnd = DateHelper.getMonthStartEnd(
+											const dataMonth = DateHelper.getMonthStartEnd(
 												new Date(data.date)
 											)
-											const entryQueryKey = QueryHelper.getEntryQueryKey(
-												data.ledger,
-												monthStartEnd
-											)
 
-											queryClient.invalidateQueries({ queryKey: entryQueryKey })
+											invalidateEntryQuery(data.ledger, dataMonth)
+
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													data.ledger,
-													monthStartEnd
+													dataMonth
 												)
 											})
 
@@ -174,11 +172,16 @@ export default function EntryListItem({
 												return
 											}
 
-											queryClient.invalidateQueries({ queryKey: entryQueryKey })
+											const oldDataMonth = DateHelper.getMonthStartEnd(
+												new Date(oldData.date)
+											)
+
+											invalidateEntryQuery(oldData.ledger, oldDataMonth)
+
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
 													oldData.ledger,
-													DateHelper.getMonthStartEnd(new Date(data.date))
+													oldDataMonth
 												)
 											})
 
@@ -234,14 +237,12 @@ export default function EntryListItem({
 														const monthStartEnd = DateHelper.getMonthStartEnd(
 															new Date(props.data.date)
 														)
-														const entryQueryKey = QueryHelper.getEntryQueryKey(
+
+														invalidateEntryQuery(
 															props.data.ledger,
 															monthStartEnd
 														)
 
-														queryClient.invalidateQueries({
-															queryKey: entryQueryKey
-														})
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getStatisticQueryKey(
 																props.data.ledger,

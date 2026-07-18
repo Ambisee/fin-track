@@ -11,11 +11,8 @@ import TimeFilterControlPanel, {
 	EntryDisplaySettings
 } from "@/components/user/TimeFilterControlPanel"
 import { DateHelper } from "@/lib/helper/DateHelper"
-import {
-	useCategoriesQuery,
-	useFilterEntryDataQuery,
-	useSettingsQuery
-} from "@/lib/queries"
+import { useDashboardTransactionEntries } from "@/lib/hooks"
+import { useCategoriesQuery, useSettingsQuery } from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -58,7 +55,7 @@ export default function DashboardEntries() {
 
 	const currentLedgerId = settingsQuery.data?.current_ledger
 
-	const entryQuery = useFilterEntryDataQuery(
+	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,
 		entryDisplaySettings
 	)
