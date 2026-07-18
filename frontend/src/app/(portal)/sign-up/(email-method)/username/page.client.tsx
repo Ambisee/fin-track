@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import { ChevronRight } from "lucide-react"
-import { FormEventHandler, useState } from "react"
+import { SubmitEventHandler, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { useSignupTransition } from "../layout"
@@ -28,7 +28,6 @@ const formSchema = z.object({
 			`Must be at most ${MAX_USERNAME_LENGTH} characters`
 		)
 		.regex(/(^$)|(^[a-zA-Z0-9]+$)/, "Must only contain alphanumeric characters")
-		.default("")
 })
 
 export default function SignUpUsername() {
@@ -55,7 +54,7 @@ export default function SignUpUsername() {
 		}
 	})
 
-	const handleOnSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+	const handleOnSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
 		e.preventDefault()
 		form.handleSubmit((formData) => {
 			setIsPendingSubmit(true)

@@ -1,4 +1,4 @@
-import { MONTHS } from "@/lib/constants"
+import { MONTHS, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
@@ -16,7 +16,7 @@ import {
 } from "../ui/dialog"
 import { Input } from "../ui/input"
 import { Controller } from "react-hook-form"
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
+import { Field, FieldGroup, FieldLabel } from "../ui/field"
 import {
 	Select,
 	SelectContent,
@@ -34,7 +34,10 @@ interface MonthPickerProps {
 
 const monthPickerFormSchema = z.object({
 	month: z.string(),
-	year: z.coerce.number().min(0)
+	year: z
+		.string()
+		.refine((v) => v !== "" && !isNaN(Number(v)), "Please enter a valid year.")
+		.refine((v) => Number(v) >= 0, "Please enter a non-negative number.")
 })
 
 export default function MonthPicker(props: MonthPickerProps) {
@@ -44,7 +47,7 @@ export default function MonthPicker(props: MonthPickerProps) {
 		resolver: zodResolver(monthPickerFormSchema),
 		defaultValues: {
 			month: MONTHS[props.value.getMonth()],
-			year: props.value.getFullYear()
+			year: `${props.value.getFullYear()}`
 		}
 	})
 
@@ -59,7 +62,7 @@ export default function MonthPicker(props: MonthPickerProps) {
 								const value = new Date()
 								value.setDate(1)
 								value.setMonth(MONTHS.indexOf(formData.month))
-								value.setFullYear(formData.year)
+								value.setFullYear(Number(formData.year))
 
 								props.onValueChange(value)
 								setOpen(false)
@@ -108,9 +111,6 @@ export default function MonthPicker(props: MonthPickerProps) {
 												</SelectGroup>
 											</SelectContent>
 										</Select>
-										{fieldState.invalid && (
-											<FieldError errors={[fieldState.error]} />
-										)}
 									</Field>
 								)}
 							/>
@@ -121,9 +121,6 @@ export default function MonthPicker(props: MonthPickerProps) {
 									<Field className="w-24" data-invalid={fieldState.invalid}>
 										<FieldLabel className="sr-only">Year</FieldLabel>
 										<Input inputMode="numeric" {...field} />
-										{fieldState.invalid && (
-											<FieldError errors={[fieldState.error]} />
-										)}
 									</Field>
 								)}
 							/>

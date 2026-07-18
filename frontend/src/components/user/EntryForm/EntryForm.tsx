@@ -25,16 +25,16 @@ const formSchema = z.object({
 	date: z.date(),
 	category: z.string(),
 	amount: z
-		.preprocess((arg) => (arg === "" ? NaN : Number(arg)), z.coerce.string())
-		.pipe(
-			z.coerce
-				.number({
-					invalid_type_error: "Please provide a valid transaction amount"
-				})
-				.nonnegative("Please provide a non-negative amount")
-				.step(0.01, "Please ensure that the value is a multiple of 0.01")
+		.string()
+		.refine(
+			(v) => v !== "" && !isNaN(Number(v)),
+			"Please provide a valid transaction amount"
 		)
-		.pipe(z.coerce.string()),
+		.refine((v) => Number(v) >= 0, "Please provide a non-negative amount")
+		.refine(
+			(v) => Number((Number(v) * 100).toFixed(0)) % 1 === 0,
+			"Please ensure that the value is a multiple of 0.01"
+		),
 	type: z.enum(["Income", "Expense"]),
 	note: z.string(),
 	ledger: z.number()
@@ -154,7 +154,7 @@ export default function EntryForm(props: EntryFormProps) {
 	return (
 		<DialogContent
 			hideCloseButton
-			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-[460px] sm:max-w-lg"
+			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-115 sm:max-w-lg"
 			onOpenAutoFocus={() => {
 				form.reset()
 				setCurPage(0)

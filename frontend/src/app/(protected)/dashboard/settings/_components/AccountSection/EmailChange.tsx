@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/field"
 
 const emailChangeFormSchema = z.object({
-	email: z.string().email("Please provide a valid email").default("")
+	email: z.email("Please provide a valid email")
 })
 
 export default function EmailChange() {
