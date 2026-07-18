@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
+import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
 import { MONTHS } from "@/lib/constants"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import {
 	StatisticsHelper,
 	TotalSpendingByDay
 } from "@/lib/helper/StatisticsHelper"
-import { useAmountFormatter } from "@/lib/hooks"
+import { useAmountFormatter, useDashboardTransactionEntries } from "@/lib/hooks"
 import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import { isNonNullable, truncate } from "@/lib/utils"
 import { useMemo, useState } from "react"
@@ -42,7 +43,20 @@ function EmptyChart() {
 
 function SpendingByDateAreaChart() {
 	const [today] = useState(new Date())
-	const [thisMonthRange] = useState(DateHelper.getMonthStartEnd(today))
+	const [viewOptions] = useState<EntryDisplaySettings>(() => {
+		const monthSpan = DateHelper.getMonthStartEnd(today)
+		return {
+			filter: {
+				type: "All",
+				categories: undefined,
+				amountRange: undefined
+			},
+			period: {
+				type: "MONTHLY",
+				timeRange: monthSpan
+			}
+		}
+	})
 	const [chartConfig] = useState({
 		totalSpending: {
 			label: "Total Spending",
@@ -54,16 +68,17 @@ function SpendingByDateAreaChart() {
 	const formatAmount = useAmountFormatter()
 
 	const ledgerId = settingsQuery.data?.current_ledger
-	const entryDataQuery = useEntryDataQuery(ledgerId, thisMonthRange)
+	const entryDataQuery = useDashboardTransactionEntries(ledgerId, viewOptions)
 
 	const totalSpendingByDay = useMemo(() => {
 		if (entryDataQuery.data === undefined) {
 			return undefined
 		}
 
+		const thisMonthRange = viewOptions.period.timeRange
 		if (
-			!isNonNullable(thisMonthRange.from) ||
-			!isNonNullable(thisMonthRange.to)
+			!isNonNullable(thisMonthRange?.from) ||
+			!isNonNullable(thisMonthRange?.to)
 		) {
 			return undefined
 		}
@@ -94,7 +109,7 @@ function SpendingByDateAreaChart() {
 		}
 
 		return finalResult
-	}, [entryDataQuery.data, thisMonthRange])
+	}, [entryDataQuery.data, viewOptions.period.timeRange])
 
 	const tooltipContent = () => (
 		<ChartTooltipContent
@@ -149,14 +164,28 @@ function SpendingByDateAreaChart() {
 
 function SpendingByCategoryPieChart() {
 	const [today] = useState(new Date())
-	const [thisMonthRange] = useState(DateHelper.getMonthStartEnd(today))
+	const [viewOptions] = useState<EntryDisplaySettings>(() => {
+		const monthSpan = DateHelper.getMonthStartEnd(today)
+		return {
+			filter: {
+				type: "All",
+				categories: undefined,
+				amountRange: undefined
+			},
+			period: {
+				type: "MONTHLY",
+				timeRange: monthSpan
+			}
+		}
+	})
 	const [chartConfig] = useState({} satisfies ChartConfig)
 
 	const settingsQuery = useSettingsQuery()
 	const ledgerId = settingsQuery.data?.current_ledger
 
 	const formatAmount = useAmountFormatter()
-	const entryDataQuery = useEntryDataQuery(ledgerId, thisMonthRange)
+	const entryDataQuery = useDashboardTransactionEntries(ledgerId, viewOptions)
+
 	const totalSpendingByCategory = useMemo(() => {
 		if (entryDataQuery.data === undefined) {
 			return undefined
