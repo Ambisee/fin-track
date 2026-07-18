@@ -154,7 +154,6 @@ function useDashboardTransactionEntries(
 			timeRange.to,
 			(a, b) => !a || !b || a < b || DateHelper.isDateEqual(a, b)
 		)
-		console.log(timeRange, entryRangeIndicies)
 
 		const targetCategories = new Set(viewOptions.filter.categories)
 		const combineResult = queryResults.data

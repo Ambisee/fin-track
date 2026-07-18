@@ -296,7 +296,6 @@ function MonthSelectorPage(props: DocumentPageProps) {
 							} catch (error: unknown) {
 								let errMessage = "Unknown error occured"
 
-								console.log(error)
 								if (error instanceof CancelledError) {
 									errMessage = "Operation cancelled by user."
 								} else if (error instanceof Error) {
