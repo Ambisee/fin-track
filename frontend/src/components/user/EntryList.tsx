@@ -27,6 +27,26 @@ enum EntryListVirtualizerType {
 	WINDOW_VIRTUALIZER
 }
 
+// Shared expand-state controller, lifted once here and passed to every list variant.
+function useExpandedIds() {
+	const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set())
+
+	const isExpanded = (id: number) => expandedIds.has(id)
+	const setExpanded = (id: number, value: boolean) => {
+		setExpandedIds((cur) => {
+			const next = new Set(cur)
+			if (value) {
+				next.add(id)
+			} else {
+				next.delete(id)
+			}
+			return next
+		})
+	}
+
+	return { isExpanded, setExpanded }
+}
+
 interface EntryListProps {
 	data: Entry[]
 	showButtons?: boolean
@@ -34,6 +54,12 @@ interface EntryListProps {
 
 	onEditItem?: (data: Entry) => void
 	onScrollToBottom?: () => void
+}
+
+// Internal prop shape shared by all three list variants once expand state is lifted.
+interface InnerListProps extends EntryListProps {
+	isExpanded: (id: number) => boolean
+	setExpanded: (id: number, value: boolean) => void
 }
 
 function EmptyEntryList() {
@@ -81,8 +107,9 @@ function EmptyEntryList() {
 	)
 }
 
-function NormalList(props: EntryListProps) {
-	const { data, onScrollToBottom, ...restProps } = props
+function NormalList(props: InnerListProps) {
+	const { data, onScrollToBottom, isExpanded, setExpanded, ...restProps } =
+		props
 	const lastItemRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -115,6 +142,8 @@ function NormalList(props: EntryListProps) {
 				<div key={val.id} ref={index === data.length - 1 ? lastItemRef : null}>
 					<EntryListItem
 						data={val}
+						expand={isExpanded(val.id)}
+						onExpand={(value) => setExpanded(val.id, value)}
 						showButtons={restProps.showButtons}
 						onEdit={restProps.onEditItem}
 					/>
@@ -124,8 +153,8 @@ function NormalList(props: EntryListProps) {
 	)
 }
 
-function VirtualizedList(props: EntryListProps) {
-	const { data, onScrollToBottom } = props
+function VirtualizedList(props: InnerListProps) {
+	const { data, onScrollToBottom, isExpanded, setExpanded } = props
 	const listRef = useRef<HTMLDivElement>(null)
 
 	// [TEMPORARY] Disable memoization warning for this API.
@@ -133,8 +162,8 @@ function VirtualizedList(props: EntryListProps) {
 	const virtualizer = useVirtualizer({
 		count: data.length,
 		estimateSize: () => 100,
-		getItemKey: (index) => data[index].id,
 		getScrollElement: () => listRef.current,
+		getItemKey: (index) => data[index].id,
 		overscan: 5,
 		gap: 16
 	})
@@ -161,30 +190,34 @@ function VirtualizedList(props: EntryListProps) {
 						transform: `translateY(${virtualItems[0]?.start ?? 0}px)`
 					}}
 				>
-					{virtualItems.map((value) => (
-						<div
-							key={value.key}
-							ref={virtualizer.measureElement}
-							data-index={value.index}
-						>
-							<EntryListItem
-								data={data[value.index]}
-								onEdit={props.onEditItem}
-								showButtons={props.showButtons}
-							/>
-						</div>
-					))}
+					{virtualItems.map((value) => {
+						const item = data[value.index]
+						return (
+							<div
+								key={value.key}
+								ref={virtualizer.measureElement}
+								data-index={value.index}
+							>
+								<EntryListItem
+									data={item}
+									expand={isExpanded(item.id)}
+									onExpand={(v) => setExpanded(item.id, v)}
+									onEdit={props.onEditItem}
+									showButtons={props.showButtons}
+								/>
+							</div>
+						)
+					})}
 				</div>
 			</div>
 		</div>
 	)
 }
 
-function WindowVirtualizedList(props: EntryListProps) {
-	const { data, onScrollToBottom } = props
+function WindowVirtualizedList(props: InnerListProps) {
+	const { data, onScrollToBottom, isExpanded, setExpanded } = props
 	const listRef = useRef<HTMLDivElement>(null)
 	const listOffsetRef = useRef<number>(0)
-	const [expanded, setExpanded] = useState(new Set<number>())
 
 	useLayoutEffect(() => {
 		listOffsetRef.current = listRef.current?.offsetTop ?? 0
@@ -192,8 +225,8 @@ function WindowVirtualizedList(props: EntryListProps) {
 
 	const virtualizer = useWindowVirtualizer({
 		count: data.length,
-		getItemKey: (index) => data[index].id,
 		estimateSize: () => 100,
+		getItemKey: (index) => data[index].id,
 		overscan: 3,
 		gap: 16,
 
@@ -231,32 +264,24 @@ function WindowVirtualizedList(props: EntryListProps) {
 						transform: `translateY(${y}px)`
 					}}
 				>
-					{virtualItems.map((it) => (
-						<div
-							key={it.key}
-							data-index={it.index}
-							ref={virtualizer.measureElement}
-						>
-							<EntryListItem
-								expand={expanded.has(data[it.index].id)}
-								showButtons={props.showButtons}
-								data={data!.at(it.index)!}
-								onEdit={props.onEditItem}
-								onExpand={(value) => {
-									const id = data[it.index].id
-									setExpanded((cur) => {
-										const next = new Set(cur)
-										if (value) {
-											next.add(id)
-										} else {
-											next.delete(id)
-										}
-										return next
-									})
-								}}
-							/>
-						</div>
-					))}
+					{virtualItems.map((it) => {
+						const item = data.at(it.index)!
+						return (
+							<div
+								key={it.key}
+								data-index={it.index}
+								ref={virtualizer.measureElement}
+							>
+								<EntryListItem
+									expand={isExpanded(item.id)}
+									showButtons={props.showButtons}
+									data={item}
+									onEdit={props.onEditItem}
+									onExpand={(value) => setExpanded(item.id, value)}
+								/>
+							</div>
+						)
+					})}
 				</div>
 			</div>
 		</div>
@@ -270,13 +295,20 @@ export default function EntryList({
 	virtualizerType = EntryListVirtualizerType.NONE,
 	...props
 }: EntryListProps) {
+	const { isExpanded, setExpanded } = useExpandedIds()
 	const Component = Components[virtualizerType]
+
 	return (
 		<ConditionalWrapper
 			showContent={props.data.length > 0}
 			fallback={<EmptyEntryList />}
 		>
-			<Component showButtons={showButtons} {...props} />
+			<Component
+				showButtons={showButtons}
+				isExpanded={isExpanded}
+				setExpanded={setExpanded}
+				{...props}
+			/>
 		</ConditionalWrapper>
 	)
 }

@@ -67,7 +67,6 @@ export default function EntryListItem({
 	showButtons = true,
 	...props
 }: EntryListItemProps) {
-	const [internalOpen, setInternalOpen] = useState(false)
 	const [supabase] = useState(supabaseClient())
 
 	const queryClient = useQueryClient()
@@ -85,7 +84,7 @@ export default function EntryListItem({
 	})
 
 	const formatAmount = useAmountFormatter()
-	const isItemExpanded = props.expand ?? internalOpen
+	const isItemExpanded = props.expand ?? false
 
 	return (
 		<Card
@@ -98,11 +97,7 @@ export default function EntryListItem({
 				<button
 					type="button"
 					className="h-full w-full p-4 text-left focus:outline-hidden"
-					onClick={() => {
-						const curOpen = props.expand ?? internalOpen
-						setInternalOpen(!curOpen)
-						props.onExpand?.(!curOpen)
-					}}
+					onClick={() => props.onExpand?.(!isItemExpanded)}
 				>
 					<div className="flex justify-between items-center w-inherit">
 						<div className="grid max-w-[calc(50%-0.25rem)] text-entry-item">
@@ -124,7 +119,7 @@ export default function EntryListItem({
 									</p>
 								</div>
 							)}
-							{internalOpen ? (
+							{props.expand ? (
 								<ChevronUpIcon width={25} height={25} />
 							) : (
 								<ChevronDownIcon width={25} height={25} />
@@ -188,7 +183,7 @@ export default function EntryListItem({
 											setOpen(false)
 										})
 									}}
-									onFocus={() => setInternalOpen(true)}
+									onFocus={() => props.onExpand?.(true)}
 									variant="default"
 								>
 									Edit
@@ -201,7 +196,7 @@ export default function EntryListItem({
 									<Button
 										className="min-w-24"
 										type="button"
-										onFocus={() => setInternalOpen(true)}
+										onFocus={() => props.onExpand?.(true)}
 										variant="destructive"
 									>
 										Delete
