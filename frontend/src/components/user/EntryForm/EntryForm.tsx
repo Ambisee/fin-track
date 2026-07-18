@@ -24,25 +24,17 @@ interface EntryFormProps {
 const formSchema = z.object({
 	date: z.date(),
 	category: z.string(),
-	amount: z.string().transform((arg, ctx) => {
-		const intValue = parseFloat(arg)
-		if (isNaN(intValue)) {
-			ctx.addIssue("Please provide a valid amount.")
-			return arg
-		}
-
-		if (intValue < 0) {
-			ctx.addIssue("Please provide a non-negative amount.")
-			return arg
-		}
-
-		if (Math.floor(intValue * 1000) % 10 != 0) {
-			ctx.addIssue("Please ensure that the value is a multiple of 0.01.")
-			return arg
-		}
-
-		return arg
-	}),
+	amount: z
+		.string()
+		.refine(
+			(v) => v !== "" && !isNaN(Number(v)),
+			"Please provide a valid transaction amount"
+		)
+		.refine((v) => Number(v) >= 0, "Please provide a non-negative amount")
+		.refine(
+			(v) => Number((Number(v) * 100).toFixed(0)) % 1 === 0,
+			"Please ensure that the value is a multiple of 0.01"
+		),
 	type: z.enum(["Income", "Expense"]),
 	note: z.string(),
 	ledger: z.number()
