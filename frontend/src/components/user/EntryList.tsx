@@ -5,7 +5,13 @@ import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState
+} from "react"
 import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
 import EntryListItem from "./EntryListItem"
@@ -157,13 +163,17 @@ function VirtualizedList(props: InnerListProps) {
 	const { data, onScrollToBottom, isExpanded, setExpanded } = props
 	const listRef = useRef<HTMLDivElement>(null)
 
+	const estimateSize = useCallback(() => 100, [])
+	const getScrollElement = useCallback(() => listRef.current, [])
+	const getItemKey = useCallback((index: number) => data[index].id, [data])
+
 	// [TEMPORARY] Disable memoization warning for this API.
 	// eslint-disable-next-line react-hooks/incompatible-library
 	const virtualizer = useVirtualizer({
 		count: data.length,
-		estimateSize: () => 100,
-		getScrollElement: () => listRef.current,
-		getItemKey: (index) => data[index].id,
+		estimateSize,
+		getScrollElement,
+		getItemKey,
 		overscan: 5,
 		gap: 16
 	})
@@ -217,21 +227,22 @@ function VirtualizedList(props: InnerListProps) {
 function WindowVirtualizedList(props: InnerListProps) {
 	const { data, onScrollToBottom, isExpanded, setExpanded } = props
 	const listRef = useRef<HTMLDivElement>(null)
-	const listOffsetRef = useRef<number>(0)
+	const [scrollMargin, setScrollMargin] = useState(0)
 
 	useLayoutEffect(() => {
-		listOffsetRef.current = listRef.current?.offsetTop ?? 0
+		setScrollMargin(listRef.current?.offsetTop ?? 0)
 	}, [])
+
+	const estimateSize = useCallback(() => 100, [])
+	const getItemKey = useCallback((index: number) => data[index].id, [data])
 
 	const virtualizer = useWindowVirtualizer({
 		count: data.length,
-		estimateSize: () => 100,
-		getItemKey: (index) => data[index].id,
+		estimateSize,
+		getItemKey,
 		overscan: 3,
 		gap: 16,
-
-		// eslint-disable-next-line react-hooks/refs
-		scrollMargin: listOffsetRef.current
+		scrollMargin
 	})
 
 	const virtualItems = virtualizer.getVirtualItems()
