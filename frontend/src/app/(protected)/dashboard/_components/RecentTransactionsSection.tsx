@@ -71,7 +71,10 @@ export default function RecentTransactionSection() {
 		<div className="mt-4 pt-4">
 			<h4 className="mb-4">Recent Transactions</h4>
 			<ConditionalWrapper
-				showContent={!entryDataQuery.isLoading || entryDataQuery.isError}
+				showContent={
+					(!entryDataQuery.isLoading || entryDataQuery.isError) &&
+					isNonNullable(entryDataQuery.data)
+				}
 				fallback={<EntryListSkeleton />}
 			>
 				<ConditionalWrapper
