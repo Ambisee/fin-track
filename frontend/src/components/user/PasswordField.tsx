@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons"
 import React, { ComponentProps, useState } from "react"
+import { Input } from "../ui/input"
 
 const PasswordField = React.forwardRef<
 	HTMLInputElement,
@@ -13,9 +14,8 @@ const PasswordField = React.forwardRef<
 	return (
 		<div
 			className={cn(
-				`flex h-10 w-full rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground ${
-					focused ? "outline-hidden ring-2 ring-ring ring-offset-2" : ""
-				} disabled:cursor-not-allowed disabled:opacity-50`,
+				"flex h-10 w-full rounded-md border border-input bg-muted-bac text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+				focused ? "outline-hidden ring-2 ring-ring ring-offset-2" : "",
 				className
 			)}
 		>
@@ -30,7 +30,7 @@ const PasswordField = React.forwardRef<
 					setFocused(false)
 				}}
 				className={cn(
-					`flex w-full px-3 py-2 rounded-md bg-background text-base ring-offset-background file:border-0 file:bg-transparent border-none outline-hidden file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50`,
+					`flex w-full px-3 py-2 rounded-md text-base ring-offset-background file:border-0 file:bg-transparent border-none outline-hidden file:text-sm file:font-medium placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50`,
 					className
 				)}
 				ref={ref}
