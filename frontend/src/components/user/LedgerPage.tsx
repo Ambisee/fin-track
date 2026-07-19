@@ -47,7 +47,9 @@ const formSchema = z.object({
 })
 
 export default function LedgerPage(props: LedgerPageProps) {
-	const [isFormLoading, setIsFormLoading] = useState(props.isLoading ?? false)
+	const [isFormSubmitting, setIsFormSubmitting] = useState(
+		props.isLoading ?? false
+	)
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -60,9 +62,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 		}
 	})
 
-	useEffect(() => {
-		setIsFormLoading(props.isLoading ?? false)
-	}, [props.isLoading])
+	const isFormLoading = props.isLoading || isFormSubmitting
 
 	useEffect(() => {
 		if (!(props.isInitialized ?? true)) {
@@ -136,7 +136,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 					onSubmit={(e) => {
 						e.preventDefault()
 						form.handleSubmit(async (formData) => {
-							setIsFormLoading(true)
+							setIsFormSubmitting(true)
 
 							const isUpdate = props.data !== undefined
 							const ledgerData: LedgerFormData = {
@@ -151,7 +151,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 								await props.onCreate?.(ledgerData)
 							}
 
-							setIsFormLoading(false)
+							setIsFormSubmitting(false)
 						})()
 					}}
 				>

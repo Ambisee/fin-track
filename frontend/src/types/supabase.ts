@@ -1,4 +1,4 @@
-import { useMonthGroupQuery } from "@/lib/queries"
+import { useLedgersQuery, useMonthGroupQuery } from "@/lib/queries"
 import { DefinedQueryObserverResult } from "@tanstack/react-query"
 import { Database } from "./supabase-auto"
 
@@ -19,7 +19,7 @@ type Statistic =
 
 type Entry = Entity<"entry">
 type Category = Entity<"category">
-type Ledger = Entity<"ledger">
+type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
 type Currency = Entity<"currency">
 type MonthGroup = InferQueryType<ReturnType<typeof useMonthGroupQuery>>
 type UserSettings = Entity<"settings">
