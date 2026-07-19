@@ -367,7 +367,10 @@ function FilterControlTab(props: {
 	}
 
 	return (
-		<TabsContent value={props.tabValue} className="grid gap-4 min-h-0 h-full">
+		<TabsContent
+			value={props.tabValue}
+			className="grid gap-4 min-h-0 h-full grid-rows-[auto_1fr]"
+		>
 			<section className="grid gap-2">
 				<h6>Type</h6>
 				<div className="grid grid-rows-3 gap-2">
@@ -384,7 +387,7 @@ function FilterControlTab(props: {
 					))}
 				</div>
 			</section>
-			<section className="grid gap-2 min-h-0 h-full">
+			<section className="grid gap-2 min-h-0 h-full grid-rows-[auto_1fr]">
 				<div className="flex justify-between items-center">
 					<h6>Categories</h6>
 					<Button
