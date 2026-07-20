@@ -149,7 +149,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 					</VisuallyHidden>
 				</DialogDescription>
 			</DialogHeader>
-			<FieldGroup className="h-fit *:text-left grid gap-4">
+			<FieldGroup className="h-fit *:text-left grid grid-cols-1 gap-4 justify-start">
 				<Controller
 					control={form.control}
 					name="type"
@@ -205,13 +205,15 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									!ledgerQuery.isFetched ||
 									isFormLoading
 								}
-								className="w-full text-base justify-normal text-muted-foreground"
+								className="min-w-0 w-full text-base justify-normal text-muted-foreground"
 								onClick={props.onLedgerButton}
 							>
 								{ledgerQuery.isFetching || !ledgerQuery.isFetched ? (
 									<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 								) : (
-									getLedgerName(field.value)
+									<span className="truncate min-w-0">
+										{getLedgerName(field.value)}
+									</span>
 								)}
 								<ChevronRight className="w-4 h-4 ml-auto" />
 							</Button>
@@ -246,14 +248,14 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									!categoryQuery.isFetched ||
 									isFormLoading
 								}
-								className="w-full text-base justify-normal text-muted-foreground"
+								className="w-full min-w-0 text-base justify-normal text-muted-foreground"
 								onClick={props.onCategoryButton}
 							>
 								{categoryQuery.isFetching || !categoryQuery.isFetched ? (
 									<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
 								) : (
 									<>
-										{field.value}
+										<span className="truncate min-w-0">{field.value}</span>
 										<ChevronRight className="w-4 h-4 ml-auto" />
 									</>
 								)}

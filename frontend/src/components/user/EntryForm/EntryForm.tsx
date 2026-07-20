@@ -52,7 +52,7 @@ export function EntryFormItem(props: {
 		<Field
 			data-invalid={props.fieldState?.invalid}
 			className={cn(
-				"grid grid-cols-[minmax(75px,30%)_1fr] items-center space-y-0",
+				"w-full grid grid-cols-[minmax(75px,30%)_minmax(0,1fr)] items-center space-y-0",
 				props.className
 			)}
 		>
