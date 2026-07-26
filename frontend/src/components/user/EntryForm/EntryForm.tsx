@@ -153,6 +153,7 @@ export default function EntryForm(props: EntryFormProps) {
 		<DialogContent
 			hideCloseButton
 			className="auto-rows-fr h-dvh max-w-none duration-0 border-0 sm:border sm:h-[90%] sm:min-h-115 sm:max-w-lg"
+			onCloseAutoFocus={(e) => e.preventDefault()}
 			onOpenAutoFocus={() => {
 				form.reset()
 				setCurPage(0)
