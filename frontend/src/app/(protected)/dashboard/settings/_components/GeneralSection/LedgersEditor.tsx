@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import LedgerGroup from "@/components/user/LedgerGroup"
 import { useSettingsQuery } from "@/lib/queries"
 import { useUserQuery } from "@/lib/queries"
@@ -17,20 +18,21 @@ export default function LedgersEditor() {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<div id="ledgers-editor" className="grid pt-4 mt-4">
+			<div id="ledgers-editor" className="w-full grid min-w-0 pt-4 mt-4">
 				<Label className="text-sm">Ledgers</Label>
-				<div className="mt-2 p-4 rounded-md border">
-					<div className="flex justify-between items-center">
-						<span className="text-md text-muted-foreground">
+				<div className="mt-2 p-4 min-w-0 rounded-md border">
+					<div className="flex gap-2 min-w-0 justify-between items-center">
+						<span className="inline-block text-nowrap text-md text-muted-foreground">
 							Current ledger
 						</span>
-						{userQuery.isLoading || settingsQuery.isLoading ? (
-							<Skeleton className="rounded-full h-8" />
-						) : (
-							<span className="text-sm bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
+						<ConditionalWrapper
+							showContent={!(userQuery.isLoading || settingsQuery.isLoading)}
+							fallback={<Skeleton className="rounded-full h-8" />}
+						>
+							<span className="inline-block min-w-0 truncate text-sm bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
 								{settingsQuery.data?.ledger?.name}
 							</span>
-						)}
+						</ConditionalWrapper>
 					</div>
 					<div className="flex mt-4">
 						{userQuery.isLoading || settingsQuery.isLoading ? (
