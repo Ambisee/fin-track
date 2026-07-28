@@ -56,14 +56,14 @@ const editModeClass: CommandGroupClass = {
 	commandItem:
 		"border flex justify-between items-center rounded-md break-words cursor-pointer p-4 first:mt-0 last:mb-0 my-2",
 	commandGroup: "",
-	commandText: ""
+	commandText: "w-full truncate"
 }
 
 const selectModeClass: CommandGroupClass = {
 	commandItem: "border rounded-md break-words cursor-pointer",
 	commandGroup:
 		"*:grid *:gap-2 *:grid-cols-[repeat(auto-fill,minmax(125px,1fr))] *:grid-flow-row *:auto-rows-[150px]",
-	commandText: "w-full text-sm text-center"
+	commandText: "w-full text-sm text-center truncate px-1"
 }
 
 export default function CategoriesListPage(props: CategoriesListPageProps) {
@@ -85,7 +85,9 @@ export default function CategoriesListPage(props: CategoriesListPageProps) {
 			<DialogHeader className="relative space-y-0 sm:text-center h-fit">
 				<div className="relative">
 					<DialogTitle className="leading-6" asChild>
-						<h1 className="h-6 leading-6">Choose a category</h1>
+						<h1 className="h-6 leading-6">
+							{isEditMode ? "Select category" : "Edit category"}
+						</h1>
 					</DialogTitle>
 					{!props.editModeOnly && (isEditMode || props.onBackButton) && (
 						<button

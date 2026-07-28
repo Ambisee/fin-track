@@ -51,13 +51,9 @@ export default function CategoryPage(props: CategoryPageProps) {
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
-			<DialogHeader className="relative space-y-0 sm:text-center">
-				<DialogTitle className="leading-6" asChild>
-					<h1 className="h-6 leading-6">
-						{props.data !== undefined
-							? `Edit category - ${props.data.name}`
-							: "Create a new category"}
-					</h1>
+			<DialogHeader className="w-full min-w-0 relative space-y-0 text-center">
+				<DialogTitle className="truncate min-w-0 h-6 max-w-3/5 mx-auto leading-6">
+					{props.data !== undefined ? `${props.data.name}` : "Create category"}
 				</DialogTitle>
 				<button
 					className="absolute block left-0 top-1/2 translate-y-[-50%]"

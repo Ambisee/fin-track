@@ -59,9 +59,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 				<div className="relative">
 					<DialogTitle className="leading-6" asChild>
 						<h2 className="h-6 leading-6">
-							{isEditMode
-								? "Select a ledger to edit"
-								: "Select a ledger to view"}
+							{isEditMode ? "Edit ledger" : "Select ledger"}
 						</h2>
 					</DialogTitle>
 					{(isEditMode || props.onBackButton) && (
@@ -125,7 +123,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 						<CommandGroup className="">
 							{props.ledgersList.map((val) => (
 								<CommandItem
-									className="border flex justify-between items-center rounded-md wrap-break-word cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
+									className="w-full border flex justify-between items-center rounded-md wrap-break-word cursor-pointer p-4 first:mt-0 last:mb-0 my-2"
 									key={val.name}
 									value={val.name}
 									disabled={!(props.isInitialized ?? true) || !isInputEnabled}
@@ -135,7 +133,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 										setIsPendingOperation(false)
 									}}
 								>
-									<p className="w-full">{val.name} </p>
+									<p className="w-full min-w-0 truncate">{val.name}</p>
 									{isEditMode && val.id !== props.currentLedger?.id && (
 										<AlertDialogTrigger
 											onClick={(e) => {

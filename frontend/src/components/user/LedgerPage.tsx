@@ -105,13 +105,9 @@ export default function LedgerPage(props: LedgerPageProps) {
 
 	return (
 		<div className="grid grid-rows-[auto_1fr]">
-			<DialogHeader className="relative space-y-0 sm:text-center">
-				<DialogTitle className="leading-6" asChild>
-					<h2 className="h-6 leading-6">
-						{props.data
-							? `Edit ledger - ${props.data.name}`
-							: "Create a new ledger"}
-					</h2>
+			<DialogHeader className="relative min-w-0 max-w-full space-y-0 sm:text-center">
+				<DialogTitle className="h-6 leading-6 min-w-0 max-w-3/5 mx-auto truncate">
+					{props.data ? props.data.name : "Create ledger"}
 				</DialogTitle>
 				{props.onBackButton && (
 					<button
