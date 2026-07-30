@@ -5,6 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+	/* Custom breakpoints */
+	--breakpoint-xs: 348px;
+
 	/* Colors */
 	--color-border: hsl(var(--border));
 	--color-input: hsl(var(--input));
@@ -87,7 +90,7 @@
 }
 
 @utility text-entry-item {
-	@apply group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-violet-600;
+	@apply group-data-[is-positive='true']:text-green-500 group-data-[is-positive='false']:text-violet-600 text-sm xs:text-base;
 }
 
 @utility cmdk-input-no-border {

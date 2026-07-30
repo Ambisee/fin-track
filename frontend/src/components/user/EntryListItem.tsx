@@ -101,7 +101,7 @@ export default function EntryListItem({
 				>
 					<div className="flex justify-between items-center w-inherit">
 						<div className="grid max-w-[calc(50%-0.25rem)] text-entry-item">
-							<CardTitle className="text-lg whitespace-nowrap overflow-hidden text-ellipsis">
+							<CardTitle className="text-base xs:text-lg whitespace-nowrap overflow-hidden text-ellipsis">
 								{props.data.category}
 							</CardTitle>
 							<CardDescription>
