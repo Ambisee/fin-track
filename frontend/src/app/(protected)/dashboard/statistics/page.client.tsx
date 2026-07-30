@@ -35,7 +35,7 @@ import { cn, isNonNullable } from "@/lib/utils"
 import { Statistic } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
 import { X } from "lucide-react"
-import { createContext, useContext, useEffect, useRef, useState } from "react"
+import { createContext, useContext, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
@@ -137,7 +137,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 
 	if (props.data.length < 1) {
 		return (
-			<div className="h-62.5 flex items-center justify-center flex-col gap-2">
+			<div className="w-full h-62.5 flex items-center justify-center flex-col gap-2">
 				<h4>No {props.dataKey} data entered for this period.</h4>
 				<DialogTrigger
 					asChild
@@ -203,7 +203,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 					</Pie>
 				</PieChart>
 			</ChartContainer>
-			<ul className="grid gap-1.5">
+			<ul className="[&>li:not(:last-child)]:mb-1.5">
 				{props.data
 					.toSorted((a, b) => b.percentage - a.percentage)
 					.map((value: Group) => (
@@ -235,21 +235,22 @@ function CategoryItem(props: CategoryItemProps) {
 					<button
 						className={cn(
 							buttonVariants({ variant: "ghost" }),
-							"w-full flex items-center py-2 gap-2.5 text-md"
+							"w-full min-w-0 h-auto relative flex items-center gap-2.5 text-md"
 						)}
 					>
 						<div
 							style={{ background: props.value.fillColor }}
-							className={`w-6 aspect-square rounded-sm`}
+							className={`min-w-6 max-w-6 aspect-square rounded-sm`}
 						/>
-						<span>
-							{props.value.category}{" "}
-							<span className="opacity-55">
-								({((props.value.percentage as number) * 100).toFixed(2)}
-								%)
-							</span>
-						</span>
-						<span className="flex-1 text-right">
+						<div className="max-w-1/2">
+							<h5 className="truncate text-sm xs:text-base">
+								{props.value.category}
+							</h5>
+							<p className="text-xs opacity-55 text-left">
+								{((props.value.percentage as number) * 100).toFixed(2)}%
+							</p>
+						</div>
+						<span className="text-sm xs:text-base flex-1 text-right">
 							{formatAmount(props.value.total_amount as number)}
 						</span>
 					</button>
@@ -306,29 +307,6 @@ function CategoryItem(props: CategoryItemProps) {
 function MobileStatsUI(props: StatsUIProps) {
 	const [curTab, setCurTab] = useState<string>("expense")
 
-	const incomeValRef = useRef<HTMLHeadingElement>(null!)
-	const expenseValRef = useRef<HTMLHeadingElement>(null!)
-
-	const resizeFontUntilFit = (el: HTMLHeadingElement) => {
-		const parentBB = el.parentElement?.getBoundingClientRect()
-		if (parentBB === undefined || el.textContent === null) {
-			return
-		}
-
-		el.style.removeProperty("font-size")
-
-		let fontSize = 30 // equals to 1.875rem as defined in the text-3xl TW class
-		while (el.getBoundingClientRect().width > parentBB.width) {
-			fontSize--
-			el.style.fontSize = `${fontSize}px`
-		}
-	}
-
-	useEffect(() => {
-		resizeFontUntilFit(incomeValRef.current)
-		resizeFontUntilFit(expenseValRef.current)
-	}, [props.stats.totalIncome, props.stats.totalExpense])
-
 	const formatAmount = useAmountFormatter()
 
 	return (
@@ -341,13 +319,11 @@ function MobileStatsUI(props: StatsUIProps) {
 					data-curtab={curTab}
 				>
 					<div className="w-full bg-transparent">
-						<h2 className="text-md group-data-[curtab='income']:opacity-55">
+						<h4 className="group-data-[curtab='income']:opacity-55 text-base xs:text-lg">
 							Total expense
-						</h2>
-						<h3 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='income']:text-opacity-55">
-							<span ref={expenseValRef}>
-								{formatAmount(props.stats?.totalExpense)}
-							</span>
+						</h4>
+						<h3 className="text-sm xs:text-xl text-entry-item group-data-[curtab='income']:text-opacity-55">
+							{formatAmount(props.stats?.totalExpense)}
 						</h3>
 					</div>
 				</TabsTrigger>
@@ -358,13 +334,11 @@ function MobileStatsUI(props: StatsUIProps) {
 					data-is-positive="true"
 				>
 					<div className="w-full bg-transparent">
-						<h2 className="text-md group-data-[curtab='expense']:opacity-55">
+						<h4 className="group-data-[curtab='expense']:opacity-55 text-base xs:text-lg">
 							Total income
-						</h2>
-						<h3 className="text-2xl sm:text-3xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
-							<span ref={incomeValRef}>
-								{formatAmount(props.stats?.totalIncome)}
-							</span>
+						</h4>
+						<h3 className="text-sm xs:text-xl text-entry-item group-data-[curtab='expense']:text-opacity-55">
+							{formatAmount(props.stats?.totalIncome)}
 						</h3>
 					</div>
 				</TabsTrigger>
@@ -403,8 +377,8 @@ function DesktopStatsUI(props: StatsUIProps) {
 	const formatAmount = useAmountFormatter()
 
 	return (
-		<div className="flex py-4 w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
-			<div className="flex-1 px-4 group" data-is-positive="false">
+		<div className="flex py-4 w-full min-w-0 max-w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
+			<div className="min-w-0 flex-1 px-4 group" data-is-positive="false">
 				<h2 className="text-md">Total expense</h2>
 				<h3 className="text-3xl text-entry-item">
 					{formatAmount(props.stats?.totalExpense)}
@@ -418,7 +392,10 @@ function DesktopStatsUI(props: StatsUIProps) {
 					dataKey="total_amount"
 				/>
 			</div>
-			<div className="flex-1 px-4 group border-l" data-is-positive="true">
+			<div
+				className="min-w-0 flex-1 px-4 group border-l"
+				data-is-positive="true"
+			>
 				<h2 className="text-md">Total income</h2>
 				<h3 className="text-3xl text-entry-item">
 					{formatAmount(props.stats?.totalIncome)}
