@@ -1,4 +1,4 @@
-import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
+import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { ENTRY_QKEY, STATISTICS_QKEY } from "../constants"
 import { DateHelper, DateRange } from "./DateHelper"
 import { getMonthSpansForDateRange, isNonNullable } from "../utils"
@@ -30,7 +30,7 @@ class QueryHelper {
 
 	static getFilterEntryQueryKey(
 		ledger: number | undefined,
-		filters: EntryDisplaySettings
+		filters: EntryViewOptions
 	) {
 		return [...ENTRY_QKEY, ledger, filters] as const
 	}

@@ -1,4 +1,4 @@
-import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
+import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { type ClassValue, clsx } from "clsx"
 import { SetStateAction } from "react"
 import { twMerge } from "tailwind-merge"
@@ -114,9 +114,9 @@ function getMonthSpansForDateRange(dateRange: DateRange) {
 	return result
 }
 
-function getDateRangeFromDisplaySettings(
+function getDateRangeFromViewOptions(
 	today: Date = new Date(),
-	displaySettings: EntryDisplaySettings
+	displaySettings: EntryViewOptions
 ) {
 	let dateRange: DateRange
 	switch (displaySettings.period.type) {
@@ -141,7 +141,7 @@ export {
 	cn,
 	getUsernameFromEmail,
 	findBoundIndicies,
-	getDateRangeFromDisplaySettings,
+	getDateRangeFromViewOptions,
 	isNonNullable,
 	getMonthSpansForDateRange,
 	isSetStateFunction,

@@ -8,7 +8,8 @@ import EntryList from "@/components/user/EntryList"
 import EntrySearchBar from "@/components/user/EntrySearchBar"
 import TimeFilterControlPanel, {
 	changePeriod,
-	EntryDisplaySettings
+	EntryViewOptions,
+	getDefaultEntryViewOptions
 } from "@/components/user/TimeFilterControlPanel"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
@@ -40,14 +41,13 @@ function EntryContainer(props: {
 
 export default function DashboardEntries() {
 	const [isSearching, setIsSearching] = useState(false)
-	const [entryDisplaySettings, setEntryDisplaySettings] =
-		useState<EntryDisplaySettings>({
-			period: {
-				type: "MONTHLY",
-				timeRange: DateHelper.getMonthStartEnd(new Date())
-			},
-			filter: { type: "All", amountRange: undefined, categories: undefined }
-		})
+	const [entryViewOptions, setEntryViewOptions] = useState<EntryViewOptions>(
+		() => {
+			const initial = getDefaultEntryViewOptions()
+			initial.period.timeRange = DateHelper.getMonthStartEnd(new Date())
+			return initial
+		}
+	)
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
 	const settingsQuery = useSettingsQuery()
@@ -57,10 +57,10 @@ export default function DashboardEntries() {
 
 	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,
-		entryDisplaySettings
+		entryViewOptions
 	)
 	const showButton = ["WEEKLY", "MONTHLY", "YEARLY"].includes(
-		entryDisplaySettings.period.type
+		entryViewOptions.period.type
 	)
 
 	return (
@@ -100,16 +100,15 @@ export default function DashboardEntries() {
 									variant="ghost"
 									className="aspect-square"
 									onClick={() => {
-										const type = entryDisplaySettings.period.type
-										const currentDate =
-											entryDisplaySettings.period.timeRange?.from
+										const type = entryViewOptions.period.type
+										const currentDate = entryViewOptions.period.timeRange?.from
 										if (
 											!(type in changePeriod) ||
 											!isNonNullable(currentDate)
 										) {
 											return
 										}
-										setEntryDisplaySettings((cur) => ({
+										setEntryViewOptions((cur) => ({
 											...cur,
 											period: {
 												...cur.period,
@@ -124,8 +123,8 @@ export default function DashboardEntries() {
 							<Dialog>
 								<div className="w-full flex justify-center">
 									<TimeFilterControlPanel
-										settings={entryDisplaySettings}
-										setSettings={setEntryDisplaySettings}
+										settings={entryViewOptions}
+										setSettings={setEntryViewOptions}
 										availableCategories={categoriesQuery.data?.map((value) => ({
 											...value,
 											count: -1
@@ -138,12 +137,11 @@ export default function DashboardEntries() {
 									variant="ghost"
 									className="aspect-square"
 									onClick={() => {
-										const type = entryDisplaySettings.period.type
-										const currentDate =
-											entryDisplaySettings.period.timeRange?.from
+										const type = entryViewOptions.period.type
+										const currentDate = entryViewOptions.period.timeRange?.from
 										if (!(type in changePeriod) || !isNonNullable(currentDate))
 											return
-										setEntryDisplaySettings((cur) => ({
+										setEntryViewOptions((cur) => ({
 											...cur,
 											period: {
 												...cur.period,

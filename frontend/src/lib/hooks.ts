@@ -1,4 +1,4 @@
-import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
+import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { Entry } from "@/types/supabase"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
@@ -8,7 +8,7 @@ import { useEntryDataQuery, useSettingsQuery } from "./queries"
 import { supabaseClient } from "./supabase"
 import {
 	findBoundIndicies,
-	getDateRangeFromDisplaySettings,
+	getDateRangeFromViewOptions,
 	isNonNullable
 } from "./utils"
 import { DateHelper } from "./helper/DateHelper"
@@ -103,10 +103,10 @@ function useAmountFormatter() {
 
 function useDashboardTransactionEntries(
 	ledgerId: number | undefined,
-	viewOptions: EntryDisplaySettings
+	viewOptions: EntryViewOptions
 ) {
 	const [today] = useState(new Date())
-	const dateRange = getDateRangeFromDisplaySettings(today, viewOptions)
+	const dateRange = getDateRangeFromViewOptions(today, viewOptions)
 
 	const entryDataQueries = useEntryDataQuery(ledgerId, dateRange)
 	return useMemo(() => {
@@ -122,7 +122,7 @@ function useDashboardTransactionEntries(
 			isError: entryDataQueries.reduce((acc, q) => q.isError || acc, false)
 		}
 
-		const timeRange = getDateRangeFromDisplaySettings(today, viewOptions)
+		const timeRange = getDateRangeFromViewOptions(today, viewOptions)
 		if (
 			queryResults.isPending ||
 			queryResults.isLoading ||

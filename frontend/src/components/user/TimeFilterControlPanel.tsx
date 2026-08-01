@@ -56,7 +56,7 @@ interface FilterSettings {
 	amountRange: [number, number] | undefined
 }
 
-interface EntryDisplaySettings {
+interface EntryViewOptions {
 	period: TimeSettings
 	filter: FilterSettings
 }
@@ -109,9 +109,13 @@ const changePeriod: {
 	}
 } as const
 
-const defaultSettings: EntryDisplaySettings = {
+const defaultSettings: EntryViewOptions = {
 	period: { type: "MONTHLY", timeRange: undefined },
 	filter: { type: "All", categories: undefined, amountRange: undefined }
+}
+
+function getDefaultEntryViewOptions(): EntryViewOptions {
+	return { ...defaultSettings }
 }
 
 function TimeRangeSelector(props: {
@@ -456,8 +460,8 @@ function FilterControlTab(props: {
 }
 
 function TimeFilterControlDialogContent(props: {
-	settings: EntryDisplaySettings
-	onSettingsChange: Dispatch<SetStateAction<EntryDisplaySettings>>
+	settings: EntryViewOptions
+	onSettingsChange: Dispatch<SetStateAction<EntryViewOptions>>
 	availableCategories?: CategoryItem[]
 }) {
 	const [timeSettings, setTimeSettings] = useControlPropState<TimeSettings>(
@@ -556,11 +560,11 @@ function useControlPropState<T>(
 }
 
 export default function TimeFilterControlPanel(props: {
-	settings?: EntryDisplaySettings
-	setSettings?: Dispatch<SetStateAction<EntryDisplaySettings>>
+	settings?: EntryViewOptions
+	setSettings?: Dispatch<SetStateAction<EntryViewOptions>>
 	availableCategories?: CategoryItem[]
 }) {
-	const [entryDisplaySettings, setEntryDisplaySettings] = useControlPropState(
+	const [entryViewOptions, setEntryViewOptions] = useControlPropState(
 		defaultSettings,
 		props.settings,
 		props.setSettings
@@ -569,7 +573,7 @@ export default function TimeFilterControlPanel(props: {
 	const shouldUseShort = useIsSmallMobile()
 	const triggerText = useMemo(() => {
 		let result: ReactNode = ""
-		const period = entryDisplaySettings.period
+		const period = entryViewOptions.period
 		switch (period.type) {
 			case "TODAY":
 				result = PERIOD_TYPE.TODAY.label
@@ -607,7 +611,7 @@ export default function TimeFilterControlPanel(props: {
 		}
 
 		return result
-	}, [entryDisplaySettings.period, shouldUseShort])
+	}, [entryViewOptions.period, shouldUseShort])
 
 	return (
 		<Dialog>
@@ -617,12 +621,17 @@ export default function TimeFilterControlPanel(props: {
 				</Button>
 			</DialogTrigger>
 			<TimeFilterControlDialogContent
-				settings={entryDisplaySettings}
-				onSettingsChange={setEntryDisplaySettings}
+				settings={entryViewOptions}
+				onSettingsChange={setEntryViewOptions}
 				availableCategories={props.availableCategories}
 			/>
 		</Dialog>
 	)
 }
 
-export { changePeriod, PERIOD_TYPE, type EntryDisplaySettings }
+export {
+	type EntryViewOptions,
+	getDefaultEntryViewOptions,
+	changePeriod,
+	PERIOD_TYPE
+}

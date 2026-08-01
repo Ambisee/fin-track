@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
-import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
+import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { MONTHS } from "@/lib/constants"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import { StatisticsHelper, TotalByDay } from "@/lib/helper/StatisticsHelper"
@@ -40,7 +40,7 @@ function EmptyChart() {
 
 function SpendingByDateAreaChart() {
 	const [today] = useState(new Date())
-	const [viewOptions] = useState<EntryDisplaySettings>(() => {
+	const [viewOptions] = useState<EntryViewOptions>(() => {
 		const monthSpan = DateHelper.getMonthStartEnd(today)
 		return {
 			filter: {
@@ -161,7 +161,7 @@ function SpendingByDateAreaChart() {
 
 function SpendingByCategoryPieChart() {
 	const [today] = useState(new Date())
-	const [viewOptions] = useState<EntryDisplaySettings>(() => {
+	const [viewOptions] = useState<EntryViewOptions>(() => {
 		const monthSpan = DateHelper.getMonthStartEnd(today)
 		return {
 			filter: {

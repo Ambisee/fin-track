@@ -2,7 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import EntryList from "@/components/user/EntryList"
-import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
+import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
 import { useSettingsQuery } from "@/lib/queries"
@@ -44,7 +44,7 @@ function ErrorFetchingDataAlert(props: { error: Error | null }) {
 
 export default function RecentTransactionSection() {
 	const [today] = useState(new Date())
-	const [viewOptions] = useState<EntryDisplaySettings>(() => {
+	const [viewOptions] = useState<EntryViewOptions>(() => {
 		const monthSpan = DateHelper.getMonthStartEnd(today)
 		return {
 			filter: {
