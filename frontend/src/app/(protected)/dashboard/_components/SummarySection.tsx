@@ -195,14 +195,22 @@ function SpendingByCategoryPieChart() {
 		for (let i = 0; i < groupSize; i++) {
 			groups[i].category = truncate(groups[i].category)
 		}
+
 		return groups
 	}, [entryDataQuery.data])
 
+	const totalSpending =
+		totalSpendingByCategory
+			?.map((v) => v.total)
+			?.reduce((previous, current) => previous + current, 0) ?? 0
+
 	const tooltipContent = () => (
 		<ChartTooltipContent
+			className="min-w-70 max-w-screen"
 			formatterOverride={false}
 			formatter={(value) => {
-				return formatAmount(Number(value))
+				const percentage = (100 * Number(value)) / totalSpending
+				return `${formatAmount(Number(value))} (${percentage.toFixed(2)}%)`
 			}}
 		/>
 	)
