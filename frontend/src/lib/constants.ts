@@ -32,7 +32,6 @@ export const TRANSITION_PAGE_CLASSNAME = "transition-page"
 export const SMALL_MOBILE_BREKPOINT = 348
 export const DESKTOP_BREAKPOINT = 1024
 export const MAX_USERNAME_LENGTH = 20
-export const DEFAULT_TRUNCATE_MAX_LENGTH = 20
 
 export const LONG_TOAST_DURATION = 2.5 * 1000
 export const SHORT_TOAST_DURATION = 1.5 * 1000

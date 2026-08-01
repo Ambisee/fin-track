@@ -16,6 +16,13 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "@/components/ui/dialog"
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle
+} from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
@@ -45,7 +52,7 @@ import {
 	useSettingsQuery
 } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
-import { cn, isNonNullable, truncate } from "@/lib/utils"
+import { cn, isNonNullable } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createContext, useContext, useState } from "react"
@@ -74,6 +81,41 @@ const StatisticsPageContext = createContext<{
 	viewOptions: EntryViewOptions
 }>(null!)
 
+function StatsSkeletonUI() {
+	return (
+		<>
+			<div className="block lg:hidden [&>.category-item:not(:last-child)]:mb-1.5">
+				<Skeleton className="transaction-type w-full h-16.25" />
+				<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+			</div>
+			<div className="hidden lg:flex py-4 w-full min-w-0 max-w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
+				<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5">
+					<Skeleton className="transaction-type w-37.5 h-8" />
+					<Skeleton className="transaction-amount mt-2 w-55 h-9" />
+					<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+				</div>
+				<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5 border-l">
+					<Skeleton className="transaction-type w-37.5 h-8" />
+					<Skeleton className="transaction-amount mt-2 w-55 h-9" />
+					<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+					<Skeleton className="category-item w-full h-14" />
+				</div>
+			</div>
+		</>
+	)
+}
+
 function ChartDisplay(props: ChartDisplayProps) {
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
@@ -92,31 +134,43 @@ function ChartDisplay(props: ChartDisplayProps) {
 
 	if (props.data.length < 1) {
 		return (
-			<div className="w-full h-62.5 flex items-center justify-center flex-col gap-2">
-				<h4>No transaction.</h4>
-				<DialogTrigger
-					asChild
-					onClick={() => {
-						setData(undefined)
-						setOnSubmitSuccess((data) => {
-							const monthStartEnd = DateHelper.getMonthStartEnd(
-								new Date(data.date)
-							)
-
-							invalidateEntryQuery(data.ledger, monthStartEnd)
-
-							queryClient.invalidateQueries({
-								queryKey: QueryHelper.getStatisticQueryKey(
-									data.ledger,
-									monthStartEnd
+			<Empty>
+				<EmptyHeader>
+					<EmptyTitle>No transaction entries.</EmptyTitle>
+					<EmptyDescription>
+						Add transaction entries to view statistics.
+					</EmptyDescription>
+				</EmptyHeader>
+				<EmptyContent>
+					<DialogTrigger
+						asChild
+						onClick={() => {
+							setData(undefined)
+							setOnSubmitSuccess((data) => {
+								const monthStartEnd = DateHelper.getMonthStartEnd(
+									new Date(data.date)
 								)
+
+								invalidateEntryQuery(data.ledger, monthStartEnd)
+
+								queryClient.invalidateQueries({
+									queryKey: QueryHelper.getStatisticQueryKey(
+										data.ledger,
+										monthStartEnd
+									)
+								})
 							})
-						})
-					}}
-				>
-					<Button>Add an entry</Button>
-				</DialogTrigger>
-			</div>
+						}}
+					>
+						<Button>Add an entry</Button>
+					</DialogTrigger>
+				</EmptyContent>
+			</Empty>
+
+			// <div className="w-full h-62.5 flex items-center justify-center flex-col gap-2">
+			// 	<h4>No transaction.</h4>
+
+			// </div>
 		)
 	}
 
@@ -287,19 +341,6 @@ function CategoryItem(props: CategoryItemProps) {
 	)
 }
 
-function MobileSkeletonUI() {
-	return (
-		<div className="[&>.category-item:not(:last-child)]:mb-1.5">
-			<Skeleton className="transaction-type w-full h-16.25" />
-			<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
-			<Skeleton className="category-item w-full h-14" />
-			<Skeleton className="category-item w-full h-14" />
-			<Skeleton className="category-item w-full h-14" />
-			<Skeleton className="category-item w-full h-14" />
-		</div>
-	)
-}
-
 function MobileStatsUI(props: StatsUIProps) {
 	const [curTab, setCurTab] = useState<string>("expense")
 
@@ -348,9 +389,7 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="expense">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups
-						.filter((value) => !value.isPositive)
-						.map((v) => ({ ...v, category: truncate(v.category) }))}
+					data={props.stats.groups.filter((value) => !value.isPositive)}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -358,39 +397,12 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="income">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups
-						.filter((value) => value.isPositive)
-						.map((v) => ({ ...v, category: truncate(v.category) }))}
+					data={props.stats.groups.filter((value) => value.isPositive)}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
 			</TabsContent>
 		</Tabs>
-	)
-}
-
-function DesktopSkeletonUI() {
-	return (
-		<div className="flex py-4 w-full min-w-0 max-w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
-			<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5">
-				<Skeleton className="transaction-type w-37.5 h-8" />
-				<Skeleton className="transaction-amount mt-2 w-55 h-9" />
-				<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-			</div>
-			<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5 border-l">
-				<Skeleton className="transaction-type w-37.5 h-8" />
-				<Skeleton className="transaction-amount mt-2 w-55 h-9" />
-				<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-				<Skeleton className="category-item w-full h-14" />
-			</div>
-		</div>
 	)
 }
 
@@ -406,9 +418,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups
-						.filter((value) => !value.isPositive)
-						.map((v) => ({ ...v, category: truncate(v.category) }))}
+					data={props.stats.groups.filter((value) => !value.isPositive)}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -423,9 +433,7 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups
-						.filter((value) => value.isPositive)
-						.map((v) => ({ ...v, category: truncate(v.category) }))}
+					data={props.stats.groups.filter((value) => value.isPositive)}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -469,13 +477,12 @@ export default function DashboardStatistics() {
 			}
 		}
 
-		const SkeletonUI = isDesktop ? DesktopSkeletonUI : MobileSkeletonUI
 		const StatsUI = isDesktop ? DesktopStatsUI : MobileStatsUI
 
 		return (
 			<ConditionalWrapper
 				showContent={!isDataPending}
-				fallback={<SkeletonUI />}
+				fallback={<StatsSkeletonUI />}
 			>
 				<StatsUI chartConfig={chartConfig} stats={stats} />
 			</ConditionalWrapper>

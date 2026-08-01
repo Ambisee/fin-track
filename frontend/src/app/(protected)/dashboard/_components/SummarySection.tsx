@@ -19,7 +19,7 @@ import { DateHelper } from "@/lib/helper/DateHelper"
 import { StatisticsHelper, TotalByDay } from "@/lib/helper/StatisticsHelper"
 import { useAmountFormatter, useDashboardTransactionEntries } from "@/lib/hooks"
 import { useSettingsQuery } from "@/lib/queries"
-import { isNonNullable, truncate } from "@/lib/utils"
+import { isNonNullable } from "@/lib/utils"
 import { useMemo, useState } from "react"
 import { Area, AreaChart, Cell, Pie, PieChart, XAxis } from "recharts"
 
@@ -191,10 +191,6 @@ function SpendingByCategoryPieChart() {
 		const groups = StatisticsHelper.groupTotalSpendingByCategory(
 			entryDataQuery.data
 		)
-		const groupSize = groups.length
-		for (let i = 0; i < groupSize; i++) {
-			groups[i].category = truncate(groups[i].category)
-		}
 
 		return groups
 	}, [entryDataQuery.data])
