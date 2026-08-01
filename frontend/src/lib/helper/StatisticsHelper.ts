@@ -2,19 +2,19 @@ import { Entry } from "@/types/supabase"
 import { isNonNullable } from "../utils"
 import { DateHelper } from "./DateHelper"
 
-interface TotalSpendingByDay {
+interface TotalByDay {
 	date: Date
-	totalSpending: number
+	total: number
 }
 
-interface TotalSpendingByCategory {
+interface TotalByCategory {
 	category: string
-	totalSpending: number
+	total: number
 }
 
 class StatisticsHelper {
-	static groupTotalSpendingByDate(entryData: Entry[]): TotalSpendingByDay[] {
-		const result: TotalSpendingByDay[] = []
+	static groupTotalSpendingByDate(entryData: Entry[]): TotalByDay[] {
+		const result: TotalByDay[] = []
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
@@ -29,19 +29,17 @@ class StatisticsHelper {
 				!isNonNullable(totalSpendingByDay) ||
 				!DateHelper.isDateEqual(totalSpendingByDay.date, entryDate)
 			) {
-				totalSpendingByDay = { date: entryDate, totalSpending: 0 }
+				totalSpendingByDay = { date: entryDate, total: 0 }
 				result.push(totalSpendingByDay)
 			}
 
-			totalSpendingByDay.totalSpending += entry.amount
+			totalSpendingByDay.total += entry.amount
 		}
 
 		return result
 	}
 
-	static groupTotalSpendingByCategory(
-		entryData: Entry[]
-	): TotalSpendingByCategory[] {
+	static groupTotalSpendingByCategory(entryData: Entry[]): TotalByCategory[] {
 		const counter: { [key: string]: number } = {}
 
 		for (let i = 0; i < entryData.length; i++) {
@@ -59,12 +57,12 @@ class StatisticsHelper {
 			counter[entry.category] += entry.amount
 		}
 
-		const result: TotalSpendingByCategory[] = []
+		const result: TotalByCategory[] = []
 		for (const key in counter) {
-			result.push({ category: key, totalSpending: counter[key] })
+			result.push({ category: key, total: counter[key] })
 		}
 		return result
 	}
 }
 
-export { type TotalSpendingByDay, StatisticsHelper }
+export { type TotalByDay, StatisticsHelper }

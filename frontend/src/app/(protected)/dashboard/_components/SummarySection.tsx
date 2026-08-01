@@ -16,12 +16,9 @@ import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import { EntryDisplaySettings } from "@/components/user/TimeFilterControlPanel"
 import { MONTHS } from "@/lib/constants"
 import { DateHelper } from "@/lib/helper/DateHelper"
-import {
-	StatisticsHelper,
-	TotalSpendingByDay
-} from "@/lib/helper/StatisticsHelper"
+import { StatisticsHelper, TotalByDay } from "@/lib/helper/StatisticsHelper"
 import { useAmountFormatter, useDashboardTransactionEntries } from "@/lib/hooks"
-import { useEntryDataQuery, useSettingsQuery } from "@/lib/queries"
+import { useSettingsQuery } from "@/lib/queries"
 import { isNonNullable, truncate } from "@/lib/utils"
 import { useMemo, useState } from "react"
 import { Area, AreaChart, Cell, Pie, PieChart, XAxis } from "recharts"
@@ -86,7 +83,7 @@ function SpendingByDateAreaChart() {
 		const calculatedGroups = StatisticsHelper.groupTotalSpendingByDate(
 			entryDataQuery.data
 		)
-		const finalResult: TotalSpendingByDay[] = []
+		const finalResult: TotalByDay[] = []
 
 		calculatedGroups.sort(
 			(group1, group2) => group1.date.getTime() - group2.date.getTime()
@@ -102,7 +99,7 @@ function SpendingByDateAreaChart() {
 				finalResult.push(calculatedGroups[index])
 				index++
 			} else {
-				finalResult.push({ date: new Date(curDate), totalSpending: 0 })
+				finalResult.push({ date: new Date(curDate), total: 0 })
 			}
 
 			curDate.setDate(curDate.getDate() + 1)
@@ -143,7 +140,7 @@ function SpendingByDateAreaChart() {
 							config={chartConfig}
 						>
 							<AreaChart accessibilityLayer data={totalSpendingByDay}>
-								<Area type="monotone" dataKey="totalSpending" />
+								<Area type="monotone" dataKey="total" />
 								<XAxis
 									dataKey="date"
 									padding={{ left: 5, right: 5 }}
@@ -231,7 +228,7 @@ function SpendingByCategoryPieChart() {
 							<PieChart accessibilityLayer>
 								<Pie
 									nameKey="category"
-									dataKey="totalSpending"
+									dataKey="total"
 									data={totalSpendingByCategory}
 									minAngle={10}
 								>
