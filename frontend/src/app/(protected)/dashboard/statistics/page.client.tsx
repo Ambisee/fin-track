@@ -18,41 +18,36 @@ import {
 } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import EntryList from "@/components/user/EntryList"
-import MonthPicker from "@/components/user/MonthPicker"
+import TimeFilterControlPanel, {
+	changePeriod,
+	EntryViewOptions,
+	getDefaultEntryViewOptions,
+	PERIOD_TYPE
+} from "@/components/user/TimeFilterControlPanel"
 import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
-import { DateHelper } from "@/lib/helper/DateHelper"
+import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
 import { QueryHelper } from "@/lib/helper/QueryHelper"
-import { useAmountFormatter } from "@/lib/hooks"
 import {
-	useEntryDataQuery,
-	useInvalidateEntryDataQuery,
-	useSettingsQuery,
-	useStatisticsQuery
-} from "@/lib/queries"
+	StatisticGroup,
+	Statistics,
+	StatisticsHelper
+} from "@/lib/helper/StatisticsHelper"
+import {
+	useAmountFormatter,
+	useDashboardTransactionEntries,
+	useIsSmallMobile
+} from "@/lib/hooks"
+import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { cn, isNonNullable } from "@/lib/utils"
-import { Statistic } from "@/types/supabase"
 import { useQueryClient } from "@tanstack/react-query"
-import { X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createContext, useContext, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { Cell, Pie, PieChart } from "recharts"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-
-type NonNullableFields<T> = { [key in keyof T]: Exclude<T[key], null> }
-
-interface Statistics {
-	totalIncome: number
-	totalExpense: number
-	groupByCategory: Group[]
-}
-
-interface Group extends NonNullableFields<Statistic> {
-	fillColor: string
-	percentage: number
-}
 
 interface StatsUIProps {
 	stats: Statistics
@@ -60,66 +55,22 @@ interface StatsUIProps {
 }
 
 interface CategoryItemProps {
-	value: Group
-	period: Date
+	value: StatisticGroup
+	groupColor: string
 }
 
 interface ChartDisplayProps {
-	data?: Group[]
+	data?: StatisticGroup[]
 	chartConfig: ChartConfig
 	dataKey: string
 	nameKey: string
 }
 
-const StatisticsPageContext = createContext<{ period: Date }>(null!)
-
-const calculateStatistics = (categoryGroups: Statistic[]) => {
-	const result: Statistics = {
-		totalIncome: 0,
-		totalExpense: 0,
-		groupByCategory: []
-	}
-
-	let colorIndex = 1
-	for (let i = 0; i < categoryGroups.length; i++) {
-		const statistic: Statistic = categoryGroups[i]
-		if (!isNonNullable(statistic.total_amount)) {
-			console.error("Expected a non-null value: statistic.total")
-			continue
-		}
-
-		if (statistic.is_positive) {
-			result.totalIncome += statistic.total_amount
-		} else {
-			result.totalExpense += statistic.total_amount
-		}
-
-		result.groupByCategory.push({
-			...statistic,
-			fillColor: `var(--chart-${colorIndex++})`,
-			percentage: 0
-		})
-	}
-
-	for (let i = 0; i < result.groupByCategory.length; i++) {
-		const group: Group = result.groupByCategory[i]
-		if (!isNonNullable(group.total_amount)) {
-			console.error("Expected a non-null value: group.total_amount")
-			continue
-		}
-
-		const totalAmount = group.is_positive
-			? result.totalIncome
-			: result.totalExpense
-		group.percentage = group.total_amount / totalAmount
-	}
-
-	return result
-}
+const StatisticsPageContext = createContext<{
+	viewOptions: EntryViewOptions
+}>(null!)
 
 function ChartDisplay(props: ChartDisplayProps) {
-	const { period } = useContext(StatisticsPageContext)
-
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
@@ -129,7 +80,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const invalidateEntryQuery = useInvalidateEntryDataQuery()
 
 	const formatAmount = useAmountFormatter()
-	const percentageKey = "percentage" as keyof Group
+	const percentageKey = "percentage" as keyof StatisticGroup
 
 	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
 		return <Skeleton className="w-full h-62.5 mt-5" />
@@ -138,7 +89,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	if (props.data.length < 1) {
 		return (
 			<div className="w-full h-62.5 flex items-center justify-center flex-col gap-2">
-				<h4>No {props.dataKey} data entered for this period.</h4>
+				<h4>No transaction.</h4>
 				<DialogTrigger
 					asChild
 					onClick={() => {
@@ -177,7 +128,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 							<ChartTooltipContent
 								formatterOverride={false}
 								formatter={(value, name, item, index, payload: unknown) => {
-									const data = payload as Pick<Group, "percentage">
+									const data = payload as Pick<StatisticGroup, "percentage">
 									const result = formatAmount(value as number)
 									if (percentageKey !== "percentage") {
 										return result
@@ -197,8 +148,8 @@ function ChartDisplay(props: ChartDisplayProps) {
 						dataKey={props.dataKey}
 						minAngle={15}
 					>
-						{props.data.map((entry, index) => (
-							<Cell key={`cell-${index}`} fill={entry.fillColor} />
+						{props.data.map((_, index) => (
+							<Cell key={`cell-${index}`} fill={`var(--chart-${index + 1}`} />
 						))}
 					</Pie>
 				</PieChart>
@@ -206,11 +157,11 @@ function ChartDisplay(props: ChartDisplayProps) {
 			<ul className="[&>li:not(:last-child)]:mb-1.5">
 				{props.data
 					.toSorted((a, b) => b.percentage - a.percentage)
-					.map((value: Group) => (
+					.map((value: StatisticGroup, index: number) => (
 						<CategoryItem
-							key={`${value.category}-${period.toDateString()}`}
+							key={`${value.category}-${value.isPositive}`}
 							value={value}
-							period={period}
+							groupColor={`var(--chart-${index + 1})`}
 						/>
 					))}
 			</ul>
@@ -219,14 +170,53 @@ function ChartDisplay(props: ChartDisplayProps) {
 }
 
 function CategoryItem(props: CategoryItemProps) {
-	const settingsQuery = useSettingsQuery()
-
-	const currentLedgerId = settingsQuery.data?.current_ledger
-	const dateRange = DateHelper.getMonthStartEnd(props.period)
-
-	const entryDataQuery = useEntryDataQuery(currentLedgerId, dateRange)
-
 	const formatAmount = useAmountFormatter()
+	const { viewOptions } = useContext(StatisticsPageContext)
+
+	const shouldUseShort = useIsSmallMobile()
+	const settingsQuery = useSettingsQuery()
+	const entryDataQuery = useDashboardTransactionEntries(
+		settingsQuery.data?.current_ledger,
+		viewOptions
+	)
+
+	let entryPeriodText: string = ""
+	const period = viewOptions.period
+	switch (period.type) {
+		case "TODAY":
+			entryPeriodText = PERIOD_TYPE.TODAY.label
+			break
+		case "YESTERDAY":
+			entryPeriodText = PERIOD_TYPE.YESTERDAY.label
+			break
+		case "LAST_7_DAYS":
+			entryPeriodText = PERIOD_TYPE.LAST_7_DAYS.label
+			break
+		case "WEEKLY":
+			let timeRange: DateRange
+			if (isNonNullable(period.timeRange)) {
+				timeRange = period.timeRange
+			} else {
+				timeRange = DateHelper.getWeekStartEnd(new Date())
+			}
+
+			const from = timeRange.from!
+			const to = timeRange.to!
+			if (shouldUseShort) {
+				entryPeriodText = `${DateHelper.toShortString(from)} - ${DateHelper.toShortString(to)}`
+			} else {
+				entryPeriodText = `${DateHelper.toFullString(from)} - ${DateHelper.toFullString(to)}`
+			}
+			break
+		case "MONTHLY":
+			const monthDate = new Date(period.timeRange?.from ?? 0)
+			entryPeriodText = `${MONTHS[monthDate.getMonth()]} ${monthDate.getFullYear()}`
+			break
+		case "YEARLY":
+			const yearDate = new Date(period.timeRange?.from ?? 0)
+			entryPeriodText = `${yearDate.getFullYear()}`
+			break
+	}
 
 	return (
 		<li key={props.value.category}>
@@ -239,7 +229,7 @@ function CategoryItem(props: CategoryItemProps) {
 						)}
 					>
 						<div
-							style={{ background: props.value.fillColor }}
+							style={{ background: props.groupColor }}
 							className={`min-w-6 max-w-6 aspect-square rounded-sm`}
 						/>
 						<div className="max-w-1/2">
@@ -251,48 +241,37 @@ function CategoryItem(props: CategoryItemProps) {
 							</p>
 						</div>
 						<span className="text-sm xs:text-base flex-1 text-right">
-							{formatAmount(props.value.total_amount as number)}
+							{formatAmount(props.value.totalAmount as number)}
 						</span>
 					</button>
 				</DialogTrigger>
 				<DialogContent
 					hideCloseButton
-					className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-[460px] sm:max-w-lg"
+					className="grid-rows-[auto_1fr] h-dvh max-w-none duration-0 border-0 sm:border sm:h-5/6 sm:min-h-115 sm:max-w-lg"
 				>
-					<DialogHeader className="relative space-y-0 sm:text-center">
-						<DialogTitle className="mx-auto w-2/3 leading-6 lg:w-full" asChild>
-							<h2 className="leading-6">
-								<span className="whitespace-nowrap">
-									{props.value.category}{" "}
-									{props.value.is_positive ? "Income" : "Expense"}
-								</span>{" "}
-								<span className="whitespace-nowrap">
-									({MONTHS[props.period.getMonth()]}{" "}
-									{props.period.getFullYear()})
-								</span>
+					<DialogHeader className="relative min-w-0 space-y-0 sm:text-center">
+						<DialogTitle
+							className="min-w-0 w-full leading-6 px-6 lg:w-full"
+							asChild
+						>
+							<h2 className="leading-6 whitespace-nowrap min-w-0 truncate">
+								{props.value.isPositive ? "Income" : "Expense"} -{" "}
+								{props.value.category}{" "}
 							</h2>
 						</DialogTitle>
-						<DialogDescription>
-							<VisuallyHidden>
-								{props.value.category} entries for{" "}
-								{new Date(props.value.start).toDateString()}-
-								{new Date(props.value.end).toDateString()}
-							</VisuallyHidden>
-						</DialogDescription>
-						<DialogClose className="absolute block right-0 top-1/2 translate-y-[-50%]">
+						<DialogClose className="absolute block right-0 top-3 translate-y-[-50%]">
 							<X className="w-4 h-4" />
 						</DialogClose>
+						<DialogDescription>{entryPeriodText}</DialogDescription>
 					</DialogHeader>
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
 							data={
-								entryDataQuery
-									.flatMap((v) => v.data ?? [])
-									.filter(
-										(v) =>
-											v?.category === props.value.category &&
-											v?.is_positive == props.value.is_positive
-									) ?? []
+								entryDataQuery.data?.filter(
+									(v) =>
+										v?.category === props.value.category &&
+										v?.is_positive == props.value.isPositive
+								) ?? []
 							}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
@@ -301,6 +280,19 @@ function CategoryItem(props: CategoryItemProps) {
 				</DialogContent>
 			</Dialog>
 		</li>
+	)
+}
+
+function MobileSkeletonUI() {
+	return (
+		<div className="[&>.category-item:not(:last-child)]:mb-1.5">
+			<Skeleton className="transaction-type w-full h-16.25" />
+			<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+			<Skeleton className="category-item w-full h-14" />
+			<Skeleton className="category-item w-full h-14" />
+			<Skeleton className="category-item w-full h-14" />
+			<Skeleton className="category-item w-full h-14" />
+		</div>
 	)
 }
 
@@ -352,24 +344,45 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="expense">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groupByCategory.filter(
-						(value) => !value.is_positive
-					)}
+					data={props.stats.groups.filter((value) => !value.isPositive)}
 					nameKey="category"
-					dataKey="total_amount"
+					dataKey="totalAmount"
 				/>
 			</TabsContent>
 			<TabsContent value="income">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groupByCategory.filter(
-						(value) => value.is_positive
-					)}
+					data={props.stats.groups.filter((value) => value.isPositive)}
 					nameKey="category"
-					dataKey="total_amount"
+					dataKey="totalAmount"
 				/>
 			</TabsContent>
 		</Tabs>
+	)
+}
+
+function DesktopSkeletonUI() {
+	return (
+		<div className="flex py-4 w-full min-w-0 max-w-full lg:m-auto rounded-lg border bg-card text-card-foreground shadow-xs">
+			<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5">
+				<Skeleton className="transaction-type w-37.5 h-8" />
+				<Skeleton className="transaction-amount mt-2 w-55 h-9" />
+				<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+			</div>
+			<div className="min-w-0 flex-1 px-4 [&>.category-item:not(:last-child)]:mb-1.5 border-l">
+				<Skeleton className="transaction-type w-37.5 h-8" />
+				<Skeleton className="transaction-amount mt-2 w-55 h-9" />
+				<Skeleton className="chart mx-auto my-7.25 rounded-full w-48 aspect-square" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+				<Skeleton className="category-item w-full h-14" />
+			</div>
+		</div>
 	)
 }
 
@@ -385,11 +398,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groupByCategory.filter(
-						(value) => !value.is_positive
-					)}
+					data={props.stats.groups.filter((value) => !value.isPositive)}
 					nameKey="category"
-					dataKey="total_amount"
+					dataKey="totalAmount"
 				/>
 			</div>
 			<div
@@ -402,11 +413,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groupByCategory.filter(
-						(value) => value.is_positive
-					)}
+					data={props.stats.groups.filter((value) => value.isPositive)}
 					nameKey="category"
-					dataKey="total_amount"
+					dataKey="totalAmount"
 				/>
 			</div>
 		</div>
@@ -414,58 +423,107 @@ function DesktopStatsUI(props: StatsUIProps) {
 }
 
 export default function DashboardStatistics() {
-	const [curPeriod, setCurPeriod] = useState<Date>(new Date())
+	const [entryViewOptions, setEntryViewOptions] = useState<EntryViewOptions>(
+		() => {
+			const initial = getDefaultEntryViewOptions()
+			initial.period.timeRange = DateHelper.getMonthStartEnd(new Date())
+			return initial
+		}
+	)
 
 	const settingsQuery = useSettingsQuery()
-	const statisticsQuery = useStatisticsQuery(
+	const entryData = useDashboardTransactionEntries(
 		settingsQuery.data?.current_ledger,
-		DateHelper.getMonthStartEnd(curPeriod)
+		entryViewOptions
 	)
+
 	const isDesktop = useMediaQuery({ minWidth: DESKTOP_BREAKPOINT })
+	const showButton = ["WEEKLY", "MONTHLY", "YEARLY"].includes(
+		entryViewOptions.period.type
+	)
 
 	const renderStatsUI = () => {
-		if (statisticsQuery.isFetching || !statisticsQuery.isFetched) {
-			return (
-				<div className="w-full py-4 flex gap-2 ">
-					<div className="grid gap-2 flex-1">
-						<Skeleton className="w-full h-6" />
-						<Skeleton className="w-full h-9" />
-					</div>
-					<div className="grid gap-2 flex-1">
-						<Skeleton className="w-full h-6" />
-						<Skeleton className="w-full h-9" />
-					</div>
-				</div>
-			)
-		}
-
-		const stats = calculateStatistics(statisticsQuery.data ?? [])
+		const isDataPending =
+			entryData.isFetching || entryData.isLoading || entryData.isPending
+		const stats = StatisticsHelper.calculateStatistics(entryData.data ?? [])
 		const chartConfig: ChartConfig = {}
 
-		for (let i = 0; i < stats.groupByCategory.length; i++) {
-			const group = stats.groupByCategory[i]
+		for (let i = 0; i < stats.groups.length; i++) {
+			const group = stats.groups[i]
 
 			chartConfig[group.category!] = {
 				label: group.category!
 			}
 		}
 
+		const SkeletonUI = isDesktop ? DesktopSkeletonUI : MobileSkeletonUI
 		const StatsUI = isDesktop ? DesktopStatsUI : MobileStatsUI
 
-		return <StatsUI chartConfig={chartConfig} stats={stats} />
+		return (
+			<ConditionalWrapper
+				showContent={!isDataPending}
+				fallback={<SkeletonUI />}
+			>
+				<StatsUI chartConfig={chartConfig} stats={stats} />
+			</ConditionalWrapper>
+		)
+
+		return
 	}
 
 	return (
-		<StatisticsPageContext.Provider value={{ period: curPeriod }}>
+		<StatisticsPageContext.Provider value={{ viewOptions: entryViewOptions }}>
 			<DashboardPageLayout title="Statistics">
 				<div className="flex justify-between items-center pb-4 pt-2 bg-background">
-					<MonthPicker
-						key={`${curPeriod.getMonth()}-${curPeriod.getFullYear()}`}
-						value={curPeriod}
-						onValueChange={(value) => {
-							setCurPeriod(value)
-						}}
-					/>
+					<ConditionalWrapper showContent={showButton} fallback={null}>
+						<Button
+							variant="ghost"
+							className="aspect-square"
+							onClick={() => {
+								const type = entryViewOptions.period.type
+								const currentDate = entryViewOptions.period.timeRange?.from
+								if (!(type in changePeriod) || !isNonNullable(currentDate)) {
+									return
+								}
+								setEntryViewOptions((cur) => ({
+									...cur,
+									period: {
+										...cur.period,
+										timeRange: changePeriod[type]?.(currentDate, -1)
+									}
+								}))
+							}}
+						>
+							<ChevronLeft />
+						</Button>
+					</ConditionalWrapper>
+					<div className="w-full flex justify-center">
+						<TimeFilterControlPanel
+							settings={entryViewOptions}
+							setSettings={setEntryViewOptions}
+						/>
+					</div>
+					<ConditionalWrapper showContent={showButton} fallback={null}>
+						<Button
+							variant="ghost"
+							className="aspect-square"
+							onClick={() => {
+								const type = entryViewOptions.period.type
+								const currentDate = entryViewOptions.period.timeRange?.from
+								if (!(type in changePeriod) || !isNonNullable(currentDate))
+									return
+								setEntryViewOptions((cur) => ({
+									...cur,
+									period: {
+										...cur.period,
+										timeRange: changePeriod[type]?.(currentDate, 1)
+									}
+								}))
+							}}
+						>
+							<ChevronRight />
+						</Button>
+					</ConditionalWrapper>
 				</div>
 				{renderStatsUI()}
 			</DashboardPageLayout>
