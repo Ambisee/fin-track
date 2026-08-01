@@ -126,7 +126,7 @@ export default function DashboardEntries() {
 										settings={entryViewOptions}
 										setSettings={setEntryViewOptions}
 										availableCategories={categoriesQuery.data?.map((value) => ({
-											...value,
+											name: value.name,
 											count: -1
 										}))}
 									/>

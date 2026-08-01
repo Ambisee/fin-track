@@ -39,7 +39,11 @@ import {
 	useDashboardTransactionEntries,
 	useIsSmallMobile
 } from "@/lib/hooks"
-import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
+import {
+	useCategoriesQuery,
+	useInvalidateEntryDataQuery,
+	useSettingsQuery
+} from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { cn, isNonNullable, truncate } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
@@ -440,6 +444,7 @@ export default function DashboardStatistics() {
 	)
 
 	const settingsQuery = useSettingsQuery()
+	const categoriesQuery = useCategoriesQuery()
 	const entryData = useDashboardTransactionEntries(
 		settingsQuery.data?.current_ledger,
 		entryViewOptions
@@ -475,8 +480,6 @@ export default function DashboardStatistics() {
 				<StatsUI chartConfig={chartConfig} stats={stats} />
 			</ConditionalWrapper>
 		)
-
-		return
 	}
 
 	return (
@@ -509,6 +512,11 @@ export default function DashboardStatistics() {
 						<TimeFilterControlPanel
 							settings={entryViewOptions}
 							setSettings={setEntryViewOptions}
+							allowSetTransactionType={false}
+							availableCategories={categoriesQuery.data?.map((v) => ({
+								name: v.name,
+								count: -1
+							}))}
 						/>
 					</div>
 					<ConditionalWrapper showContent={showButton} fallback={null}>

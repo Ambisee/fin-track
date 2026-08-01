@@ -343,9 +343,10 @@ function FilterCommandInput(props: {
 
 function FilterControlTab(props: {
 	tabValue: string
-	categories?: string[]
+	allowSetTransactionType: boolean
 	filterSettings: FilterSettings
 	onFilterSettings: Dispatch<SetStateAction<FilterSettings>>
+	categories?: string[]
 }) {
 	const [searchValue, setSearchValue] = useState("")
 
@@ -371,26 +372,25 @@ function FilterControlTab(props: {
 	}
 
 	return (
-		<TabsContent
-			value={props.tabValue}
-			className="grid gap-4 min-h-0 h-full grid-rows-[auto_1fr]"
-		>
-			<section className="grid gap-2">
-				<h6>Type</h6>
-				<div className="grid grid-rows-3 gap-2">
-					{TRANSACTION_TYPE.map((type) => (
-						<Button
-							key={type}
-							variant="outline"
-							className="flex justify-between"
-							onClick={() => onTransactionTypeChange(type)}
-						>
-							<span>{type}</span>
-							{props.filterSettings.type === type && <Check />}
-						</Button>
-					))}
-				</div>
-			</section>
+		<TabsContent value={props.tabValue} className="grid gap-4 min-h-0 h-full">
+			{props.allowSetTransactionType && (
+				<section className="grid gap-2">
+					<h6>Type</h6>
+					<div className="grid grid-rows-3 gap-2">
+						{TRANSACTION_TYPE.map((type) => (
+							<Button
+								key={type}
+								variant="outline"
+								className="flex justify-between"
+								onClick={() => onTransactionTypeChange(type)}
+							>
+								<span>{type}</span>
+								{props.filterSettings.type === type && <Check />}
+							</Button>
+						))}
+					</div>
+				</section>
+			)}
 			<section className="grid gap-2 min-h-0 h-full grid-rows-[auto_1fr]">
 				<div className="flex justify-between items-center">
 					<h6>Categories</h6>
@@ -413,7 +413,7 @@ function FilterControlTab(props: {
 				</div>
 				<Command className="h-full min-h-0 grid grid-rows-[auto_1fr]">
 					<FilterCommandInput value={searchValue} onChange={setSearchValue} />
-					<CommandList>
+					<CommandList className="max-h-none">
 						<CommandEmpty>No categories found.</CommandEmpty>
 						<CommandGroup>
 							{availableCategories.map((value) => (
@@ -463,6 +463,7 @@ function TimeFilterControlDialogContent(props: {
 	settings: EntryViewOptions
 	onSettingsChange: Dispatch<SetStateAction<EntryViewOptions>>
 	availableCategories?: CategoryItem[]
+	allowSetTransactionType: boolean
 }) {
 	const [timeSettings, setTimeSettings] = useControlPropState<TimeSettings>(
 		defaultSettings.period,
@@ -541,6 +542,7 @@ function TimeFilterControlDialogContent(props: {
 					filterSettings={filterSettings}
 					onFilterSettings={setFilterSettings}
 					categories={props.availableCategories?.map((value) => value.name)}
+					allowSetTransactionType={props.allowSetTransactionType}
 				/>
 			</Tabs>
 		</DialogContent>
@@ -563,6 +565,7 @@ export default function TimeFilterControlPanel(props: {
 	settings?: EntryViewOptions
 	setSettings?: Dispatch<SetStateAction<EntryViewOptions>>
 	availableCategories?: CategoryItem[]
+	allowSetTransactionType?: boolean // TODO: This should be refactored out.
 }) {
 	const [entryViewOptions, setEntryViewOptions] = useControlPropState(
 		defaultSettings,
@@ -624,6 +627,7 @@ export default function TimeFilterControlPanel(props: {
 				settings={entryViewOptions}
 				onSettingsChange={setEntryViewOptions}
 				availableCategories={props.availableCategories}
+				allowSetTransactionType={props?.allowSetTransactionType ?? true}
 			/>
 		</Dialog>
 	)
