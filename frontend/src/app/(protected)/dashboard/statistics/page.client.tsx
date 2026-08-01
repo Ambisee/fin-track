@@ -41,7 +41,7 @@ import {
 } from "@/lib/hooks"
 import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
-import { cn, isNonNullable } from "@/lib/utils"
+import { cn, isNonNullable, truncate } from "@/lib/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createContext, useContext, useState } from "react"
@@ -126,6 +126,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 					<ChartTooltip
 						content={
 							<ChartTooltipContent
+								className="min-w-70 max-w-screen"
 								formatterOverride={false}
 								formatter={(value, name, item, index, payload: unknown) => {
 									const data = payload as Pick<StatisticGroup, "percentage">
@@ -134,9 +135,8 @@ function ChartDisplay(props: ChartDisplayProps) {
 										return result
 									}
 
-									return (
-										result + ` (${(data[percentageKey] * 100).toFixed(2)}%)`
-									)
+									const percentage = 100 * data[percentageKey]
+									return result + ` (${percentage.toFixed(2)}%)`
 								}}
 							/>
 						}
@@ -344,7 +344,9 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="expense">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups.filter((value) => !value.isPositive)}
+					data={props.stats.groups
+						.filter((value) => !value.isPositive)
+						.map((v) => ({ ...v, category: truncate(v.category) }))}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -352,7 +354,9 @@ function MobileStatsUI(props: StatsUIProps) {
 			<TabsContent value="income">
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups.filter((value) => value.isPositive)}
+					data={props.stats.groups
+						.filter((value) => value.isPositive)
+						.map((v) => ({ ...v, category: truncate(v.category) }))}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -398,7 +402,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups.filter((value) => !value.isPositive)}
+					data={props.stats.groups
+						.filter((value) => !value.isPositive)
+						.map((v) => ({ ...v, category: truncate(v.category) }))}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
@@ -413,7 +419,9 @@ function DesktopStatsUI(props: StatsUIProps) {
 				</h3>
 				<ChartDisplay
 					chartConfig={props.chartConfig}
-					data={props.stats.groups.filter((value) => value.isPositive)}
+					data={props.stats.groups
+						.filter((value) => value.isPositive)
+						.map((v) => ({ ...v, category: truncate(v.category) }))}
 					nameKey="category"
 					dataKey="totalAmount"
 				/>
