@@ -99,8 +99,8 @@ export default function EntryListItem({
 					className="h-full w-full p-4 text-left focus:outline-hidden"
 					onClick={() => props.onExpand?.(!isItemExpanded)}
 				>
-					<div className="flex justify-between items-center w-inherit">
-						<div className="grid max-w-[calc(50%-0.25rem)] text-entry-item">
+					<div className="flex justify-between items-center gap-2 w-inherit">
+						<div className="grid max-w-[calc(100%)] text-entry-item">
 							<CardTitle className="text-base xs:text-lg whitespace-nowrap overflow-hidden text-ellipsis">
 								{props.data.category}
 							</CardTitle>

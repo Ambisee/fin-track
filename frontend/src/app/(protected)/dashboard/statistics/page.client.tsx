@@ -290,7 +290,7 @@ function CategoryItem(props: CategoryItemProps) {
 							style={{ background: props.groupColor }}
 							className={`min-w-6 max-w-6 aspect-square rounded-sm`}
 						/>
-						<div className="max-w-1/2">
+						<div className="min-w-0 max-w-full">
 							<h5 className="truncate text-sm xs:text-base text-left">
 								{props.value.category}
 							</h5>
