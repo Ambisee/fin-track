@@ -291,7 +291,7 @@ function CategoryItem(props: CategoryItemProps) {
 							className={`min-w-6 max-w-6 aspect-square rounded-sm`}
 						/>
 						<div className="max-w-1/2">
-							<h5 className="truncate text-sm xs:text-base">
+							<h5 className="truncate text-sm xs:text-base text-left">
 								{props.value.category}
 							</h5>
 							<p className="text-xs opacity-55 text-left">
