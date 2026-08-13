@@ -17,7 +17,6 @@ type Statistic =
 		? U
 		: never
 
-type Entry = Entity<"entry">
 type Category = Entity<"category">
 type Ledger = InferQueryType<ReturnType<typeof useLedgersQuery>>
 type Currency = Entity<"currency">
@@ -36,7 +35,6 @@ export {
 	type Category,
 	type Currency,
 	type Database,
-	type Entry,
 	type EntryDataCursor,
 	type Ledger,
 	type MonthGroup,

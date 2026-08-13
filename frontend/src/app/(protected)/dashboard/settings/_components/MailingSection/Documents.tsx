@@ -246,11 +246,11 @@ function MonthSelectorPage(props: DocumentPageProps) {
 									new Date(data.date)
 								)
 
-								invalidateEntryQuery(data.ledger, monthStartEnd)
+								invalidateEntryQuery(data.ledger.id, monthStartEnd)
 
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
+										data.ledger.id,
 										monthStartEnd
 									)
 								})

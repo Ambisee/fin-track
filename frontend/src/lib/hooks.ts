@@ -1,5 +1,5 @@
 import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
 import { SMALL_MOBILE_BREKPOINT } from "./constants"
@@ -29,15 +29,43 @@ function useSearchEntry() {
 			setIsSearching(true)
 			const { data, error } = await supabase.rpc("search_entry", {
 				query: DatabaseHelper.parseSearchQuery(searchQuery)
-			})
+			}).select(`
+                    id, 
+                    amount, 
+                    date, 
+                    is_positive, 
+                    note, 
+                    category,
+                    ledger (id, name, currency (id, name:currency_name))
+            `)
 
 			if (error != null || !isNonNullable(data)) {
 				setSearchResult(null)
 				return
 			}
 
-			setSearchResult(data)
 			setIsSearching(false)
+			setSearchResult(
+				data.map(
+					(v) =>
+						({
+							id: v.id,
+							amount: v.amount,
+							note: v.note,
+							type: v.is_positive ? "Income" : "Expense",
+							date: new Date(v.date),
+							category: v.category,
+							ledger: {
+								id: v.ledger.id,
+								name: v.ledger.name,
+								currency: {
+									id: v.ledger.currency.id,
+									name: v.ledger.currency.name
+								}
+							}
+						}) satisfies Entry
+				)
+			)
 		}, 350)
 
 		return () => {
@@ -141,10 +169,10 @@ function useDashboardTransactionEntries(
 				typeChecker = () => true
 				break
 			case "Expense":
-				typeChecker = (value: Entry) => !value.is_positive
+				typeChecker = (value: Entry) => value.type === "Expense"
 				break
 			case "Income":
-				typeChecker = (value: Entry) => value.is_positive
+				typeChecker = (value: Entry) => value.type === "Income"
 				break
 		}
 

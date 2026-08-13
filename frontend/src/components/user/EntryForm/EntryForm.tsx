@@ -4,7 +4,7 @@ import { LEDGER_QKEY } from "@/lib/constants"
 import { useSettingsQuery } from "@/lib/queries"
 import { EntryFormState } from "@/lib/store"
 import { cn } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQueryClient } from "@tanstack/react-query"
 import { ReactNode, useEffect, useState } from "react"
@@ -98,12 +98,12 @@ export default function EntryForm(props: EntryFormProps) {
 			return
 		}
 
-		defaultValues.date = new Date(`${props.data?.date} 00:00`)
+		defaultValues.date = props.data.date
 		defaultValues.category = props.data.category
-		defaultValues.type = props.data.is_positive ? "Income" : "Expense"
+		defaultValues.type = props.data.type
 		defaultValues.amount = props.data.amount.toFixed(2)
 		defaultValues.note = props.data.note ?? ""
-		defaultValues.ledger = props.data.ledger ?? -1
+		defaultValues.ledger = props.data.ledger.id
 
 		form.reset(defaultValues)
 		return

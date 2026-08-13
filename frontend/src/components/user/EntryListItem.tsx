@@ -13,7 +13,7 @@ import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { supabaseClient } from "@/lib/supabase"
 import { isNonNullable } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
@@ -85,11 +85,12 @@ export default function EntryListItem({
 
 	const formatAmount = useAmountFormatter()
 	const isItemExpanded = props.expand ?? false
+	const isIncome = props.data.type === "Income"
 
 	return (
 		<Card
 			data-open={isItemExpanded}
-			data-is-positive={props.data.is_positive}
+			data-is-positive={isIncome}
 			className="data-[open='true']:max-h-none 
                     data-[open='false']:max-h-25 overflow-hidden group"
 		>
@@ -105,7 +106,7 @@ export default function EntryListItem({
 								{props.data.category}
 							</CardTitle>
 							<CardDescription>
-								{formatListItemDate(new Date(props.data.date))}
+								{formatListItemDate(props.data.date)}
 							</CardDescription>
 						</div>
 						<div className="flex gap-2 items-center">
@@ -114,7 +115,7 @@ export default function EntryListItem({
 							) : (
 								<div className="whitespace-nowrap">
 									<p className="w-full align-baseline text-entry-item">
-										{props.data.is_positive ? "+ " : "- "}
+										{isIncome ? "+ " : "- "}
 										{formatAmount(props.data.amount)}
 									</p>
 								</div>
@@ -147,11 +148,11 @@ export default function EntryListItem({
 												new Date(data.date)
 											)
 
-											invalidateEntryQuery(data.ledger, dataMonth)
+											invalidateEntryQuery(data.ledger.id, dataMonth)
 
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
-													data.ledger,
+													data.ledger.id,
 													dataMonth
 												)
 											})
@@ -171,11 +172,11 @@ export default function EntryListItem({
 												new Date(oldData.date)
 											)
 
-											invalidateEntryQuery(oldData.ledger, oldDataMonth)
+											invalidateEntryQuery(oldData.ledger.id, oldDataMonth)
 
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
-													oldData.ledger,
+													oldData.ledger.id,
 													oldDataMonth
 												)
 											})
@@ -230,17 +231,17 @@ export default function EntryListItem({
 														})
 
 														const monthStartEnd = DateHelper.getMonthStartEnd(
-															new Date(props.data.date)
+															props.data.date
 														)
 
 														invalidateEntryQuery(
-															props.data.ledger,
+															props.data.ledger.id,
 															monthStartEnd
 														)
 
 														queryClient.invalidateQueries({
 															queryKey: QueryHelper.getStatisticQueryKey(
-																props.data.ledger,
+																props.data.ledger.id,
 																monthStartEnd
 															)
 														})

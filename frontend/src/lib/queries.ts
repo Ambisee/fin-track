@@ -22,6 +22,7 @@ import { DateRange } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { getMonthSpansForDateRange, isNonNullable } from "./utils"
+import { Entry } from "@/types/Entry"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -146,7 +147,16 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 
 				const { data, error } = await supabase
 					.from("entry")
-					.select(`*`)
+					.select(
+						`
+                        id, 
+                        amount, 
+                        date, 
+                        is_positive, 
+                        note, 
+                        category,
+                        ledger (id, name, currency (id, currency_name))`
+					)
 					.eq("created_by", user.id)
 					.eq("ledger", ledger!)
 					.gte("date", from.toDateString())
@@ -159,7 +169,29 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 					throw new PostgrestError(error)
 				}
 
-				return data ?? []
+				if (!isNonNullable(data)) {
+					return []
+				}
+
+				return data.map(
+					(v) =>
+						({
+							id: v.id,
+							amount: v.amount,
+							date: new Date(v.date),
+							type: v.is_positive ? "Income" : "Expense",
+							note: v.note,
+							category: v.category,
+							ledger: {
+								id: v.ledger.id,
+								name: v.ledger.name,
+								currency: {
+									id: v.ledger.currency.id,
+									name: v.ledger.currency.currency_name
+								}
+							}
+						}) satisfies Entry
+				)
 			},
 			staleTime: QUERY_STALE_TIME,
 			refetchOnWindowFocus: (query) =>

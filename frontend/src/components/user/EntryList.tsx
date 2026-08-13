@@ -2,7 +2,7 @@
 
 import useGlobalStore from "@/lib/store"
 import { isNonNullable } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
 import {
@@ -94,11 +94,11 @@ function EmptyEntryList() {
 									new Date(data.date)
 								)
 
-								invaldiateEntryQuery(data.ledger, monthStartEnd)
+								invaldiateEntryQuery(data.ledger.id, monthStartEnd)
 
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
+										data.ledger.id,
 										monthStartEnd
 									)
 								})

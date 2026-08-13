@@ -1,4 +1,4 @@
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { isNonNullable } from "../utils"
 import { DateHelper } from "./DateHelper"
 
@@ -37,19 +37,20 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			const groupKey = `${entry.category}_${entry.is_positive}`
+			const isPositive = entry.type === "Income"
+			const groupKey = `${entry.category}_${entry.type}`
 
 			if (!(groupKey in groupMap)) {
 				groupMap[groupKey] = {
 					category: entry.category,
-					isPositive: entry.is_positive,
+					isPositive: isPositive,
 					totalAmount: 0,
 					percentage: 0
 				}
 			}
 
 			groupMap[groupKey].totalAmount += entry.amount
-			if (entry.is_positive) {
+			if (isPositive) {
 				result.totalIncome += entry.amount
 			} else {
 				result.totalExpense += entry.amount
@@ -76,7 +77,9 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			if (entry.is_positive) {
+			const isPositive = entry.type === "Income"
+
+			if (isPositive) {
 				continue
 			}
 
@@ -102,7 +105,9 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			if (entry.is_positive) {
+			const isPositive = entry.type === "Income"
+
+			if (isPositive) {
 				continue
 			}
 

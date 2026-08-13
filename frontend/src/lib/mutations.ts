@@ -10,6 +10,7 @@ import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
 import { useUserQuery } from "./queries"
 import { useLedgersQuery } from "./queries"
+import { Entry } from "@/types/Entry"
 
 function useInsertEntryMutation() {
 	const [supabase] = useState(supabaseClient())
@@ -39,14 +40,45 @@ function useInsertEntryMutation() {
 					note: note,
 					ledger: entry.ledger
 				})
-				.select()
+				.select(
+					`
+                        id,
+                        is_positive,
+                        amount,
+                        date,
+                        category,
+                        note,
+                        ledger (
+                            *,
+                            currency (
+                                id,
+                                name:currency_name
+                            )
+                        )
+                    `
+				)
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				type: data.is_positive ? "Income" : "Expense",
+				amount: data.amount,
+				date: new Date(data.date),
+				category: data.category,
+				note: data.note,
+				ledger: {
+					id: data.ledger.id,
+					name: data.ledger.name,
+					currency: {
+						id: data.ledger.currency.id,
+						name: data.ledger.currency.name
+					}
+				}
+			} satisfies Entry
 		}
 	})
 }
@@ -67,14 +99,45 @@ function useDeleteEntryMutation() {
 				.delete()
 				.eq("created_by", user.id)
 				.eq("id", id)
-				.select("*")
+				.select(
+					`
+                        id,
+                        is_positive,
+                        amount,
+                        date,
+                        category,
+                        note,
+                        ledger (
+                            *,
+                            currency (
+                                id,
+                                name:currency_name
+                            )
+                        )
+                    `
+				)
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				type: data.is_positive ? "Income" : "Expense",
+				amount: data.amount,
+				date: new Date(data.date),
+				category: data.category,
+				note: data.note,
+				ledger: {
+					id: data.ledger.id,
+					name: data.ledger.name,
+					currency: {
+						id: data.ledger.currency.id,
+						name: data.ledger.currency.name
+					}
+				}
+			} satisfies Entry
 		}
 	})
 }
@@ -101,14 +164,45 @@ function useUpdateEntryMutation() {
 					ledger: entry.ledger
 				})
 				.eq("id", entry.id)
-				.select()
+				.select(
+					`
+                        id,
+                        is_positive,
+                        amount,
+                        date,
+                        category,
+                        note,
+                        ledger (
+                            *,
+                            currency (
+                                id,
+                                name:currency_name
+                            )
+                        )
+                    `
+				)
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				type: data.is_positive ? "Income" : "Expense",
+				amount: data.amount,
+				date: new Date(data.date),
+				category: data.category,
+				note: data.note,
+				ledger: {
+					id: data.ledger.id,
+					name: data.ledger.name,
+					currency: {
+						id: data.ledger.currency.id,
+						name: data.ledger.currency.name
+					}
+				}
+			} satisfies Entry
 		}
 	})
 }

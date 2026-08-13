@@ -151,11 +151,11 @@ function ChartDisplay(props: ChartDisplayProps) {
 									new Date(data.date)
 								)
 
-								invalidateEntryQuery(data.ledger, monthStartEnd)
+								invalidateEntryQuery(data.ledger.id, monthStartEnd)
 
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
+										data.ledger.id,
 										monthStartEnd
 									)
 								})
@@ -325,11 +325,13 @@ function CategoryItem(props: CategoryItemProps) {
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
 							data={
-								entryDataQuery.data?.filter(
-									(v) =>
+								entryDataQuery.data?.filter((v) => {
+									const isPositive = v?.type === "Income"
+									return (
 										v?.category === props.value.category &&
-										v?.is_positive == props.value.isPositive
-								) ?? []
+										isPositive === props.value.isPositive
+									)
+								}) ?? []
 							}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
