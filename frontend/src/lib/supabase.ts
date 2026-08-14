@@ -1,4 +1,4 @@
-import { Database } from "@/types/supabase"
+import { Database } from "@/types/supabase-auto"
 import { createBrowserClient, createServerClient } from "@supabase/ssr"
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies"
 import { NextRequest, NextResponse } from "next/server"
