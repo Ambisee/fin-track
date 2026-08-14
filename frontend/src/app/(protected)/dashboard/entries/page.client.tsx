@@ -53,7 +53,7 @@ export default function DashboardEntries() {
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 
-	const currentLedgerId = settingsQuery.data?.current_ledger
+	const currentLedgerId = settingsQuery.data?.visibleLedger.id
 
 	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,

@@ -69,7 +69,7 @@ export default function EntryForm(props: EntryFormProps) {
 	const settingsQuery = useSettingsQuery()
 
 	const isEditForm = props.data !== undefined
-	const currentLedger = settingsQuery.data?.current_ledger
+	const currentLedger = settingsQuery.data?.visibleLedger.id
 
 	const form = useForm<EntryFormData>({
 		resolver: zodResolver(formSchema),

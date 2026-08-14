@@ -160,7 +160,7 @@ export default function EntryListItem({
 											// Update the query data corresponding to the data's old ledger and date
 											const oldDataExists = isNonNullable(oldData)
 											const similarLedgerAndDate =
-												data.ledger === oldData?.ledger &&
+												data.ledger.id === oldData?.ledger?.id &&
 												data.date === oldData?.date
 
 											if (!oldDataExists || similarLedgerAndDate) {

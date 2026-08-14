@@ -29,7 +29,8 @@ import {
 } from "@/lib/queries"
 import { useUserQuery } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
-import { Ledger, MonthGroup } from "@/types/supabase"
+import { MonthGroup } from "@/types/supabase"
+import { Ledger } from "@/types/Ledger"
 import { DownloadIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import {

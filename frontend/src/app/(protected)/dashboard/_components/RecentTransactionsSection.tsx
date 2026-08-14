@@ -60,7 +60,7 @@ export default function RecentTransactionSection() {
 	})
 
 	const settingsQuery = useSettingsQuery()
-	const currentLedgerId = settingsQuery.data?.current_ledger
+	const currentLedgerId = settingsQuery.data?.visibleLedger.id
 
 	const entryDataQuery = useDashboardTransactionEntries(
 		currentLedgerId,

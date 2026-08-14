@@ -15,7 +15,7 @@ import {
 	useSettingsQuery
 } from "@/lib/queries"
 import { useUserQuery } from "@/lib/queries"
-import { Ledger } from "@/types/supabase"
+import { Ledger } from "@/types/Ledger"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
@@ -76,8 +76,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 		}
 
 		const payload: Parameters<typeof insertLedgerMutation.mutate>[0] = {
-			...ledger,
-			created_by: userID
+			...ledger
 		}
 
 		try {
@@ -127,10 +126,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			return
 		}
 
-		const payload: Parameters<typeof updateLedgerMutation.mutate>[0] = {
-			...ledger,
-			created_by: userID
-		}
+		const payload: Parameters<typeof updateLedgerMutation.mutate>[0] = ledger
 
 		try {
 			const successData = await updateLedgerMutation.mutateAsync(payload)
@@ -141,7 +137,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			toast.info("Ledger updated", { duration: SHORT_TOAST_DURATION })
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
-			if (ledger.id === settingsQuery.data?.current_ledger) {
+			if (ledger.id === settingsQuery.data?.visibleLedger.id) {
 				await queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
 			}
 
@@ -214,9 +210,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 		}
 
 		try {
-			const successData = await switchLedgerMutation.mutateAsync({
-				id: ledger.id
-			})
+			const successData = await switchLedgerMutation.mutateAsync(ledger)
 			if (successData === undefined) {
 				toast.error("Failed to switch to the specified ledger.")
 				return
@@ -226,7 +220,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 
 			toast.info(
 				<>
-					Switched to the ledger: <b>{successData?.ledger?.name}</b>
+					Switched to the ledger: <b>{successData?.visibleLedger?.name}</b>
 				</>,
 				{ duration: SHORT_TOAST_DURATION }
 			)
@@ -252,7 +246,7 @@ export default function LedgerGroup(props: LedgerGroupProps) {
 			isInitialized={!ledgersQuery.isLoading}
 			isEditMode={isEditMode}
 			ledgersList={ledgersQuery.data ?? []}
-			currentLedger={settingsQuery.data?.ledger ?? undefined}
+			currentLedger={settingsQuery.data?.visibleLedger ?? undefined}
 			onAddButton={() => {
 				setCurrentLedger(undefined)
 				setCurrentPage(1)

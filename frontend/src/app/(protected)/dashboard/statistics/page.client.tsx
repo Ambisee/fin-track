@@ -128,7 +128,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const formatAmount = useAmountFormatter()
 	const percentageKey = "percentage" as keyof StatisticGroup
 
-	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
+	if (props.data === undefined || !settingsQuery.data?.visibleLedger.id) {
 		return <Skeleton className="w-full h-62.5 mt-5" />
 	}
 
@@ -234,7 +234,7 @@ function CategoryItem(props: CategoryItemProps) {
 	const shouldUseShort = useIsSmallMobile()
 	const settingsQuery = useSettingsQuery()
 	const entryDataQuery = useDashboardTransactionEntries(
-		settingsQuery.data?.current_ledger,
+		settingsQuery.data?.visibleLedger.id,
 		viewOptions
 	)
 
@@ -456,7 +456,7 @@ export default function DashboardStatistics() {
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 	const entryData = useDashboardTransactionEntries(
-		settingsQuery.data?.current_ledger,
+		settingsQuery.data?.visibleLedger.id,
 		entryViewOptions
 	)
 

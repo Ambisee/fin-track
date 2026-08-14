@@ -108,7 +108,7 @@ function useAmountFormatter() {
 
 	const formatAmount = useCallback(
 		(num?: number) => {
-			const currency = userSettingsQuery.data?.ledger?.currency?.currency_name
+			const currency = userSettingsQuery.data?.visibleLedger?.currency.name
 			if (!isNonNullable(num) || !isNonNullable(currency)) {
 				return num
 			}

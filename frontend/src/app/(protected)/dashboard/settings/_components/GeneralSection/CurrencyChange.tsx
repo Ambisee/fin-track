@@ -45,8 +45,8 @@ export default function CurrencyChange() {
 	const formDefaultValues = useCallback(
 		() => ({
 			currency: {
-				id: userSettings?.ledger?.currency_id,
-				currency_name: userSettings?.ledger?.currency?.currency_name
+				id: userSettings?.visibleLedger?.currency.id,
+				currency_name: userSettings?.visibleLedger?.currency?.name
 			}
 		}),
 		[userSettings]
@@ -70,7 +70,7 @@ export default function CurrencyChange() {
 		const { data: result, error } = await supabase
 			.from("ledger")
 			.update({ currency_id: data.currency.id })
-			.eq("id", userSettings.current_ledger)
+			.eq("id", userSettings.visibleLedger.id)
 			.select()
 			.single()
 
@@ -127,7 +127,7 @@ export default function CurrencyChange() {
 									}}
 									values={
 										currencies?.map((val) => ({
-											label: val.currency_name,
+											label: val.name,
 											value: JSON.stringify(val)
 										})) ?? []
 									}

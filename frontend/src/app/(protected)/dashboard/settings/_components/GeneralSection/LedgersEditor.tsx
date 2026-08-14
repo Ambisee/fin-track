@@ -30,7 +30,7 @@ export default function LedgersEditor() {
 							fallback={<Skeleton className="rounded-full h-8" />}
 						>
 							<span className="inline-block min-w-0 truncate text-sm bg-secondary text-secondary-foreground rounded-full py-0.5 px-6">
-								{settingsQuery.data?.ledger?.name}
+								{settingsQuery.data?.visibleLedger?.name}
 							</span>
 						</ConditionalWrapper>
 					</div>

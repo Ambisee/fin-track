@@ -1,17 +1,17 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Ledger } from "@/types/supabase"
 import { Category } from "@/types/Category"
+import { Entry } from "@/types/Entry"
+import { Ledger } from "@/types/Ledger"
+import { Settings } from "@/types/Settings"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { CATEGORIES_QKEY, LEDGER_QKEY, USER_SETTINGS_QKEY } from "./constants"
 import { DateHelper } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
+import { useLedgersQuery, useUserQuery } from "./queries"
 import { supabaseClient } from "./supabase"
 import { isNonNullable } from "./utils"
-import { useUserQuery } from "./queries"
-import { useLedgersQuery } from "./queries"
-import { Entry } from "@/types/Entry"
 
 function useInsertEntryMutation() {
 	const [supabase] = useState(supabaseClient())
@@ -214,9 +214,7 @@ function useInsertLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (
-			ledger: Pick<Ledger, "created_by" | "name" | "currency_id">
-		) => {
+		mutationFn: async (ledger: Ledger) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
@@ -231,16 +229,23 @@ function useInsertLedgerMutation() {
 				.insert({
 					created_by: user.id,
 					name: ledger.name,
-					currency_id: ledger.currency_id
+					currency_id: ledger.currency.id
 				})
-				.select("*, currency (currency_name), entry(count)")
+				.select("*, currency (id, name:currency_name)")
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				name: data.name,
+				currency: {
+					id: data.currency.id,
+					name: data.currency.name
+				}
+			} satisfies Ledger
 		}
 	})
 }
@@ -251,9 +256,7 @@ function useUpdateLedgerMutation() {
 
 	return useMutation({
 		mutationKey: LEDGER_QKEY,
-		mutationFn: async (
-			ledger: Pick<Ledger, "id" | "created_by" | "name" | "currency_id">
-		) => {
+		mutationFn: async (ledger: Ledger) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
@@ -265,17 +268,24 @@ function useUpdateLedgerMutation() {
 
 			const { data, error } = await supabase
 				.from("ledger")
-				.update({ name: ledger.name, currency_id: ledger.currency_id })
+				.update({ name: ledger.name, currency_id: ledger.currency.id })
 				.eq("id", ledger.id)
-				.eq("created_by", ledger.created_by)
-				.select("*, currency (currency_name), entry(count)")
+				.eq("created_by", user.id)
+				.select("*, currency (id, name:currency_name)")
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				name: data.name,
+				currency: {
+					id: data.currency.id,
+					name: data.currency.name
+				}
+			} satisfies Ledger
 		}
 	})
 }
@@ -300,14 +310,21 @@ function useDeleteLedgerMutation() {
 				.from("ledger")
 				.delete()
 				.eq("id", ledger.id)
-				.select("*, currency (currency_name), entry(count)")
+				.select("*, currency (id, name:currency_name)")
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.id,
+				name: data.name,
+				currency: {
+					id: data.currency.id,
+					name: data.currency.name
+				}
+			} satisfies Ledger
 		}
 	})
 }
@@ -318,7 +335,7 @@ function useSwitchLedgerMutation() {
 
 	return useMutation({
 		mutationKey: USER_SETTINGS_QKEY,
-		mutationFn: async (ledger: Pick<Ledger, "id">) => {
+		mutationFn: async (ledger: Ledger) => {
 			const user = userQuery.data
 			if (!isNonNullable(user)) {
 				throw Error(QueryHelper.MESSAGE_NO_USER)
@@ -328,14 +345,25 @@ function useSwitchLedgerMutation() {
 				.from("settings")
 				.update({ current_ledger: ledger.id })
 				.eq("user_id", user.id)
-				.select("*, ledger (name)")
+				.select("*, ledger (id, name, currency (id, name:currency_name))")
 				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				userId: data.user_id,
+				allowMonthlyReport: data.allow_report,
+				visibleLedger: {
+					id: data.ledger.id,
+					name: data.ledger.name,
+					currency: {
+						id: data.ledger.currency.id,
+						name: data.ledger.currency.name
+					}
+				}
+			} satisfies Settings
 		}
 	})
 }
@@ -369,7 +397,10 @@ function useInsertCategoryMutation() {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.created_by,
+				name: data.name
+			} satisfies Category
 		}
 	})
 }
@@ -404,7 +435,10 @@ function useUpdateCategoryMutation() {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.created_by,
+				name: data.name
+			} satisfies Category
 		}
 	})
 }
@@ -426,22 +460,26 @@ function useDeleteCategoryMutation() {
 				.delete()
 				.eq("created_by", category.id)
 				.eq("name", category.name)
-				.select()
+				.select("*")
+				.single()
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				id: data.created_by,
+				name: data.name
+			} satisfies Category
 		}
 	})
 }
 
 export {
 	useDeleteCategoryMutation,
-	useInsertCategoryMutation,
 	useDeleteEntryMutation,
 	useDeleteLedgerMutation,
+	useInsertCategoryMutation,
 	useInsertEntryMutation,
 	useInsertLedgerMutation,
 	useSwitchLedgerMutation,
