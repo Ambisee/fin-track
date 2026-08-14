@@ -1,5 +1,6 @@
 import { EntryFormData } from "@/components/user/EntryForm/EntryForm"
-import { Category, Ledger } from "@/types/supabase"
+import { Ledger } from "@/types/supabase"
+import { Category } from "@/types/Category"
 import { PostgrestError } from "@supabase/supabase-js"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
@@ -423,7 +424,7 @@ function useDeleteCategoryMutation() {
 			const { data, error } = await supabase
 				.from("category")
 				.delete()
-				.eq("created_by", category.created_by)
+				.eq("created_by", category.id)
 				.eq("name", category.name)
 				.select()
 

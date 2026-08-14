@@ -12,7 +12,6 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "./dialog"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 interface DatePickerProps {
 	value: Date

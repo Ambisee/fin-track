@@ -23,6 +23,7 @@ import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { getMonthSpansForDateRange, isNonNullable } from "./utils"
 import { Entry } from "@/types/Entry"
+import { Category } from "@/types/Category"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -248,7 +249,11 @@ function useCategoriesQuery() {
 				throw new PostgrestError(error)
 			}
 
-			return data ?? []
+			return (
+				data.map(
+					(v) => ({ id: v.created_by, name: v.name }) satisfies Category
+				) ?? []
+			)
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,

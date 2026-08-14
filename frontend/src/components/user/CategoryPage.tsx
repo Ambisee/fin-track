@@ -1,5 +1,5 @@
 import InputSkeleton from "@/components/user/InputSkeleton"
-import { Category } from "@/types/supabase"
+import { Category } from "@/types/Category"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
