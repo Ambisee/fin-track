@@ -28,7 +28,7 @@ export default function PublicNavbar(props: PublicNavbarProps) {
 		}
 
 		isUserSignedIn()
-	}, [])
+	}, [supabase.auth])
 
 	const linkObject = {
 		text: "Sign In",

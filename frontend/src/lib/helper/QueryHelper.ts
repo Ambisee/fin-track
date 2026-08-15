@@ -1,7 +1,7 @@
 import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { ENTRY_QKEY, STATISTICS_QKEY } from "../constants"
-import { DateHelper, DateRange } from "./DateHelper"
-import { getMonthSpansForDateRange, isNonNullable } from "../utils"
+import { getMonthSpansForDateRange } from "../utils"
+import { DateRange } from "./DateHelper"
 
 class QueryHelper {
 	static readonly MESSAGE_NO_USER = "No user data found."

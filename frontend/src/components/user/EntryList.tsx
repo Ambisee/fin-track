@@ -230,6 +230,8 @@ function WindowVirtualizedList(props: InnerListProps) {
 	const [scrollMargin, setScrollMargin] = useState(0)
 
 	useLayoutEffect(() => {
+		// Disable ESLint warning - It should be fine. This effect only runs after the first render
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setScrollMargin(listRef.current?.offsetTop ?? 0)
 	}, [])
 

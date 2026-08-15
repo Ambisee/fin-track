@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons"
 import React, { ComponentProps, useState } from "react"
-import { Input } from "../ui/input"
 
 const PasswordField = React.forwardRef<
 	HTMLInputElement,

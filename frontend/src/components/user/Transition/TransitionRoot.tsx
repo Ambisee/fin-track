@@ -6,16 +6,8 @@ import {
 	TRANSITION_ROOT_CLASSNAME
 } from "@/lib/constants"
 import { NavigationEdges, TransitionClassNames } from "@/types/transition"
-import { usePathname, useRouter } from "next/navigation"
-import {
-	Context,
-	createContext,
-	HTMLProps,
-	useContext,
-	useEffect,
-	useRef,
-	useState
-} from "react"
+import { usePathname } from "next/navigation"
+import { Context, HTMLProps, useEffect, useRef, useState } from "react"
 
 export interface TransitionContextObject {
 	curLabel: string

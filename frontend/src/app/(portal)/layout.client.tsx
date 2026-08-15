@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Cross1Icon } from "@radix-ui/react-icons"
 import Cookies from "js-cookie"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { ReactNode } from "react"
 
 interface PortalLayoutProps {
@@ -51,7 +51,6 @@ function CloseButton(props: CloseButtonProps) {
 }
 
 export default function PortalLayout(props: PortalLayoutProps) {
-	const router = useRouter()
 	const pathname = usePathname()
 
 	return (
