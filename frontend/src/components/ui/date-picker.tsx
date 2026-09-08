@@ -29,6 +29,7 @@ export function DatePicker(props: DatePickerProps) {
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button
+					disabled={props.disabled}
 					variant="outline"
 					id="date-picker-simple"
 					className="justify-start font-medium text-md text-muted-foreground"
