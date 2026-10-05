@@ -36,6 +36,8 @@ interface EntryFormPageProps {
 	onSubmitSuccess: EntryFormState["onSubmitSuccess"]
 }
 
+const commonFormFieldClassName = "px-3"
+
 const getErrors: <T extends FieldValues>(
 	errors: FieldErrors<T>
 ) => ReactNode[] = (errors) => {
@@ -205,7 +207,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									!ledgerQuery.isFetched ||
 									isFormLoading
 								}
-								className="min-w-0 w-full text-base justify-normal text-muted-foreground"
+								className={`${commonFormFieldClassName} min-w-0 w-full text-base justify-normal text-muted-foreground`}
 								onClick={props.onLedgerButton}
 							>
 								{ledgerQuery.isFetching || !ledgerQuery.isFetched ? (
@@ -231,6 +233,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								onChange={field.onChange}
 								value={field.value}
 								closeOnSelect
+								triggerClassName={commonFormFieldClassName}
 							/>
 						</EntryFormItem>
 					)}
@@ -248,7 +251,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									!categoryQuery.isFetched ||
 									isFormLoading
 								}
-								className="w-full min-w-0 text-base justify-normal text-muted-foreground"
+								className={`${commonFormFieldClassName} min-w-0 w-full text-base justify-normal text-muted-foreground`}
 								onClick={props.onCategoryButton}
 							>
 								{categoryQuery.isFetching || !categoryQuery.isFetched ? (
@@ -275,6 +278,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 									type="text"
 									placeholder="Amount"
 									inputMode="decimal"
+									className={commonFormFieldClassName}
 									onChange={onChange}
 									disabled={isFormLoading}
 									{...rest}
@@ -293,7 +297,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 							fieldState={fieldState}
 						>
 							<Textarea
-								className="max-h-none h-36 sm:max-h-28 sm:h-auto webkit-textarea"
+								className={`${commonFormFieldClassName} max-h-none h-36 sm:max-h-28 sm:h-auto webkit-textarea`}
 								disabled={isFormLoading}
 								{...field}
 							/>

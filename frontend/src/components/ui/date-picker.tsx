@@ -12,7 +12,7 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from "./dialog"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { cn } from "@/lib/utils"
 
 interface DatePickerProps {
 	value: Date
@@ -20,6 +20,7 @@ interface DatePickerProps {
 	disabled?: boolean
 	onChange: Dispatch<SetStateAction<Date>>
 	closeOnSelect?: boolean
+	triggerClassName?: string
 }
 
 export function DatePicker(props: DatePickerProps) {
@@ -32,7 +33,10 @@ export function DatePicker(props: DatePickerProps) {
 					disabled={props.disabled}
 					variant="outline"
 					id="date-picker-simple"
-					className="justify-start font-medium text-md text-muted-foreground"
+					className={cn(
+						"justify-start font-medium text-md text-muted-foreground",
+						props.triggerClassName
+					)}
 				>
 					{format(props.value, "PPP")}
 				</Button>
