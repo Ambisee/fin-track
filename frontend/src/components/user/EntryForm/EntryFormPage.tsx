@@ -211,7 +211,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								onClick={props.onLedgerButton}
 							>
 								{ledgerQuery.isFetching || !ledgerQuery.isFetched ? (
-									<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+									<ReloadIcon className="ml-1 h-4 w-4 animate-spin" />
 								) : (
 									<span className="truncate min-w-0">
 										{getLedgerName(field.value)}
@@ -255,7 +255,7 @@ export default function EntryFormPage(props: EntryFormPageProps) {
 								onClick={props.onCategoryButton}
 							>
 								{categoryQuery.isFetching || !categoryQuery.isFetched ? (
-									<ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+									<ReloadIcon className="ml-1 h-4 w-4 animate-spin" />
 								) : (
 									<>
 										<span className="truncate min-w-0">{field.value}</span>
