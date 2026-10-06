@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog } from "@/components/ui/dialog"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import EntryList from "@/components/user/EntryList"
@@ -17,9 +17,16 @@ import { useCategoriesQuery, useSettingsQuery } from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
+import {
+	ChevronLeft,
+	ChevronRight,
+	FileSearchIcon,
+	SearchIcon
+} from "lucide-react"
 import { ReactNode, useState } from "react"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
+import TransactionReportViewer from "@/components/user/TransactionReport/TransactionReportViewer"
+import TransactionReportDocument from "@/components/user/TransactionReport/TransactionReportDocument"
 
 function EntryContainer(props: {
 	isLoading?: boolean
@@ -65,16 +72,30 @@ export default function DashboardEntries() {
 
 	return (
 		<DashboardPageLayout title="Entries">
-			<div className="sticky top-0 py-4 z-50 bg-background">
+			<div className="sticky flex justify-between items-center gap-2 top-0 py-4 z-50 bg-background">
 				<SearchIcon className="absolute top-1/2 translate-y-[-50%] left-5 translate-x-[-50%] w-4 h-4 stroke-muted-foreground pointer-events-none" />
 				<EntrySearchBar
 					disabled={entryQuery.isLoading || !entryQuery.data}
 					type="search"
-					className="pl-10"
+					className="w-full pl-10"
 					placeholder="Search for an entry..."
 					onSearchStateChange={(state) => setIsSearching(state)}
 					onSearchResult={(searchResult) => setSearchResult(searchResult)}
 				/>
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button
+							variant="ghost"
+							size="lg"
+							className="px-[initial] aspect-square"
+						>
+							<FileSearchIcon />
+						</Button>
+					</DialogTrigger>
+					<TransactionReportViewer>
+						<TransactionReportDocument />
+					</TransactionReportViewer>
+				</Dialog>
 			</div>
 			<EntryContainer
 				isLoading={isSearching}
