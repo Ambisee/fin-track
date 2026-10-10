@@ -11,9 +11,13 @@ import TimeFilterControlPanel, {
 	EntryViewOptions,
 	getDefaultEntryViewOptions
 } from "@/components/user/TimeFilterControlPanel"
-import { DateHelper } from "@/lib/helper/DateHelper"
+import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
-import { useCategoriesQuery, useSettingsQuery } from "@/lib/queries"
+import {
+	useCategoriesQuery,
+	useSettingsQuery,
+	useUserQuery
+} from "@/lib/queries"
 import { isNonNullable } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
@@ -23,10 +27,15 @@ import {
 	FileSearchIcon,
 	SearchIcon
 } from "lucide-react"
+import dynamic from "next/dynamic"
 import { ReactNode, useState } from "react"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
-import TransactionReportViewer from "@/components/user/TransactionReport/TransactionReportViewer"
 import TransactionReportDocument from "@/components/user/TransactionReport/TransactionReportDocument"
+
+const TransactionReportViewer = dynamic(
+	() => import("@/components/user/TransactionReport/TransactionReportViewer"),
+	{ ssr: false }
+)
 
 function EntryContainer(props: {
 	isLoading?: boolean
@@ -47,6 +56,7 @@ function EntryContainer(props: {
 }
 
 export default function DashboardEntries() {
+	const [isReportViewerOpen, setIsReportViewerOpen] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
 	const [entryViewOptions, setEntryViewOptions] = useState<EntryViewOptions>(
 		() => {
@@ -57,10 +67,33 @@ export default function DashboardEntries() {
 	)
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
+	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 
+	const userName = userQuery.data?.user_metadata["username"]
+	const ledgerName = settingsQuery.data?.ledger.name
 	const currentLedgerId = settingsQuery.data?.current_ledger
+
+	const today = new Date()
+	let dateRange: DateRange
+	switch (entryViewOptions.period.type) {
+		case "TODAY":
+			dateRange = DateHelper.getDateStartEnd(today)
+			break
+		case "YESTERDAY":
+			dateRange = DateHelper.getYesterdayStartEnd(today)
+			break
+		case "LAST_7_DAYS":
+			dateRange = DateHelper.getLast7DaysStartEnd(today)
+			break
+		default:
+			dateRange = entryViewOptions.period.timeRange ?? {
+				from: today,
+				to: today
+			}
+			break
+	}
 
 	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,
@@ -82,9 +115,16 @@ export default function DashboardEntries() {
 					onSearchStateChange={(state) => setIsSearching(state)}
 					onSearchResult={(searchResult) => setSearchResult(searchResult)}
 				/>
-				<Dialog>
+				<Dialog open={isReportViewerOpen} onOpenChange={setIsReportViewerOpen}>
 					<DialogTrigger asChild>
 						<Button
+							disabled={
+								entryQuery.isFetching ||
+								entryQuery.isLoading ||
+								entryQuery.isFetching ||
+								settingsQuery.isLoading ||
+								userQuery.isLoading
+							}
 							variant="ghost"
 							size="lg"
 							className="px-[initial] aspect-square"
@@ -92,9 +132,27 @@ export default function DashboardEntries() {
 							<FileSearchIcon />
 						</Button>
 					</DialogTrigger>
-					<TransactionReportViewer>
-						<TransactionReportDocument />
-					</TransactionReportViewer>
+					{isReportViewerOpen && (
+						<TransactionReportViewer>
+							<TransactionReportDocument
+								info={{
+									username: userName ?? "",
+									ledger: ledgerName ?? "",
+									period: dateRange
+								}}
+								entries={
+									entryQuery.data?.map((v) => ({
+										amount: v.amount,
+										category: v.category,
+										date: v.date,
+										isPositive: v.is_positive
+									})) ?? []
+								}
+								title="FinTrack Report"
+								generatedAt={new Date()}
+							/>
+						</TransactionReportViewer>
+					)}
 				</Dialog>
 			</div>
 			<EntryContainer

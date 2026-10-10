@@ -1,35 +1,40 @@
-import { DateRange } from "@/lib/helper/DateHelper"
-import { Entry } from "@/types/supabase"
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer"
+"use client"
 
-const styles = StyleSheet.create({
-	page: {
-		padding: 48,
-		fontSize: 11,
-		lineHeight: 1.6,
-		color: "#3f3f46"
-	},
-	header: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		borderBottomWidth: 1,
-		borderBottomColor: "#e4e4e7",
-		paddingBottom: 12
-	}
-})
+import { Document, Page, StyleSheet } from "@react-pdf/renderer"
+import type { ReportDocumentProps } from "./types"
+import { fonts, pageSpacing } from "./theme"
+import { ReportTitle } from "./ReportTitle"
+import { DocumentInfoSection } from "./DocumentInfoSection"
+import { TransactionTable } from "./TransactionTable"
+import { PageFooter } from "./PageFooter"
 
-interface TransactionReportDocumentProps {
-	dateRange: DateRange
-	createdAt: Date
-	data: Entry[]
-}
-
-export default function TransactionReportDocument() {
+export default function TransactionReportDocument({
+	info,
+	entries,
+	title,
+	generatedAt
+}: ReportDocumentProps) {
 	return (
-		<Document>
-			<Page style={styles.page} size="A4">
-				<Text>This is rendered</Text>
+		<Document
+			title={`${info.ledger} - Financial Report`}
+			author={info.username}
+		>
+			<Page size="A4" style={styles.page} wrap>
+				<ReportTitle title={title} />
+				<DocumentInfoSection {...info} />
+				<TransactionTable entries={entries} />
+				<PageFooter generatedAt={generatedAt} />
 			</Page>
 		</Document>
 	)
 }
+
+const styles = StyleSheet.create({
+	page: {
+		width: "100%",
+		fontFamily: fonts.regular,
+		paddingTop: pageSpacing.top,
+		paddingBottom: pageSpacing.bottom,
+		paddingHorizontal: pageSpacing.horizontal
+	}
+})
