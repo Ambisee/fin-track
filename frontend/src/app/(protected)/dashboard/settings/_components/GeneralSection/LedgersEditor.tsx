@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import LedgerGroup from "@/components/user/LedgerGroup"
-import { useSettingsQuery } from "@/lib/queries"
-import { useUserQuery } from "@/lib/queries"
+import { useSettingsQuery, useUserQuery } from "@/lib/queries"
 import { useState } from "react"
 import SubSectionTitle from "../SubSectionTitle"
 

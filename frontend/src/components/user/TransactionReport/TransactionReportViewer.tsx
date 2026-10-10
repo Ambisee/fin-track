@@ -6,11 +6,14 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
+import { isNonNullable } from "@/lib/utils"
+import { ReloadIcon } from "@radix-ui/react-icons"
 import { DocumentProps, usePDF } from "@react-pdf/renderer"
 import { X } from "lucide-react"
 import { ReactElement, useEffect } from "react"
 
 interface TransactionReportViewerProps {
+	isLoading?: boolean
 	children: ReactElement<DocumentProps>
 }
 
@@ -36,11 +39,17 @@ export default function TransactionReportViewer(
 					<X className="w-4 h-4" />
 				</DialogClose>
 			</DialogHeader>
-			<iframe
-				src={`${instance.url}#zoom=page-fit&toolbar=1`}
-				className="flex-1 w-full border-0 p-0"
-				title="PDF preview"
-			></iframe>
+			{isNonNullable(props.isLoading) && props.isLoading ? (
+				<div className="w-full h-full flex items-center justify-center">
+					<ReloadIcon className="h-4 w-4 animate-spin" />
+				</div>
+			) : (
+				<iframe
+					src={`${instance.url}#zoom=page-fit&toolbar=1`}
+					className="flex-1 w-full border-0 p-0"
+					title="PDF preview"
+				></iframe>
+			)}
 		</DialogContent>
 	)
 }
