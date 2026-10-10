@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer"
 import type { DocumentInfo } from "./types"
 import { colors, fonts, infoSection, MM } from "./theme"
+import { getCurrencySymbol } from "@/lib/utils"
 
 export type InfoField = "username" | "ledger" | "period" | "currency"
 
@@ -18,6 +19,7 @@ export const DocumentInfoSection = ({
 	fields?: InfoField[]
 }) => {
 	const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" })
+	const currencySymbol = getCurrencySymbol(currency)
 	return (
 		<View style={styles.wrap}>
 			{fields.includes("username") && (
@@ -31,7 +33,10 @@ export const DocumentInfoSection = ({
 				/>
 			)}
 			{fields.includes("currency") && (
-				<InfoRow label="CURRENCY" value={currency} />
+				<InfoRow
+					label="CURRENCY"
+					value={`${currency}${currencySymbol === currency ? "" : ` (${currencySymbol})`}`}
+				/>
 			)}
 		</View>
 	)

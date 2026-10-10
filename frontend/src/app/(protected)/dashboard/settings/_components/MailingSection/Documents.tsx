@@ -129,8 +129,10 @@ export default function Documents() {
 							setDateRange(dateRange)
 							setIsReportOpen(true)
 						}}
-						monthGroups={monthGroupQuery.data?.map((v) =>
-							DateHelper.getMonthStartEnd(new Date(v.year ?? 0, v.month ?? 0))
+						monthGroups={monthGroupQuery.data?.toReversed()?.map((v) =>
+							DateHelper.getMonthStartEnd(
+								new Date(v.year ?? 0, (v.month ?? 0) - 1) // Raw Month Group is 1-base indexed
+							)
 						)}
 					/>
 				)}
