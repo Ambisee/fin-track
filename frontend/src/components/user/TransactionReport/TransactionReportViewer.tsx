@@ -55,7 +55,7 @@ export default function TransactionReportViewer(
 					title="PDF preview"
 				></iframe>
 			)}
-			<DialogFooter className="px-4 pb-4">
+			<DialogFooter className="space-y-2 sm:space-y-0 px-4 pb-4">
 				<PDFDownloadLink
 					className={cn(buttonVariants({ variant: "ghost" }))}
 					document={props.children}

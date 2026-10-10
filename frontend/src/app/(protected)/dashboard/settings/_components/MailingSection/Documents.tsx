@@ -66,7 +66,7 @@ function MonthGroupList(props: {
 						<li key={JSON.stringify(v)}>
 							<Button
 								variant="ghost"
-								className="w-full flex items-center justify-start rounded-none"
+								className="w-full h-12 flex items-center justify-start rounded-none"
 								onClick={() => props.onGroup(v)}
 							>
 								<FileTextIcon />
