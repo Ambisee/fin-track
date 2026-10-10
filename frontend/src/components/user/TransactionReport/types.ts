@@ -4,9 +4,16 @@ import { DateRange } from "@/lib/helper/DateHelper"
 export interface DocumentInfo {
 	username: string
 	ledger: string
+	/** BCP 47 locale used to format amounts (digit grouping and decimal separator). Default: "en-US". */
+	locale: string
 	/** Free-form text, e.g. "01 Sep 2026 - 30 Sep 2026". */
 	period: DateRange
+	/** Currency shown in the info section, e.g. "USD". Display only: amounts are plain numbers. */
+	currency: string
 }
+
+/** Formats an absolute amount as a plain number string (no currency symbol). */
+export type AmountFormatter = (amount: number) => string
 
 /** A single transaction row. The row number is generated automatically from its position in the array. */
 export interface Entry {
@@ -29,4 +36,6 @@ export interface ReportDocumentProps {
 	title?: string
 	/** Document generation date shown in the footer. Default: today. */
 	generatedAt?: Date
+	/** BCP 47 locale used to format amounts (digit grouping and decimal separator). Default: "en-US". */
+	locale?: string
 }

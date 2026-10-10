@@ -3,6 +3,7 @@ import { type ClassValue, clsx } from "clsx"
 import { SetStateAction } from "react"
 import { twMerge } from "tailwind-merge"
 import { DateHelper, DateRange } from "./helper/DateHelper"
+import { CURRENCY_SYMBOLS } from "./constants"
 
 function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
@@ -124,6 +125,11 @@ function getDateRangeFromViewOptions(
 	}
 
 	return dateRange
+}
+
+export function getCurrencySymbol(code: string): string {
+	const key = String(code).toUpperCase() as keyof typeof CURRENCY_SYMBOLS
+	return CURRENCY_SYMBOLS[key] ?? key
 }
 
 export {

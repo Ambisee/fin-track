@@ -1,9 +1,15 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer"
-import type { Entry } from "./types"
+import type { AmountFormatter, Entry } from "./types"
 import { colors, columns, fonts } from "./theme"
-import { formatMoney, formatSignedMoney, summarize } from "./format"
+import { formatSignedAmount, summarize } from "./format"
 
-export const TableSummary = ({ entries }: { entries: Entry[] }) => {
+export const TableSummary = ({
+	entries,
+	formatAmount
+}: {
+	entries: Entry[]
+	formatAmount: AmountFormatter
+}) => {
 	const { totalCredit, totalDebit, net } = summarize(entries)
 	return (
 		<View>
@@ -13,21 +19,21 @@ export const TableSummary = ({ entries }: { entries: Entry[] }) => {
 				<Text style={{ width: columns.date }}>TOTAL</Text>
 				<Text
 					style={{
-						width: columns.credit,
-						textAlign: "right",
-						color: colors.credit
-					}}
-				>
-					{formatMoney(totalCredit)}
-				</Text>
-				<Text
-					style={{
 						width: columns.debit,
 						textAlign: "right",
 						color: colors.debit
 					}}
 				>
-					{formatMoney(totalDebit)}
+					{formatAmount(totalDebit)}
+				</Text>
+				<Text
+					style={{
+						width: columns.credit,
+						textAlign: "right",
+						color: colors.credit
+					}}
+				>
+					{formatAmount(totalCredit)}
 				</Text>
 			</View>
 			<View style={[styles.row, styles.netRow]}>
@@ -41,7 +47,7 @@ export const TableSummary = ({ entries }: { entries: Entry[] }) => {
 						color: net >= 0 ? colors.credit : colors.debit
 					}}
 				>
-					{formatSignedMoney(net)}
+					{formatSignedAmount(net, formatAmount)}
 				</Text>
 			</View>
 		</View>

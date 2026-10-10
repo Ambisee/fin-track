@@ -11,14 +11,18 @@ import TimeFilterControlPanel, {
 	EntryViewOptions,
 	getDefaultEntryViewOptions
 } from "@/components/user/TimeFilterControlPanel"
-import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
+import { DateHelper } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
 import {
 	useCategoriesQuery,
 	useSettingsQuery,
 	useUserQuery
 } from "@/lib/queries"
-import { isNonNullable } from "@/lib/utils"
+import {
+	isNonNullable,
+	getDateRangeFromViewOptions,
+	getCurrencySymbol
+} from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import {
@@ -71,29 +75,17 @@ export default function DashboardEntries() {
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 
+	const today = new Date()
 	const userName = userQuery.data?.user_metadata["username"]
 	const ledgerName = settingsQuery.data?.ledger.name
-	const currentLedgerId = settingsQuery.data?.current_ledger
 
-	const today = new Date()
-	let dateRange: DateRange
-	switch (entryViewOptions.period.type) {
-		case "TODAY":
-			dateRange = DateHelper.getDateStartEnd(today)
-			break
-		case "YESTERDAY":
-			dateRange = DateHelper.getYesterdayStartEnd(today)
-			break
-		case "LAST_7_DAYS":
-			dateRange = DateHelper.getLast7DaysStartEnd(today)
-			break
-		default:
-			dateRange = entryViewOptions.period.timeRange ?? {
-				from: today,
-				to: today
-			}
-			break
-	}
+	const currencyName = settingsQuery.data?.ledger?.currency?.currency_name
+	const currency = isNonNullable(currencyName)
+		? `${currencyName} (${getCurrencySymbol(currencyName)})`
+		: "-"
+
+	const currentLedgerId = settingsQuery.data?.current_ledger
+	const dateRange = getDateRangeFromViewOptions(today, entryViewOptions)
 
 	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,
@@ -138,7 +130,9 @@ export default function DashboardEntries() {
 								info={{
 									username: userName ?? "",
 									ledger: ledgerName ?? "",
-									period: dateRange
+									period: dateRange,
+									locale: navigator.language,
+									currency: currency ?? ""
 								}}
 								entries={
 									entryQuery.data?.map((v) => ({

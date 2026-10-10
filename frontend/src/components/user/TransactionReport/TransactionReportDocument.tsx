@@ -7,13 +7,16 @@ import { ReportTitle } from "./ReportTitle"
 import { DocumentInfoSection } from "./DocumentInfoSection"
 import { TransactionTable } from "./TransactionTable"
 import { PageFooter } from "./PageFooter"
+import { createAmountFormatter } from "./format"
 
 export default function TransactionReportDocument({
 	info,
 	entries,
 	title,
-	generatedAt
+	generatedAt,
+	locale
 }: ReportDocumentProps) {
+	const formatAmount = createAmountFormatter(locale)
 	return (
 		<Document
 			title={`${info.ledger} - Financial Report`}
@@ -22,7 +25,7 @@ export default function TransactionReportDocument({
 			<Page size="A4" style={styles.page} wrap>
 				<ReportTitle title={title} />
 				<DocumentInfoSection {...info} />
-				<TransactionTable entries={entries} />
+				<TransactionTable entries={entries} formatAmount={formatAmount} />
 				<PageFooter generatedAt={generatedAt} />
 			</Page>
 		</Document>

@@ -1,4 +1,4 @@
-import type { Entry } from "./types"
+import type { AmountFormatter, Entry } from "./types"
 
 const MONTHS = [
 	"Jan",
@@ -31,16 +31,33 @@ export function formatDate(value: Date | string): string {
 	return `${pad2(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
-/** "$1,234.56" – always the absolute value. */
-export function formatMoney(value: number): string {
-	const [int, dec] = Math.abs(value).toFixed(2).split(".")
-	return `$${int.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${dec}`
+export const DEFAULT_LOCALE = "en-US"
+
+/**
+ * Creates a formatter that renders amounts as plain numbers with 2 decimals, e.g. "1,234.56"
+ * (en-US) or "1.234,56" (de-DE). Always formats the absolute value; no currency symbol.
+ * Falls back to DEFAULT_LOCALE if the locale tag is invalid.
+ */
+export function createAmountFormatter(
+	locale: string = DEFAULT_LOCALE
+): AmountFormatter {
+	const options = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+	let nf: Intl.NumberFormat
+	try {
+		nf = new Intl.NumberFormat(locale, options)
+	} catch {
+		nf = new Intl.NumberFormat(DEFAULT_LOCALE, options)
+	}
+	// Some locales group digits with U+202F (narrow no-break space), which the built-in PDF fonts
+	// cannot draw. Swap it for a regular no-break space (U+00A0), which Courier does support.
+	return (amount) => nf.format(Math.abs(amount)).replace(/\u202F/g, "\u00A0")
 }
 
-/** "+$1,234.56" / "-$1,234.56" (hyphen ASCII; the true minus sign U+2212 is missing from the standard PDF fonts). */
-export function formatSignedMoney(value: number): string {
-	return `${value >= 0 ? "+" : "-"}${formatMoney(value)}`
-}
+/** "+1,234.56" / "-1,234.56" (ASCII hyphen; the true minus sign U+2212 is missing from the standard PDF fonts). */
+export const formatSignedAmount = (
+	value: number,
+	formatAmount: AmountFormatter
+) => `${value >= 0 ? "+" : "-"}${formatAmount(value)}`
 
 /** "001", "002", … */
 export const formatRowNumber = (index: number) =>
