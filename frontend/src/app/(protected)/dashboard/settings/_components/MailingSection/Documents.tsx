@@ -139,7 +139,10 @@ export default function Documents() {
 			</div>
 			<Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
 				{isReportOpen && (
-					<TransactionReportViewer isLoading={!isSafeToShowTransactionViewer}>
+					<TransactionReportViewer
+						title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
+						isLoading={!isSafeToShowTransactionViewer}
+					>
 						<TransactionReportDocument
 							info={{
 								username: userQuery.data?.user_metadata["username"],
