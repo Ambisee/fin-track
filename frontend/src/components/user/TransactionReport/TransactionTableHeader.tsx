@@ -6,8 +6,8 @@ export const TransactionTableHeader = () => (
 		<Text style={{ width: columns.no }}>NO.</Text>
 		<Text style={{ width: columns.date }}>DATE</Text>
 		<Text style={{ width: columns.category }}>CATEGORY</Text>
-		<Text style={{ width: columns.credit, textAlign: "right" }}>CREDIT</Text>
 		<Text style={{ width: columns.debit, textAlign: "right" }}>DEBIT</Text>
+		<Text style={{ width: columns.credit, textAlign: "right" }}>CREDIT</Text>
 	</View>
 )
 
