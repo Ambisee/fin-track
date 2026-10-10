@@ -20,7 +20,7 @@ import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import InputSkeleton from "@/components/user/InputSkeleton"
@@ -35,6 +35,9 @@ export default function UsernameChange() {
 	const [supabase] = useState(supabaseClient())
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 
+	// For fixing hydration errors due to mismatching rendered HTML between client and server
+	const [mounted, setMounted] = useState(false)
+
 	const userQuery = useUserQuery()
 	const queryClient = useQueryClient()
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -43,6 +46,10 @@ export default function UsernameChange() {
 			username: ""
 		}
 	})
+
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 
 	return (
 		<>
@@ -95,7 +102,7 @@ export default function UsernameChange() {
 								<FieldLabel htmlFor="username-field" className="text-sm">
 									Username
 								</FieldLabel>
-								{userQuery.isLoading ? (
+								{!mounted || userQuery.isLoading ? (
 									<InputSkeleton />
 								) : (
 									<Input
