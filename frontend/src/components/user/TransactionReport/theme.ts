@@ -37,3 +37,53 @@ export const infoSection = {
 		return Math.floor(valueWidth / (0.6 * this.fontSize))
 	}
 } as const
+
+// ---- Category summary page (v2 breakdown design) ----------------------------------------------
+export const summaryLayout = {
+	/** Gap between the CREDIT and DEBIT columns. */
+	columnGap: 10 * MM
+} as const
+
+/** Donut chart geometry in points. The chart is centred in its column. */
+export const donut = {
+	size: 148,
+	outerRadius: 73,
+	innerRadius: 45,
+	/** White stroke drawn around every slice, which also acts as the gap between slices. */
+	sliceGap: 1.5,
+	marginTop: 16,
+	marginBottom: 16
+} as const
+
+/** Breakdown table (swatch + category | qty | amount | %). Category takes the remaining width. */
+export const breakdownColumns = {
+	swatch: 8.5,
+	swatchGap: 8.5,
+	qty: 26,
+	amount: 76,
+	percent: 34,
+	rowHeight: 18,
+	fontSize: 8
+} as const
+
+/** Slice colours run from `from` (largest category) to `to` (smallest). */
+export const palettes = {
+	credit: { from: colors.credit, to: "#CDE8D2" },
+	debit: { from: colors.debit, to: "#F6D2CF" }
+} as const
+
+const hexToRgb = (hex: string) =>
+	[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+
+/** `count` evenly spaced colours from `from` to `to` (inclusive). A single colour returns `from`. */
+export function shadeRamp(from: string, to: string, count: number): string[] {
+	const a = hexToRgb(from)
+	const b = hexToRgb(to)
+	return Array.from({ length: count }, (_, i) => {
+		const t = count > 1 ? i / (count - 1) : 0
+		const rgb = a.map((v, k) =>
+			Math.round(v + (b[k] - v) * t).toString(16).padStart(2, "0")
+		)
+		return `#${rgb.join("")}`
+	})
+}

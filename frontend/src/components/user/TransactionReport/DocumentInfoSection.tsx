@@ -2,23 +2,37 @@ import { StyleSheet, Text, View } from "@react-pdf/renderer"
 import type { DocumentInfo } from "./types"
 import { colors, fonts, infoSection, MM } from "./theme"
 
+export type InfoField = "username" | "ledger" | "period" | "currency"
+
+const ALL_FIELDS: InfoField[] = ["username", "ledger", "period", "currency"]
+
 export const DocumentInfoSection = ({
 	username,
 	ledger,
 	period,
 	currency,
-	locale
-}: DocumentInfo) => {
+	locale,
+	fields = ALL_FIELDS
+}: DocumentInfo & {
+	/** Which rows to show (always in the order username, ledger, period, currency). Default: all. */
+	fields?: InfoField[]
+}) => {
 	const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" })
 	return (
 		<View style={styles.wrap}>
-			<InfoRow label="USERNAME" value={username} />
-			<InfoRow label="LEDGER" value={ledger} />
-			<InfoRow
-				label="PERIOD"
-				value={`${dateFormatter.format(period.from)} - ${dateFormatter.format(period.to)}`}
-			/>
-			<InfoRow label="CURRENCY" value={currency} />
+			{fields.includes("username") && (
+				<InfoRow label="USERNAME" value={username} />
+			)}
+			{fields.includes("ledger") && <InfoRow label="LEDGER" value={ledger} />}
+			{fields.includes("period") && (
+				<InfoRow
+					label="PERIOD"
+					value={`${dateFormatter.format(period.from)} - ${dateFormatter.format(period.to)}`}
+				/>
+			)}
+			{fields.includes("currency") && (
+				<InfoRow label="CURRENCY" value={currency} />
+			)}
 		</View>
 	)
 }

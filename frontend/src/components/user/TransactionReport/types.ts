@@ -29,11 +29,24 @@ export interface Entry {
 	isPositive: boolean
 }
 
+/** One category's aggregate for the summary page. */
+export interface CategoryStat {
+	category: string
+	/** Number of entries in this category (on the credit or debit side being summarised). */
+	count: number
+	/** Sum of absolute amounts. */
+	total: number
+	/** Share of the side's total, 0..1. */
+	share: number
+}
+
 export interface ReportDocumentProps {
 	info: DocumentInfo
 	entries: Entry[]
 	/** Title at the top of page 1. Default: "FINANCIAL REPORT". */
 	title?: string
+	/** Title at the top of the category summary page. Default: "CATEGORY SUMMARY". */
+	summaryTitle?: string
 	/** Document generation date shown in the footer. Default: today. */
 	generatedAt?: Date
 	/** BCP 47 locale used to format amounts (digit grouping and decimal separator). Default: "en-US". */
