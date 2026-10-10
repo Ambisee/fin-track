@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import SettingsSection from "../SettingsSection"
+import SubSectionTitle from "../SubSectionTitle"
 
 export default function MiscellaneousSection() {
 	const router = useRouter()
@@ -85,24 +86,15 @@ export default function MiscellaneousSection() {
 							</AlertDialogFooter>
 						</AlertDialogHeader>
 					</AlertDialogContent>
-					<div className="mb-4">
-						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-							Account Deletion
-						</span>
-						<br />
+					<div>
+						<SubSectionTitle>Account Deletion</SubSectionTitle>
 						<AlertDialogTrigger asChild>
-							<Button className="mt-2" variant="destructive">
-								Delete Account
-							</Button>
+							<Button variant="destructive">Delete Account</Button>
 						</AlertDialogTrigger>
 					</div>
-					<div>
-						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-							Log out of your account
-						</span>
-						<br />
+					<div className="mt-8">
+						<SubSectionTitle>Log out of your account</SubSectionTitle>
 						<Button
-							className="mt-2"
 							variant="default"
 							onClick={async () => {
 								const toastId = toast.loading("Loading...")

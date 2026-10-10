@@ -3,7 +3,8 @@ import {
 	Field,
 	FieldDescription,
 	FieldError,
-	FieldGroup
+	FieldGroup,
+	FieldLabel
 } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
 import PasswordField from "@/components/user/PasswordField"
@@ -17,6 +18,7 @@ import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import InputSkeleton from "@/components/user/InputSkeleton"
+import SubSectionTitle from "../SubSectionTitle"
 
 const passwordChangeFormSchema = z
 	.object({
@@ -124,7 +126,9 @@ export default function PasswordChange() {
 					name="oldPassword"
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid} className="-mb-4">
+							<FieldLabel htmlFor="old-password-field">Password</FieldLabel>
 							<PasswordField
+								id="old-password-field"
 								aria-invalid={fieldState.invalid}
 								placeholder="Old password"
 								{...field}

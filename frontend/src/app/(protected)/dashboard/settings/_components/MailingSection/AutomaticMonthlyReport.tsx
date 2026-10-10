@@ -18,6 +18,7 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
+import SubSectionTitle from "../SubSectionTitle"
 
 const mailingSectionFormSchema = z.object({
 	allowReport: z.boolean()
@@ -71,7 +72,7 @@ export default function AutomaticMonthlyReport() {
 							data-invalid={fieldState.invalid}
 						>
 							<div>
-								<FieldLabel>Automatic Monthly Report</FieldLabel>
+								<SubSectionTitle>Automatic Monthly Report</SubSectionTitle>
 								<FieldDescription>
 									Allow the app to send automatic transaction reports every
 									month.

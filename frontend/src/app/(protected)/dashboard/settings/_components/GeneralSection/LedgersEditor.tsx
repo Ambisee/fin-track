@@ -9,6 +9,7 @@ import LedgerGroup from "@/components/user/LedgerGroup"
 import { useSettingsQuery } from "@/lib/queries"
 import { useUserQuery } from "@/lib/queries"
 import { useState } from "react"
+import SubSectionTitle from "../SubSectionTitle"
 
 export default function LedgersEditor() {
 	const [open, setOpen] = useState(false)
@@ -19,8 +20,8 @@ export default function LedgersEditor() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<div id="ledgers-editor" className="w-full grid min-w-0 pt-4 mt-4">
-				<Label className="text-sm">Ledgers</Label>
-				<div className="mt-2 p-4 min-w-0 rounded-md border">
+				<SubSectionTitle>Ledgers</SubSectionTitle>
+				<div className="p-4 min-w-0 rounded-md border">
 					<div className="flex gap-2 min-w-0 justify-between items-center">
 						<span className="inline-block text-nowrap text-md text-muted-foreground">
 							Current ledger

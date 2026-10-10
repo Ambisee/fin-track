@@ -12,6 +12,7 @@ import Image from "next/image"
 import googleIcon from "../../../../../../../public/google-icon.svg"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import SubSectionTitle from "../SubSectionTitle"
 
 export default function LinkedAccountChange() {
 	const userQuery = useUserQuery()
@@ -96,7 +97,7 @@ export default function LinkedAccountChange() {
 
 	return (
 		<div className="mt-2">
-			<Label>Linked Accounts</Label>
+			<SubSectionTitle>Linked Accounts</SubSectionTitle>
 			<ul className="mt-2">
 				<li className="rounded-md border p-4">
 					<div className="flex justify-between">

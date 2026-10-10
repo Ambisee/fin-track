@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import CategoryGroup from "@/components/user/CategoryGroup"
 
 import { useCategoriesQuery } from "@/lib/queries"
+import SubSectionTitle from "../SubSectionTitle"
 
 export default function CategoriesEditor() {
 	const categoriesQuery = useCategoriesQuery()
@@ -14,11 +15,11 @@ export default function CategoriesEditor() {
 	return (
 		<Dialog>
 			<div id="asdf" className="grid mt-8">
-				<Label className="text-sm">Categories</Label>
+				<SubSectionTitle>Categories</SubSectionTitle>
 				{!categoriesQuery.isFetched ? (
-					<Skeleton className="w-full mt-2 h-10" />
+					<Skeleton className="w-full h-10" />
 				) : (
-					<DialogTrigger className="mt-2" asChild>
+					<DialogTrigger asChild>
 						<Button>Open category editor</Button>
 					</DialogTrigger>
 				)}

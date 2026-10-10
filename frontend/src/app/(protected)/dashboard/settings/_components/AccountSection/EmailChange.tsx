@@ -68,12 +68,13 @@ export default function EmailChange() {
 					name="email"
 					render={({ field, fieldState }) => (
 						<Field className="w-full" data-invalid={fieldState.invalid}>
-							<FieldLabel>Email</FieldLabel>
+							<FieldLabel htmlFor="email-field">Email</FieldLabel>
 							{userQuery.isLoading ? (
 								<InputSkeleton />
 							) : (
 								<Input
 									{...field}
+									id="email-field"
 									aria-invalid={fieldState.invalid}
 									placeholder={userQuery.data?.email}
 								/>

@@ -50,6 +50,7 @@ import { toast } from "sonner"
 
 import classNames from "@/styles/flicker-ellipse-animation.module.css"
 import { DateHelper } from "@/lib/helper/DateHelper"
+import SubSectionTitle from "../SubSectionTitle"
 
 interface DocumentPageProps {
 	isFetchingReport: boolean
@@ -429,7 +430,7 @@ export default function Documents() {
 		>
 			<div className="mt-8">
 				<div>
-					<Label>Documents</Label>
+					<SubSectionTitle>Documents</SubSectionTitle>
 					<p className="text-sm text-muted-foreground">
 						Download a PDF document detailing the transactions of a given month.
 					</p>
