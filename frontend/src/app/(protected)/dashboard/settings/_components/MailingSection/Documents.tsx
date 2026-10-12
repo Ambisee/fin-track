@@ -21,19 +21,6 @@ import { useDashboardTransactionEntries } from "@/lib/hooks"
 import { isNonNullable } from "@/lib/utils"
 import SubSectionTitle from "../SubSectionTitle"
 
-interface DocumentPageProps {
-	isFetchingReport: boolean
-	fetchFn: (monthGroup: MonthGroup) => Promise<Blob>
-	curPageState: {
-		curPage: number
-		setCurPage: Dispatch<SetStateAction<number>>
-	}
-	ledgerState: {
-		ledger: Ledger | undefined
-		setLedger: Dispatch<SetStateAction<Ledger | undefined>>
-	}
-}
-
 function MonthGroupList(props: {
 	monthGroups: DateRange[] | undefined
 	onGroup: (dateRange: DateRange) => void
