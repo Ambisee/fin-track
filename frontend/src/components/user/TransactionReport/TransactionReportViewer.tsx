@@ -56,28 +56,13 @@ export default function TransactionReportViewer(
 				></iframe>
 			)}
 			<DialogFooter className="space-y-2 sm:space-y-0 px-4 pb-4">
-				<PDFDownloadLink
-					className={cn(buttonVariants({ variant: "ghost" }))}
-					document={props.children}
-					title={`${props.title}.pdf`}
-				>
-					{(instance) =>
-						instance.loading ? (
-							<ReloadIcon />
-						) : (
-							<>
-								Download <DownloadIcon />
-							</>
-						)
-					}
-				</PDFDownloadLink>
 				<Button asChild>
 					<a
 						href={instance.url ?? undefined}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						Open
+						New Tab
 						<ArrowUpRightIcon />
 					</a>
 				</Button>
