@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
 	DialogClose,
 	DialogContent,
@@ -8,9 +8,15 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
-import { cn, isNonNullable } from "@/lib/utils"
+import { isNonNullable } from "@/lib/utils"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { DocumentProps, PDFDownloadLink, usePDF } from "@react-pdf/renderer"
+import {
+	DocumentProps,
+	PDFDownloadLink,
+	PDFViewer,
+	usePDF
+} from "@react-pdf/renderer"
+import { useQuery } from "@tanstack/react-query"
 import { ArrowUpRightIcon, DownloadIcon, X } from "lucide-react"
 import { ReactElement, useEffect } from "react"
 
@@ -49,13 +55,31 @@ export default function TransactionReportViewer(
 					<ReloadIcon className="h-4 w-4 animate-spin" />
 				</div>
 			) : (
-				<iframe
-					src={`${instance.url}#zoom=page-fit&toolbar=1`}
+				<PDFViewer
 					className="flex-1 w-full border-0 p-0"
-					title="PDF preview"
-				></iframe>
+					// title="PDF preview"
+				>
+					{props.children}
+				</PDFViewer>
 			)}
-			<DialogFooter className="space-y-2 sm:space-y-0 px-4 pb-4">
+			<DialogFooter className="flex gap-2 px-4 pb-4">
+				<PDFDownloadLink
+					fileName={props.title ?? "FinTrack Report"}
+					document={props.children}
+				>
+					{({ loading }) => (
+						<Button variant="outline" disabled={loading}>
+							{loading ? (
+								<ReloadIcon className="size-4 animate-spin" />
+							) : (
+								<>
+									Download
+									<DownloadIcon />
+								</>
+							)}
+						</Button>
+					)}
+				</PDFDownloadLink>
 				<Button asChild>
 					<a
 						href={instance.url ?? undefined}
