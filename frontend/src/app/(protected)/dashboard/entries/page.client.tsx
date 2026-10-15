@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import ConditionalWrapper from "@/components/user/ConditionalWrapper"
 import EntryList from "@/components/user/EntryList"
@@ -19,22 +19,16 @@ import {
 	useUserQuery
 } from "@/lib/queries"
 import {
-	isNonNullable,
+	getCurrencySymbol,
 	getDateRangeFromViewOptions,
-	getCurrencySymbol
+	isNonNullable
 } from "@/lib/utils"
 import { Entry } from "@/types/supabase"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import {
-	ChevronLeft,
-	ChevronRight,
-	FileSearchIcon,
-	SearchIcon
-} from "lucide-react"
+import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
 import dynamic from "next/dynamic"
 import { ReactNode, useState } from "react"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
-import TransactionReportDocument from "@/components/user/TransactionReport/TransactionReportDocument"
 
 const TransactionReportViewer = dynamic(
 	() => import("@/components/user/TransactionReport/TransactionReportViewer"),
@@ -60,7 +54,6 @@ function EntryContainer(props: {
 }
 
 export default function DashboardEntries() {
-	const [isReportViewerOpen, setIsReportViewerOpen] = useState(false)
 	const [isSearching, setIsSearching] = useState(false)
 	const [entryViewOptions, setEntryViewOptions] = useState<EntryViewOptions>(
 		() => {
@@ -107,47 +100,6 @@ export default function DashboardEntries() {
 					onSearchStateChange={(state) => setIsSearching(state)}
 					onSearchResult={(searchResult) => setSearchResult(searchResult)}
 				/>
-				<Dialog open={isReportViewerOpen} onOpenChange={setIsReportViewerOpen}>
-					<DialogTrigger asChild>
-						<Button
-							disabled={
-								entryQuery.isFetching ||
-								entryQuery.isLoading ||
-								entryQuery.isFetching ||
-								settingsQuery.isLoading ||
-								userQuery.isLoading
-							}
-							variant="ghost"
-							size="lg"
-							className="px-[initial] aspect-square"
-						>
-							<FileSearchIcon />
-						</Button>
-					</DialogTrigger>
-					{isReportViewerOpen && (
-						<TransactionReportViewer>
-							<TransactionReportDocument
-								info={{
-									username: userName ?? "",
-									ledger: ledgerName ?? "",
-									period: dateRange,
-									locale: navigator.language,
-									currency: currency ?? ""
-								}}
-								entries={
-									entryQuery.data?.map((v) => ({
-										amount: v.amount,
-										category: v.category,
-										date: v.date,
-										isPositive: v.is_positive
-									})) ?? []
-								}
-								title="FinTrack Report"
-								generatedAt={new Date()}
-							/>
-						</TransactionReportViewer>
-					)}
-				</Dialog>
 			</div>
 			<EntryContainer
 				isLoading={isSearching}
