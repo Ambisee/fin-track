@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "@react-pdf/renderer"
 import { colors, fonts, MM } from "./theme"
 
 export const ReportTitle = ({
-	title = "FINANCIAL REPORT"
+	title = "FINTRACK REPORT"
 }: {
 	title?: string
 }) => (
