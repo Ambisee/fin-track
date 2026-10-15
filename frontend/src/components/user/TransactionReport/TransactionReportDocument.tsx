@@ -8,7 +8,7 @@ import { DocumentInfoSection } from "./DocumentInfoSection"
 import { TransactionTable } from "./TransactionTable"
 import { CategorySummary } from "./CategorySummary"
 import { PageFooter } from "./PageFooter"
-import { createAmountFormatter } from "./format"
+import { createAmountFormatter, createDateFormatter } from "./format"
 
 export default function TransactionReportDocument({
 	info,
@@ -19,6 +19,8 @@ export default function TransactionReportDocument({
 	locale
 }: ReportDocumentProps) {
 	const formatAmount = createAmountFormatter(locale)
+	const formatDate = createDateFormatter(locale)
+
 	return (
 		<Document
 			title={`${info.ledger} - Financial Report`}
@@ -27,8 +29,12 @@ export default function TransactionReportDocument({
 			<Page size="A4" style={styles.page} wrap>
 				<ReportTitle title={title} />
 				<DocumentInfoSection {...info} />
-				<TransactionTable entries={entries} formatAmount={formatAmount} />
-				<PageFooter generatedAt={generatedAt} />
+				<TransactionTable
+					entries={entries}
+					formatDate={formatDate}
+					formatAmount={formatAmount}
+				/>
+				<PageFooter formatDate={formatDate} generatedAt={generatedAt} />
 			</Page>
 			<Page size="A4" style={styles.page} wrap>
 				<CategorySummary
@@ -37,7 +43,7 @@ export default function TransactionReportDocument({
 					title={summaryTitle}
 					formatAmount={formatAmount}
 				/>
-				<PageFooter generatedAt={generatedAt} />
+				<PageFooter formatDate={formatDate} generatedAt={generatedAt} />
 			</Page>
 		</Document>
 	)

@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer"
 import { colors, fonts, MM, pageSpacing } from "./theme"
-import { formatDate } from "./format"
+import { DateFormatter } from "./types"
 
 export const PageFooter = ({
+	formatDate,
 	generatedAt = new Date()
 }: {
+	formatDate: DateFormatter
 	generatedAt?: Date
 }) => (
 	<View style={styles.footer} fixed>

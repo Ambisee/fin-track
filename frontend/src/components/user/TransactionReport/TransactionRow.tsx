@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer"
-import type { AmountFormatter, Entry } from "./types"
+import { columnOf, formatRowNumber } from "./format"
 import { colors, columns, fonts } from "./theme"
-import { columnOf, formatDate, formatRowNumber } from "./format"
+import type { AmountFormatter, DateFormatter, Entry } from "./types"
 
 interface Props {
 	entry: Entry
@@ -9,6 +9,7 @@ interface Props {
 	index: number
 	/** The last row uses a thicker bottom border. */
 	isLast?: boolean
+	formatDate: DateFormatter
 	formatAmount: AmountFormatter
 }
 
@@ -16,17 +17,21 @@ export const TransactionRow = ({
 	entry,
 	index,
 	isLast = false,
-	formatAmount
+	formatAmount,
+	formatDate
 }: Props) => {
 	const column = columnOf(entry)
 	const money = formatAmount(entry.amount)
+
 	return (
 		<View
 			style={[styles.row, isLast ? styles.rowLast : styles.rowMiddle]}
 			wrap={false}
 		>
 			<Text style={{ width: columns.no }}>{formatRowNumber(index)}</Text>
-			<Text style={{ width: columns.date }}>{formatDate(entry.date)}</Text>
+			<Text style={{ width: columns.date }}>
+				{formatDate(new Date(entry.date))}
+			</Text>
 			<Text style={{ width: columns.category }}>{entry.category}</Text>
 			<Text
 				style={{

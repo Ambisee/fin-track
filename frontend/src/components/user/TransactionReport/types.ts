@@ -14,6 +14,7 @@ export interface DocumentInfo {
 
 /** Formats an absolute amount as a plain number string (no currency symbol). */
 export type AmountFormatter = (amount: number) => string
+export type DateFormatter = (date: number | string | Date) => string
 
 /** A single transaction row. The row number is generated automatically from its position in the array. */
 export interface Entry {

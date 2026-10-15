@@ -1,46 +1,18 @@
-import type { AmountFormatter, CategoryStat, Entry } from "./types"
+import type {
+	AmountFormatter,
+	CategoryStat,
+	DateFormatter,
+	Entry
+} from "./types"
 
-const MONTHS = [
-	"Jan",
-	"Feb",
-	"Mar",
-	"Apr",
-	"May",
-	"Jun",
-	"Jul",
-	"Aug",
-	"Sep",
-	"Oct",
-	"Nov",
-	"Dec"
-]
-
-const pad2 = (n: number) => String(n).padStart(2, "0")
-
-/** "01 Sep 2026". A `YYYY-MM-DD` string is read as a local date (no timezone shift). */
-export function formatDate(value: Date | string): string {
-	let d: Date
-	if (typeof value === "string") {
-		const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
-		d = m
-			? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
-			: new Date(value)
-	} else {
-		d = value
-	}
-	return `${pad2(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
-}
-
-export const DEFAULT_LOCALE = "en-US"
+const DEFAULT_LOCALE = "en-US"
 
 /**
  * Creates a formatter that renders amounts as plain numbers with 2 decimals, e.g. "1,234.56"
  * (en-US) or "1.234,56" (de-DE). Always formats the absolute value; no currency symbol.
  * Falls back to DEFAULT_LOCALE if the locale tag is invalid.
  */
-export function createAmountFormatter(
-	locale: string = DEFAULT_LOCALE
-): AmountFormatter {
+export function createAmountFormatter(locale?: string): AmountFormatter {
 	const options = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 	let nf: Intl.NumberFormat
 	try {
@@ -51,6 +23,18 @@ export function createAmountFormatter(
 	// Some locales group digits with U+202F (narrow no-break space), which the built-in PDF fonts
 	// cannot draw. Swap it for a regular no-break space (U+00A0), which Courier does support.
 	return (amount) => nf.format(Math.abs(amount)).replace(/\u202F/g, "\u00A0")
+}
+
+export function createDateFormatter(locale?: string): DateFormatter {
+	const options: Intl.DateTimeFormatOptions = { dateStyle: "medium" }
+	let dtf: Intl.DateTimeFormat
+	try {
+		dtf = new Intl.DateTimeFormat(locale, options)
+	} catch {
+		dtf = new Intl.DateTimeFormat(DEFAULT_LOCALE, options)
+	}
+
+	return (date) => dtf.format(typeof date === "string" ? new Date(date) : date)
 }
 
 /** "+1,234.56" / "-1,234.56" (ASCII hyphen; the true minus sign U+2212 is missing from the standard PDF fonts). */
