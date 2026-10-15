@@ -42,7 +42,7 @@ export default function TransactionReportViewer(
 		>
 			<DialogHeader className="pt-4 px-4 flex flex-row items-center">
 				<DialogTitle asChild>
-					<h2 className="w-2/3 mx-auto sm:w-full leading-6">
+					<h2 className="mx-auto sm:w-full leading-6">
 						{props.title ?? "PDF Viewer"}
 					</h2>
 				</DialogTitle>
@@ -62,24 +62,29 @@ export default function TransactionReportViewer(
 					{props.children}
 				</PDFViewer>
 			)}
-			<DialogFooter className="flex gap-2 px-4 pb-4">
-				<PDFDownloadLink
-					fileName={props.title ?? "FinTrack Report"}
-					document={props.children}
+			<DialogFooter className="gap-2 px-4 pb-4">
+				<Button
+					variant="outline"
+					disabled={instance.loading}
+					className="aria-disabled:opacity-50 aria-disabled:pointer-events-none"
+					asChild
 				>
-					{({ loading }) => (
-						<Button variant="outline" disabled={loading}>
-							{loading ? (
-								<ReloadIcon className="size-4 animate-spin" />
-							) : (
-								<>
-									Download
-									<DownloadIcon />
-								</>
-							)}
-						</Button>
-					)}
-				</PDFDownloadLink>
+					<a
+						href={instance.url ?? undefined}
+						aria-disabled={instance.loading}
+						download={props.title ?? "FinTrack Report"}
+						onClick={(e) => instance.loading && e.preventDefault()}
+					>
+						{instance.loading ? (
+							<ReloadIcon className="size-4 animate-spin" />
+						) : (
+							<>
+								Download
+								<DownloadIcon />
+							</>
+						)}
+					</a>
+				</Button>
 				<Button asChild>
 					<a
 						href={instance.url ?? undefined}
