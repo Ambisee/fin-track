@@ -1,11 +1,36 @@
-# docker
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env*.local
+.env.backend
+.env.frontend
+**/.env*
+
+# Docker
 compose_copy.yaml
 
-# git
-.git
-
-# vscode
+# IDE / Editor
+.vscode/
 *.code-workspace
+.idea/
+*.swp
+*.swo
 
-# .env
-**/.env*
+# OS
+.DS_Store
+Thumbs.db

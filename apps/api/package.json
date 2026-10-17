@@ -1,0 +1,33 @@
+{
+	"name": "@fintrack/api",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@fintrack/transaction-report": "workspace:*",
+		"@fintrack/types": "workspace:*",
+		"@fintrack/utils": "workspace:*",
+		"@hono/node-server": "^1.13.8",
+		"@react-pdf/renderer": "^4.9.0",
+		"@supabase/supabase-js": "^2.44.3",
+		"dotenv": "^16.4.7",
+		"hono": "^4.7.0",
+		"nodemailer": "^6.10.0",
+		"react": "19.2.4",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/nodemailer": "^6.4.17",
+		"@types/react": "19.2.10",
+		"@types/react-dom": "19.2.3",
+		"tsx": "^4.19.3",
+		"typescript": "^5"
+	}
+}

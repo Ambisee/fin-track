@@ -1,0 +1,25 @@
+{
+	"name": "@fintrack/utils",
+	"version": "1.0.0",
+	"private": true,
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"type-check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@fintrack/types": "workspace:*",
+		"@react-pdf/renderer": "^4.9.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0 || ^19.0.0"
+	},
+	"devDependencies": {
+		"@types/react": "19.2.10",
+		"react": "19.2.4",
+		"typescript": "^5"
+	}
+}

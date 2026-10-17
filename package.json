@@ -1,0 +1,15 @@
+{
+	"name": "fin-track-monorepo",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "pnpm --filter \"./apps/*\" --parallel dev",
+		"dev:web": "pnpm --filter @fintrack/web dev",
+		"dev:api": "pnpm --filter @fintrack/api dev",
+		"build": "pnpm -r build",
+		"build:web": "pnpm --filter @fintrack/web build",
+		"build:api": "pnpm --filter @fintrack/api build",
+		"lint": "pnpm -r lint",
+		"test": "pnpm -r test"
+	}
+}
