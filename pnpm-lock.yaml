@@ -7,6 +7,9 @@ settings:
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
 
+patchedDependencies:
+  '@react-pdf/hyphenate': ff6d490501cd24a6bac26f7f5d4acc898446405e293ab6b84be4eff948206326
+
 importers:
 
   .: {}
@@ -27,7 +30,7 @@ importers:
         version: 1.19.17(hono@4.13.13)
       '@react-pdf/renderer':
         specifier: ^4.9.0
-        version: 4.9.0(react@19.2.4)
+        version: 4.9.0(react@19.3.1)
       '@supabase/supabase-js':
         specifier: ^2.44.3
         version: 2.118.0
@@ -41,8 +44,11 @@ importers:
         specifier: ^10.0.6
         version: 10.1.2
       react:
-        specifier: 19.2.4
-        version: 19.2.4
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
       zod:
         specifier: ^3.24.2
         version: 3.25.76
@@ -4441,6 +4447,11 @@ packages:
     peerDependencies:
       react: ^19.2.4
 
+  react-dom@19.3.1:
+    resolution: {integrity: sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==}
+    peerDependencies:
+      react: ^19.3.1
+
   react-hook-form@7.90.0:
     resolution: {integrity: sha512-+NdG0FLzCPhFOp2NNxaUYLF9fyZhNjx9FTBBSYWF71/l6BBlmIc/j6xlp3DbaHWLJbIG7Zd8oznA19xJClU97w==}
     engines: {node: '>=18.0.0'}
@@ -4513,6 +4524,10 @@ packages:
 
   react@19.2.4:
     resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
+    engines: {node: '>=0.10.0'}
+
+  react@19.3.1:
+    resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
     engines: {node: '>=0.10.0'}
 
   recharts-scale@0.4.5:
@@ -4602,6 +4617,9 @@ packages:
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
+
+  scheduler@0.28.0:
+    resolution: {integrity: sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -6824,7 +6842,7 @@ snapshots:
       is-url: 1.2.4
       pdfkit: 0.20.1
 
-  '@react-pdf/hyphenate@0.1.0':
+  '@react-pdf/hyphenate@0.1.0(patch_hash=ff6d490501cd24a6bac26f7f5d4acc898446405e293ab6b84be4eff948206326)':
     dependencies:
       hyphen: 1.6.6
 
@@ -6857,6 +6875,12 @@ snapshots:
       react: 19.2.4
       scheduler: 0.25.0-rc-603e6108-20241029
 
+  '@react-pdf/reconciler@2.0.0(react@19.3.1)':
+    dependencies:
+      object-assign: 4.1.1
+      react: 19.3.1
+      scheduler: 0.25.0-rc-603e6108-20241029
+
   '@react-pdf/render@4.7.0':
     dependencies:
       '@babel/runtime': 7.29.10
@@ -6887,6 +6911,23 @@ snapshots:
       queue: 6.0.2
       react: 19.2.4
 
+  '@react-pdf/renderer@4.9.0(react@19.3.1)':
+    dependencies:
+      '@babel/runtime': 7.29.10
+      '@react-pdf/fns': 3.1.3
+      '@react-pdf/font': 4.1.2
+      '@react-pdf/layout': 5.2.0
+      '@react-pdf/primitives': 4.4.0
+      '@react-pdf/reconciler': 2.0.0(react@19.3.1)
+      '@react-pdf/render': 4.7.0
+      '@react-pdf/types': 2.14.0
+      events: 3.3.0
+      object-assign: 4.1.1
+      pdfkit: 0.20.1
+      prop-types: 15.8.1
+      queue: 6.0.2
+      react: 19.3.1
+
   '@react-pdf/stylesheet@6.3.2':
     dependencies:
       '@react-pdf/fns': 3.1.3
@@ -6903,7 +6944,7 @@ snapshots:
   '@react-pdf/textkit@7.0.1':
     dependencies:
       '@react-pdf/fns': 3.1.3
-      '@react-pdf/hyphenate': 0.1.0
+      '@react-pdf/hyphenate': 0.1.0(patch_hash=ff6d490501cd24a6bac26f7f5d4acc898446405e293ab6b84be4eff948206326)
       bidi-js: 1.1.0
       unicode-properties: 1.4.1
 
@@ -9698,6 +9739,11 @@ snapshots:
       react: 19.2.4
       scheduler: 0.27.0
 
+  react-dom@19.3.1(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+      scheduler: 0.28.0
+
   react-hook-form@7.90.0(@types/react@19.2.10)(react@19.2.4):
     dependencies:
       react: 19.2.4
@@ -9765,6 +9811,8 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
 
   react@19.2.4: {}
+
+  react@19.3.1: {}
 
   recharts-scale@0.4.5:
     dependencies:
@@ -9869,6 +9917,8 @@ snapshots:
   scheduler@0.25.0-rc-603e6108-20241029: {}
 
   scheduler@0.27.0: {}
+
+  scheduler@0.28.0: {}
 
   semver@6.3.1: {}
 

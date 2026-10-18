@@ -7,3 +7,5 @@ allowBuilds:
   unrs-resolver: set this to true or false
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
+patchedDependencies:
+  '@react-pdf/hyphenate': patches/@react-pdf__hyphenate.patch
