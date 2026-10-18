@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
-// import { cronRouter } from "./routes/cron"
+import { cronRouter } from "./routes/cron"
 import { reportsRouter } from "./routes/reports"
 
 dotenv.config()
@@ -51,7 +51,7 @@ app.get("/api/ping", (c) =>
 
 // Mount routers
 app.route("/api/reports", reportsRouter)
-// app.route("/api/cron", cronRouter)
+app.route("/api/cron", cronRouter)
 
 // Global error handler
 app.onError((err, c) => {
@@ -64,14 +64,20 @@ app.onError((err, c) => {
 	)
 })
 
+const hostname = "localhost"
 const port = Number(process.env.PORT) || 8000
 
 if (process.env.NODE_ENV !== "test") {
-	console.log(`Starting FinTrack API on port ${port}...`)
-	serve({
-		fetch: app.fetch,
-		port
-	})
+	serve(
+		{
+			fetch: app.fetch,
+			hostname,
+			port
+		},
+		() => {
+			console.log(`FinTrack API listening on http://${hostname}:${port}`)
+		}
+	)
 }
 
 export default app
