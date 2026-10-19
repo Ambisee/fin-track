@@ -8,6 +8,7 @@ import {
 	DialogHeader,
 	DialogTitle
 } from "@/components/ui/dialog"
+import { useIsSafari } from "@/lib/hooks"
 import { isNonNullable } from "@/lib/utils"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import {
@@ -30,10 +31,34 @@ export default function TransactionReportViewer(
 	props: TransactionReportViewerProps
 ) {
 	const [instance, update] = usePDF({ document: props.children })
+	const { isSafari, isLoading: isBrowserChecking } = useIsSafari()
+
+	const blobUrlQuery = useQuery({
+		queryKey: [instance, isSafari] as const,
+		queryFn: async ({ queryKey }) => {
+			const rawBlob = queryKey[0].blob
+			if (!isNonNullable(rawBlob)) return rawBlob
+
+			const isBrowserSafari = queryKey[1]
+			const streamBlob = new Blob([rawBlob], {
+				type: isBrowserSafari ? "application/octet-stream" : "application/pdf"
+			})
+
+			return URL.createObjectURL(streamBlob)
+		},
+		enabled: !isBrowserChecking
+	})
 
 	useEffect(() => {
 		update(props.children)
 	}, [props.children])
+
+	useEffect(() => {
+		return () => {
+			if (!isNonNullable(blobUrlQuery.data)) return
+			URL.revokeObjectURL(blobUrlQuery.data)
+		}
+	}, [blobUrlQuery.data])
 
 	return (
 		<DialogContent
@@ -65,14 +90,14 @@ export default function TransactionReportViewer(
 			<DialogFooter className="gap-2 px-4 pb-4">
 				<Button
 					variant="outline"
-					disabled={instance.loading}
+					disabled={blobUrlQuery.isLoading || blobUrlQuery.isFetching}
 					className="aria-disabled:opacity-50 aria-disabled:pointer-events-none"
 					asChild
 				>
 					<a
-						href={instance.url ?? undefined}
+						href={blobUrlQuery.data ?? undefined}
 						aria-disabled={instance.loading}
-						download={props.title ?? "FinTrack Report"}
+						download={`${props.title ?? "FinTrack Report"}.pdf`}
 						onClick={(e) => instance.loading && e.preventDefault()}
 					>
 						{instance.loading ? (

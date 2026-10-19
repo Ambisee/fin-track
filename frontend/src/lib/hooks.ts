@@ -75,6 +75,20 @@ function useSetElementWindowHeight() {
 	return elementRef
 }
 
+function useIsSafari() {
+	const [isSafari, setIsSafari] = useState<boolean | null>(null)
+
+	useEffect(() => {
+		const ua = navigator.userAgent
+		const isSafariTest =
+			/safari/i.test(ua) &&
+			!/chrome|chromium|crios|fxios|edgios|edg|opr|opera|android/i.test(ua)
+		setIsSafari(isSafariTest)
+	}, [])
+
+	return { isSafari, isLoading: isSafari === null }
+}
+
 function useAmountFormatter() {
 	const userSettingsQuery = useSettingsQuery()
 
@@ -179,5 +193,6 @@ export {
 	useDashboardTransactionEntries,
 	useIsSmallMobile,
 	useSearchEntry,
+	useIsSafari,
 	useSetElementWindowHeight
 }
