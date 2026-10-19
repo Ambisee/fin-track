@@ -1,4 +1,4 @@
-import { Context, Next } from "hono"
+import type { Context, Next } from "hono"
 import { supabase } from "../services/supabase"
 import type { User } from "@supabase/supabase-js"
 

@@ -1,6 +1,6 @@
 import {
 	TransactionReportDocument,
-	ReportDocumentProps
+	type ReportDocumentProps
 } from "@fintrack/transaction-report"
 import type { DateRange, EntryRow } from "@fintrack/types"
 import React from "react"

@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { cronAuthMiddleware } from "../middleware/cronAuth"
 import { generateReportPdf } from "../services/pdf"
-import { DataFetcher, UserProfile } from "../services/supabase"
+import { DataFetcher, type UserProfile } from "../services/supabase"
 import { DummyMailerService, GmailMailerService } from "../services/mailer"
 import { type DateRange } from "@fintrack/types"
 
