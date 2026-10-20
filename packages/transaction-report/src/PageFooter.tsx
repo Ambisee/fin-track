@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer"
 import { colors, fonts, MM, pageSpacing } from "./theme"
-import { DateFormatter } from "./types"
+import type { DateFormatter } from "./types"
 
 export const PageFooter = ({
 	formatDate,

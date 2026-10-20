@@ -5,10 +5,14 @@ import { cors } from "hono/cors"
 import { logger } from "hono/logger"
 import { cronRouter } from "./routes/cron"
 import { reportsRouter } from "./routes/reports"
+import { LoggerImpl, type Logger } from "./services/log"
+import { showRoutes } from "hono/dev"
 
 dotenv.config()
 
 export const app = new Hono()
+
+const appLogger: Logger = new LoggerImpl()
 
 // Global middlewares
 app.use("*", logger())
@@ -36,26 +40,31 @@ app.use(
 // Health check endpoints
 app.get("/", (c) =>
 	c.json({
-		service: "FinTrack API",
-		status: "healthy",
-		version: "1.0.0"
+		service: "FinTrack API"
 	})
 )
 
 app.get("/api/ping", (c) =>
 	c.json({
-		status: "online",
+		status: "Online",
 		timestamp: new Date().toISOString()
 	})
 )
 
 // Mount routers
-app.route("/api/reports", reportsRouter)
-app.route("/api/cron", cronRouter)
+if (process.env.INCLUDE_REPORTS_ROUTER) {
+	app.route("/api/reports", reportsRouter)
+	appLogger.info("index", "Reports Router added.")
+}
+
+if (process.env.INCLUDE_CRON_ROUTER) {
+	app.route("/api/cron", cronRouter)
+	appLogger.info("index", "Cron Router added.")
+}
 
 // Global error handler
 app.onError((err, c) => {
-	console.error("[API Error]", err)
+	appLogger.error("API Error", err)
 	return c.json(
 		{
 			error: err.message || "Internal server error"
@@ -64,7 +73,7 @@ app.onError((err, c) => {
 	)
 })
 
-const hostname = "localhost"
+const hostname = process.env.HOST || "localhost"
 const port = Number(process.env.PORT) || 8000
 
 if (process.env.NODE_ENV !== "test") {
@@ -75,7 +84,13 @@ if (process.env.NODE_ENV !== "test") {
 			port
 		},
 		() => {
-			console.log(`FinTrack API listening on http://${hostname}:${port}`)
+			appLogger.info("index", `Show Routes:`)
+			showRoutes(app)
+
+			appLogger.info(
+				"index",
+				`FinTrack API listening on http://${hostname}:${port}`
+			)
 		}
 	)
 }

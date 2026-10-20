@@ -1,6 +1,6 @@
 import nodemailer, { type Transporter } from "nodemailer"
 
-interface MonthlyReportEmailParams {
+export interface MonthlyReportEmailParams {
 	to: string
 	username: string
 	ledgerName: string

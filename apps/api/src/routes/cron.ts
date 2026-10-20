@@ -1,13 +1,30 @@
 import { Hono } from "hono"
 import { cronAuthMiddleware } from "../middleware/cronAuth"
-import { generateReportPdf } from "../services/pdf"
-import { DataFetcher, type UserProfile } from "../services/supabase"
-import { DummyMailerService, GmailMailerService } from "../services/mailer"
+import {
+	ReportGenerationServiceImpl,
+	type ReportGenerationService
+} from "../services/pdf"
+import {
+	SupabaseDataFetcherService,
+	type DataFetcherService,
+	type UserProfile
+} from "../services/dataFetcher"
+import {
+	DummyMailerService,
+	GmailMailerService,
+	type MailerService
+} from "../services/mailer"
 import { type DateRange } from "@fintrack/types"
+import { LoggerImpl, type Logger } from "../services/log"
 
 export const cronRouter = new Hono()
 
 cronRouter.use("*", cronAuthMiddleware)
+
+const logger: Logger = new LoggerImpl()
+const dataFetcherService: DataFetcherService = new SupabaseDataFetcherService()
+const reportGenerationService: ReportGenerationService =
+	new ReportGenerationServiceImpl()
 
 const mailerEmail = process.env.MAILER_EMAIL
 const mailerPassword = process.env.MAILER_PASSWORD
@@ -60,106 +77,145 @@ function getTargetMonthlyPeriod() {
 	return { from, to, periodName }
 }
 
-async function handleSingleUserMonthlyReport(
+type SingleUserMonthlyReportHandler = (
 	periodName: string,
 	dateRange: DateRange,
 	user: UserProfile
-) {
-	const { from, to } = dateRange
-	if (from === undefined || to === undefined) {
-		throw Error("Invalid time range.")
-	}
+) => Promise<void>
 
-	if (!user.current_ledger) {
-		console.log(
-			`[Cron] Skipping user ${user.username} (${user.id}): No current ledger selected.`
-		)
-		throw Error("No ledger selected.")
-	}
-
-	const ledger = await DataFetcher.getLedger(user.id, user.current_ledger)
-	if (!ledger) {
-		console.log(
-			`[Cron] Skipping user ${user.username}: Ledger ${user.current_ledger} not found.`
-		)
-		throw Error(`Ledger ${user.current_ledger} not found.`)
-	}
-
-	const entries = await DataFetcher.getEntriesForPeriod(
-		user.id,
-		ledger.id,
-		from,
-		to
-	)
-
-	if (entries.length < 1) {
-		console.log(
-			`[Cron] User ${user.username} has 0 transactions in ${periodName}. Skipping.`
-		)
-		return
-	}
-
-	const pdfBuffer = await generateReportPdf({
-		user,
-		ledger,
-		entries,
-		period: { from, to },
-		title: "MONTHLY FINANCIAL REPORT"
-	})
-
-	await mailerService.sendMonthlyReportEmail({
-		to: user.email,
-		username: user.username,
-		ledgerName: ledger.name,
-		periodName,
-		pdfBuffer
-	})
-}
-
-async function handleMonthlyReports(c: any) {
-	const { from, to, periodName } = getTargetMonthlyPeriod()
-
-	const eligibleUsers = await DataFetcher.getUsersWithReportEnabled()
-	console.log(
-		`[Cron] Found ${eligibleUsers.length} users with automatic monthly report enabled for ${periodName}.`
-	)
-
-	const sendEmailPromiseList = []
-
-	for (const user of eligibleUsers) {
-		sendEmailPromiseList.push(
-			handleSingleUserMonthlyReport(periodName, { from, to }, user)
-				.then((v) => {
-					console.log(
-						`[Cron] Successfully delivered monthly report to ${user.email} (${user.username}).`
-					)
-				})
-				.catch((err) => {
-					console.error(
-						`[Cron] Error processing monthly report for user ${user.username}:`,
-						err
-					)
-				})
-		)
-	}
-
-	const settledPromises = await Promise.allSettled(sendEmailPromiseList)
-	const successCount = settledPromises.reduce(
-		(acc, v) => acc + (v.status === "fulfilled" ? 1 : 0),
-		0
-	)
-
-	return c.json({
-		data: {
-			period: periodName,
-			users: {
-				count: eligibleUsers.length,
-				sent: successCount
+class MonthReportHandlerFactory {
+	private static createSingleUserMonthlyReportHandler(
+		dataFetcherService: DataFetcherService,
+		mailerService: MailerService
+	): SingleUserMonthlyReportHandler {
+		return async (periodName, dateRange, user) => {
+			const { from, to } = dateRange
+			if (from === undefined || to === undefined) {
+				throw Error("Invalid time range.")
 			}
+
+			if (!user.current_ledger) {
+				console.log(
+					`[Cron] Skipping user ${user.username} (${user.id}): No current ledger selected.`
+				)
+				throw Error("No ledger selected.")
+			}
+
+			const ledger = await dataFetcherService.getLedger(
+				user.id,
+				user.current_ledger
+			)
+			if (!ledger) {
+				console.log(
+					`[Cron] Skipping user ${user.username}: Ledger ${user.current_ledger} not found.`
+				)
+				throw Error(`Ledger ${user.current_ledger} not found.`)
+			}
+
+			const entries = await dataFetcherService.getEntriesForPeriod(
+				user.id,
+				ledger.id,
+				from,
+				to
+			)
+
+			if (entries.length < 1) {
+				console.log(
+					`[Cron] User ${user.username} has 0 transactions in ${periodName}. Skipping.`
+				)
+				return
+			}
+
+			const pdfBuffer = await reportGenerationService.generate({
+				user,
+				ledger,
+				entries,
+				period: { from, to }
+			})
+
+			await mailerService.sendMonthlyReportEmail({
+				to: user.email,
+				username: user.username,
+				ledgerName: ledger.name,
+				periodName,
+				pdfBuffer
+			})
 		}
-	})
+	}
+
+	static createMonthlyReportHandler(
+		dataFetcherService: DataFetcherService,
+		mailerService: MailerService
+	): (c: any) => Promise<void> {
+		const ctxName = "cron.handleMonthlyReport"
+		const handleSingleUserMonthlyReport =
+			this.createSingleUserMonthlyReportHandler(
+				dataFetcherService,
+				mailerService
+			)
+
+		return async (c) => {
+			const { from, to, periodName } = getTargetMonthlyPeriod()
+			logger.info(
+				ctxName,
+				`
+                Target Monthly Period:
+                - From: ${from.toISOString()}
+                - To: ${to.toISOString()}
+                - Period Name: ${periodName}
+                `
+			)
+
+			const eligibleUsers = await dataFetcherService.getUsersWithReportEnabled()
+			logger.info(
+				ctxName,
+				`Found ${eligibleUsers.length} users with automatic monthly report enabled for ${periodName}.`
+			)
+
+			const sendEmailPromiseList = []
+
+			for (const user of eligibleUsers) {
+				sendEmailPromiseList.push(
+					handleSingleUserMonthlyReport(periodName, { from, to }, user)
+						.then((v) => {
+							console.log(
+								`[Cron] Successfully delivered monthly report to ${user.email} (${user.username}).`
+							)
+						})
+						.catch((err) => {
+							console.error(
+								`[Cron] Error processing monthly report for user ${user.username}:`,
+								err
+							)
+						})
+				)
+			}
+
+			const settledPromises = await Promise.allSettled(sendEmailPromiseList)
+			const successCount = settledPromises.reduce(
+				(acc, v) => acc + (v.status === "fulfilled" ? 1 : 0),
+				0
+			)
+
+			return c.json({
+				data: {
+					period: periodName,
+					users: {
+						count: eligibleUsers.length,
+						sent: successCount
+					}
+				}
+			})
+		}
+	}
 }
 
 // Support both POST and GET (Vercel Cron triggers GET by default)
+const handleMonthlyReports =
+	MonthReportHandlerFactory.createMonthlyReportHandler(
+		dataFetcherService,
+		mailerService
+	)
+
 cronRouter.post("/monthly-reports", handleMonthlyReports)
 cronRouter.get("/monthly-reports", handleMonthlyReports)

@@ -32,8 +32,25 @@ export interface LedgerDetails {
 	currency_name: string
 }
 
-export class DataFetcher {
-	static async getUser(uid: string): Promise<UserProfile | null> {
+export interface UserDataFetchParams {
+	uid: string
+	ledgerId: number
+}
+
+export interface DataFetcherService {
+	getUser: (uid: string) => Promise<UserProfile | null>
+	getLedger: (uid: string, ledgerId: number) => Promise<LedgerDetails | null>
+	getUsersWithReportEnabled: () => Promise<UserProfile[]>
+	getEntriesForPeriod: (
+		uid: string,
+		ledgerId: number,
+		from: Date,
+		to: Date
+	) => Promise<EntryRow[]>
+}
+
+export class SupabaseDataFetcherService implements DataFetcherService {
+	async getUser(uid: string): Promise<UserProfile | null> {
 		const { data: authUser, error: authError } =
 			await supabase.auth.admin.getUserById(uid)
 		if (authError || !authUser.user) {
@@ -60,7 +77,7 @@ export class DataFetcher {
 		}
 	}
 
-	static async getLedger(
+	async getLedger(
 		uid: string,
 		ledgerId: number
 	): Promise<LedgerDetails | null> {
@@ -86,7 +103,7 @@ export class DataFetcher {
 		}
 	}
 
-	static async getEntriesForPeriod(
+	async getEntriesForPeriod(
 		uid: string,
 		ledgerId: number,
 		from: Date,
@@ -111,7 +128,7 @@ export class DataFetcher {
 		return data
 	}
 
-	static async getUsersWithReportEnabled(): Promise<UserProfile[]> {
+	async getUsersWithReportEnabled(): Promise<UserProfile[]> {
 		const { data, error } = await supabase
 			.from("user_view")
 			.select("*")

@@ -1,5 +1,5 @@
 import type { Context, Next } from "hono"
-import { supabase } from "../services/supabase"
+import { supabase } from "../services/dataFetcher"
 import type { User } from "@supabase/supabase-js"
 
 declare module "hono" {
