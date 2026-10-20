@@ -1,5 +1,3 @@
-"use client"
-
 import { Document, Page, StyleSheet } from "@react-pdf/renderer"
 import type { ReportDocumentProps } from "./types"
 import { fonts, pageSpacing } from "./theme"

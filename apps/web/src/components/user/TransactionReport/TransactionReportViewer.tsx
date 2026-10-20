@@ -27,7 +27,8 @@ export default function TransactionReportViewer(
 
 	useEffect(() => {
 		update(props.children)
-	}, [props.children, update])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [props.children])
 
 	return (
 		<DialogContent
@@ -49,10 +50,7 @@ export default function TransactionReportViewer(
 					<ReloadIcon className="h-4 w-4 animate-spin" />
 				</div>
 			) : (
-				<PDFViewer
-					className="flex-1 w-full border-0 p-0"
-					// title="PDF preview"
-				>
+				<PDFViewer className="flex-1 w-full border-0 p-0">
 					{props.children}
 				</PDFViewer>
 			)}
