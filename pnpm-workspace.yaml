@@ -2,10 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
-  '@parcel/watcher': set this to true or false
+  "@parcel/watcher": false
   esbuild: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: false
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
 patchedDependencies:
-  '@react-pdf/hyphenate': patches/@react-pdf__hyphenate.patch
+  "@react-pdf/hyphenate": patches/@react-pdf__hyphenate.patch
