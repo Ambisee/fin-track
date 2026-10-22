@@ -2,6 +2,7 @@
 	"name": "fin-track-monorepo",
 	"version": "1.0.0",
 	"private": true,
+	"packageManager": "pnpm@12.11.2",
 	"scripts": {
 		"dev": "pnpm --filter \"./apps/*\" --parallel dev",
 		"dev:web": "pnpm --filter @fintrack/web dev",
