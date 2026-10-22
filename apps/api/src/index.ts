@@ -1,22 +1,14 @@
 import { serve } from "@hono/node-server"
-import dotenv from "dotenv"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
+import { showRoutes } from "hono/dev"
 import { logger } from "hono/logger"
 import { cronRouter } from "./routes/cron"
 import { reportsRouter } from "./routes/reports"
-import { LoggerImpl, type Logger } from "./services/log"
-import { showRoutes } from "hono/dev"
+import { logger as appLogger } from "./services/log"
+import { isDebug } from "./utils/envHelper"
 
 export const app = new Hono()
-
-const appLogger: Logger = new LoggerImpl()
-const isDebug = () => process.env.DEBUG?.toLowerCase() === "true"
-
-if (isDebug()) {
-	appLogger.info("index", "Environment variables loaded.")
-	dotenv.config()
-}
 
 // Global middlewares
 app.use("*", logger())

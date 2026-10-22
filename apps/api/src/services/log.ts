@@ -22,3 +22,6 @@ export class LoggerImpl implements Logger {
 		console.error(`[${ctx}]`, ...messages)
 	}
 }
+
+const logger: Logger = new LoggerImpl()
+export { logger }

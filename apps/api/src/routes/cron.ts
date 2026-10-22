@@ -15,13 +15,12 @@ import {
 	type MailerService
 } from "../services/mailer"
 import { type DateRange } from "@fintrack/types"
-import { LoggerImpl, type Logger } from "../services/log"
+import { logger } from "../services/log"
 
 export const cronRouter = new Hono()
 
 cronRouter.use("*", cronAuthMiddleware)
 
-const logger: Logger = new LoggerImpl()
 const dataFetcherService: DataFetcherService = new SupabaseDataFetcherService()
 const reportGenerationService: ReportGenerationService =
 	new ReportGenerationServiceImpl()

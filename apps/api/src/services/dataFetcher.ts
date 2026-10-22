@@ -1,8 +1,8 @@
-import dotenv from "dotenv"
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
 import type { Database, EntryRow } from "@fintrack/types"
+import { loadDotenv as loadDotEnv } from "../utils/envHelper"
 
-dotenv.config()
+loadDotEnv()
 
 const supabaseUrl = process.env.SUPABASE_URL || ""
 const supabaseKey = process.env.SUPABASE_KEY || ""
