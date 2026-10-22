@@ -8,11 +8,15 @@ import { reportsRouter } from "./routes/reports"
 import { LoggerImpl, type Logger } from "./services/log"
 import { showRoutes } from "hono/dev"
 
-dotenv.config()
-
 export const app = new Hono()
 
 const appLogger: Logger = new LoggerImpl()
+const isDebug = () => process.env.DEBUG?.toLowerCase() === "true"
+
+if (isDebug()) {
+	appLogger.info("index", "Environment variables loaded.")
+	dotenv.config()
+}
 
 // Global middlewares
 app.use("*", logger())
@@ -76,23 +80,23 @@ app.onError((err, c) => {
 const hostname = process.env.HOST || "localhost"
 const port = Number(process.env.PORT) || 8000
 
-if (process.env.NODE_ENV !== "test") {
-	serve(
-		{
-			fetch: app.fetch,
-			hostname,
-			port
-		},
-		() => {
-			appLogger.info("index", `Show Routes:`)
+serve(
+	{
+		fetch: app.fetch,
+		hostname,
+		port
+	},
+	() => {
+		appLogger.info("index", `Show Routes:`)
+		if (isDebug()) {
 			showRoutes(app)
-
-			appLogger.info(
-				"index",
-				`FinTrack API listening on http://${hostname}:${port}`
-			)
 		}
-	)
-}
+
+		appLogger.info(
+			"index",
+			`FinTrack API listening on http://${hostname}:${port}`
+		)
+	}
+)
 
 export default app
