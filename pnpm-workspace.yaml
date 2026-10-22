@@ -3,7 +3,7 @@ packages:
   - "packages/*"
 allowBuilds:
   '@parcel/watcher': set this to true or false
-  esbuild: set this to true or false
+  esbuild: true
   unrs-resolver: set this to true or false
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
