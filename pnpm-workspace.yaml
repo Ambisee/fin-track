@@ -5,6 +5,14 @@ allowBuilds:
   "@parcel/watcher": false
   esbuild: true
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - "@pnpm/exe@11.28.8"
+  - "@pnpm/linux-arm64@11.28.8"
+  - "@pnpm/linux-x64@11.28.8"
+  - "@pnpm/linuxstatic-x64@11.28.8"
+  - "@pnpm/macos-arm64@11.28.8"
+  - "@pnpm/win-arm64@11.28.8"
+  - "@pnpm/win-x64@11.28.8"
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
 patchedDependencies:
