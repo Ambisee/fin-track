@@ -79,7 +79,7 @@ export default function Documents() {
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 	const entryQuery = useDashboardTransactionEntries(
-		settingsQuery.data?.current_ledger,
+		settingsQuery.data?.visibleLedger.id,
 		{
 			filter: {
 				type: "All",
@@ -89,7 +89,9 @@ export default function Documents() {
 			period: { timeRange: dateRange, type: "MONTHLY" }
 		}
 	)
-	const monthGroupQuery = useMonthGroupQuery(settingsQuery.data?.current_ledger)
+	const monthGroupQuery = useMonthGroupQuery(
+		settingsQuery.data?.visibleLedger.id
+	)
 
 	const isSafeToShowTransactionViewer =
 		isNonNullable(dateRange) &&
@@ -135,18 +137,17 @@ export default function Documents() {
 						<TransactionReportDocument
 							info={{
 								username: userQuery.data?.user_metadata["username"],
-								ledger: settingsQuery.data?.ledger.name ?? "",
+								ledger: settingsQuery.data?.visibleLedger.name ?? "",
 								locale: navigator.language,
 								period: dateRange ?? { from: new Date(), to: new Date() },
-								currency:
-									settingsQuery.data?.ledger.currency.currency_name ?? ""
+								currency: settingsQuery.data?.visibleLedger.currency.name ?? ""
 							}}
 							entries={
 								entryQuery.data?.map((v) => ({
 									category: v.category,
 									date: new Date(v.date),
 									amount: v.amount,
-									isPositive: v.is_positive
+									isPositive: v.type === "Income"
 								})) ?? []
 							}
 						/>

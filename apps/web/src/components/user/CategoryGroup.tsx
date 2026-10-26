@@ -6,7 +6,7 @@ import {
 } from "@/lib/mutations"
 import { useCategoriesQuery } from "@/lib/queries"
 import { useUserQuery } from "@/lib/queries"
-import { Category } from "@/types/supabase"
+import { Category } from "@/types/Category"
 import { useIsMutating, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -60,7 +60,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 		try {
 			await insertCategoryMutation.mutateAsync({
-				created_by: userData.id,
+				id: userData.id,
 				name: category.name
 			})
 
@@ -71,7 +71,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 			)
 
 			await queryClient.invalidateQueries({ queryKey: CATEGORIES_QKEY })
-			props.onCreate?.({ created_by: userData.id, name: category.name })
+			props.onCreate?.({ id: userData.id, name: category.name })
 
 			setCurPage(0)
 		} catch (e) {
@@ -90,7 +90,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 		try {
 			await updateCategoryMutation.mutateAsync({
 				oldName: category.oldName,
-				created_by: userData.id,
+				id: userData.id,
 				name: category.name
 			})
 
@@ -99,7 +99,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 			await queryClient.invalidateQueries({
 				queryKey: CATEGORIES_QKEY
 			})
-			props.onDelete?.({ created_by: userData.id, name: category.name })
+			props.onDelete?.({ id: userData.id, name: category.name })
 		} catch (e) {
 			const errorData = e as Error
 			toast.error(errorData.message)
@@ -115,7 +115,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 
 		try {
 			await deleteCategoryMutation.mutateAsync({
-				created_by: userData.id,
+				id: userData.id,
 				name: category.name
 			})
 
@@ -124,7 +124,7 @@ export default function CategoryGroup(props: CategoryGroupProps) {
 			await queryClient.invalidateQueries({
 				queryKey: CATEGORIES_QKEY
 			})
-			props.onDelete?.({ created_by: userData.id, name: category.name })
+			props.onDelete?.({ id: userData.id, name: category.name })
 		} catch (e) {
 			const errorData = e as Error
 			toast.error(errorData.message)

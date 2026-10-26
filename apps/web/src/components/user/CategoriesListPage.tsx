@@ -1,4 +1,4 @@
-import { Category } from "@/types/supabase"
+import { Category } from "@/types/Category"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"

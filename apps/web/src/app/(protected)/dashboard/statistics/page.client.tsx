@@ -129,7 +129,7 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const formatAmount = useAmountFormatter()
 	const percentageKey = "percentage" as keyof StatisticGroup
 
-	if (props.data === undefined || !settingsQuery.data?.current_ledger) {
+	if (props.data === undefined || !settingsQuery.data?.visibleLedger) {
 		return <Skeleton className="w-full h-62.5 mt-5" />
 	}
 
@@ -152,11 +152,11 @@ function ChartDisplay(props: ChartDisplayProps) {
 									new Date(data.date)
 								)
 
-								invalidateEntryQuery(data.ledger, monthStartEnd)
+								invalidateEntryQuery(data.ledger.id, monthStartEnd)
 
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
+										data.ledger.id,
 										monthStartEnd
 									)
 								})
@@ -235,7 +235,7 @@ function CategoryItem(props: CategoryItemProps) {
 	const shouldUseShort = useIsSmallMobile()
 	const settingsQuery = useSettingsQuery()
 	const entryDataQuery = useDashboardTransactionEntries(
-		settingsQuery.data?.current_ledger,
+		settingsQuery.data?.visibleLedger.id,
 		viewOptions
 	)
 
@@ -326,11 +326,14 @@ function CategoryItem(props: CategoryItemProps) {
 					<div className="h-full overflow-y-auto pr-1">
 						<EntryList
 							data={
-								entryDataQuery.data?.filter(
-									(v) =>
+								entryDataQuery.data?.filter((v) => {
+									const isPositive = v?.type === "Income"
+
+									return (
 										v?.category === props.value.category &&
-										v?.is_positive == props.value.isPositive
-								) ?? []
+										isPositive == props.value.isPositive
+									)
+								}) ?? []
 							}
 							showButtons={false}
 							virtualizerType={EntryList.VirtualizerType.NORMAL_VIRTUALIZER}
@@ -455,7 +458,7 @@ export default function DashboardStatistics() {
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 	const entryData = useDashboardTransactionEntries(
-		settingsQuery.data?.current_ledger,
+		settingsQuery.data?.visibleLedger.id,
 		entryViewOptions
 	)
 

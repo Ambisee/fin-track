@@ -64,7 +64,7 @@ function SpendingByDateAreaChart() {
 	const settingsQuery = useSettingsQuery()
 	const formatAmount = useAmountFormatter()
 
-	const ledgerId = settingsQuery.data?.current_ledger
+	const ledgerId = settingsQuery.data?.visibleLedger.id
 	const entryDataQuery = useDashboardTransactionEntries(ledgerId, viewOptions)
 
 	const totalSpendingByDay = useMemo(() => {
@@ -178,7 +178,7 @@ function SpendingByCategoryPieChart() {
 	const [chartConfig] = useState({} satisfies ChartConfig)
 
 	const settingsQuery = useSettingsQuery()
-	const ledgerId = settingsQuery.data?.current_ledger
+	const ledgerId = settingsQuery.data?.visibleLedger.id
 
 	const formatAmount = useAmountFormatter()
 	const entryDataQuery = useDashboardTransactionEntries(ledgerId, viewOptions)

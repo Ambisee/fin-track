@@ -1,5 +1,5 @@
 import { useSearchEntry } from "@/lib/hooks"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { ComponentProps, useEffect } from "react"
 import { Input } from "../ui/input"
 

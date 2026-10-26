@@ -2,7 +2,7 @@
 
 import useGlobalStore from "@/lib/store"
 import { isNonNullable } from "@fintrack/utils"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { useQueryClient } from "@tanstack/react-query"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
 import {
@@ -90,15 +90,13 @@ function EmptyEntryList() {
 						onClick={() => {
 							setData(undefined)
 							setOnSubmitSuccess((data) => {
-								const monthStartEnd = DateHelper.getMonthStartEnd(
-									new Date(data.date)
-								)
+								const monthStartEnd = DateHelper.getMonthStartEnd(data.date)
 
-								invaldiateEntryQuery(data.ledger, monthStartEnd)
+								invaldiateEntryQuery(data.ledger.id, monthStartEnd)
 
 								queryClient.invalidateQueries({
 									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger,
+										data.ledger.id,
 										monthStartEnd
 									)
 								})
@@ -230,6 +228,7 @@ function WindowVirtualizedList(props: InnerListProps) {
 	const [scrollMargin, setScrollMargin] = useState(0)
 
 	useLayoutEffect(() => {
+		// Disable ESLint warning - It should be fine. This effect only runs after the first render
 		setScrollMargin(listRef.current?.offsetTop ?? 0)
 	}, [])
 

@@ -6,7 +6,7 @@ import {
 	TRANSITION_ROOT_CLASSNAME
 } from "@/lib/constants"
 import { NavigationEdges, TransitionClassNames } from "@/types/transition"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
 	Context,
 	createContext,

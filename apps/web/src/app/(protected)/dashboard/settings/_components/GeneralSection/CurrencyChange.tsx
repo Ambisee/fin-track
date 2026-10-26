@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import ComboBox from "@/components/ui/combobox"
 import {
 	Field,
@@ -7,23 +8,24 @@ import {
 	FieldLabel
 } from "@/components/ui/field"
 import InputSkeleton from "@/components/user/InputSkeleton"
-import { Controller, useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useCurrenciesQuery, useSettingsQuery } from "@/lib/queries"
-import { useUserQuery } from "@/lib/queries"
-import { toast } from "sonner"
-import { supabaseClient } from "@/lib/supabase"
-import { useCallback, useEffect, useState } from "react"
 import {
 	SHORT_TOAST_DURATION,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "@/lib/constants"
-import { useQueryClient } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
+import {
+	useCurrenciesQuery,
+	useSettingsQuery,
+	useUserQuery
+} from "@/lib/queries"
+import { supabaseClient } from "@/lib/supabase"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import SubSectionTitle from "../SubSectionTitle"
+import { useQueryClient } from "@tanstack/react-query"
+import { useCallback, useEffect, useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
 
 const formSchema = z.object({
 	currency: z.object({
@@ -46,8 +48,8 @@ export default function CurrencyChange() {
 	const formDefaultValues = useCallback(
 		() => ({
 			currency: {
-				id: userSettings?.ledger?.currency_id,
-				currency_name: userSettings?.ledger?.currency?.currency_name
+				id: userSettings?.visibleLedger?.currency.id,
+				currency_name: userSettings?.visibleLedger?.currency?.name
 			}
 		}),
 		[userSettings]
@@ -71,7 +73,7 @@ export default function CurrencyChange() {
 		const { data: result, error } = await supabase
 			.from("ledger")
 			.update({ currency_id: data.currency.id })
-			.eq("id", userSettings.current_ledger)
+			.eq("id", userSettings.visibleLedger.id)
 			.select()
 			.single()
 
@@ -128,7 +130,7 @@ export default function CurrencyChange() {
 									}}
 									values={
 										currencies?.map((val) => ({
-											label: val.currency_name,
+											label: val.name,
 											value: JSON.stringify(val)
 										})) ?? []
 									}

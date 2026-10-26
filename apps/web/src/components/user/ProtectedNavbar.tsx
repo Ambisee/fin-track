@@ -73,14 +73,14 @@ export default function ProtectedNavbar() {
 										setData(undefined)
 										setOnSubmitSuccess((data) => {
 											const monthStartEnd = DateHelper.getMonthStartEnd(
-												new Date(data.date)
+												data.date
 											)
 
-											invalidateUserQuery(data.ledger, monthStartEnd)
+											invalidateUserQuery(data.ledger.id, monthStartEnd)
 
 											queryClient.invalidateQueries({
 												queryKey: QueryHelper.getStatisticQueryKey(
-													data.ledger,
+													data.ledger.id,
 													monthStartEnd
 												)
 											})

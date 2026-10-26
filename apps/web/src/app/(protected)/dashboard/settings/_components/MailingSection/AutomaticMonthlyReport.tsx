@@ -3,20 +3,18 @@ import {
 	Field,
 	FieldDescription,
 	FieldError,
-	FieldGroup,
-	FieldLabel
+	FieldGroup
 } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
 import { SHORT_TOAST_DURATION } from "@/lib/constants"
-import { useSettingsQuery } from "@/lib/queries"
-import { useUserQuery } from "@/lib/queries"
+import { useSettingsQuery, useUserQuery } from "@/lib/queries"
 import { supabaseClient } from "@/lib/supabase"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 import SubSectionTitle from "../SubSectionTitle"
 
@@ -34,7 +32,7 @@ export default function AutomaticMonthlyReport() {
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),
 		values: {
-			allowReport: userSettingsQuery.data?.allow_report ?? false
+			allowReport: userSettingsQuery.data?.allowMonthlyReport ?? false
 		}
 	})
 
@@ -47,7 +45,7 @@ export default function AutomaticMonthlyReport() {
 					const { error } = await supabase
 						.from("settings")
 						.update({ allow_report: formData.allowReport })
-						.eq("user_id", userSettingsQuery.data?.user_id as string)
+						.eq("user_id", userSettingsQuery.data?.userId as string)
 
 					if (error !== null) {
 						toast.error(error.message, { duration: SHORT_TOAST_DURATION })

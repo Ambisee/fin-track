@@ -15,7 +15,8 @@ import {
 	FieldGroup,
 	FieldLabel
 } from "@/components/ui/field"
-import { Currency, Ledger } from "@/types/supabase"
+import { Currency } from "@/types/Currency"
+import { Ledger } from "@/types/Ledger"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
@@ -24,7 +25,7 @@ import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
-export type LedgerFormData = Pick<Ledger, "id" | "currency_id" | "name">
+export type LedgerFormData = Ledger
 
 export interface LedgerPageProps {
 	data?: Ledger
@@ -42,7 +43,7 @@ const formSchema = z.object({
 	name: z.string(),
 	currency: z.object({
 		id: z.number(),
-		currency_name: z.string()
+		name: z.string()
 	})
 })
 
@@ -56,8 +57,8 @@ export default function LedgerPage(props: LedgerPageProps) {
 		defaultValues: {
 			name: props.data?.name ?? "",
 			currency: {
-				id: props.data?.currency_id ?? NaN,
-				currency_name: props.data?.currency?.currency_name ?? ""
+				id: props.data?.id ?? NaN,
+				name: props.data?.currency?.name ?? ""
 			}
 		}
 	})
@@ -73,8 +74,8 @@ export default function LedgerPage(props: LedgerPageProps) {
 			form.reset({
 				name: props.data.name,
 				currency: {
-					id: props.data.currency_id,
-					currency_name: props.data.currency?.currency_name ?? ""
+					id: props.data.currency.id,
+					name: props.data.currency?.name ?? ""
 				}
 			})
 			return
@@ -85,7 +86,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 				name: "",
 				currency: {
 					id: -1,
-					currency_name: ""
+					name: ""
 				}
 			})
 			return
@@ -96,7 +97,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 			name: "",
 			currency: {
 				id: defaultCurrency?.id,
-				currency_name: defaultCurrency?.currency_name
+				name: defaultCurrency?.name
 			}
 		})
 
@@ -138,7 +139,10 @@ export default function LedgerPage(props: LedgerPageProps) {
 							const ledgerData: LedgerFormData = {
 								id: props.data?.id ?? -1,
 								name: formData.name,
-								currency_id: formData.currency.id
+								currency: {
+									id: formData.currency.id,
+									name: formData.currency.name
+								}
 							}
 
 							if (isUpdate) {
@@ -183,11 +187,11 @@ export default function LedgerPage(props: LedgerPageProps) {
 										<ComboBox
 											closeOnSelect
 											disabled={isFormLoading}
-											value={value.currency_name}
+											value={value.name}
 											onChange={(e) => onChange(JSON.parse(e))}
 											values={
 												props.currencyList.map((val) => ({
-													label: val.currency_name,
+													label: val.name,
 													value: JSON.stringify(val)
 												})) ?? []
 											}

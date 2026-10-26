@@ -1,5 +1,5 @@
 import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { isNonNullable } from "@fintrack/utils"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
@@ -26,15 +26,43 @@ function useSearchEntry() {
 			setIsSearching(true)
 			const { data, error } = await supabase.rpc("search_entry", {
 				query: DatabaseHelper.parseSearchQuery(searchQuery)
-			})
+			}).select(`
+                    id, 
+                    amount, 
+                    date, 
+                    is_positive, 
+                    note, 
+                    category,
+                    ledger (id, name, currency (id, name:currency_name))
+            `)
 
 			if (error != null || !isNonNullable(data)) {
 				setSearchResult(null)
 				return
 			}
 
-			setSearchResult(data)
 			setIsSearching(false)
+			setSearchResult(
+				data.map(
+					(v) =>
+						({
+							id: v.id,
+							amount: v.amount,
+							note: v.note,
+							type: v.is_positive ? "Income" : "Expense",
+							date: new Date(v.date),
+							category: v.category,
+							ledger: {
+								id: v.ledger.id,
+								name: v.ledger.name,
+								currency: {
+									id: v.ledger.currency.id,
+									name: v.ledger.currency.name
+								}
+							}
+						}) satisfies Entry
+				)
+			)
 		}, 350)
 
 		return () => {
@@ -77,7 +105,7 @@ function useAmountFormatter() {
 
 	const formatAmount = useCallback(
 		(num?: number) => {
-			const currency = userSettingsQuery.data?.ledger?.currency?.currency_name
+			const currency = userSettingsQuery.data?.visibleLedger?.currency.name
 			if (!isNonNullable(num) || !isNonNullable(currency)) {
 				return num
 			}
@@ -138,15 +166,15 @@ function useDashboardTransactionEntries(
 				typeChecker = () => true
 				break
 			case "Expense":
-				typeChecker = (value: Entry) => !value.is_positive
+				typeChecker = (value: Entry) => value.type === "Expense"
 				break
 			case "Income":
-				typeChecker = (value: Entry) => value.is_positive
+				typeChecker = (value: Entry) => value.type === "Income"
 				break
 		}
 
 		const entryRangeIndicies = findBoundIndicies(
-			queryResults.data.map((val) => new Date(val.date)),
+			queryResults.data.map((val) => val.date),
 			timeRange.from,
 			timeRange.to,
 			(a, b) => !a || !b || a < b || DateHelper.isDateEqual(a, b)

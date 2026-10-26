@@ -25,13 +25,13 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { Ledger } from "@/types/supabase"
+import { Ledger } from "@/types/Ledger"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronLeft, PencilIcon, PlusIcon, Trash2Icon, X } from "lucide-react"
 import { useState } from "react"
 
 export interface LedgersListPageProps {
-	currentLedger?: Omit<Ledger, "entry">
+	currentLedger?: Ledger
 	ledgersList: Ledger[]
 
 	isLoading?: boolean
@@ -153,8 +153,7 @@ export default function LedgersListPage(props: LedgersListPageProps) {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete ledger</AlertDialogTitle>
 						<AlertDialogDescription>
-							This action will also delete{" "}
-							<b>{ledgerToBeDelete?.entry[0].count}</b> transaction records
+							This action will also delete all of the transaction records
 							associated with the ledger. Are you sure that you want to delete
 							the ledger: <b>{ledgerToBeDelete?.name}</b>?
 						</AlertDialogDescription>

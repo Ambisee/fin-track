@@ -23,6 +23,11 @@ import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { getMonthSpansForDateRange } from "./utils"
 import { isNonNullable } from "@fintrack/utils"
+import { Entry } from "@/types/Entry"
+import { Category } from "@/types/Category"
+import { Ledger } from "@/types/Ledger"
+import { Settings } from "@/types/Settings"
+import { Currency } from "@/types/Currency"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -61,7 +66,7 @@ function useSettingsQuery() {
 
 			const { data, error } = await supabase
 				.from("settings")
-				.select(`*, ledger (*, currency (currency_name))`)
+				.select(`*, ledger (*, currency (id, name:currency_name))`)
 				.eq("user_id", user.id)
 				.limit(1)
 				.single()
@@ -70,7 +75,18 @@ function useSettingsQuery() {
 				throw new PostgrestError(error)
 			}
 
-			return data
+			return {
+				userId: data.user_id,
+				allowMonthlyReport: data.allow_report,
+				visibleLedger: {
+					id: data.ledger.id,
+					name: data.ledger.name,
+					currency: {
+						id: data.ledger.currency.id,
+						name: data.ledger.currency.name
+					}
+				}
+			} satisfies Settings
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: (query) =>
@@ -147,7 +163,16 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 
 				const { data, error } = await supabase
 					.from("entry")
-					.select(`*`)
+					.select(
+						`
+                        id, 
+                        amount, 
+                        date, 
+                        is_positive, 
+                        note, 
+                        category,
+                        ledger (id, name, currency (id, name:currency_name))`
+					)
 					.eq("created_by", user.id)
 					.eq("ledger", ledger!)
 					.gte("date", from.toDateString())
@@ -160,7 +185,27 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 					throw new PostgrestError(error)
 				}
 
-				return data ?? []
+				return (
+					data.map(
+						(v) =>
+							({
+								id: v.id,
+								amount: v.amount,
+								date: new Date(v.date),
+								type: v.is_positive ? "Income" : "Expense",
+								category: v.category,
+								note: v.note,
+								ledger: {
+									id: v.ledger.id,
+									name: v.ledger.name,
+									currency: {
+										id: v.ledger.currency.id,
+										name: v.ledger.currency.name
+									}
+								}
+							}) satisfies Entry
+					) ?? []
+				)
 			},
 			staleTime: QUERY_STALE_TIME,
 			refetchOnWindowFocus: (query) =>
@@ -180,12 +225,22 @@ function useCurrenciesQuery() {
 	return useQuery({
 		queryKey: CURRENCIES_QKEY,
 		queryFn: async () => {
-			const { data, error } = await supabase.from("currency").select("*")
+			const { data, error } = await supabase
+				.from("currency")
+				.select("id, name:currency_name")
 
 			if (error !== null) {
 				throw new PostgrestError(error)
 			}
-			return data ?? []
+			return (
+				data.map(
+					(v) =>
+						({
+							id: v.id,
+							name: v.name
+						}) satisfies Currency
+				) ?? []
+			)
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: (query) =>
@@ -217,7 +272,11 @@ function useCategoriesQuery() {
 				throw new PostgrestError(error)
 			}
 
-			return data ?? []
+			return (
+				data.map(
+					(v) => ({ id: v.created_by, name: v.name }) satisfies Category
+				) ?? []
+			)
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,
@@ -240,7 +299,7 @@ function useLedgersQuery() {
 
 			const { data, error } = await supabase
 				.from("ledger")
-				.select("*, currency (currency_name), entry(count)")
+				.select("*, currency (id, name:currency_name)")
 				.eq("created_by", user.id)
 				.order("name")
 
@@ -248,7 +307,19 @@ function useLedgersQuery() {
 				throw new PostgrestError(error)
 			}
 
-			return data ?? []
+			return (
+				data.map(
+					(v) =>
+						({
+							id: v.id,
+							name: v.name,
+							currency: {
+								id: v.currency.id,
+								name: v.currency.name
+							}
+						}) satisfies Ledger
+				) ?? []
+			)
 		},
 		staleTime: QUERY_STALE_TIME,
 		refetchOnWindowFocus: false,

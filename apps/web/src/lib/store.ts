@@ -1,4 +1,4 @@
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { isSetStateFunction } from "@fintrack/utils"
 import { Dispatch, SetStateAction } from "react"
 import { create, StateCreator } from "zustand"

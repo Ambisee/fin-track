@@ -1,4 +1,4 @@
-import { Entry } from "@/types/supabase"
+import { Entry } from "@/types/Entry"
 import { isNonNullable } from "@fintrack/utils"
 import { DateHelper } from "./DateHelper"
 
@@ -37,19 +37,20 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			const groupKey = `${entry.category}_${entry.is_positive}`
+			const isPositive = entry.type === "Income"
+			const groupKey = `${entry.category}_${entry.type}`
 
 			if (!(groupKey in groupMap)) {
 				groupMap[groupKey] = {
 					category: entry.category,
-					isPositive: entry.is_positive,
+					isPositive: isPositive,
 					totalAmount: 0,
 					percentage: 0
 				}
 			}
 
 			groupMap[groupKey].totalAmount += entry.amount
-			if (entry.is_positive) {
+			if (isPositive) {
 				result.totalIncome += entry.amount
 			} else {
 				result.totalExpense += entry.amount
@@ -76,11 +77,13 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			if (entry.is_positive) {
+			const isPositive = entry.type === "Income"
+
+			if (isPositive) {
 				continue
 			}
 
-			const entryDate = new Date(entry.date)
+			const entryDate = entry.date
 			let totalSpendingByDay = result.at(-1)
 
 			if (
@@ -102,7 +105,9 @@ class StatisticsHelper {
 
 		for (let i = 0; i < entryData.length; i++) {
 			const entry = entryData[i]
-			if (entry.is_positive) {
+			const isPositive = entry.type === "Income"
+
+			if (isPositive) {
 				continue
 			}
 
@@ -119,13 +124,14 @@ class StatisticsHelper {
 		for (const key in counter) {
 			result.push({ category: key, total: counter[key] })
 		}
+
 		return result
+	}
+
+	static formatPercentage(val: number): string {
+		return `${Number((val * 100).toFixed(0))}%`
 	}
 }
 
-export {
-	StatisticsHelper,
-	type StatisticGroup,
-	type Statistics,
-	type TotalByDay
-}
+export { StatisticsHelper }
+export type { Statistics, StatisticGroup, TotalByCategory, TotalByDay }

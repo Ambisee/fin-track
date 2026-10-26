@@ -13,24 +13,13 @@ import TimeFilterControlPanel, {
 } from "@/components/user/TimeFilterControlPanel"
 import { DateHelper } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
-import {
-	useCategoriesQuery,
-	useSettingsQuery,
-	useUserQuery
-} from "@/lib/queries"
-import { getCurrencySymbol, getDateRangeFromViewOptions } from "@/lib/utils"
-import { Entry } from "@/types/supabase"
+import { useCategoriesQuery, useSettingsQuery } from "@/lib/queries"
+import { Entry } from "@/types/Entry"
 import { isNonNullable } from "@fintrack/utils"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChevronLeft, ChevronRight, SearchIcon } from "lucide-react"
-import dynamic from "next/dynamic"
 import { ReactNode, useState } from "react"
 import { DashboardPageLayout } from "../_components/DashboardPageLayout"
-
-const TransactionReportViewer = dynamic(
-	() => import("@/components/user/TransactionReport/TransactionReportViewer"),
-	{ ssr: false }
-)
 
 function EntryContainer(props: {
 	isLoading?: boolean
@@ -61,21 +50,10 @@ export default function DashboardEntries() {
 	)
 	const [searchResult, setSearchResult] = useState<Entry[] | null>(null)
 
-	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
 	const categoriesQuery = useCategoriesQuery()
 
-	const today = new Date()
-	const userName = userQuery.data?.user_metadata["username"]
-	const ledgerName = settingsQuery.data?.ledger.name
-
-	const currencyName = settingsQuery.data?.ledger?.currency?.currency_name
-	const currency = isNonNullable(currencyName)
-		? `${currencyName} (${getCurrencySymbol(currencyName)})`
-		: "-"
-
-	const currentLedgerId = settingsQuery.data?.current_ledger
-	const dateRange = getDateRangeFromViewOptions(today, entryViewOptions)
+	const currentLedgerId = settingsQuery.data?.visibleLedger.id
 
 	const entryQuery = useDashboardTransactionEntries(
 		currentLedgerId,
