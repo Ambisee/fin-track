@@ -1,3 +1,9 @@
+import { Category } from "@/types/Category"
+import { Currency } from "@/types/Currency"
+import { Entry } from "@/types/Entry"
+import { Ledger } from "@/types/Ledger"
+import { Settings } from "@/types/Settings"
+import { isNonNullable } from "@fintrack/utils"
 import { PostgrestError } from "@supabase/supabase-js"
 import {
 	queryOptions,
@@ -11,10 +17,7 @@ import {
 	CURRENCIES_QKEY,
 	LEDGER_QKEY,
 	MONTH_GROUP_QKEY,
-	PING_QUERY_STALE_TIME,
 	QUERY_STALE_TIME,
-	SERVER_PING_QKEY,
-	SERVER_STATUS,
 	USER_QKEY,
 	USER_SETTINGS_QKEY
 } from "./constants"
@@ -22,12 +25,6 @@ import { DateRange } from "./helper/DateHelper"
 import { QueryHelper } from "./helper/QueryHelper"
 import { supabaseClient } from "./supabase"
 import { getMonthSpansForDateRange } from "./utils"
-import { isNonNullable } from "@fintrack/utils"
-import { Entry } from "@/types/Entry"
-import { Category } from "@/types/Category"
-import { Ledger } from "@/types/Ledger"
-import { Settings } from "@/types/Settings"
-import { Currency } from "@/types/Currency"
 
 function useUserQuery() {
 	const [supabase] = useState(supabaseClient())
@@ -94,49 +91,6 @@ function useSettingsQuery() {
 		refetchOnMount: (query) =>
 			query.state.data === undefined || query.state.isInvalidated,
 		enabled: !!userQuery.data && !userQuery.isRefetching
-	})
-}
-
-function useStatisticsQuery(
-	ledger: number | undefined = undefined,
-	dateRange: DateRange
-) {
-	const [supabase] = useState(supabaseClient())
-	const userQuery = useUserQuery()
-
-	return useQuery({
-		queryKey: QueryHelper.getStatisticQueryKey(ledger, dateRange),
-		queryFn: async ({ queryKey }) => {
-			const user = userQuery.data
-			if (!isNonNullable(user)) {
-				throw Error(QueryHelper.MESSAGE_NO_USER)
-			}
-
-			const ledger = queryKey[1]
-			const { from = new Date(), to = new Date() } = queryKey[2]
-
-			if (!isNonNullable(ledger)) {
-				throw Error(QueryHelper.MESSAGE_NO_LEDGER)
-			}
-
-			const { data, error } = await supabase.rpc("calculate_statistics", {
-				p_start_ts: from.toDateString(),
-				p_end_ts: to.toDateString(),
-				p_ledger_id: ledger
-			})
-
-			if (error !== null) {
-				throw new PostgrestError(error)
-			}
-
-			return data
-		},
-		staleTime: QUERY_STALE_TIME,
-		refetchOnWindowFocus: (query) =>
-			query.state.data === undefined || query.state.isInvalidated,
-		refetchOnMount: (query) =>
-			query.state.data === undefined || query.state.isInvalidated,
-		enabled: !!ledger && !!userQuery.data && !userQuery.isRefetching
 	})
 }
 
@@ -363,34 +317,6 @@ function useMonthGroupQuery(ledger_id?: number) {
 	})
 }
 
-function useServerPingQuery() {
-	const query = useQuery({
-		queryKey: SERVER_PING_QKEY,
-		queryFn: async () => {
-			const response = await fetch("/api/ping")
-			if (!response.ok) {
-				throw Error()
-			}
-
-			return SERVER_STATUS.ONLINE
-		},
-		retry: 3,
-		staleTime: PING_QUERY_STALE_TIME,
-		refetchOnMount: (query) => query.state.isInvalidated
-	})
-
-	let data: number
-	if (query.error !== null) {
-		data = SERVER_STATUS.OFFLINE
-	} else if (query.data === SERVER_STATUS.ONLINE) {
-		data = SERVER_STATUS.ONLINE
-	} else {
-		data = SERVER_STATUS.LOADING
-	}
-
-	return { ...query, data }
-}
-
 function useInvalidateUserQuery() {
 	const queryClient = useQueryClient()
 	return () => queryClient.invalidateQueries({ queryKey: USER_QKEY })
@@ -417,8 +343,6 @@ export {
 	useInvalidateUserQuery,
 	useLedgersQuery,
 	useMonthGroupQuery,
-	useServerPingQuery,
 	useSettingsQuery,
-	useStatisticsQuery,
 	useUserQuery
 }
