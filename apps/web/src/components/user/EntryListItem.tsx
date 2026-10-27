@@ -1,5 +1,6 @@
 "use client"
 
+import { AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import {
 	Card,
 	CardContent,
@@ -7,18 +8,22 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
-import { QueryHelper } from "@/lib/helper/QueryHelper"
+import { DialogTrigger } from "@/components/ui/dialog"
+import { DateHelper } from "@/lib/helper/DateHelper"
 import { useAmountFormatter } from "@/lib/hooks"
-import { useInvalidateEntryDataQuery, useSettingsQuery } from "@/lib/queries"
+import {
+	useInvalidateEntryDataQuery,
+	useInvalidateMonthGroupQuery,
+	useSettingsQuery
+} from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { supabaseClient } from "@/lib/supabase"
-import { isNonNullable } from "@fintrack/utils"
 import { Entry } from "@/types/Entry"
-import { AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { DialogTrigger } from "@/components/ui/dialog"
+import { isNonNullable } from "@fintrack/utils"
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
+import { toast } from "sonner"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -32,8 +37,6 @@ import {
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
-import { toast } from "sonner"
-import { DateHelper } from "@/lib/helper/DateHelper"
 
 interface EntryListItemProps {
 	data: Entry
@@ -69,8 +72,8 @@ export default function EntryListItem({
 }: EntryListItemProps) {
 	const [supabase] = useState(supabaseClient())
 
-	const queryClient = useQueryClient()
-	const invalidateEntryQuery = useInvalidateEntryDataQuery()
+	const invalidateEntryDataQuery = useInvalidateEntryDataQuery()
+	const invalidateMonthGroupQuery = useInvalidateMonthGroupQuery()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
@@ -144,18 +147,10 @@ export default function EntryListItem({
 									onClick={() => {
 										setData(props.data)
 										setOnSubmitSuccess((data, oldData) => {
-											const dataMonth = DateHelper.getMonthStartEnd(
-												data.date
-											)
+											const dataMonth = DateHelper.getMonthStartEnd(data.date)
 
-											invalidateEntryQuery(data.ledger.id, dataMonth)
-
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getStatisticQueryKey(
-													data.ledger.id,
-													dataMonth
-												)
-											})
+											invalidateMonthGroupQuery(data.ledger.id)
+											invalidateEntryDataQuery(data.ledger.id, dataMonth)
 
 											// Update the query data corresponding to the data's old ledger and date
 											const oldDataExists = isNonNullable(oldData)
@@ -172,14 +167,8 @@ export default function EntryListItem({
 												oldData.date
 											)
 
-											invalidateEntryQuery(oldData.ledger.id, oldDataMonth)
-
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getStatisticQueryKey(
-													oldData.ledger.id,
-													oldDataMonth
-												)
-											})
+											invalidateMonthGroupQuery(oldData.ledger.id)
+											invalidateEntryDataQuery(oldData.ledger.id, oldDataMonth)
 
 											setOpen(false)
 										})
@@ -234,17 +223,11 @@ export default function EntryListItem({
 															props.data.date
 														)
 
-														invalidateEntryQuery(
+														invalidateMonthGroupQuery(props.data.ledger.id)
+														invalidateEntryDataQuery(
 															props.data.ledger.id,
 															monthStartEnd
 														)
-
-														queryClient.invalidateQueries({
-															queryKey: QueryHelper.getStatisticQueryKey(
-																props.data.ledger.id,
-																monthStartEnd
-															)
-														})
 													}
 												})
 											}

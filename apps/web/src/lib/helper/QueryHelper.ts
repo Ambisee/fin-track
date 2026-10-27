@@ -1,5 +1,5 @@
 import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
-import { ENTRY_QKEY, STATISTICS_QKEY } from "../constants"
+import { ENTRY_QKEY, MONTH_GROUP_QKEY } from "../constants"
 import { getMonthSpansForDateRange } from "../utils"
 import { DateRange } from "./DateHelper"
 
@@ -35,11 +35,8 @@ class QueryHelper {
 		return [...ENTRY_QKEY, ledger, filters] as const
 	}
 
-	static getStatisticQueryKey(
-		ledger: number | undefined,
-		dateRange: DateRange
-	) {
-		return [...STATISTICS_QKEY, ledger, dateRange] as const
+	static getMonthGroupQueryKey(ledger: number | undefined) {
+		return [MONTH_GROUP_QKEY, ledger] as const
 	}
 }
 

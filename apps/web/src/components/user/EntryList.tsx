@@ -1,9 +1,13 @@
 "use client"
 
+import { DateHelper } from "@/lib/helper/DateHelper"
+import {
+	useInvalidateEntryDataQuery,
+	useInvalidateMonthGroupQuery
+} from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
-import { isNonNullable } from "@fintrack/utils"
 import { Entry } from "@/types/Entry"
-import { useQueryClient } from "@tanstack/react-query"
+import { isNonNullable } from "@fintrack/utils"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
 import {
 	useCallback,
@@ -14,9 +18,6 @@ import {
 } from "react"
 import { Button } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
-import EntryListItem from "./EntryListItem"
-import { QueryHelper } from "@/lib/helper/QueryHelper"
-import { DateHelper } from "@/lib/helper/DateHelper"
 import {
 	Empty,
 	EmptyContent,
@@ -25,7 +26,7 @@ import {
 	EmptyTitle
 } from "../ui/empty"
 import ConditionalWrapper from "./ConditionalWrapper"
-import { useInvalidateEntryDataQuery } from "@/lib/queries"
+import EntryListItem from "./EntryListItem"
 
 enum EntryListVirtualizerType {
 	NONE,
@@ -69,8 +70,8 @@ interface InnerListProps extends EntryListProps {
 }
 
 function EmptyEntryList() {
-	const queryClient = useQueryClient()
-	const invaldiateEntryQuery = useInvalidateEntryDataQuery()
+	const invalidateEntryDataQuery = useInvalidateEntryDataQuery()
+	const invalidateMonthGroupQuery = useInvalidateMonthGroupQuery()
 
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
@@ -92,14 +93,8 @@ function EmptyEntryList() {
 							setOnSubmitSuccess((data) => {
 								const monthStartEnd = DateHelper.getMonthStartEnd(data.date)
 
-								invaldiateEntryQuery(data.ledger.id, monthStartEnd)
-
-								queryClient.invalidateQueries({
-									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger.id,
-										monthStartEnd
-									)
-								})
+								invalidateMonthGroupQuery(data.ledger.id)
+								invalidateEntryDataQuery(data.ledger.id, monthStartEnd)
 							})
 						}}
 					>

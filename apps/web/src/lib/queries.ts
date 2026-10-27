@@ -335,12 +335,22 @@ function useInvalidateEntryDataQuery() {
 	}
 }
 
+function useInvalidateMonthGroupQuery() {
+	const queryClient = useQueryClient()
+	return (ledger: number) => {
+		return queryClient.invalidateQueries({
+			queryKey: QueryHelper.getMonthGroupQueryKey(ledger)
+		})
+	}
+}
+
 export {
 	useCategoriesQuery,
 	useCurrenciesQuery,
 	useEntryDataQuery,
 	useInvalidateEntryDataQuery,
 	useInvalidateUserQuery,
+	useInvalidateMonthGroupQuery,
 	useLedgersQuery,
 	useMonthGroupQuery,
 	useSettingsQuery,

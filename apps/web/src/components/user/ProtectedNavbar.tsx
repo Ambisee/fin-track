@@ -1,18 +1,19 @@
 "use client"
 
+import { DateHelper } from "@/lib/helper/DateHelper"
+import {
+	useInvalidateEntryDataQuery,
+	useInvalidateMonthGroupQuery
+} from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { GearIcon, TableIcon } from "@radix-ui/react-icons"
-import { useQueryClient } from "@tanstack/react-query"
 import { BarChart3Icon, HouseIcon, PlusIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { ReactNode } from "react"
 import { Button, buttonVariants } from "../ui/button"
 import { DialogTrigger } from "../ui/dialog"
-import { QueryHelper } from "@/lib/helper/QueryHelper"
-import { ReactNode } from "react"
-import { DateHelper } from "@/lib/helper/DateHelper"
-import { useInvalidateEntryDataQuery } from "@/lib/queries"
 
 function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 	const pathname = usePathname()
@@ -40,8 +41,8 @@ function NavLink(props: { href: string; icon?: ReactNode; label: string }) {
 }
 
 export default function ProtectedNavbar() {
-	const queryClient = useQueryClient()
-	const invalidateUserQuery = useInvalidateEntryDataQuery()
+	const invalidateEntryDataQuery = useInvalidateEntryDataQuery()
+	const invalidateMonthGroupQuery = useInvalidateMonthGroupQuery()
 
 	const setOpen = useGlobalStore((state) => state.setOpen)
 	const setData = useGlobalStore((state) => state.setData)
@@ -76,14 +77,8 @@ export default function ProtectedNavbar() {
 												data.date
 											)
 
-											invalidateUserQuery(data.ledger.id, monthStartEnd)
-
-											queryClient.invalidateQueries({
-												queryKey: QueryHelper.getStatisticQueryKey(
-													data.ledger.id,
-													monthStartEnd
-												)
-											})
+											invalidateMonthGroupQuery(data.ledger.id)
+											invalidateEntryDataQuery(data.ledger.id, monthStartEnd)
 										})
 										setOpen(true)
 									}}

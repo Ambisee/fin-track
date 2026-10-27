@@ -35,7 +35,6 @@ import TimeFilterControlPanel, {
 } from "@/components/user/TimeFilterControlPanel"
 import { DESKTOP_BREAKPOINT, MONTHS } from "@/lib/constants"
 import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
-import { QueryHelper } from "@/lib/helper/QueryHelper"
 import {
 	StatisticGroup,
 	Statistics,
@@ -49,12 +48,12 @@ import {
 import {
 	useCategoriesQuery,
 	useInvalidateEntryDataQuery,
+	useInvalidateMonthGroupQuery,
 	useSettingsQuery
 } from "@/lib/queries"
 import useGlobalStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { isNonNullable } from "@fintrack/utils"
-import { useQueryClient } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { createContext, useContext, useState } from "react"
 import { useMediaQuery } from "react-responsive"
@@ -121,10 +120,10 @@ function ChartDisplay(props: ChartDisplayProps) {
 	const setData = useGlobalStore((state) => state.setData)
 	const setOnSubmitSuccess = useGlobalStore((state) => state.setOnSubmitSuccess)
 
-	const queryClient = useQueryClient()
 	const settingsQuery = useSettingsQuery()
 
-	const invalidateEntryQuery = useInvalidateEntryDataQuery()
+	const invalidateEntryDataQuery = useInvalidateEntryDataQuery()
+	const invalidateMonthGroupQuery = useInvalidateMonthGroupQuery()
 
 	const formatAmount = useAmountFormatter()
 	const percentageKey = "percentage" as keyof StatisticGroup
@@ -152,14 +151,8 @@ function ChartDisplay(props: ChartDisplayProps) {
 									new Date(data.date)
 								)
 
-								invalidateEntryQuery(data.ledger.id, monthStartEnd)
-
-								queryClient.invalidateQueries({
-									queryKey: QueryHelper.getStatisticQueryKey(
-										data.ledger.id,
-										monthStartEnd
-									)
-								})
+								invalidateMonthGroupQuery(data.ledger.id)
+								invalidateEntryDataQuery(data.ledger.id, monthStartEnd)
 							})
 						}}
 					>

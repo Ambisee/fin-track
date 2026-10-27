@@ -2,13 +2,11 @@
 export const USER_QKEY = ["user"] as const
 export const LEDGER_QKEY = ["ledger"] as const
 export const ENTRY_QKEY = ["entryData"] as const
-export const STATISTICS_QKEY = ["statistic"] as const
 export const USER_SETTINGS_QKEY = ["settings"] as const
 export const CATEGORIES_QKEY = ["categories"] as const
 export const CURRENCIES_QKEY = ["currencies"] as const
 export const MONTH_GROUP_QKEY = ["monthGroup"] as const
 export const DOCUMENT_QKEY = ["document"] as const
-export const SERVER_PING_QKEY = ["serverPing"] as const
 
 export const QUERY_STALE_TIME = 15 * 60 * 1000
 export const PING_QUERY_STALE_TIME = 15 * 60 * 1000
