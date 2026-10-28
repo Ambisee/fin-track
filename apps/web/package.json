@@ -7,7 +7,6 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint .",
-		"gen-type": "pnpx supabase gen types typescript --project-id gjniozckblfslplhhzkc --schema public > src/types/supabase-auto.ts",
 		"test": "jest"
 	},
 	"dependencies": {

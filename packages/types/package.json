@@ -9,6 +9,7 @@
 		"./supabase-auto": "./src/supabase-auto.ts"
 	},
 	"scripts": {
+		"gen-type": "pnpx supabase gen types typescript --project-id gjniozckblfslplhhzkc --schema public > src/supabase-auto.ts",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
