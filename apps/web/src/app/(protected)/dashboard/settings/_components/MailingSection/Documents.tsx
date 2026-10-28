@@ -10,14 +10,14 @@ import {
 	useUserQuery
 } from "@/lib/queries"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { ArrowUpRightIcon, FileTextIcon, TriangleAlert } from "lucide-react"
+import { ArrowUpRightIcon, FileTextIcon, TriangleAlertIcon } from "lucide-react"
 import { useState } from "react"
 
 import TransactionReportViewer from "@/components/user/TransactionReport/TransactionReportViewer"
 import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
-import { isNonNullable } from "@fintrack/utils"
 import { TransactionReportDocument } from "@fintrack/transaction-report"
+import { isNonNullable } from "@fintrack/utils"
 import SubSectionTitle from "../SubSectionTitle"
 
 function MonthGroupList(props: {
@@ -29,7 +29,7 @@ function MonthGroupList(props: {
 	if (!isNonNullable(monthGroups)) {
 		return (
 			<div className="h-full w-full flex flex-col gap-4 items-center justify-center">
-				<TriangleAlert className="stroke-destructive" />
+				<TriangleAlertIcon className="stroke-destructive" />
 				<p className="text-destructive">Error retrieving available periods.</p>
 			</div>
 		)
