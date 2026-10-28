@@ -19,10 +19,11 @@ import {
 	useUserQuery
 } from "@/lib/queries"
 import { supabaseClient } from "@/lib/supabase"
+import { isNonNullable } from "@fintrack/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -30,9 +31,11 @@ import { z } from "zod"
 const formSchema = z.object({
 	currency: z.object({
 		id: z.number(),
-		currency_name: z.string()
+		name: z.string()
 	})
 })
+
+type CurrencyFormSchema = z.infer<typeof formSchema>
 
 export default function CurrencyChange() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
@@ -45,19 +48,15 @@ export default function CurrencyChange() {
 
 	const currencies = currenciesQuery.data
 	const userSettings = settingsQuery.data
-	const formDefaultValues = useCallback(
-		() => ({
-			currency: {
-				id: userSettings?.visibleLedger?.currency.id,
-				currency_name: userSettings?.visibleLedger?.currency?.name
-			}
-		}),
-		[userSettings]
-	)
 
-	const form = useForm<z.infer<typeof formSchema>>({
+	const form = useForm<CurrencyFormSchema>({
 		resolver: zodResolver(formSchema),
-		defaultValues: formDefaultValues()
+		defaultValues: {
+			currency: {
+				id: -1,
+				name: ""
+			}
+		}
 	})
 
 	const onFormSubmit: Parameters<typeof form.handleSubmit>["0"] = async (
@@ -92,15 +91,29 @@ export default function CurrencyChange() {
 		toast.info(
 			<>
 				The currency for the ledger <b>{result.name}</b> has been switched to{" "}
-				<b>{data.currency.currency_name}</b>
+				<b>{data.currency.name}</b>
 			</>,
 			{ duration: SHORT_TOAST_DURATION }
 		)
 	}
 
+	const settingsLedgerCurrency = settingsQuery.data?.visibleLedger?.currency
 	useEffect(() => {
-		form.reset(formDefaultValues())
-	}, [form, formDefaultValues])
+		const defaultValues: CurrencyFormSchema = {
+			currency: {
+				id: -1,
+				name: ""
+			}
+		}
+
+		if (!isNonNullable(settingsLedgerCurrency)) {
+			form.reset(defaultValues)
+			return
+		}
+
+		defaultValues.currency = settingsLedgerCurrency
+		form.reset(defaultValues)
+	}, [form, settingsLedgerCurrency])
 
 	return (
 		<form
@@ -119,12 +132,12 @@ export default function CurrencyChange() {
 							<FieldDescription>
 								Change the currency for the current ledger.
 							</FieldDescription>
-							{!field.value.id ? (
+							{field.value.id === -1 ? (
 								<InputSkeleton />
 							) : (
 								<ComboBox
 									closeOnSelect
-									value={field.value.currency_name}
+									value={field.value.name}
 									onChange={(e) => {
 										form.setValue(field.name, JSON.parse(e))
 									}}
