@@ -33,7 +33,7 @@ function useSearchEntry() {
                     is_positive, 
                     note, 
                     category,
-                    ledger (id, name, currency (id, name:currency_name))
+                    ledger (*, currency (id, name:currency_name))
             `)
 
 			if (error != null || !isNonNullable(data)) {
@@ -55,6 +55,7 @@ function useSearchEntry() {
 							ledger: {
 								id: v.ledger.id,
 								name: v.ledger.name,
+								isInMonthEndRecap: v.ledger.is_in_month_end_recap,
 								currency: {
 									id: v.ledger.currency.id,
 									name: v.ledger.currency.name

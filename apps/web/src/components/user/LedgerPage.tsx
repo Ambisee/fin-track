@@ -139,6 +139,7 @@ export default function LedgerPage(props: LedgerPageProps) {
 							const ledgerData: LedgerFormData = {
 								id: props.data?.id ?? -1,
 								name: formData.name,
+								isInMonthEndRecap: props.data?.isInMonthEndRecap ?? false,
 								currency: {
 									id: formData.currency.id,
 									name: formData.currency.name
