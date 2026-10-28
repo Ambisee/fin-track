@@ -74,6 +74,7 @@ function useInsertEntryMutation() {
 				ledger: {
 					id: data.ledger.id,
 					name: data.ledger.name,
+					isInMonthEndRecap: data.ledger.is_in_month_end_recap ?? false,
 					currency: {
 						id: data.ledger.currency.id,
 						name: data.ledger.currency.name
@@ -133,6 +134,7 @@ function useDeleteEntryMutation() {
 				ledger: {
 					id: data.ledger.id,
 					name: data.ledger.name,
+					isInMonthEndRecap: data.ledger.is_in_month_end_recap ?? false,
 					currency: {
 						id: data.ledger.currency.id,
 						name: data.ledger.currency.name
@@ -198,6 +200,7 @@ function useUpdateEntryMutation() {
 				ledger: {
 					id: data.ledger.id,
 					name: data.ledger.name,
+					isInMonthEndRecap: data.ledger.is_in_month_end_recap ?? false,
 					currency: {
 						id: data.ledger.currency.id,
 						name: data.ledger.currency.name
@@ -229,7 +232,8 @@ function useInsertLedgerMutation() {
 				.insert({
 					created_by: user.id,
 					name: ledger.name,
-					currency_id: ledger.currency.id
+					currency_id: ledger.currency.id,
+					is_in_month_end_recap: ledger.isInMonthEndRecap
 				})
 				.select("*, currency (id, name:currency_name)")
 				.single()
@@ -241,6 +245,7 @@ function useInsertLedgerMutation() {
 			return {
 				id: data.id,
 				name: data.name,
+				isInMonthEndRecap: data.is_in_month_end_recap ?? false,
 				currency: {
 					id: data.currency.id,
 					name: data.currency.name
@@ -268,7 +273,11 @@ function useUpdateLedgerMutation() {
 
 			const { data, error } = await supabase
 				.from("ledger")
-				.update({ name: ledger.name, currency_id: ledger.currency.id })
+				.update({
+					name: ledger.name,
+					currency_id: ledger.currency.id,
+					is_in_month_end_recap: ledger.isInMonthEndRecap
+				})
 				.eq("id", ledger.id)
 				.eq("created_by", user.id)
 				.select("*, currency (id, name:currency_name)")
@@ -281,6 +290,7 @@ function useUpdateLedgerMutation() {
 			return {
 				id: data.id,
 				name: data.name,
+				isInMonthEndRecap: data.is_in_month_end_recap ?? false,
 				currency: {
 					id: data.currency.id,
 					name: data.currency.name
@@ -320,6 +330,7 @@ function useDeleteLedgerMutation() {
 			return {
 				id: data.id,
 				name: data.name,
+				isInMonthEndRecap: data.is_in_month_end_recap ?? false,
 				currency: {
 					id: data.currency.id,
 					name: data.currency.name
@@ -345,7 +356,7 @@ function useSwitchLedgerMutation() {
 				.from("settings")
 				.update({ current_ledger: ledger.id })
 				.eq("user_id", user.id)
-				.select("*, ledger (id, name, currency (id, name:currency_name))")
+				.select("*, ledger (*, currency (id, name:currency_name))")
 				.single()
 
 			if (error !== null) {
@@ -358,6 +369,7 @@ function useSwitchLedgerMutation() {
 				visibleLedger: {
 					id: data.ledger.id,
 					name: data.ledger.name,
+					isInMonthEndRecap: data.ledger.is_in_month_end_recap ?? false,
 					currency: {
 						id: data.ledger.currency.id,
 						name: data.ledger.currency.name

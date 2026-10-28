@@ -127,18 +127,21 @@ export type Database = {
           created_by: string
           currency_id: number
           id: number
+          is_in_month_end_recap: boolean
           name: string
         }
         Insert: {
           created_by: string
           currency_id: number
           id?: number
+          is_in_month_end_recap?: boolean
           name?: string
         }
         Update: {
           created_by?: string
           currency_id?: number
           id?: number
+          is_in_month_end_recap?: boolean
           name?: string
         }
         Relationships: [
@@ -292,6 +295,15 @@ export type Database = {
       create_default_categories: { Args: { new: unknown }; Returns: undefined }
       create_initial_ledger: { Args: { new: unknown }; Returns: undefined }
       create_settings: { Args: { new: unknown }; Returns: undefined }
+      get_allow_monthly_report_users_and_ledgers: {
+        Args: never
+        Returns: {
+          email: string
+          ledgers: Json
+          user_id: string
+          user_name: string
+        }[]
+      }
       search_entry: {
         Args: { query: string }
         Returns: {

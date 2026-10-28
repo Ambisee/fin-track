@@ -78,6 +78,7 @@ function useSettingsQuery() {
 				visibleLedger: {
 					id: data.ledger.id,
 					name: data.ledger.name,
+					isInMonthEndRecap: data.ledger.is_in_month_end_recap ?? false,
 					currency: {
 						id: data.ledger.currency.id,
 						name: data.ledger.currency.name
@@ -125,7 +126,7 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
                         is_positive, 
                         note, 
                         category,
-                        ledger (id, name, currency (id, name:currency_name))`
+                        ledger (*, currency (id, name:currency_name))`
 					)
 					.eq("created_by", user.id)
 					.eq("ledger", ledger!)
@@ -152,6 +153,7 @@ function useEntryDataQuery(ledger: number | undefined, dateRange: DateRange) {
 								ledger: {
 									id: v.ledger.id,
 									name: v.ledger.name,
+									isInMonthEndRecap: v.ledger.is_in_month_end_recap,
 									currency: {
 										id: v.ledger.currency.id,
 										name: v.ledger.currency.name
@@ -267,6 +269,7 @@ function useLedgersQuery() {
 						({
 							id: v.id,
 							name: v.name,
+							isInMonthEndRecap: v.is_in_month_end_recap ?? false,
 							currency: {
 								id: v.currency.id,
 								name: v.currency.name

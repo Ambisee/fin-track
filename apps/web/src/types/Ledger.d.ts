@@ -4,4 +4,5 @@ export interface Ledger {
 	id: number
 	name: string
 	currency: Currency
+	isInMonthEndRecap: boolean
 }
