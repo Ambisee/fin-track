@@ -61,6 +61,7 @@ function LedgerRecapList(props: {
 						</span>
 					</div>
 					<Checkbox
+						className="size-6"
 						checked={includedLedgerIds.has(ledger.id)}
 						onCheckedChange={(checked) => {
 							setIncludedLedgerIds((prev) => {
