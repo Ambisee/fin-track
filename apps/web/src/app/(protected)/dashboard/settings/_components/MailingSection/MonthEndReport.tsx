@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
-import { LEDGER_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
+import {
+	LEDGER_QKEY,
+	SHORT_TOAST_DURATION,
+	USER_SETTINGS_QKEY
+} from "@/lib/constants"
 import { useUpdateLedgerMutation } from "@/lib/mutations"
 import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/queries"
 import { supabaseClient } from "@/lib/supabase"
@@ -28,8 +32,10 @@ import { z } from "zod"
 import SubSectionTitle from "../SubSectionTitle"
 
 const mailingSectionFormSchema = z.object({
-	allowReport: z.boolean()
+	allowMonthEndReport: z.boolean()
 })
+
+type MailingFormSchema = z.infer<typeof mailingSectionFormSchema>
 
 function LedgerRecapList(props: {
 	ledgers: Ledger[] | undefined
@@ -93,6 +99,13 @@ export default function MonthEndReport() {
 	const queryClient = useQueryClient()
 	const updateLedgerMutation = useUpdateLedgerMutation()
 
+	const form = useForm<MailingFormSchema>({
+		resolver: zodResolver(mailingSectionFormSchema),
+		defaultValues: {
+			allowMonthEndReport: settingsQuery.data?.allowMonthEndReport ?? false
+		}
+	})
+
 	const [includedLedgerIds, setIncludedLedgerIds] = useState(new Set<number>())
 
 	const onFormSubmit = async (
@@ -100,7 +113,7 @@ export default function MonthEndReport() {
 	) => {
 		setIsPendingSubmit(true)
 		try {
-			if (formData.allowReport && (includedLedgerIds?.size ?? 0) < 1) {
+			if (formData.allowMonthEndReport && (includedLedgerIds?.size ?? 0) < 1) {
 				throw Error(
 					"At least one ledger should be included in the month-end recap."
 				)
@@ -108,7 +121,7 @@ export default function MonthEndReport() {
 
 			const { error } = await supabase
 				.from("settings")
-				.update({ allow_report: formData.allowReport })
+				.update({ allow_report: formData.allowMonthEndReport })
 				.eq("user_id", settingsQuery.data?.userId as string)
 
 			if (error !== null) {
@@ -131,6 +144,7 @@ export default function MonthEndReport() {
 			)
 
 			await queryClient.invalidateQueries({ queryKey: LEDGER_QKEY })
+			await queryClient.invalidateQueries({ queryKey: USER_SETTINGS_QKEY })
 			toast.info("New settings data saved.", { duration: SHORT_TOAST_DURATION })
 		} catch (e) {
 			toast.error((e as Error).message, { duration: SHORT_TOAST_DURATION })
@@ -138,13 +152,6 @@ export default function MonthEndReport() {
 			setIsPendingSubmit(false)
 		}
 	}
-
-	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
-		resolver: zodResolver(mailingSectionFormSchema),
-		values: {
-			allowReport: settingsQuery.data?.allowMonthEndReport ?? false
-		}
-	})
 
 	useEffect(() => {
 		if (ledgersQuery.isLoading) return
@@ -159,6 +166,19 @@ export default function MonthEndReport() {
 		setIncludedLedgerIds(new Set(optedIds))
 	}, [ledgersQuery.data, ledgersQuery.isLoading])
 
+	const settingsData = settingsQuery.data
+	useEffect(() => {
+		const defaultValues: MailingFormSchema = { allowMonthEndReport: false }
+
+		if (!isNonNullable(settingsData)) {
+			form.reset(defaultValues)
+			return
+		}
+
+		defaultValues.allowMonthEndReport = settingsData.allowMonthEndReport
+		form.reset(defaultValues)
+	}, [form, settingsData])
+
 	return (
 		<form
 			onSubmit={(e) => {
@@ -169,7 +189,7 @@ export default function MonthEndReport() {
 			<FieldGroup>
 				<Controller
 					control={form.control}
-					name="allowReport"
+					name="allowMonthEndReport"
 					render={({ field, fieldState }) => (
 						<Field
 							className="flex gap-4 items-center space-y-0"
