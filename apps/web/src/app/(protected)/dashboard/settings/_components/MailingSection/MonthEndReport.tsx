@@ -14,13 +14,14 @@ import { LEDGER_QKEY, SHORT_TOAST_DURATION } from "@/lib/constants"
 import { useUpdateLedgerMutation } from "@/lib/mutations"
 import { useLedgersQuery, useSettingsQuery, useUserQuery } from "@/lib/queries"
 import { supabaseClient } from "@/lib/supabase"
+import { cn } from "@/lib/utils"
 import { Ledger } from "@/types/Ledger"
 import { isNonNullable } from "@fintrack/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQueryClient } from "@tanstack/react-query"
 import { TriangleAlertIcon } from "lucide-react"
-import { useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -33,7 +34,7 @@ const mailingSectionFormSchema = z.object({
 function LedgerRecapList(props: {
 	ledgers: Ledger[] | undefined
 	includedLedgerIds: Set<number>
-	setIncludedLedgerIds: React.Dispatch<React.SetStateAction<Set<number>>>
+	setIncludedLedgerIds: Dispatch<SetStateAction<Set<number>>>
 	isDisabled: boolean
 }) {
 	const { ledgers, includedLedgerIds, setIncludedLedgerIds, isDisabled } = props
@@ -82,31 +83,24 @@ function LedgerRecapList(props: {
 	)
 }
 
-export default function AutomaticMonthlyReport() {
+export default function MonthEndReport() {
 	const [isPendingSubmit, setIsPendingSubmit] = useState(false)
 	const [supabase] = useState(supabaseClient())
 
 	const userQuery = useUserQuery()
-	const userSettingsQuery = useSettingsQuery()
+	const settingsQuery = useSettingsQuery()
 	const ledgersQuery = useLedgersQuery()
 	const queryClient = useQueryClient()
 	const updateLedgerMutation = useUpdateLedgerMutation()
 
-	const [includedLedgerIds, setIncludedLedgerIds] = useState<Set<number>>(
-		() =>
-			new Set(
-				(ledgersQuery.data ?? [])
-					.filter((ledger) => ledger.isInMonthEndRecap)
-					.map((ledger) => ledger.id)
-			)
-	)
+	const [includedLedgerIds, setIncludedLedgerIds] = useState(new Set<number>())
 
 	const onFormSubmit = async (
 		formData: z.infer<typeof mailingSectionFormSchema>
 	) => {
 		setIsPendingSubmit(true)
 		try {
-			if (formData.allowReport && includedLedgerIds.size < 1) {
+			if (formData.allowReport && (includedLedgerIds?.size ?? 0) < 1) {
 				throw Error(
 					"At least one ledger should be included in the month-end recap."
 				)
@@ -115,7 +109,7 @@ export default function AutomaticMonthlyReport() {
 			const { error } = await supabase
 				.from("settings")
 				.update({ allow_report: formData.allowReport })
-				.eq("user_id", userSettingsQuery.data?.userId as string)
+				.eq("user_id", settingsQuery.data?.userId as string)
 
 			if (error !== null) {
 				throw Error(error.message)
@@ -123,14 +117,15 @@ export default function AutomaticMonthlyReport() {
 
 			const changedLedgers = (ledgersQuery.data ?? []).filter(
 				(ledger) =>
-					includedLedgerIds.has(ledger.id) !== ledger.isInMonthEndRecap
+					includedLedgerIds?.has(ledger.id) !== ledger.isInMonthEndRecap
 			)
 
 			await Promise.all(
 				changedLedgers.map((ledger) =>
 					updateLedgerMutation.mutateAsync({
 						...ledger,
-						isInMonthEndRecap: includedLedgerIds.has(ledger.id)
+						isInMonthEndRecap:
+							includedLedgerIds?.has(ledger.id) ?? ledger.isInMonthEndRecap
 					})
 				)
 			)
@@ -147,9 +142,22 @@ export default function AutomaticMonthlyReport() {
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),
 		values: {
-			allowReport: userSettingsQuery.data?.allowMonthlyReport ?? false
+			allowReport: settingsQuery.data?.allowMonthlyReport ?? false
 		}
 	})
+
+	useEffect(() => {
+		if (ledgersQuery.isLoading) return
+
+		const optedIds = ledgersQuery.data
+			?.filter((v) => v.isInMonthEndRecap)
+			?.map((v) => v.id)
+
+		if (optedIds === undefined) return
+
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setIncludedLedgerIds(new Set(optedIds))
+	}, [ledgersQuery.data, ledgersQuery.isLoading])
 
 	return (
 		<form
@@ -168,14 +176,14 @@ export default function AutomaticMonthlyReport() {
 							data-invalid={fieldState.invalid}
 						>
 							<div>
-								<SubSectionTitle>Automatic Monthly Report</SubSectionTitle>
+								<SubSectionTitle>Month-End Report</SubSectionTitle>
 								<FieldDescription>
-									Allow the app to send automatic transaction reports every
-									month.
+									Receive a curated recap of your income and expenses in your
+									inbox at the end of each month.
 								</FieldDescription>
 							</div>
 							<div className="w-11">
-								{userQuery.isLoading || userSettingsQuery.isLoading ? (
+								{userQuery.isLoading || settingsQuery.isLoading ? (
 									<Skeleton className="h-6 w-11 rounded-full" />
 								) : (
 									<Switch
@@ -187,26 +195,36 @@ export default function AutomaticMonthlyReport() {
 								)}
 							</div>
 							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-							<div>
-								<p className="text-sm text-muted-foreground mb-2">
-									Select which ledgers should appear in the month-end recap
-									report.
-								</p>
-								<div className="relative h-96 rounded-md border overflow-y-auto">
-									{ledgersQuery.isLoading ? (
-										<ReloadIcon className="absolute top-1/2 left-1/2 translate-[-50%] mr-2 h-4 w-4 animate-spin" />
-									) : ledgersQuery.data?.length === 0 ? (
-										<p className="text-sm text-muted-foreground flex h-full items-center justify-center p-4">
-											No ledgers available.
-										</p>
-									) : (
-										<LedgerRecapList
-											ledgers={ledgersQuery.data}
-											includedLedgerIds={includedLedgerIds}
-											setIncludedLedgerIds={setIncludedLedgerIds}
-											isDisabled={!field.value || isPendingSubmit}
-										/>
-									)}
+							<div
+								className={cn(
+									"grid transition-[grid-template-rows] duration-300 ease-out",
+									field.value ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+								)}
+							>
+								<div className="overflow-hidden min-h-0">
+									<p className="text-sm text-muted-foreground mb-2">
+										Select which ledgers should appear in the month-end recap
+										report.
+									</p>
+									<div
+										inert={!field.value}
+										className="relative h-96 rounded-md border overflow-y-auto"
+									>
+										{ledgersQuery.isLoading ? (
+											<ReloadIcon className="absolute top-1/2 left-1/2 translate-[-50%] mr-2 h-4 w-4 animate-spin" />
+										) : ledgersQuery.data?.length === 0 ? (
+											<p className="text-sm text-muted-foreground flex h-full items-center justify-center p-4">
+												No ledgers available.
+											</p>
+										) : (
+											<LedgerRecapList
+												ledgers={ledgersQuery.data}
+												includedLedgerIds={includedLedgerIds ?? new Set()}
+												setIncludedLedgerIds={setIncludedLedgerIds}
+												isDisabled={!field.value || isPendingSubmit}
+											/>
+										)}
+									</div>
 								</div>
 							</div>
 						</Field>

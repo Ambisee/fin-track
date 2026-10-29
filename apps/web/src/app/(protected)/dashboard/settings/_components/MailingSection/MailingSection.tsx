@@ -1,12 +1,12 @@
 import SettingsSection from "../SettingsSection"
-import AutomaticMonthlyReport from "./AutomaticMonthlyReport"
+import MonthEndReport from "./MonthEndReport"
 import Documents from "./Documents"
 
 export default function MailingSection() {
 	return (
 		<SettingsSection name="Mailing">
 			<>
-				<AutomaticMonthlyReport />
+				<MonthEndReport />
 				<Documents />
 			</>
 		</SettingsSection>
