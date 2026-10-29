@@ -365,7 +365,7 @@ function useSwitchLedgerMutation() {
 
 			return {
 				userId: data.user_id,
-				allowMonthlyReport: data.allow_report,
+				allowMonthEndReport: data.allow_report,
 				visibleLedger: {
 					id: data.ledger.id,
 					name: data.ledger.name,

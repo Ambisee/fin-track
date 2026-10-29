@@ -142,7 +142,7 @@ export default function MonthEndReport() {
 	const form = useForm<z.infer<typeof mailingSectionFormSchema>>({
 		resolver: zodResolver(mailingSectionFormSchema),
 		values: {
-			allowReport: settingsQuery.data?.allowMonthlyReport ?? false
+			allowReport: settingsQuery.data?.allowMonthEndReport ?? false
 		}
 	})
 
