@@ -1,5 +1,5 @@
 {
-	"name": "fin-track-monorepo",
+	"name": "fin-track",
 	"version": "1.0.0",
 	"private": true,
 	"packageManager": "pnpm@11.28.8",

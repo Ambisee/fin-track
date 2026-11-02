@@ -295,13 +295,39 @@ export type Database = {
       create_default_categories: { Args: { new: unknown }; Returns: undefined }
       create_initial_ledger: { Args: { new: unknown }; Returns: undefined }
       create_settings: { Args: { new: unknown }; Returns: undefined }
-      get_allow_monthly_report_users_and_ledgers: {
-        Args: never
+      get_ledgers_with_entries:
+        | {
+            Args: {
+              p_end_date: string
+              p_ledger_ids: number[]
+              p_start_date: string
+            }
+            Returns: {
+              entries: Database["public"]["Tables"]["entry"]["Row"][]
+              ledger_id: number
+              ledger_name: string
+            }[]
+          }
+        | {
+            Args: {
+              p_cutoff_iso?: string
+              p_end_date: string
+              p_ledger_ids: number[]
+              p_start_date: string
+            }
+            Returns: {
+              entries: Database["public"]["Tables"]["entry"]["Row"][]
+              ledger_id: number
+              ledger_name: string
+            }[]
+          }
+      get_opt_in_monthly_recap_users_and_ledgers: {
+        Args: { p_user_id?: string }
         Returns: {
           email: string
-          ledgers: Json
-          user_id: string
-          user_name: string
+          ledgers: Record<string, unknown>[]
+          uid: string
+          username: string
         }[]
       }
       search_entry: {
