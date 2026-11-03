@@ -10,8 +10,8 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"@fintrack/types": "workspace:*",
 		"@fintrack/transaction-report": "workspace:*",
+		"@fintrack/types": "workspace:*",
 		"@fintrack/utils": "workspace:*",
 		"@hookform/resolvers": "^5.2.2",
 		"@radix-ui/react-dialog": "^1.1.15",
@@ -58,7 +58,7 @@
 		"@types/js-cookie": "^3.0.6",
 		"@types/next": "^9.0.0",
 		"@types/node": "^20",
-		"@types/react": "19.2.10",
+		"@types/react": "19.3.0",
 		"@types/react-dom": "19.2.3",
 		"eslint": "^10.12.0",
 		"eslint-config-next": "^16.3.8",
@@ -68,9 +68,5 @@
 		"tailwindcss": "^4.2.4",
 		"ts-node": "^10.9.2",
 		"typescript": "^5"
-	},
-	"overrides": {
-		"@types/react": "19.2.10",
-		"@types/react-dom": "19.2.3"
 	}
 }

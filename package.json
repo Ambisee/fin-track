@@ -6,10 +6,10 @@
 	"scripts": {
 		"dev": "pnpm --filter \"./apps/*\" --parallel dev",
 		"dev:web": "pnpm --filter @fintrack/web dev",
-		"dev:api": "pnpm --filter @fintrack/api dev",
+		"dev:recap": "pnpm --filter @fintrack/recap dev",
 		"build": "pnpm -r build",
 		"build:web": "pnpm --filter @fintrack/web build",
-		"build:api": "pnpm --filter @fintrack/api build",
+		"build:recap": "pnpm --filter @fintrack/recap build",
 		"lint": "pnpm -r lint",
 		"test": "pnpm -r test"
 	}
