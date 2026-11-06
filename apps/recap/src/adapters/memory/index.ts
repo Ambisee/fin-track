@@ -44,7 +44,12 @@ const users: RecapUser[] = [
 		username: "linus",
 		ledgers: [{ id: "l6", name: "Quiet", currency: "USD" }]
 	},
-	{ id: "u4", email: "nobody@example.com", username: "nobody", ledgers: [] }
+	{
+		id: "u4",
+		email: "nobody@example.com",
+		username: "nobody",
+		ledgers: []
+	}
 ]
 
 const EMPTY_LEDGERS = new Set(["l4", "l6"])

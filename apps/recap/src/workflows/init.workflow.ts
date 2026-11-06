@@ -23,7 +23,11 @@ export async function monthEndRecapInitWorkflow(periodKey: string) {
 
 	const chunks = chunked(users, USER_START_CHUNK_SIZE)
 	for (const [i, chunk] of chunks.entries()) {
-		await Promise.all(chunk.map((user) => start(userRecapWorkflow, [user, periodKey, cutoffIso])))
+		await Promise.all(
+			chunk.map((user) =>
+				start(userRecapWorkflow, [user, periodKey, cutoffIso])
+			)
+		)
 		// Throttle the senders (Gmail), but never sleep after the last burst.
 		if (i < chunks.length - 1) await sleep(USER_START_CHUNK_DELAY)
 	}

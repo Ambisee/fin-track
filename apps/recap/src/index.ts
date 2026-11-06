@@ -1,12 +1,8 @@
-import { createHash, timingSafeEqual } from "node:crypto"
 import { Hono } from "hono"
+import { createHash, timingSafeEqual } from "node:crypto"
 import { start } from "workflow/api"
 import { loadConfig } from "./config"
-import {
-	isFinished,
-	parsePeriodKey,
-	previousMonthKey
-} from "./domain/period"
+import { isFinished, parsePeriodKey, previousMonthKey } from "./domain/period"
 import { monthEndRecapInitWorkflow } from "./workflows/init.workflow"
 
 const app = new Hono()
@@ -34,9 +30,14 @@ app.get("/api/cron/month-end-recap", async (c) => {
 	const requested = c.req.query("period")
 	let periodKey: string
 	try {
-		periodKey = requested ? parsePeriodKey(requested).key : previousMonthKey(now, config.timeZone)
+		periodKey = requested
+			? parsePeriodKey(requested).key
+			: previousMonthKey(now, config.timeZone)
 	} catch (e) {
-		return c.json({ error: e instanceof Error ? e.message : "invalid period" }, 400)
+		return c.json(
+			{ error: e instanceof Error ? e.message : "invalid period" },
+			400
+		)
 	}
 	if (!isFinished(periodKey, now, config.timeZone)) {
 		return c.json({ error: `period ${periodKey} has not finished yet` }, 400)

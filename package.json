@@ -5,11 +5,13 @@
 	"packageManager": "pnpm@11.28.8",
 	"scripts": {
 		"dev": "pnpm --filter \"./apps/*\" --parallel dev",
-		"dev:web": "pnpm --filter @fintrack/web dev",
-		"dev:recap": "pnpm --filter @fintrack/recap dev",
+		"dev:transaction-report": "pnpm --filter @fintrack/transaction-report dev",
+		"dev:web": "pnpm --parallel --filter @fintrack/web --filter @fintrack/transaction-report dev",
+		"dev:recap": "pnpm --parallel --filter @fintrack/recap --filter @fintrack/transaction-report dev",
 		"build": "pnpm -r build",
-		"build:web": "pnpm --filter @fintrack/web build",
-		"build:recap": "pnpm --filter @fintrack/recap build",
+		"build:transaction-report": "pnpm --filter @fintrack/transaction-report build",
+		"build:web": "pnpm run build:transaction-report && pnpm --filter @fintrack/web build",
+		"build:recap": "pnpm run build:transaction-report && pnpm --filter @fintrack/recap build",
 		"lint": "pnpm -r lint",
 		"test": "pnpm -r test"
 	}

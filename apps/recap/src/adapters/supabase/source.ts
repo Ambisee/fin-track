@@ -1,8 +1,8 @@
-import { CurrencyRow, Database } from "@fintrack/types"
+import { type Database } from "@fintrack/types"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { fail } from "assert"
 import type { Source } from "../../domain/ports"
 import type { LedgerEntries, Period, RecapUser } from "../../domain/types"
-import { fail } from "assert"
 
 /** Rows per batch. PostgREST caps a response at 1000 rows by default, so this must not exceed that. */
 const BATCH_SIZE = 1000

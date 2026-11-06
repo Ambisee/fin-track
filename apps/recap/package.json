@@ -1,5 +1,5 @@
 {
-	"name": "recap",
+	"name": "@fintrack/recap",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
@@ -11,20 +11,21 @@
 		"gen-type": "npx supabase gen types typescript --project-id gjniozckblfslplhhzkc --schema workflow > src/adapters/supabase-auto.ts"
 	},
 	"dependencies": {
+		"@fintrack/transaction-report": "workspace:*",
+		"@fintrack/types": "workspace:*",
 		"@react-pdf/renderer": "^4.9.0",
 		"@supabase/supabase-js": "^2.118.0",
 		"hono": "^4.13.14",
 		"nitro": "^3.0.261029-rc",
 		"nodemailer": "^10.3.1",
 		"react": "^19.3.1",
-		"workflow": "^5.2.3",
-		"@fintrack/transaction-report": "workspace:*",
-		"@fintrack/types": "workspace:*"
+		"workflow": "^5.2.3"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.6",
 		"@types/nodemailer": "^8.0.2",
 		"@types/react": "^19.3.0",
+		"rolldown": "^1.2.16",
 		"typescript": "^7.0.2",
 		"vitest": "^5.0.5"
 	}
