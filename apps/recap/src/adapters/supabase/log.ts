@@ -1,9 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { ClaimResult, RecapLog } from "../../domain/ports"
-import { Database, Json } from "../supabase-auto"
+import type { Database, Json } from "@fintrack/types"
 
 export class SupabaseRecapLog implements RecapLog {
-	constructor(private readonly db: SupabaseClient<Database>) {}
+	constructor(private readonly db: SupabaseClient<Database, "workflow">) {}
 
 	async ensurePeriod(periodKey: string) {
 		// ON CONFLICT DO NOTHING: the first caller's DB-assigned `cutoff` (default now()) is the snapshot forever.

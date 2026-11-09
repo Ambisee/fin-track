@@ -357,6 +357,94 @@ export type Database = {
       [_ in never]: never
     }
   }
+  workflow: {
+    Tables: {
+      recap_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          lease_expires_at: string | null
+          ledger_outcomes: Json
+          period_key: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          lease_expires_at?: string | null
+          ledger_outcomes?: Json
+          period_key: string
+          sent_at?: string | null
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          lease_expires_at?: string | null
+          ledger_outcomes?: Json
+          period_key?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recap_deliveries_period_key_fkey"
+            columns: ["period_key"]
+            isOneToOne: false
+            referencedRelation: "recap_periods"
+            referencedColumns: ["period_key"]
+          },
+        ]
+      }
+      recap_periods: {
+        Row: {
+          created_at: string
+          cutoff: string
+          period_key: string
+        }
+        Insert: {
+          created_at?: string
+          cutoff?: string
+          period_key: string
+        }
+        Update: {
+          created_at?: string
+          cutoff?: string
+          period_key?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      recap_claim_delivery: {
+        Args: {
+          p_lease_seconds: number
+          p_period_key: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
@@ -478,6 +566,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
+    Enums: {},
+  },
+  workflow: {
     Enums: {},
   },
 } as const

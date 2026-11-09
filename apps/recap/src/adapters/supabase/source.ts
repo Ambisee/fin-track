@@ -1,5 +1,5 @@
 import { type Database } from "@fintrack/types"
-import type { SupabaseClient } from "@supabase/supabase-js"
+import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js"
 import { fail } from "assert"
 import type { Source } from "../../domain/ports"
 import type { LedgerEntries, Period, RecapUser } from "../../domain/types"
@@ -44,7 +44,8 @@ export class SupabaseSource implements Source {
 			p_end_date: period.to
 		})
 
-		if (error !== null) fail("fetchLedgerEntries")
+		if (error !== null)
+			fail(`fetchLedgerEntries: ${(error as PostgrestError).message}`)
 		if (data === null) fail("fetchLedgerEntries")
 
 		return data.map((v) => ({
