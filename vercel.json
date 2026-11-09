@@ -1,0 +1,32 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"services": {
+		"web": {
+			"root": "apps/web"
+		},
+		"recap": {
+			"root": "apps/recap"
+		}
+	},
+	"rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": {
+				"service": "web"
+			}
+		},
+		{
+			"source": "/api/cron/month-end-recap",
+			"destination": {
+				"service": "recap"
+			}
+		}
+	],
+	"schedules": {
+		"month-end-recap": {
+			"schedule": "0 1 1 * *",
+			"requestMethod": "GET",
+			"path": "/api/cron/month-end-recap"
+		}
+	}
+}
