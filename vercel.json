@@ -32,5 +32,10 @@
 			"requestMethod": "GET",
 			"path": "/api/cron/month-end-recap"
 		}
+	},
+	"functions": {
+		"api/cron/**/*.js": {
+			"includeFiles": "node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**"
+		}
 	}
 }
