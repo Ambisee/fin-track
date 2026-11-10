@@ -4,12 +4,12 @@
 		"web": {
 			"root": "apps/web",
 			"framework": "nextjs",
-			"buildCommand": "pnpm run build:web"
+			"buildCommand": "pnpm run -w build:web"
 		},
 		"recap": {
 			"root": "apps/recap",
 			"framework": "hono",
-			"buildCommand": "pnpm run build:recap"
+			"buildCommand": "pnpm run -w build:recap"
 		}
 	},
 	"rewrites": [
