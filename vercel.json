@@ -9,7 +9,12 @@
 		"recap": {
 			"root": "apps/recap",
 			"framework": "hono",
-			"buildCommand": "pnpm run -w build:recap"
+			"buildCommand": "pnpm run -w build:recap",
+			"functions": {
+				"src/**/*.js": {
+					"includeFiles": "node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**"
+				}
+			}
 		}
 	},
 	"rewrites": [
@@ -31,11 +36,6 @@
 			"schedule": "0 1 1 * *",
 			"requestMethod": "GET",
 			"path": "/api/cron/month-end-recap"
-		}
-	},
-	"functions": {
-		"api/cron/**/*.js": {
-			"includeFiles": "node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**"
 		}
 	}
 }
