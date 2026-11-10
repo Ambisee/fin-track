@@ -14,15 +14,15 @@
 	},
 	"rewrites": [
 		{
-			"source": "/(.*)",
-			"destination": {
-				"service": "web"
-			}
-		},
-		{
 			"source": "/api/cron/month-end-recap",
 			"destination": {
 				"service": "recap"
+			}
+		},
+		{
+			"source": "/(.*)",
+			"destination": {
+				"service": "web"
 			}
 		}
 	],
