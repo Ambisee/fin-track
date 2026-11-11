@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "nitro dev",
 		"build": "nitro build",
+		"start": "nitro start",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
 		"gen-type": "npx supabase gen types typescript --project-id gjniozckblfslplhhzkc --schema workflow > src/adapters/supabase-auto.ts"
