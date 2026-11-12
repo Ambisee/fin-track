@@ -6,6 +6,7 @@ settings:
 
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
+  pdfkit: 0.20.2
 
 patchedDependencies:
   '@react-pdf/hyphenate': ff6d490501cd24a6bac26f7f5d4acc898446405e293ab6b84be4eff948206326
@@ -32,8 +33,8 @@ importers:
         specifier: ^4.13.14
         version: 4.13.17
       nitro:
-        specifier: ^3.0.261029-rc
-        version: 3.0.261029-rc
+        specifier: ^3.0.261103-rc
+        version: 3.0.261103-rc
       nodemailer:
         specifier: ^10.3.1
         version: 10.4.0
@@ -76,7 +77,7 @@ importers:
         version: link:../../packages/utils
       '@hookform/resolvers':
         specifier: ^5.2.2
-        version: 5.9.2(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.2.4))(zod@4.6.7)
+        version: 5.9.2(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.0.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.2.4))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.3.1(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -5621,8 +5622,8 @@ packages:
       sass:
         optional: true
 
-  nitro@3.0.261029-rc:
-    resolution: {integrity: sha512-BQvzAV0HgcsJCkDqZAbGYlGNi9ALJznhsihugYAIi+8IcItz320FNaxbAJvn/pMNxGOYo2MGs10mTU9tcnB9jQ==}
+  nitro@3.0.261103-rc:
+    resolution: {integrity: sha512-tLD7r5fWCtwnQEE4ZkckLUnx1wkWDaLY48dD+BCJtcQ+srSWAUpxJEK3YfTsgN3v+e4UgBYRzuR7zV7Sqns/zA==}
     engines: {node: '>=22.22.0'}
     hasBin: true
 
@@ -5840,8 +5841,8 @@ packages:
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
-  pdfkit@0.20.1:
-    resolution: {integrity: sha512-1rRXK6x5o8I/3dBrBzXfxibpHpkfCnIA7EBAES7pEpGFc/65inMLlA8SalGWpJfal7BGekxeLf6A30IOpQpc5Q==}
+  pdfkit@0.20.2:
+    resolution: {integrity: sha512-Q/w03ICAQyXfHNfTsg1udp0ADerdBN0s7a6XSPL7J7Ro6ABnafoBOCDBstIO9U02mvzHEV8HrvFIw5iV5ejIRA==}
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
@@ -7553,13 +7554,13 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@hookform/resolvers@5.9.2(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.2.4))(zod@4.6.7)':
+  '@hookform/resolvers@5.9.2(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.0.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.2.4))(zod@4.6.7)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.2.4)
     optionalDependencies:
       '@sinclair/typebox': 0.34.52
-      '@standard-schema/spec': 1.1.0
+      '@standard-schema/spec': 1.0.0
       zod: 4.6.7
 
   '@humanfs/core@0.19.2':
@@ -8989,7 +8990,7 @@ snapshots:
       '@react-pdf/types': 2.14.0
       fontkit: 2.0.4
       is-url: 1.2.4
-      pdfkit: 0.20.1
+      pdfkit: 0.20.2
 
   '@react-pdf/hyphenate@0.1.0(patch_hash=ff6d490501cd24a6bac26f7f5d4acc898446405e293ab6b84be4eff948206326)':
     dependencies:
@@ -9055,7 +9056,7 @@ snapshots:
       '@react-pdf/types': 2.14.0
       events: 3.3.0
       object-assign: 4.1.1
-      pdfkit: 0.20.1
+      pdfkit: 0.20.2
       prop-types: 15.8.1
       queue: 6.0.2
       react: 19.2.4
@@ -9072,7 +9073,7 @@ snapshots:
       '@react-pdf/types': 2.14.0
       events: 3.3.0
       object-assign: 4.1.1
-      pdfkit: 0.20.1
+      pdfkit: 0.20.2
       prop-types: 15.8.1
       queue: 6.0.2
       react: 19.3.1
@@ -12849,7 +12850,7 @@ snapshots:
       - babel-plugin-macros
     optional: true
 
-  nitro@3.0.261029-rc:
+  nitro@3.0.261103-rc:
     dependencies:
       crossws: 0.4.17(srvx@1.0.8)
       env-runner: 0.3.11
@@ -13076,7 +13077,7 @@ snapshots:
 
   pathe@2.0.3: {}
 
-  pdfkit@0.20.1:
+  pdfkit@0.20.2:
     dependencies:
       '@noble/ciphers': 1.3.0
       '@noble/hashes': 1.8.0

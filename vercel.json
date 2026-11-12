@@ -8,7 +8,7 @@
 		},
 		"recap": {
 			"root": "apps/recap",
-			"framework": "hono",
+			"framework": "nitro",
 			"buildCommand": "pnpm run -w build:recap",
 			"functions": {
 				"src/**/*.js": {

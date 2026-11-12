@@ -44,5 +44,6 @@ minimumReleaseAgeExclude:
   - rollup@4.67.3
 overrides:
   nodemailer@<=10.0.5: ^10.0.6
+  pdfkit: 0.20.2
 patchedDependencies:
   "@react-pdf/hyphenate": patches/@react-pdf__hyphenate.patch
