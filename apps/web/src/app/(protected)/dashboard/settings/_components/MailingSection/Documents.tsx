@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
-import { MONTHS } from "@/lib/constants"
+import { MONTHS, SUPPORTED_FILE_TYPES } from "@/lib/constants"
 import {
 	useCategoriesQuery,
 	useMonthGroupQuery,
@@ -13,12 +13,14 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { ArrowUpRightIcon, FileTextIcon, TriangleAlertIcon } from "lucide-react"
 import { useState } from "react"
 
-import TransactionReportViewer from "@/components/user/TransactionReport/TransactionReportViewer"
+import TransactionPdfReportViewer from "@/components/user/TransactionReport/TransactionPdfReportViewer"
 import { DateHelper, DateRange } from "@/lib/helper/DateHelper"
 import { useDashboardTransactionEntries } from "@/lib/hooks"
 import { TransactionReportDocument } from "@fintrack/transaction-report"
 import { isNonNullable } from "@fintrack/utils"
 import SubSectionTitle from "../SubSectionTitle"
+import ComboBox from "@/components/ui/combobox"
+import TransactionCsvDataViewer from "@/components/user/TransactionReport/TransactionCsvDataViewer"
 
 function MonthGroupList(props: {
 	monthGroups: DateRange[] | undefined
@@ -74,6 +76,9 @@ function MonthGroupList(props: {
 export default function Documents() {
 	const [isReportOpen, setIsReportOpen] = useState(false)
 	const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+	const [selectedFileType, setSelectedFileType] = useState(
+		SUPPORTED_FILE_TYPES[0].value
+	)
 
 	const userQuery = useUserQuery()
 	const settingsQuery = useSettingsQuery()
@@ -108,6 +113,14 @@ export default function Documents() {
 					View and download a report on your activities for a selected month.
 				</p>
 			</div>
+			<div className="mt-2">
+				<ComboBox
+					closeOnSelect
+					value={selectedFileType}
+					values={SUPPORTED_FILE_TYPES}
+					onChange={(value) => setSelectedFileType(value)}
+				/>
+			</div>
 			<div className="mt-4 relative h-96 rounded-md border overflow-y-auto">
 				{userQuery.isLoading ||
 				settingsQuery.isLoading ||
@@ -129,28 +142,36 @@ export default function Documents() {
 				)}
 			</div>
 			<Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
-				<TransactionReportViewer
-					title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
-					isLoading={!isSafeToShowTransactionViewer}
-				>
-					<TransactionReportDocument
-						info={{
-							username: userQuery.data?.user_metadata["username"],
-							ledger: settingsQuery.data?.visibleLedger.name ?? "",
-							locale: navigator.language,
-							period: dateRange ?? { from: new Date(), to: new Date() },
-							currency: settingsQuery.data?.visibleLedger.currency.name ?? ""
-						}}
-						entries={
-							entryQuery.data?.map((v) => ({
-								category: v.category,
-								date: new Date(v.date),
-								amount: v.amount,
-								isPositive: v.type === "Income"
-							})) ?? []
-						}
+				{selectedFileType === "PDF" ? (
+					<TransactionPdfReportViewer
+						title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
+						isLoading={!isSafeToShowTransactionViewer}
+					>
+						<TransactionReportDocument
+							info={{
+								username: userQuery.data?.user_metadata["username"],
+								ledger: settingsQuery.data?.visibleLedger.name ?? "",
+								locale: navigator.language,
+								period: dateRange ?? { from: new Date(), to: new Date() },
+								currency: settingsQuery.data?.visibleLedger.currency.name ?? ""
+							}}
+							entries={
+								entryQuery.data?.map((v) => ({
+									category: v.category,
+									date: new Date(v.date),
+									amount: v.amount,
+									isPositive: v.type === "Income"
+								})) ?? []
+							}
+						/>
+					</TransactionPdfReportViewer>
+				) : (
+					<TransactionCsvDataViewer
+						title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
+						isLoading={!isSafeToShowTransactionViewer}
+						entries={entryQuery.data ?? []}
 					/>
-				</TransactionReportViewer>
+				)}
 			</Dialog>
 		</div>
 	)

@@ -2,8 +2,9 @@ import { EntryViewOptions } from "@/components/user/TimeFilterControlPanel"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { DateHelper, DateRange } from "./helper/DateHelper"
-import { CURRENCY_SYMBOLS } from "./constants"
+import { CURRENCY_SYMBOLS, TRANSACTION_CSV_HEADERS } from "./constants"
 import { isNonNullable } from "@fintrack/utils"
+import { Entry } from "@/types/Entry"
 
 function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
@@ -117,9 +118,35 @@ function getDateRangeFromViewOptions(
 	return dateRange
 }
 
-export function getCurrencySymbol(code: string): string {
+function getCurrencySymbol(code: string): string {
 	const key = String(code).toUpperCase() as keyof typeof CURRENCY_SYMBOLS
 	return CURRENCY_SYMBOLS[key] ?? key
+}
+
+function getTransactionCsvValue(
+	entry: Entry,
+	header: (typeof TRANSACTION_CSV_HEADERS)[number]
+) {
+	switch (header) {
+		case "is_positive":
+			return entry.type === "Expense" ? "0" : "1"
+		case "currency":
+			return entry.ledger.currency.name
+		case "date":
+			return entry[header].toISOString()
+		case "ledger":
+			return entry[header].name
+		case "note":
+			return entry[header] ?? ""
+		default:
+			break
+	}
+
+	if (typeof entry[header] === "number") {
+		return entry[header].toString()
+	}
+
+	return entry[header]
 }
 
 export {
@@ -127,5 +154,7 @@ export {
 	findBoundIndicies,
 	getDateRangeFromViewOptions,
 	getMonthSpansForDateRange,
-	getUsernameFromEmail
+	getUsernameFromEmail,
+	getCurrencySymbol,
+	getTransactionCsvValue
 }

@@ -34,6 +34,22 @@ export const MAX_USERNAME_LENGTH = 20
 export const LONG_TOAST_DURATION = 2.5 * 1000
 export const SHORT_TOAST_DURATION = 1.5 * 1000
 
+export const SUPPORTED_FILE_TYPES = [
+	{ label: "CSV", value: "CSV" },
+	{ label: "PDF", value: "PDF" }
+]
+
+export const TRANSACTION_CSV_HEADERS = [
+	"id",
+	"date",
+	"category",
+	"amount",
+	"is_positive",
+	"note",
+	"ledger",
+	"currency"
+] as const
+
 export const MONTHS = [
 	"January",
 	"February",

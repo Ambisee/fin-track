@@ -20,7 +20,7 @@ interface TransactionReportViewerProps {
 	children: ReactElement<DocumentProps>
 }
 
-export default function TransactionReportViewer(
+export default function TransactionPdfReportViewer(
 	props: TransactionReportViewerProps
 ) {
 	const [instance, update] = usePDF({ document: props.children })

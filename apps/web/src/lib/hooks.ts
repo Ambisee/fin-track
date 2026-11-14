@@ -3,12 +3,16 @@ import { Entry } from "@/types/Entry"
 import { isNonNullable } from "@fintrack/utils"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMediaQuery } from "react-responsive"
-import { SMALL_MOBILE_BREKPOINT } from "./constants"
+import { SMALL_MOBILE_BREKPOINT, TRANSACTION_CSV_HEADERS } from "./constants"
 import { DatabaseHelper } from "./helper/DatabaseHelper"
 import { DateHelper } from "./helper/DateHelper"
 import { useEntryDataQuery, useSettingsQuery } from "./queries"
 import { supabaseClient } from "./supabase"
-import { findBoundIndicies, getDateRangeFromViewOptions } from "./utils"
+import {
+	findBoundIndicies,
+	getDateRangeFromViewOptions,
+	getTransactionCsvValue
+} from "./utils"
 
 function useSearchEntry() {
 	const [isSearching, setIsSearching] = useState(false)
@@ -196,11 +200,34 @@ function useDashboardTransactionEntries(
 	}, [today, entryDataQueries, viewOptions])
 }
 
+function useFileDownloadUrlGenerator() {
+	const generateCsvDownloadUrl = (entries: Entry[]) => {
+		if (entries.length < 1) return null
+
+		let csvString = TRANSACTION_CSV_HEADERS.join(",")
+
+		for (let i = 0; i < entries.length; i++) {
+			const entry = entries[i]
+
+			csvString += "\n"
+			csvString += TRANSACTION_CSV_HEADERS.map((k) =>
+				getTransactionCsvValue(entry, k)
+			).join(",")
+		}
+
+		const blob = new Blob([csvString], { type: "text/csv" })
+		return URL.createObjectURL(blob)
+	}
+
+	return { generateCsvDownloadUrl }
+}
+
 function useIsSmallMobile() {
 	return useMediaQuery({ maxWidth: SMALL_MOBILE_BREKPOINT })
 }
 
 export {
+	useFileDownloadUrlGenerator,
 	useAmountFormatter,
 	useDashboardTransactionEntries,
 	useIsSmallMobile,
