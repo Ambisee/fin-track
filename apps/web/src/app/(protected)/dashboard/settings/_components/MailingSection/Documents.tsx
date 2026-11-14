@@ -129,30 +129,28 @@ export default function Documents() {
 				)}
 			</div>
 			<Dialog open={isReportOpen} onOpenChange={setIsReportOpen}>
-				{isReportOpen && (
-					<TransactionReportViewer
-						title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
-						isLoading={!isSafeToShowTransactionViewer}
-					>
-						<TransactionReportDocument
-							info={{
-								username: userQuery.data?.user_metadata["username"],
-								ledger: settingsQuery.data?.visibleLedger.name ?? "",
-								locale: navigator.language,
-								period: dateRange ?? { from: new Date(), to: new Date() },
-								currency: settingsQuery.data?.visibleLedger.currency.name ?? ""
-							}}
-							entries={
-								entryQuery.data?.map((v) => ({
-									category: v.category,
-									date: new Date(v.date),
-									amount: v.amount,
-									isPositive: v.type === "Income"
-								})) ?? []
-							}
-						/>
-					</TransactionReportViewer>
-				)}
+				<TransactionReportViewer
+					title={`FinTrack Report - ${MONTHS[dateRange?.from?.getMonth() ?? 0]} ${dateRange?.from?.getFullYear()}`}
+					isLoading={!isSafeToShowTransactionViewer}
+				>
+					<TransactionReportDocument
+						info={{
+							username: userQuery.data?.user_metadata["username"],
+							ledger: settingsQuery.data?.visibleLedger.name ?? "",
+							locale: navigator.language,
+							period: dateRange ?? { from: new Date(), to: new Date() },
+							currency: settingsQuery.data?.visibleLedger.currency.name ?? ""
+						}}
+						entries={
+							entryQuery.data?.map((v) => ({
+								category: v.category,
+								date: new Date(v.date),
+								amount: v.amount,
+								isPositive: v.type === "Income"
+							})) ?? []
+						}
+					/>
+				</TransactionReportViewer>
 			</Dialog>
 		</div>
 	)
